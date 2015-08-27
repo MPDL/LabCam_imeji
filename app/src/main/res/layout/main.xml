@@ -1,76 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="#ffffff"
+tools:context=".MainActivity">
+
+<GridView
+    android:id="@+id/folder_gridView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#ffd8d8d8"
-    android:orientation="horizontal"
-    android:padding="3dip" >
+    android:layout_height="match_parent"
+    android:numColumns="2"
+    android:verticalSpacing="0dp"
+    android:horizontalSpacing="0dp"
+    android:gravity="center"
+    android:stretchMode="columnWidth"/>
 
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_margin="1dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:id="@+id/collection_first_item" />
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_margin="1dp"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/collection_first_item"
-        android:id="@+id/collection_first_item1" />
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_margin="1dp"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/collection_first_item1"
-        android:id="@+id/collection_first_item2" />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_margin="1dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:id="@+id/collection_first_item3" />
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_margin="1dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/collection_first_item3"
-        android:id="@+id/collection_first_item4" />
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_margin="1dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@+id/collection_first_item4"
-        android:id="@+id/collection_first_item5" />
-
-
-    <TextView
-        android:id="@+id/collection_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="bottom"
-        android:background="@color/primary_material_light"
-        android:shadowColor="#000"
-        android:textColor="#FFF"
-        android:text="CollectionTitle"
-        android:typeface="sans"
-        android:textSize="16dip"
-        />
-
-</RelativeLayout>
+</FrameLayout>
