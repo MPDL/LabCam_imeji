@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 ActiveAndroid.setTransactionSuccessful();
             } finally{
                 ActiveAndroid.endTransaction();
-                //adapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
             }
 
             if(pDialog != null) {

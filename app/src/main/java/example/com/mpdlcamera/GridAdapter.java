@@ -103,10 +103,8 @@ public class GridAdapter extends BaseAdapter {
                             .centerCrop()
                             .into(imageView);
                 }
-                title.setText(collection.getTitle());
             }
-
-
+            title.setText(collection.getTitle());
         }
         return grid;
 
