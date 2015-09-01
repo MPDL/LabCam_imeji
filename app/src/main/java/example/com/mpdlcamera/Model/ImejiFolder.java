@@ -14,7 +14,7 @@ import java.util.List;
 public class ImejiFolder extends Model {
 
     @Expose
-    @Column(name = "ImejiId")
+    //@Column(name = "ImejiId")
     public String id;
 
     @Expose

@@ -36,7 +36,7 @@ public class DataItem extends Model {
     @Column(name = "createdBy")
     private User createdBy;
 
-    @Expose
+    //@Expose
     @Column(name = "metaData")
     private MetaData metadata;
 

@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ProgressDialog pDialog;
     private Activity activity = this;
-    public GridAdapter adapter;
+    private GridAdapter adapter;
+    private GridView gridview;
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
     private ImejiFolder collectionLocal = new ImejiFolder();
 
@@ -50,9 +51,10 @@ public class MainActivity extends AppCompatActivity {
                 collectionListLocal.clear();
                 for(ImejiFolder folder : folderList){
                     Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
+                    Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
 
                     //TODO fetch items
-                    //getFolderItems(folder.id);
+                    getFolderItems(folder.id);
                     collectionLocal = folder;
 
                     collectionListLocal.add(folder);
@@ -81,22 +83,27 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void success(List<DataItem> dataList, Response response) {
             List<DataItem> dataListLocal = new ArrayList<DataItem>();
+            if(dataList != null) {
+                ActiveAndroid.beginTransaction();
+                try {
+                    for (DataItem item : dataList) {
+                        dataListLocal.add(item);
+                        item.save();
+                    }
+                    ActiveAndroid.setTransactionSuccessful();
+                } finally {
+                    ActiveAndroid.endTransaction();
 
-            ActiveAndroid.beginTransaction();
-            try {
-                // here get the string of Metadata Json
-                for (DataItem item : dataList) {
-                    dataListLocal.add(item);
-                    item.save();
+                    collectionLocal.setItems(dataList);
+                    collectionLocal.save();
+
+                    //adapter.notifyDataSetChanged();
+                    adapter = new GridAdapter(activity, collectionListLocal);
+                    gridview.setAdapter(adapter);
                 }
-                ActiveAndroid.setTransactionSuccessful();
-            } finally{
-                ActiveAndroid.endTransaction();
-
-                collectionLocal.setItems(dataListLocal);
-                collectionLocal.save();
-
-                adapter.notifyDataSetChanged();
+            }else{
+                DeviceStatus.showToast(activity, "no items");
+                Log.v(LOG_TAG, "no items");
 
             }
 
@@ -132,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
 
         adapter = new GridAdapter(activity, collectionListLocal);
 
-        GridView gridview = (GridView) findViewById(R.id.folder_gridView);
+        gridview = (GridView) findViewById(R.id.folder_gridView);
         registerForContextMenu(gridview);
 
         gridview.setAdapter(adapter);

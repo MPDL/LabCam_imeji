@@ -13,6 +13,7 @@
         android:id="@+id/frameLayout">
         <ImageView
             android:background="#8cf7f3ff"
+            android:src="@drawable/imeji"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/collection_first_item"
@@ -27,8 +28,9 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_gravity="bottom"
-        android:shadowColor="#000"
-        android:textColor="#FFF"
+        android:shadowColor="#000000"
+        android:background="#148e9fff"
+        android:textColor="#ffffff"
         android:text="Title"
         android:typeface="sans"
         android:textSize="16dip"/>

@@ -28,6 +28,7 @@ public class GridAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<ImejiFolder> dataItems;
+    private final String LOG_TAG = GridAdapter.class.getSimpleName();
 
     public GridAdapter(Activity c, List<ImejiFolder> dataItems) {
         this.activity = c;
@@ -79,7 +80,7 @@ public class GridAdapter extends BaseAdapter {
             if(collection.getItems() != null) {
                 if (collection.getItems().size() > 0) {
                     DataItem m = collection.getItems().get(0);
-
+                    Log.v(LOG_TAG, m.getWebResolutionUrlUrl());
 
 //                    final String filePath = m.getLocalPath();
 //                    File itemFile = new File(filePath);
@@ -100,7 +101,6 @@ public class GridAdapter extends BaseAdapter {
 
                     Picasso.with(activity)
                             .load(m.getWebResolutionUrlUrl())
-                            .centerCrop()
                             .into(imageView);
                 }
             }
