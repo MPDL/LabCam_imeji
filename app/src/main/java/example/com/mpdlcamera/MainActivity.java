@@ -2,6 +2,7 @@ package example.com.mpdlcamera;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,8 @@ import com.activeandroid.query.Select;
 import java.util.ArrayList;
 import java.util.List;
 
+import example.com.mpdlcamera.Folder.FolderGridAdapter;
+import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
@@ -38,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ProgressDialog pDialog;
     private Activity activity = this;
-    private GridAdapter adapter;
+    private FolderGridAdapter adapter;
     private GridView gridview;
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
     private ImejiFolder collectionLocal = new ImejiFolder();
@@ -98,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                     collectionLocal.save();
 
                     //adapter.notifyDataSetChanged();
-                    adapter = new GridAdapter(activity, collectionListLocal);
+                    adapter = new FolderGridAdapter(activity, collectionListLocal);
                     gridview.setAdapter(adapter);
                 }
             }else{
@@ -137,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         Log.v(LOG_TAG, "size: " + collectionListLocal.size() + "");
 
 
-        adapter = new GridAdapter(activity, collectionListLocal);
+        adapter = new FolderGridAdapter(activity, collectionListLocal);
 
         gridview = (GridView) findViewById(R.id.folder_gridView);
         registerForContextMenu(gridview);
@@ -155,9 +158,9 @@ public class MainActivity extends AppCompatActivity {
                         + "\n" + "Long press to delete.");
 
                 //TODO show Items inside the folder
-                //Intent showItemsIntent = new Intent(activity, CollectionDetailActivity.class);
-                //showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
-                //startActivity(showItemsIntent);
+                Intent showItemsIntent = new Intent(activity, ItemsActivity.class);
+                showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
+                startActivity(showItemsIntent);
             }
         });
 

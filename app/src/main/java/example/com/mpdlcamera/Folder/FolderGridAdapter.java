@@ -1,8 +1,7 @@
-package example.com.mpdlcamera;
+package example.com.mpdlcamera.Folder;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.util.Log;
 import android.view.Display;
@@ -20,17 +19,18 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.R;
 
 /**
  * Created by allen on 27/08/15.
  */
-public class GridAdapter extends BaseAdapter {
+public class FolderGridAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<ImejiFolder> dataItems;
-    private final String LOG_TAG = GridAdapter.class.getSimpleName();
+    private final String LOG_TAG = FolderGridAdapter.class.getSimpleName();
 
-    public GridAdapter(Activity c, List<ImejiFolder> dataItems) {
+    public FolderGridAdapter(Activity c, List<ImejiFolder> dataItems) {
         this.activity = c;
         this.dataItems = dataItems;
     }
@@ -52,7 +52,6 @@ public class GridAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View grid;
 
-
         WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
 
@@ -62,7 +61,6 @@ public class GridAdapter extends BaseAdapter {
         Log.v(size.x / 2 + " ", size.y / 2 + "");
 
         if(convertView==null){
-            grid = new View(activity);
             LayoutInflater inflater= (LayoutInflater) activity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             grid = inflater.inflate(R.layout.folder_cell, parent, false);
@@ -82,23 +80,6 @@ public class GridAdapter extends BaseAdapter {
                     DataItem m = collection.getItems().get(0);
                     Log.v(LOG_TAG, m.getWebResolutionUrlUrl());
 
-//                    final String filePath = m.getLocalPath();
-//                    File itemFile = new File(filePath);
-//                    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//
-//
-//                    if (itemFile.exists()) {
-//                        BitmapFactory.Options options = new BitmapFactory.Options();
-//                        options.inJustDecodeBounds = true;
-//                        Bitmap myBitmap = BitmapFactory.decodeFile(m.getLocalPath(), options);
-//
-//                        options.inSampleSize = calculateInSampleSize(options, 100, 100);
-//                        options.inJustDecodeBounds = false;
-//
-//                        myBitmap = BitmapFactory.decodeFile(filePath, options);
-//                        imageView.setImageBitmap(myBitmap);
-//                    }
-
                     Picasso.with(activity)
                             .load(m.getWebResolutionUrlUrl())
                             .into(imageView);
@@ -108,28 +89,5 @@ public class GridAdapter extends BaseAdapter {
         }
         return grid;
 
-    }
-
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
     }
 }

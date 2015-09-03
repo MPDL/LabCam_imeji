@@ -45,8 +45,15 @@
 
         </activity>
 
-
-
+        <activity
+            android:name=".Items.ItemsActivity"
+            android:label="@string/title_item_activity"
+            android:parentActivityName=".MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:label="CollectionDetail"
+                android:value=".MainActivity" />
+        </activity>
     </application>
 
 </manifest>
