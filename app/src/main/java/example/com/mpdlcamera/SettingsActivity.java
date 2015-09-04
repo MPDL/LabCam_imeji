@@ -59,11 +59,9 @@ public class SettingsActivity extends ListActivity {
         ArrayList<String> imageFolders = new ArrayList<String>();
         imageFolders = new ArrayList<String>(new LinkedHashSet<String>(folders));
 
-        ArrayList<String> sumne = new ArrayList<String>();
-        sumne.add("whatsapp");
-        sumne.add("facebook");
+        
 
-        this.setListAdapter(new ArrayAdapter<String>(this, R.layout.row, R.id.folder,sumne ));
+        this.setListAdapter(new ArrayAdapter<String>(this, R.layout.row, R.id.folder,imageFolders ));
 
 
     }
