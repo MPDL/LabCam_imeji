@@ -11,4 +11,8 @@
     <string name="password_hint">Password</string>
     <string name="login">Login</string>
     <string name="title_item_activity">Items</string>
+    <string name="title_activity_settings">Settings</string>
+
+
+
 </resources>
