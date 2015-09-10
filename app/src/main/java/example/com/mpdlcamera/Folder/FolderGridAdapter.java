@@ -63,7 +63,7 @@ public class FolderGridAdapter extends BaseAdapter {
         if(convertView==null){
             LayoutInflater inflater= (LayoutInflater) activity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            grid = inflater.inflate(R.layout.folder_cell, parent, false);
+            grid = inflater.inflate(R.layout.folder_grid_cell, parent, false);
         }else{
             grid = convertView;
         }

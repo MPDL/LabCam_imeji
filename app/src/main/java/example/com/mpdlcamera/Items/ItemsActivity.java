@@ -79,7 +79,7 @@ public class ItemsActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.items_grid);
+        setContentView(R.layout.items_grid_view);
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
         mPrefs = activity.getSharedPreferences("myPref", 0);

@@ -7,14 +7,23 @@ android:layout_height="match_parent"
 android:background="#ffffff"
 tools:context=".MainActivity">
 
-<GridView
-    android:id="@+id/folder_gridView"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:numColumns="2"
-    android:verticalSpacing="0dp"
-    android:horizontalSpacing="0dp"
-    android:gravity="center"
-    android:stretchMode="columnWidth"/>
+    <GridView
+        android:id="@+id/folder_gridView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="2"
+        android:verticalSpacing="0dp"
+        android:horizontalSpacing="0dp"
+        android:gravity="center"
+        android:stretchMode="columnWidth"/>
+
+
+    <ListView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/folder_listView"/>
+
+
 
 </FrameLayout>

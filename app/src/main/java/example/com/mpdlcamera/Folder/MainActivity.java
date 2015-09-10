@@ -1,4 +1,4 @@
-package example.com.mpdlcamera;
+package example.com.mpdlcamera.Folder;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -11,7 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridView;
+import android.widget.ListView;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
@@ -19,11 +19,12 @@ import com.activeandroid.query.Select;
 import java.util.ArrayList;
 import java.util.List;
 
-import example.com.mpdlcamera.Folder.FolderGridAdapter;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
+import example.com.mpdlcamera.SettingsActivity;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -42,8 +43,12 @@ public class MainActivity extends AppCompatActivity {
 
     private ProgressDialog pDialog;
     private Activity activity = this;
-    private FolderGridAdapter adapter;
-    private GridView gridview;
+    //private FolderGridAdapter adapter;
+    //private GridView gridview;
+
+    private FolderListAdapter adapter;
+    private ListView listView;
+
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
     private ImejiFolder collectionLocal = new ImejiFolder();
 
@@ -102,8 +107,8 @@ public class MainActivity extends AppCompatActivity {
                     collectionLocal.save();
 
                     //adapter.notifyDataSetChanged();
-                    adapter = new FolderGridAdapter(activity, collectionListLocal);
-                    gridview.setAdapter(adapter);
+                    adapter = new FolderListAdapter(activity, collectionListLocal);
+                    listView.setAdapter(adapter);
                 }
             }else{
                 DeviceStatus.showToast(activity, "no items");
@@ -141,22 +146,23 @@ public class MainActivity extends AppCompatActivity {
         Log.v(LOG_TAG, "size: " + collectionListLocal.size() + "");
 
 
-        adapter = new FolderGridAdapter(activity, collectionListLocal);
+        adapter = new FolderListAdapter(activity, collectionListLocal);
 
-        gridview = (GridView) findViewById(R.id.folder_gridView);
-        registerForContextMenu(gridview);
+        //gridview = (GridView) findViewById(R.id.folder_gridView);
+        //registerForContextMenu(gridview);
 
-        gridview.setAdapter(adapter);
+        listView = (ListView) findViewById(R.id.folder_listView);
+        listView.setAdapter(adapter);
 
 
 
         // Set OnItemClickListener so we can be notified on item clicks
-        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 ImejiFolder folder = (ImejiFolder) adapter.getItem(position);
-                DeviceStatus.showSnackbar(rootView, folder.getTitle()
-                        + "\n" + "Long press to delete.");
+                //DeviceStatus.showSnackbar(rootView, folder.getTitle()
+                //        + "\n" + "Long press to delete.");
 
                 //TODO show Items inside the folder
                 Intent showItemsIntent = new Intent(activity, ItemsActivity.class);
@@ -183,19 +189,12 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent showSettingIntent = new Intent(this, SettingsActivity.class);
-            //showSettingIntent.putExtra(Intent.EXTRA_TEXT, forecast);
-            //showDetailIntent.setData();
-            //startService(showDetailIntent);
             startActivity(showSettingIntent);
 
             return true;
         }
-//          else if (id == R.id.action_map){
-//            openPreferredLocationInMap();
-//        }
         return super.onOptionsItemSelected(item);
     }
 
