@@ -3,23 +3,28 @@
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:padding="10dip">
+
     <TextView
-        android:paddingTop="11dip"
         android:id="@+id/folder"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_marginRight="6dip"
+        android:paddingTop="11dip"
 
         />
+
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="0dip"
+        android:layout_height="fill_parent"
         android:layout_weight="1"
-        android:layout_height="fill_parent">
+        android:orientation="vertical">
+
         <Switch
             android:id="@+id/switchf"
-            android:layout_gravity="right"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent"
+            android:layout_gravity="right"
+            android:checked="false"
+            android:onClick="switchActivity" />
     </LinearLayout>
 </LinearLayout>
