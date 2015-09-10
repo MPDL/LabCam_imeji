@@ -230,9 +230,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void updateFolder(){
-        pDialog = new ProgressDialog(activity);
-        pDialog.setMessage("Loading...");
-        pDialog.show();
+        //pDialog = new ProgressDialog(activity);
+        //pDialog.setMessage("Loading...");
+        //pDialog.show();
         RetrofitClient.getCollections(callback, username, password);
     }
 
