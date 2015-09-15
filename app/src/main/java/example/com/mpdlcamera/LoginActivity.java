@@ -1,5 +1,6 @@
 package example.com.mpdlcamera;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.support.v7.app.AppCompatActivity;
@@ -7,43 +8,77 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+
+import org.apache.http.NameValuePair;
+
+import java.util.ArrayList;
 
 import example.com.mpdlcamera.Folder.MainActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
     ImageView animation;
+    EditText username, password ;
+    Button signIn;
+    String errorMsg,resp ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.login);
-        animation = (ImageView)findViewById(R.id.imageAnimation);
-        animation.setScaleType(ImageView.ScaleType.CENTER);
-        animation.setBackgroundResource(R.drawable.animation);
+        username = (EditText) findViewById(R.id.userName);
+        password = (EditText) findViewById(R.id.password);
+        signIn = (Button) findViewById(R.id.btnSignIn);
+        //error = (TextView) findViewById(R.id.tv_error);
+
+     /*   signIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ContentValues values = new ContentValues();
+                        values.put("username",username.getText().toString());
+                        values.put("password",password.getText().toString());
+
+                        String response = null;
+
+                        try {
+                            response = SimpleHttpClient.executeHttpPost("LoginServer/login.do", postParameters);
+                            String res = response.toString();
+                            resp = res.replaceAll("\\s+", "");
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            errorMsg = e.getMessage();
+                        }
+                    }
+
+                }).start();
+
+                try {
+                    Thread.sleep(1000);
+
+                   // error.setText(resp);
+                    if (null != errorMsg && !errorMsg.isEmpty()) {
+                        //error.setText(errorMsg);
+                    }
+                } catch (Exception e) {
+                   // error.setText(e.getMessage());
+                }
+            }
+        });
+
+*/
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        AnimationDrawable frameAnimation = (AnimationDrawable) animation.getBackground();
-        if(hasFocus) {
-            frameAnimation.start();
-        } else {
-            frameAnimation.stop();
-        }
-        ImageView imageView = (ImageView) findViewById(R.id.image);
 
-    }
 
     public void accountLogin(View view) {
         Intent intent = new Intent(this, MainActivity.class );
@@ -51,20 +86,5 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        //testing again and again
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
-
-
-        return super.onOptionsItemSelected(item);
-    }
 }
