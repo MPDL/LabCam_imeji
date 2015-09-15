@@ -168,10 +168,7 @@ public class SettingsActivity extends ListActivity {
                     public void onClick(View v) {
                         Switch sw = (Switch) v ;
                         FolderModel country = (FolderModel) sw.getTag();
-                        Toast.makeText(getApplicationContext(),
-                                "Clicked on Checkbox: " + sw.getText() +
-                                        " is " + sw.isChecked(),
-                                Toast.LENGTH_LONG).show();
+
                         country.setSelected(sw.isChecked());
                     }
                 });
@@ -181,8 +178,8 @@ public class SettingsActivity extends ListActivity {
             }
 
             FolderModel folder = folderList.get(position);
-            holder.textView.setText(" (" +  folder.getFolder() + ")");
-            //holder.name.setText(country.getName());
+            holder.textView.setText(folder.getFolder());
+
             holder.fSwitch.setChecked(folder.isSelected());
             holder.fSwitch.setTag(folder);
 
