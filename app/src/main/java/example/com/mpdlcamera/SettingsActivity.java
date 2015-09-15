@@ -167,9 +167,9 @@ public class SettingsActivity extends ListActivity {
                 holder.fSwitch.setOnClickListener( new View.OnClickListener() {
                     public void onClick(View v) {
                         Switch sw = (Switch) v ;
-                        FolderModel country = (FolderModel) sw.getTag();
+                        FolderModel folder = (FolderModel) sw.getTag();
 
-                        country.setSelected(sw.isChecked());
+                        folder.setSelected(sw.isChecked());
                     }
                 });
             }
