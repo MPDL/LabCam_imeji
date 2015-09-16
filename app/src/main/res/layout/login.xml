@@ -22,7 +22,8 @@
             android:id="@+id/userName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
+            android:inputType="text"
+            android:textColor="#000000"
             android:padding="10dp"
             android:hint="Username"
             android:textColorHint="#cccccc"
@@ -31,7 +32,8 @@
             android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
+            android:inputType="text"
+            android:textColor="#000000"
             android:layout_marginTop="-2dp"
             android:padding="10dp"
             android:hint="Password"
