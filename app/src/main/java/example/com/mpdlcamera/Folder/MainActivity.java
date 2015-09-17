@@ -64,7 +64,9 @@ public class MainActivity extends AppCompatActivity {
 
                     //TODO fetch items
                     getFolderItems(folder.id);
-                    collectionLocal = folder;
+
+                    //TODO Here is a bug, collectionLocal will be random one collection
+                    //collectionLocal = folder;
 
                     collectionListLocal.add(folder);
                     //folder.save();
@@ -72,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 ActiveAndroid.setTransactionSuccessful();
             } finally{
                 ActiveAndroid.endTransaction();
-                adapter.notifyDataSetChanged();
+                //adapter.notifyDataSetChanged();
             }
 
             if(pDialog != null) {
@@ -90,19 +92,22 @@ public class MainActivity extends AppCompatActivity {
 
     Callback<List<DataItem>> callbackItems = new Callback<List<DataItem>>() {
         @Override
-        public void success(List<DataItem> dataList, Response response) {
+        public void success(List<DataItem> dataList , Response response) {
             List<DataItem> dataListLocal = new ArrayList<DataItem>();
+
             if(dataList != null) {
                 ActiveAndroid.beginTransaction();
                 try {
                     for (DataItem item : dataList) {
                         dataListLocal.add(item);
-                        item.save();
+                        //item.save();
                     }
                     ActiveAndroid.setTransactionSuccessful();
                 } finally {
                     ActiveAndroid.endTransaction();
 
+                    //TODO get the collection by the items
+                    //here is bug
                     collectionLocal.setItems(dataList);
                     collectionLocal.save();
 
