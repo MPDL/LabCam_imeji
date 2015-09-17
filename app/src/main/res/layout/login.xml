@@ -2,90 +2,80 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".LoginActivity">
+    tools:context=".MainActivity"
 
+    android:background="#ffffff">
 
-    <ImageView
-        android:layout_height="match_parent"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:id="@+id/imageAnimation"
-        android:adjustViewBounds="false"
-        android:layout_above="@+id/button" />
-
-    <EditText
-        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:id="@+id/editUsername"
-        android:inputType="textEmailAddress"
-        android:hint="@string/username_hint"
-        android:textColorHint="#2c4aff"
-        android:textColor="#2c4aff"
-        android:imeOptions="actionNext"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="200dp"
-        android:layout_marginLeft="45dp"
-        android:layout_marginStart="45dp"
-        android:singleLine="true"
-        android:maxLines="1"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:ellipsize="start"/>
+        android:layout_centerInParent="true"
+        android:padding="10dp"
+        android:id="@+id/linearLayout">
 
-    <EditText
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/editPassword"
-        android:inputType="textPassword"
-        android:hint="@string/password_hint"
-        android:textColorHint="#2c4aff"
-        android:textColor="#2c4aff"
-        android:layout_below="@+id/editUsername"
-        android:layout_alignRight="@+id/editUsername"
-        android:layout_alignLeft="@+id/editUsername"
-        android:ems="10"
-        android:singleLine="true"
-        android:maxLines="1"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:ellipsize="start"/>
+        <EditText
+            android:id="@+id/userName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:textColor="#000000"
+            android:padding="10dp"
+            android:hint="Username"
+            android:textColorHint="#cccccc"
+            android:drawableLeft="@drawable/user"/>
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:textColor="#000000"
+            android:layout_marginTop="-2dp"
+            android:padding="10dp"
+            android:hint="Password"
+            android:textColorHint="#cccccc"
+            android:password="true"
+            android:drawableLeft="@drawable/password"/>
+        <Button
+            android:id="@+id/btnSignIn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_margin="4dp"
+            android:text="Login"
+            android:onClick="accountLogin"
 
-    <CheckBox
-        android:id="@+id/checkbox_remember_me"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="remember me"
-        android:textColor="#2c4aff"
-        android:layout_below="@+id/editPassword"
-        android:layout_alignLeft="@+id/editPassword"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"/>
+
+            />
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/textview_forgot_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="forgot password?"
-        android:layout_below="@+id/checkbox_remember_me"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:textColor="#ff4040"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/login"
-        android:id="@+id/button"
-        android:layout_alignParentBottom="true"
+        android:textColor="#000000"
+        android:text="PASSWORD"
+        android:id="@+id/textView2"
+        android:layout_below="@+id/linearLayout"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_marginLeft="74dp"
+        android:layout_marginStart="74dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:text="REGISTER"
+        android:id="@+id/textView3"
+        android:layout_below="@+id/linearLayout"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:background="@android:color/transparent"
-        android:onClick="accountLogin"/>
+        android:layout_marginRight="76dp"
+        android:layout_marginEnd="76dp" />
 
 
 </RelativeLayout>
