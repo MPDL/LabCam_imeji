@@ -38,6 +38,8 @@ public class ImejiFolder extends Model {
     @Column(name = "items")
     private List<DataItem> items;
 
+    @Column(name = "coverItemUrl")
+    private String coverItemUrl;
 
 //    @Override
 //    public String getId() {
@@ -88,4 +90,11 @@ public class ImejiFolder extends Model {
         this.profile = profile;
     }
 
+    public String getCoverItemUrl() {
+        return coverItemUrl;
+    }
+
+    public void setCoverItemUrl(String coverItemUrl) {
+        this.coverItemUrl = coverItemUrl;
+    }
 }
