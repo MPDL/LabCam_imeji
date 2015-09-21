@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
 
@@ -105,13 +104,13 @@ public class ItemsActivity extends Activity {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                     DataItem dataItem = (DataItem) adapter.getItem(position);
-                    int duration = Toast.LENGTH_SHORT;
-                    Toast toast = Toast.makeText(activity, dataItem.getCollectionId(), duration);
-                    toast.show();
+//                    int duration = Toast.LENGTH_SHORT;
+//                    Toast toast = Toast.makeText(activity, dataItem.getCollectionId(), duration);
+//                    toast.show();
 
-                    //Intent showDetailIntent = new Intent(getActivity(), DetailActivity.class);
-                    //showDetailIntent.putExtra(Intent.EXTRA_TEXT, dataItem.getFilename());
-                    //startActivity(showDetailIntent);
+                    Intent showDetailIntent = new Intent(activity, DetailActivity.class);
+                    showDetailIntent.putExtra("itemPath", dataItem.getFileUrl());
+                    startActivity(showDetailIntent);
                 }
             });
         }
