@@ -47,9 +47,6 @@
             android:padding="10dp"
             android:layout_margin="4dp"
             android:text="Login"
-            android:onClick="accountLogin"
-
-
             />
     </LinearLayout>
 

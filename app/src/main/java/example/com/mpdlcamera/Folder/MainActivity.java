@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView listView;
 
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
-    private ImejiFolder collectionLocal = new ImejiFolder();
+    private ImejiFolder currentCollectionLocal = new ImejiFolder();
 
     Callback<List<ImejiFolder>> callback = new Callback<List<ImejiFolder>>() {
         @Override
@@ -63,9 +63,10 @@ public class MainActivity extends AppCompatActivity {
                     Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
                     Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
 
-                    //TODO fetch items
                     getFolderItems(folder.id);
-                    collectionLocal = folder;
+
+                    //TODO Here is a bug, collectionLocal will be random one collection
+                    //collectionLocal = folder;
 
                     collectionListLocal.add(folder);
                     //folder.save();
@@ -73,12 +74,8 @@ public class MainActivity extends AppCompatActivity {
                 ActiveAndroid.setTransactionSuccessful();
             } finally{
                 ActiveAndroid.endTransaction();
-                adapter.notifyDataSetChanged();
             }
 
-            if(pDialog != null) {
-                pDialog.hide();
-            }
         }
 
         @Override
@@ -91,25 +88,38 @@ public class MainActivity extends AppCompatActivity {
 
     Callback<List<DataItem>> callbackItems = new Callback<List<DataItem>>() {
         @Override
-        public void success(List<DataItem> dataList, Response response) {
-            List<DataItem> dataListLocal = new ArrayList<DataItem>();
+        public void success(List<DataItem> dataList , Response response) {
+
             if(dataList != null) {
                 ActiveAndroid.beginTransaction();
                 try {
-                    for (DataItem item : dataList) {
-                        dataListLocal.add(item);
-                        item.save();
+                    for (ImejiFolder folder : collectionListLocal) {
+
+                        if(dataList.size()>0) {
+                            DataItem coverItem = dataList.get(0);
+                            //check for each folder, if the current items belongs to the current folder
+                            if(coverItem.getCollectionId().equals(folder.id)){
+                                folder.setItems(dataList);
+
+                                folder.setCoverItemUrl(coverItem.getWebResolutionUrlUrl());
+
+                                folder.save();
+
+                            }
+                        }
                     }
                     ActiveAndroid.setTransactionSuccessful();
                 } finally {
                     ActiveAndroid.endTransaction();
 
-                    collectionLocal.setItems(dataList);
-                    collectionLocal.save();
-
                     //adapter.notifyDataSetChanged();
                     adapter = new FolderListAdapter(activity, collectionListLocal);
                     listView.setAdapter(adapter);
+
+
+                    if(pDialog != null) {
+                        pDialog.hide();
+                    }
                 }
             }else{
                 DeviceStatus.showToast(activity, "no items");
@@ -162,10 +172,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 ImejiFolder folder = (ImejiFolder) adapter.getItem(position);
-                //DeviceStatus.showSnackbar(rootView, folder.getTitle()
-                //        + "\n" + "Long press to delete.");
 
-                //TODO show Items inside the folder
                 Intent showItemsIntent = new Intent(activity, ItemsActivity.class);
                 showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
                 startActivity(showItemsIntent);
@@ -215,9 +222,12 @@ public class MainActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
     }
+
     @Override
     public void onPause(){
         super.onPause();
+        hidePDialog();
+
     }
 
 
@@ -236,9 +246,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void updateFolder(){
-        //pDialog = new ProgressDialog(activity);
-        //pDialog.setMessage("Loading...");
-        //pDialog.show();
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Loading...");
+        pDialog.show();
         RetrofitClient.getCollections(callback, username, password);
     }
 

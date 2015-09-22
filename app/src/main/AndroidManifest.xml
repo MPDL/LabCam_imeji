@@ -55,13 +55,24 @@
         </activity>
 
         <activity
+            android:name=".Items.DetailActivity"
+            android:label="@string/title_item_detail_activity"
+            android:parentActivityName=".Items.ItemsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Items.ItemsActivity" />
+        </activity>
+
+        <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
+
         <activity
             android:name=".BackUpSettings"
             android:label="@string/title_backup_activity" >
         </activity>
+
 
     </application>
 

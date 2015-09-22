@@ -13,9 +13,11 @@
     <string name="title_backup_activity">Backup</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_item_activity">Items</string>
+    <string name="title_item_detail_activity">details</string>
     <string name="wifi">Over Wifi Only</string>
     <string name="wifidata">Over Wifi or mobile network</string>
-    <string name="btn_done">Done</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="btn_done">done</string>
 
 
 </resources>

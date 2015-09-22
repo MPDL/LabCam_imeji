@@ -15,8 +15,8 @@ import android.widget.Toast;
  */
 public class DeviceStatus {
 
-    public static final String username = "mpdlcam@imeji.org";
-    public static final String password = "cam";
+    //public static final String username = "mpdlcam@imeji.org";
+    //public static final String password = "cam";
     public static final String collectionID = "H2u3wx7iJ76kY_Yw";
     public static final String queryKeyword = "MPDLCam";
     public static final String BASE_URL = "https://dev-faces.mpdl.mpg.de/rest/";

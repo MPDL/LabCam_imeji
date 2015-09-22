@@ -78,11 +78,6 @@ public class FolderListAdapter extends BaseAdapter {
             }
             title.setText(collection.getTitle());
 
-//        // thumbnail image
-//        Picasso.with(activity)
-//                .load(m.getThumbnailUrl())
-//                .into(imageView);
-//        //Log.v("getThumbnailUrl ",m.getThumbnailUrl());
             //title
             title.setText(collection.getTitle());
 
