@@ -1,22 +1,14 @@
 package example.com.mpdlcamera;
 
-import android.animation.ObjectAnimator;
 import android.app.ListActivity;
 import android.content.Context;
-
 import android.content.SharedPreferences;
 import android.database.Cursor;
-
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-
-import android.preference.PreferenceManager;
-import android.provider.MediaStore;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,9 +23,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-
-import com.activeandroid.query.Select;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.otto.Produce;
@@ -44,8 +33,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-
-
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.MetaData;
@@ -98,20 +85,6 @@ public class SettingsActivity extends ListActivity {
             Toast.makeText(getApplicationContext(), "Uploaded Successfully", Toast.LENGTH_LONG).show();
             Log.v(LOG_TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
-
-
-
-          /*  List<DataItem> tempList =  dataList;
-            for(int i = 0; i<dataList.size(); i++){
-                DataItem d = tempList.get(i);
-                dataList.remove(d);
-            } */
-
-
-            if (new Select()
-                    .from(DataItem.class)
-                    .where("isLocal = ?", true)
-                    .execute().size() < 1) {
                 //upload a POI as Album on Imeji
                 // RetrofitClient.createPOI(createNewPOI(), callbackPoi, username, password);
 
@@ -131,35 +104,31 @@ public class SettingsActivity extends ListActivity {
 //                dataList.remove(d);
 //            }
 
-
-            }
         }
 
-            @Override
-            public void failure(RetrofitError error) {
+        @Override
+        public void failure(RetrofitError error) {
 
-                if (error == null || error.getResponse() == null) {
-                    OttoSingleton.getInstance().post(new UploadEvent(null));
+            if (error == null || error.getResponse() == null) {
+                OttoSingleton.getInstance().post(new UploadEvent(null));
+                Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+            } else {
+                OttoSingleton.getInstance().post(
+                        new UploadEvent(error.getResponse().getStatus()));
+                String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
+                if (jsonBody.contains("already exists")) {
+                    Toast.makeText(getApplicationContext(), "File already synced ", Toast.LENGTH_SHORT).show();
+                } else
                     Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
-                } else {
-                    OttoSingleton.getInstance().post(
-                            new UploadEvent(error.getResponse().getStatus()));
-                    String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
-                    if (jsonBody.contains("already exists")) {
-                        Toast.makeText(getApplicationContext(), "File already synced ", Toast.LENGTH_SHORT).show();
-                    } else
-                        Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
-
-                }
-
-                //Log.v(LOG_TAG, jsonBody);
-
-                Log.v(LOG_TAG, String.valueOf(error));
 
             }
-        }
 
-        ;
+            //Log.v(LOG_TAG, jsonBody);
+
+            Log.v(LOG_TAG, String.valueOf(error));
+
+        }
+    };
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -268,11 +237,6 @@ public class SettingsActivity extends ListActivity {
                 }
             });
         }
-
-
-  /*  private FolderModel getModel(int position) {
-        return (((CustomAdapter) getListAdapter()).getItem(position));
-    } */
 
 
         public class CustomAdapter extends ArrayAdapter<FolderModel> {
@@ -477,13 +441,7 @@ public class SettingsActivity extends ListActivity {
         }
 
 
-    };
-
-
-
-
-
-
+}
 
 
 
@@ -523,7 +481,3 @@ public class SettingsActivity extends ListActivity {
 
 "\"metadata\":[{\"labels\":[{\"language\":\"en\",\"value\":\"title\"}],\"statementUri\":\"http://dev-faces.mpdl.mpg.de/imeji/statement/IJNOnHLthFNIYWMW\",\"typeUri\":\"http://imeji.org/terms/metadata#text\",\"value\":{\"text\":\"20150916_141350.wav@Amalienstraße 33, 80799 München, Germany\"}},{\"labels\":[{\"language\":\"en\",\"value\":\"author\"}],\"statementUri\":\"http://dev-faces.mpdl.mpg.de/imeji/statement/IJNOnHLthFNIYWMW\",\"typeUri\":\"http://imeji.org/terms/metadata#text\",\"value\":{\"text\":\"Allen\"}},{\"labels\":[{\"language\":\"en\",\"value\":\"location\"}],\"statementUri\":\"http://dev-faces.mpdl.mpg.de/imeji/statement/IJNOnHLthFNIYWMW\",\"typeUri\":\"http://imeji.org/terms/metadata#text\", \"value\":{\"text\":\"20150916_141350.wav@Amalienstraße 33, 80799 München, Germany\"}},{\"labels\":[{\"language\":\"en\",\"value\":\"accuracy\"}],\"statementUri\":\"http://dev-faces.mpdl.mpg.de/imeji/statement/IJNOnHLthFNIYWMW\",\"typeUri\":\"http://imeji.org/terms/metadata#text\",\"value\":{\"text\":\"10.0\"}},{\"labels\":[{\"language\":\"en\",\"value\":\"deviceID\"}],\"statementUri\":\"http://dev-faces.mpdl.mpg.de/imeji/statement/IJNOnHLthFNIYWMW\",\"typeUri\":\"http://imeji.org/terms/metadata#text\",\"value\":{\"text\":\"1\"}},{\"labels\":[{\"language\":\"en\",\"value\":\"tags\"}],\"statementUri\":\"http://dev-faces.mpdl.mpg.de/imeji/statement/IJNOnHLthFNIYWMW\",\"typeUri\":\"http://imeji.org/terms/metadata#text\",\"value\":{\"text\":\"test\"}}] ";
     }*/
-
-
-
-
