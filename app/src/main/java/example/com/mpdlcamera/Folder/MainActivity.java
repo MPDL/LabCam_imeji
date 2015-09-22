@@ -19,6 +19,7 @@ import com.activeandroid.query.Select;
 import java.util.ArrayList;
 import java.util.List;
 
+import example.com.mpdlcamera.BackUpSettings;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
@@ -192,6 +193,12 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             Intent showSettingIntent = new Intent(this, SettingsActivity.class);
             startActivity(showSettingIntent);
+
+            return true;
+        }
+        if (id == R.id.backUp) {
+            Intent backUpIntent = new Intent(this, BackUpSettings.class);
+            startActivity(backUpIntent);
 
             return true;
         }

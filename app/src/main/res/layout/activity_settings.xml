@@ -37,4 +37,5 @@
         android:layout_below="@+id/syncAllCheck"
         android:clickable="true" />
 
+
 </RelativeLayout>
