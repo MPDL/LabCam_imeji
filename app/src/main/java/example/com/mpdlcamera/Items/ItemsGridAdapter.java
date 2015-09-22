@@ -75,6 +75,8 @@ public class ItemsGridAdapter extends BaseAdapter {
 
         Picasso.with(activity)
                 .load(m.getWebResolutionUrlUrl())
+                .resize(size.x / 2, size.y)
+                .centerInside()
                 .into(imageView);
 
 
