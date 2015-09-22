@@ -104,9 +104,6 @@ public class ItemsActivity extends Activity {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                     DataItem dataItem = (DataItem) adapter.getItem(position);
-//                    int duration = Toast.LENGTH_SHORT;
-//                    Toast toast = Toast.makeText(activity, dataItem.getCollectionId(), duration);
-//                    toast.show();
 
                     Intent showDetailIntent = new Intent(activity, DetailActivity.class);
                     showDetailIntent.putExtra("itemPath", dataItem.getFileUrl());
