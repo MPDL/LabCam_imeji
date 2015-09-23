@@ -49,6 +49,8 @@ public class BackUpSettings extends AppCompatActivity {
 
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("status","wifi");
+
+
                     editor.apply();
                 }
                 if(selectedId == R.id.radioTwo) {

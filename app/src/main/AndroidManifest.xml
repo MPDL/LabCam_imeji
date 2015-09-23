@@ -16,8 +16,12 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:backupAgent=".BackupFileHelper"
         android:theme="@style/AppTheme" >
 
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAIA3v4YX2ItNJ9TLtA9JbvxE69ul_QXQzIV-GFzA" />
         <meta-data
             android:name="AA_DB_NAME"
             android:value="MPDLCam.db" />
