@@ -3,6 +3,8 @@ package example.com.mpdlcamera;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -131,6 +133,11 @@ public class CustomAdapter extends ArrayAdapter<FolderModel> {
 
 
                     prefOption = settings.getString("status", "");
+
+                    ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+
+                    networkStatus = networkInfo.getTypeName();
 
                     if (prefOption.equalsIgnoreCase("both") || (prefOption.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
                         RelativeLayout rl = (RelativeLayout) buttonView.getParent();
