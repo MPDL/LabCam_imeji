@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("Camera","On");
-        editor.putString("status", "wifi");
+        //editor.putString("status", "wifi");
         editor.commit();
 
         mPrefs = this.getSharedPreferences("myPref", 0);
@@ -319,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 /* Update ListView with result */
                 //ArrayAdapter arrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_2, results);
                 //listView.setAdapter(arrayAdapter);
-                Toast.makeText(this, "aytuuu", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Files are synced", Toast.LENGTH_LONG).show();
 
                 break;
             case 2:

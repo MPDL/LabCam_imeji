@@ -47,11 +47,6 @@ public class CustomAdapter extends ArrayAdapter<FolderModel> {
 
     Context mContext;
 
-   /* public CustomAdapter(Context mContext,int resource,ArrayList<FolderModel> list ) {
-        super(mContext,resource);
-        this.mContext = mContext;
-    } */
-
     ArrayList<String> permFolder = new ArrayList<String>();
 
     String prefOption;
@@ -114,23 +109,14 @@ public class CustomAdapter extends ArrayAdapter<FolderModel> {
                     String folder = tv.getText().toString();
 
 
-
-                    Iterator folderIterator = permFolder.iterator();
-
-                    while (folderIterator.hasNext()) {
-                        if (folder.equalsIgnoreCase(folderIterator.next().toString()))
-                            permFolder.remove(folder);
                             SharedPreferences.Editor editor = settings.edit();
                             editor.putString(folder,"Off");
                             editor.commit();
-
-                    }
 
                 }
 
                 else if(isChecked)
                 {
-
 
                     prefOption = settings.getString("status", "");
 
@@ -148,18 +134,13 @@ public class CustomAdapter extends ArrayAdapter<FolderModel> {
                         editor.putString(folder,"On");
                         editor.commit();
 
-                        //Toast.makeText(getApplicationContext(), folder + "is now synced", Toast.LENGTH_LONG).show();
-
-
-
-
                     } else {
                         Toast.makeText(mContext.getApplicationContext(), "Please Switch On Wifi or change your Network Preference", Toast.LENGTH_LONG).show();
                     }
 
                 }
 
-                // upload(dataList)
+
 
             }
         });

@@ -57,25 +57,22 @@ public class UploadService extends IntentService {
         super("UploadService");
     }
 
-
-
     private DataItem item = new DataItem();
     private MetaData meta = new MetaData();
-    private String username;
-    private String password;
+    private String username = DeviceStatus.username;
+    private String password = DeviceStatus.password;
     private User user = new User();
     private String collectionID = DeviceStatus.collectionID;
     public TypedFile typedFile;
     String json;
 
 
-
-
-
-
+    /*
+    Invoked independently by the activity.
+    When all the requests are handled, it kills itself.
+     */
     @Override
     protected void onHandleIntent(Intent intent) {
-        //DO SOMETHING
         Log.d(TAG, "Service Started!");
 
         user.setCompleteName("Kiran");
@@ -102,9 +99,6 @@ public class UploadService extends IntentService {
 
         Bundle bundle = new Bundle();
 
-        if(!TextUtils.isEmpty("qw"))
-        {
-
             try {
 
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -112,7 +106,6 @@ public class UploadService extends IntentService {
                 folderSyncMap = (HashMap) preferences.getAll();
                 String status = preferences.getString("status", "");
 
-                // Iterator hashIterator = folderSyncMap.keySet().iterator();
 
                 if (status.equalsIgnoreCase("both") || (status.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi"))))
 
@@ -152,17 +145,9 @@ public class UploadService extends IntentService {
                                 item.save();
 
                                 upload(item);
-
-
                             }
-
-
                         }
-
-
                     }
-
-
                 }
             }catch (Exception e) {
 
@@ -171,23 +156,13 @@ public class UploadService extends IntentService {
                 receiver.send(0, bundle);
             }
 
+            receiver.send(1, Bundle.EMPTY);
 
-
-
-
-            receiver.send(0, Bundle.EMPTY);
-
-
-
-        }
 
 
         Log.d(TAG, "Service Stopping!");
-        this.stopSelf();
-       /* Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction("Received");
-        broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-        sendBroadcast(broadcastIntent); */
+        this.stopSelf(); //self destructing service.
+
     }
 
     private void upload(DataItem item) {
@@ -201,13 +176,9 @@ public class UploadService extends IntentService {
         item.getMetadata().setDeviceID("1");
         typedFile = new TypedFile("multipart/form-data", new File(item.getLocalPath()));
 
-
-        // json = "{" + jsonPart1 + "}";
         json = "{" + jsonPart1 + "}";
-
         Log.v(TAG, json);
         RetrofitClient.uploadItem(typedFile, json, callback, username, password);
-
 
     }
 
@@ -217,42 +188,14 @@ public class UploadService extends IntentService {
         @Produce
         public void success(DataItem dataItem, Response response) {
 
-            Toast.makeText(mContext.getApplicationContext(), "Uploaded Successfully", Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext.getApplicationContext(), "Uploaded Successfully", Toast.LENGTH_SHORT).show();
             Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
-
-
-
-
-          /*  List<DataItem> tempList =  dataList;
-            for(int i = 0; i<dataList.size(); i++){
-                DataItem d = tempList.get(i);
-                dataList.remove(d);
-            } */
 
 
             if (new Select()
                     .from(DataItem.class)
                     .where("isLocal = ?", true)
                     .execute().size() < 1) {
-                //upload a POI as Album on Imeji
-                // RetrofitClient.createPOI(createNewPOI(), callbackPoi, username, password);
-
-                //You cannot modify, add/remove, a List while iterating through it.
-                //The foreach loop you are using creates an Iterator object in the background.
-                // Use a regular for loop if you'd like to modify the list.
-
-//            for (DataItem item: dataList){
-//                //if(item.getFilename().equals(dataItem.getFilename())){
-//                    dataList.remove(item);
-//                //}
-//            }
-
-//            List<DataItem> tempList =  dataList;
-//            for(int i = 0; i<dataList.size(); i++){
-//                DataItem d = tempList.get(i);
-//                dataList.remove(d);
-//            }
-
 
             }
         }
@@ -268,17 +211,12 @@ public class UploadService extends IntentService {
                         new UploadEvent(error.getResponse().getStatus()));
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                 if (jsonBody.contains("already exists")) {
-                    Toast.makeText(mContext.getApplicationContext(), "File already synced ", Toast.LENGTH_SHORT).show();
-                }
-                else if (jsonBody.contains("Unauthorized")) {
-                    Toast.makeText(mContext.getApplicationContext(), "Unauthorized access ", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
                 }
                 else
                     Toast.makeText(mContext.getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
 
             }
-
-            //Log.v(LOG_TAG, jsonBody);
 
             Log.v(TAG, String.valueOf(error));
 

@@ -56,87 +56,22 @@ import retrofit.mime.TypedFile;
 public class SettingsActivity extends ListActivity {
 
 
-    String networkStatus;
-    String prefOption;
-    ArrayList<String> permFolder;
     CustomAdapter switchAdapter;
 
-    private final String LOG_TAG = SettingsActivity.class.getSimpleName();
-    //TODO set collection dynamically
-    private String collectionID = DeviceStatus.collectionID;
+
     private String username;
     private String password;
 
     SharedPreferences preferences;
-    private List<DataItem> dataList = new ArrayList<DataItem>();
-    private DataItem item = new DataItem();
-    private MetaData meta = new MetaData();
-    private User user;
+
     String status;
     Boolean fStatus;
-    String json;
-    // Boolean n;
+
 
 
     private SharedPreferences mPrefs;
-    public TypedFile typedFile;
-
 
     private CheckBox checkSyncAll;
-
-
-    Callback<DataItem> callback = new Callback<DataItem>() {
-        @Override
-        @Produce
-        public void success(DataItem dataItem, Response response) {
-
-            Toast.makeText(getApplicationContext(), "Uploaded Successfully", Toast.LENGTH_LONG).show();
-            Log.v(LOG_TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
-
-            //upload a POI as Album on Imeji
-            // RetrofitClient.createPOI(createNewPOI(), callbackPoi, username, password);
-
-            //You cannot modify, add/remove, a List while iterating through it.
-            //The foreach loop you are using creates an Iterator object in the background.
-            // Use a regular for loop if you'd like to modify the list.
-
-//            for (DataItem item: dataList){
-//                //if(item.getFilename().equals(dataItem.getFilename())){
-//                    dataList.remove(item);
-//                //}
-//            }
-
-//            List<DataItem> tempList =  dataList;
-//            for(int i = 0; i<dataList.size(); i++){
-//                DataItem d = tempList.get(i);
-//                dataList.remove(d);
-//            }
-
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-
-            if (error == null || error.getResponse() == null) {
-                OttoSingleton.getInstance().post(new UploadEvent(null));
-                Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
-            } else {
-                OttoSingleton.getInstance().post(
-                        new UploadEvent(error.getResponse().getStatus()));
-                String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
-                if (jsonBody.contains("already exists")) {
-                    Toast.makeText(getApplicationContext(), "File already synced ", Toast.LENGTH_SHORT).show();
-                } else
-                    Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
-
-            }
-
-            //Log.v(LOG_TAG, jsonBody);
-
-            Log.v(LOG_TAG, String.valueOf(error));
-
-        }
-    };
 
 
     @Override
@@ -145,8 +80,6 @@ public class SettingsActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        //CustomAdapter switchAdapter = new CustomAdapter(this, 1);
-
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         password = mPrefs.getString("password", "");
@@ -154,19 +87,6 @@ public class SettingsActivity extends ListActivity {
 
         //Generate listView from ArrayList
         displayListView();
-
-        user = new User();
-        user.setCompleteName("Kiran");
-        user.save();
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-
-        networkStatus = networkInfo.getTypeName();
-
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        prefOption = preferences.getString("status", "");
-        System.out.println("ille" + prefOption);
-
 
     }
 
@@ -183,7 +103,6 @@ public class SettingsActivity extends ListActivity {
 
         final ArrayList<String> folders = new ArrayList<String>();
 
-        //  final ArrayList<FolderModel> folders1 = new ArrayList<FolderModel>();
         Cursor cur = getContentResolver().query(images, albums, null, null, null);
 
 
@@ -266,13 +185,9 @@ public class SettingsActivity extends ListActivity {
         });
     }
 
-
-
-  /*  private FolderModel getModel(int position) {
-        return (((CustomAdapter) getListAdapter()).getItem(position));
-    } */
-
-
+    /*
+        Method to return the view based on the position number
+     */
     public View getViewByPosition(int pos, ListView listView) {
         final int firstListItemPosition = listView.getFirstVisiblePosition();
         final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
@@ -286,27 +201,6 @@ public class SettingsActivity extends ListActivity {
     }
 }
 
-      /*  private void upload(DataItem item) {
-            String jsonPart1 = "\"collectionId\" : \"" +
-                    collectionID +
-                    "\"";
-            Gson gson = new GsonBuilder()
-                    .serializeNulls()
-                    .excludeFieldsWithoutExposeAnnotation()
-                    .create();
-            item.getMetadata().setDeviceID("1");
-            typedFile = new TypedFile("multipart/form-data", new File(item.getLocalPath()));
-
-
-           // json = "{" + jsonPart1 + "}";
-            json = "{" + jsonPart1 + "}";
-
-            Log.v(LOG_TAG, json);
-            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
-
-
-        }
-*/
 
 
 
