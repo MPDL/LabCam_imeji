@@ -2,16 +2,23 @@ package example.com.mpdlcamera.Folder;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
@@ -26,6 +33,8 @@ import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.SettingsActivity;
+import example.com.mpdlcamera.UploadResultReceiver;
+import example.com.mpdlcamera.Folder.UploadService;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -34,7 +43,7 @@ import retrofit.client.Response;
 /**
  * Created by kiran on 25.08.15.
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements UploadResultReceiver.Receiver {
 
     private View rootView;
     private final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -52,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
 
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
     private ImejiFolder currentCollectionLocal = new ImejiFolder();
+
+
+
+
 
     Callback<List<ImejiFolder>> callback = new Callback<List<ImejiFolder>>() {
         @Override
@@ -146,6 +159,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main);
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("Camera","On");
+        editor.putString("status", "wifi");
+        editor.commit();
+
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         password = mPrefs.getString("password", "");
@@ -180,6 +200,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
+        mReceiver.setReceiver(this);
+        Intent intent = new Intent(this, UploadService.class);
+        intent.putExtra("receiver", mReceiver);
+        this.startService(intent);
+
+       /* Intent uploadIntent = new Intent(this, UploadService.class);
+        startService(uploadIntent);
+
+        IntentFilter filter = new IntentFilter("Received");
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        ResponseReceiver receiver = new ResponseReceiver();
+        registerReceiver(receiver,filter); */
     }
 
     @Override
@@ -254,6 +287,47 @@ public class MainActivity extends AppCompatActivity {
 
     private void getFolderItems(String collectionId){
         RetrofitClient.getCollectionItems(collectionId, callbackItems, username, password);
+    }
+
+
+
+  /*  public class ResponseReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //acknowledge
+            Toast.makeText(MainActivity.this,
+                    "Download complete. Download URI: ",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+*/
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        switch (resultCode) {
+            case 0:
+
+                setProgressBarIndeterminateVisibility(true);
+                break;
+            case 1:
+                /* Hide progress & extract result from bundle */
+                setProgressBarIndeterminateVisibility(false);
+
+              //  String[] results = resultData.getStringArray("result");
+
+                /* Update ListView with result */
+                //ArrayAdapter arrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_2, results);
+                //listView.setAdapter(arrayAdapter);
+                Toast.makeText(this, "aytuuu", Toast.LENGTH_LONG).show();
+
+                break;
+            case 2:
+                /* Handle the error */
+                String error = resultData.getString(Intent.EXTRA_TEXT);
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                break;
+        }
     }
 
 

@@ -7,13 +7,13 @@ public class FolderModel {
 
     String folder = null;
 
-    boolean status = false;
+    Boolean status = null;
 
     FolderModel(String folder) {
         this.folder = folder;
     }
 
-    public FolderModel(String folder, boolean status) {
+    public FolderModel(String folder, Boolean status) {
         super();
         this.folder = folder;
 
@@ -29,11 +29,11 @@ public class FolderModel {
         this.folder = folder;
     }
 
-    public boolean isSelected() {
+    public Boolean isSelected() {
         return status;
     }
 
-    public void setSelected(boolean status) {
+    public void setSelected(Boolean status) {
         this.status = status;
     }
 }

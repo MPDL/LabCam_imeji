@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.MetaData;
 import example.com.mpdlcamera.Model.User;
@@ -66,10 +67,13 @@ public class SettingsActivity extends ListActivity {
     private String username;
     private String password;
 
+    SharedPreferences preferences;
     private List<DataItem> dataList = new ArrayList<DataItem>();
     private DataItem item = new DataItem();
     private MetaData meta = new MetaData();
     private User user;
+    String status;
+    Boolean fStatus;
     String json;
     // Boolean n;
 
@@ -159,7 +163,7 @@ public class SettingsActivity extends ListActivity {
 
         networkStatus = networkInfo.getTypeName();
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
         prefOption = preferences.getString("status", "");
         System.out.println("ille" + prefOption);
 
@@ -170,6 +174,8 @@ public class SettingsActivity extends ListActivity {
     Displaying the ListView by using adapter
      */
     private void displayListView() {
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
         Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -205,7 +211,22 @@ public class SettingsActivity extends ListActivity {
 
         Iterator<String> folderIterator = imageFolders.iterator();
         while (folderIterator.hasNext()) {
-            FolderModel folderOne = new FolderModel(folderIterator.next(), false);
+            String now = folderIterator.next().toString();
+            if(preferences.contains(now)) {
+                status = preferences.getString(now,"");
+            }
+            else {
+                status = "Off";
+            }
+            if(status.equalsIgnoreCase("On")) {
+                fStatus = true;
+            }
+            else {
+
+
+                fStatus = false;
+            }
+            FolderModel folderOne = new FolderModel(now, fStatus);
             folderList.add(folderOne);
         }
 
