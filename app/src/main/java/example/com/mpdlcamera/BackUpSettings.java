@@ -30,6 +30,8 @@ public class BackUpSettings extends AppCompatActivity {
         Button btnDone = (Button) findViewById(R.id.btnDone);
         RadioButton radOne = (RadioButton) findViewById(R.id.radioOne);
         RadioButton radTwo = (RadioButton) findViewById(R.id.radioTwo);
+        RadioButton radApp = (RadioButton) findViewById(R.id.radioApp);
+        RadioButton radBack = (RadioButton) findViewById(R.id.radioBack);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if(preferences.contains("status")) {
 
@@ -44,6 +46,19 @@ public class BackUpSettings extends AppCompatActivity {
             radOne.setChecked(true);
         }
 
+
+        if(preferences.contains("uploadStatus")) {
+
+            String upOption = preferences.getString("uploadStatus", "");
+            if (upOption.equalsIgnoreCase("app")) {
+                radApp.setChecked(true);
+            } else
+                radBack.setChecked(true);
+
+        }
+        else {
+            radApp.setChecked(true);
+        }
 
 
 
