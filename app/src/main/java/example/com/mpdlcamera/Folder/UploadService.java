@@ -3,9 +3,8 @@ package example.com.mpdlcamera.Folder;
 /**
  * Created by kiran on 28.09.15.
  */
+
 import android.app.IntentService;
-import android.app.Service;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,11 +13,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -29,21 +26,21 @@ import com.squareup.otto.Produce;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.MetaData;
 import example.com.mpdlcamera.Model.User;
-import example.com.mpdlcamera.OttoSingleton;
+import example.com.mpdlcamera.Otto.OttoSingleton;
+import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
-import example.com.mpdlcamera.UploadEvent;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 import retrofit.mime.TypedFile;
+
 //import android.support.annotation.Nullable;
 
 /**

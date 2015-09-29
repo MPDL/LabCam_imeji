@@ -1,4 +1,4 @@
-package example.com.mpdlcamera;
+package example.com.mpdlcamera.Auth;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import example.com.mpdlcamera.Folder.MainActivity;
+import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 
 public class LoginActivity extends AppCompatActivity {

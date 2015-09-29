@@ -1,4 +1,4 @@
-package example.com.mpdlcamera;
+package example.com.mpdlcamera.Model;
 
 /**
  * Created by yuvan on 14.09.15.
@@ -7,13 +7,13 @@ public class FolderModel {
 
     String folder = null;
 
-    Boolean status = null;
+    boolean status = false;
 
     FolderModel(String folder) {
         this.folder = folder;
     }
 
-    public FolderModel(String folder, Boolean status) {
+    public FolderModel(String folder, boolean status) {
         super();
         this.folder = folder;
 
@@ -29,11 +29,11 @@ public class FolderModel {
         this.folder = folder;
     }
 
-    public Boolean isSelected() {
+    public boolean isSelected() {
         return status;
     }
 
-    public void setSelected(Boolean status) {
+    public void setSelected(boolean status) {
         this.status = status;
     }
 }

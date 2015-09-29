@@ -1,4 +1,4 @@
-package example.com.mpdlcamera;
+package example.com.mpdlcamera.Otto;
 
 /**
  * Created by kiran on 16.09.15.

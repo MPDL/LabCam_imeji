@@ -1,4 +1,4 @@
-package example.com.mpdlcamera;
+package example.com.mpdlcamera.Otto;
 
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
