@@ -50,6 +50,28 @@
         </activity>
 
         <activity
+            android:name=".Auth.QRCodeScanner"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat"
+            android:parentActivityName=".Auth.LoginActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Auth.LoginActivity" />
+        </activity>
+
+        <activity
+            android:name=".Auth.SimpleScannerActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat"
+            android:parentActivityName=".Auth.LoginActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Auth.LoginActivity" />
+        </activity>
+
+
+
+        <activity
             android:name=".Items.ItemsActivity"
             android:label="@string/title_item_activity"
             android:parentActivityName=".Folder.MainActivity" >

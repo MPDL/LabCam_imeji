@@ -1,10 +1,12 @@
 package example.com.mpdlcamera.Auth;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,13 +20,16 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameView, passwordView;
     private Button signIn;
-    private String errorMsg, resp ;
+    private Button scan;
+    private Activity activity = this;
     private ImageView animation;
 
     private String username;
     private String password;
     private SharedPreferences mPrefs;
     private View rootView;
+    private static final int INTENT_QR = 1001;
+    private String LOG_TAG = LoginActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
         usernameView = (EditText) findViewById(R.id.userName);
         passwordView = (EditText) findViewById(R.id.password);
         signIn = (Button) findViewById(R.id.btnSignIn);
+        scan = (Button) findViewById(R.id.qr_scanner);
         //error = (TextView) findViewById(R.id.tv_error);
 
 
@@ -88,51 +94,43 @@ public class LoginActivity extends AppCompatActivity {
         });
 
 
-
-
-
-     /*   signIn.setOnClickListener(new View.OnClickListener() {
+        scan.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
+                Intent intent = new Intent(activity, SimpleScannerActivity.class);
+                startActivityForResult(intent,INTENT_QR);
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ContentValues values = new ContentValues();
-                        values.put("username",username.getText().toString());
-                        values.put("password",password.getText().toString());
 
-                        String response = null;
-
-                        try {
-                            response = SimpleHttpClient.executeHttpPost("LoginServer/login.do", postParameters);
-                            String res = response.toString();
-                            resp = res.replaceAll("\\s+", "");
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            errorMsg = e.getMessage();
-                        }
-                    }
-
-                }).start();
-
-                try {
-                    Thread.sleep(1000);
-
-                   // error.setText(resp);
-                    if (null != errorMsg && !errorMsg.isEmpty()) {
-                        //error.setText(errorMsg);
-                    }
-                } catch (Exception e) {
-                   // error.setText(e.getMessage());
-                }
             }
         });
-
-*/
     }
 
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == INTENT_QR) {
+            if (resultCode == Activity.RESULT_OK) {
+                Bundle bundle = data.getExtras();
+                String QRText = bundle.getString("QRText");
+
+                Log.v(LOG_TAG, QRText);
+
+//                usernameView.setText();
+//                passwordView.setText();
+//                mPrefs = getSharedPreferences("myPref", 0);
+//                SharedPreferences.Editor mEditor = mPrefs.edit();
+//                mEditor.putString("username", username).apply();
+//                mEditor.putString("password", password).apply();
+//
+//                accountLogin();
+
+
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // User cancelled the photo picking
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
 
 
