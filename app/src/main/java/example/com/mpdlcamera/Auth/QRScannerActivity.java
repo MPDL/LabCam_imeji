@@ -7,7 +7,7 @@ import android.os.Bundle;
 import me.dm7.barcodescanner.zbar.Result;
 import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
-public class SimpleScannerActivity extends Activity implements ZBarScannerView.ResultHandler {
+public class QRScannerActivity extends Activity implements ZBarScannerView.ResultHandler {
     private ZBarScannerView mScannerView;
     private Activity activity = this;
 

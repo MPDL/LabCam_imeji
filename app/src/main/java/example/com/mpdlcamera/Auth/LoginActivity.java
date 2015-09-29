@@ -97,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(activity, SimpleScannerActivity.class);
+                Intent intent = new Intent(activity, QRScannerActivity.class);
                 startActivityForResult(intent,INTENT_QR);
 
 
