@@ -1,6 +1,7 @@
 package example.com.mpdlcamera;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -26,15 +27,17 @@ import retrofit.mime.TypedFile;
  */
 public class FileUploader {
 
-    private String collectionID = DeviceStatus.collectionID;
+    private String collectionID;
     public TypedFile typedFile;
     String json;
+    private SharedPreferences mPrefs;
+
 
     private Context context;
 
     private static final String TAG = "FileUploader";
-    private String username = DeviceStatus.username;
-    private String password = DeviceStatus.password;
+    private String username;
+    private String password;
 
     public FileUploader(Context context) {
         this.context = context;
@@ -44,7 +47,19 @@ public class FileUploader {
 
     }
 
+
+
     public void upload(DataItem item) {
+
+        mPrefs = context.getSharedPreferences("myPref", 0);
+        username = mPrefs.getString("username", "");
+        password = mPrefs.getString("password", "");
+        if(mPrefs.contains("collectionID")) {
+            collectionID = mPrefs.getString("collectionID","");
+        }
+        else
+            collectionID = DeviceStatus.collectionID;
+
         String jsonPart1 = "\"collectionId\" : \"" +
                 collectionID +
                 "\"";
