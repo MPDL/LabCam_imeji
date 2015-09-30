@@ -55,14 +55,10 @@ public class FolderListAdapter extends BaseAdapter {
 
         WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
-
         Point size = new Point();
         display.getSize(size);
 
-        Log.v(size.x  + " width", size.y  + "height");
-
-
-
+        //Log.v(size.x  + " width", size.y  + " height");
 
         if (inflater == null)
             inflater = (LayoutInflater) activity

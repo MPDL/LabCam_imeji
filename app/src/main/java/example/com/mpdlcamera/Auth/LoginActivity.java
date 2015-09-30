@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,7 +13,9 @@ import android.widget.ImageView;
 
 import org.eclipse.jetty.util.MultiMap;
 import org.eclipse.jetty.util.UrlEncoded;
+
 import java.net.URL;
+
 import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -81,8 +82,8 @@ public class LoginActivity extends AppCompatActivity {
                     // There was an error, focus the first form field with an error.
                     focusView.requestFocus();
                 } else {
-                    usernameView.setEnabled(false);
-                    passwordView.setEnabled(false);
+//                    usernameView.setEnabled(false);
+//                    passwordView.setEnabled(false);
 
                     mPrefs = getSharedPreferences("myPref", 0);
                     SharedPreferences.Editor mEditor = mPrefs.edit();
@@ -118,7 +119,7 @@ public class LoginActivity extends AppCompatActivity {
                 Bundle bundle = data.getExtras();
                 String QRText = bundle.getString("QRText");
 
-                Log.v(LOG_TAG, QRText);
+//                Log.v(LOG_TAG, QRText);
 
                 try {
                     URL u = new URL(QRText);
@@ -133,9 +134,6 @@ public class LoginActivity extends AppCompatActivity {
                     MultiMap<String> values = new MultiMap<String>();
                     UrlEncoded.decodeTo(query, values, "UTF-8", 1000);
 
-                    System.out.println(collectionId);
-                    System.out.println(values.getString("username"));
-                    System.out.println(values.getString("password"));
 
                     usernameView.setText(values.getString("username"));
                     passwordView.setText(values.getString("password"));
@@ -145,6 +143,9 @@ public class LoginActivity extends AppCompatActivity {
                     mEditor.putString("username", values.getString("username")).apply();
                     mEditor.putString("password", values.getString("password")).apply();
                     mEditor.putString("collectionID", collectionId).apply();
+//                    Log.v(LOG_TAG, values.getString("username"));
+//                    Log.v(LOG_TAG, values.getString("password"));
+//                    Log.v(LOG_TAG, collectionId);
 
                     accountLogin();
 
