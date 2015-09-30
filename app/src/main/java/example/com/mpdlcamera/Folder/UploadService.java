@@ -62,7 +62,7 @@ public class UploadService extends IntentService {
     private String username;
     private String password;
     private User user = new User();
-    private String collectionID = DeviceStatus.collectionID;
+    private String collectionID;
     public TypedFile typedFile;
     String json;
 
@@ -85,6 +85,11 @@ public class UploadService extends IntentService {
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         password = mPrefs.getString("password", "");
+        if(mPrefs.contains("collectionID")) {
+            collectionID = mPrefs.getString("collectionID","");
+        }
+        else
+           collectionID = DeviceStatus.collectionID;
 
         Uri uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         String[] projection = {MediaStore.MediaColumns.DATA,
