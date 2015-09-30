@@ -70,12 +70,16 @@ public class BackUpSettings extends AppCompatActivity {
 
         final RadioGroup radioOptionGroup = (RadioGroup) findViewById(R.id.radioNetwork);
 
+        final RadioGroup radioUploadGroup = (RadioGroup) findViewById(R.id.radioUpload);
 
 
 
                 int selectedId = radioOptionGroup.getCheckedRadioButtonId();
 
-                //RadioButton radioNetworkButton = (RadioButton) findViewById(selectedId);
+                int selectedId2 = radioUploadGroup.getCheckedRadioButtonId();
+
+
+        //RadioButton radioNetworkButton = (RadioButton) findViewById(selectedId);
 
                 if(selectedId == R.id.radioOne) {
 
@@ -91,6 +95,20 @@ public class BackUpSettings extends AppCompatActivity {
                     editor.putString("status","both");
                     editor.apply();
                 }
+
+                  if(selectedId2 == R.id.radioApp) {
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("uploadStatus","app");
+            editor.apply();
+                 }
+
+                  if(selectedId2 == R.id.radioBack) {
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("uploadStatus","back");
+            editor.apply();
+                 }
 
                 Intent intent = new Intent(this, MainActivity.class);
                 startActivity(intent);
