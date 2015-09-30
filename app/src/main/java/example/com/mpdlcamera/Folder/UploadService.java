@@ -185,16 +185,10 @@ public class UploadService extends IntentService {
         @Produce
         public void success(DataItem dataItem, Response response) {
 
-            Toast.makeText(mContext.getApplicationContext(), "Uploaded Successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
             Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
 
-            if (new Select()
-                    .from(DataItem.class)
-                    .where("isLocal = ?", true)
-                    .execute().size() < 1) {
-
-            }
         }
 
         @Override
@@ -202,7 +196,7 @@ public class UploadService extends IntentService {
 
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
-                Toast.makeText(mContext.getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Upload failed", Toast.LENGTH_SHORT).show();
             } else {
                 OttoSingleton.getInstance().post(
                         new UploadEvent(error.getResponse().getStatus()));
@@ -211,7 +205,7 @@ public class UploadService extends IntentService {
                    // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
                 }
                 else
-                    Toast.makeText(mContext.getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "Upload failed", Toast.LENGTH_SHORT).show();
 
             }
 

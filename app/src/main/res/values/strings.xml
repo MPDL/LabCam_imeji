@@ -18,6 +18,9 @@
     <string name="wifidata">Over Wifi or mobile network</string>
     <string name="error_field_required">This field is required</string>
     <string name="btn_done">done</string>
+    <string name="app_text">Upload when the app is running</string>
+    <string name="back_text">Upload in the background with wifi</string>
+
 
 
 </resources>

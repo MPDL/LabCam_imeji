@@ -89,7 +89,10 @@
             android:name=".BackUpSettings"
             android:label="@string/title_backup_activity" >
         </activity>
-
+        
+        <service android:name="example.com.mpdlcamera.Folder.UploadService"
+                 android:enabled="true">
+        </service>
 
     </application>
 

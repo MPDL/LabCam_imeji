@@ -6,39 +6,74 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="example.com.mpdlcamera.SettingsActivity">
+    tools:context="example.com.mpdlcamera.SettingsActivity"
+    android:id="@+id/toplayout">
 
 
     <RadioGroup
         android:id="@+id/radioNetwork"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-    <RadioButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/wifi"
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wifi"
 
 
-        android:id="@+id/radioOne"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+            android:id="@+id/radioOne"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
-    <RadioButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/wifidata"
-        android:id="@+id/radioTwo"
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wifidata"
+            android:id="@+id/radioTwo"
 
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
     </RadioGroup>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_below="@+id/radioNetwork"
+        android:id="@+id/vw"/>
+
+
+    <RadioGroup
+        android:id="@+id/radioUpload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/vw">
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_text"
+            android:id="@+id/radioApp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/back_text"
+            android:id="@+id/radioBack"
+
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+    </RadioGroup>
+
 
     <Button
         android:layout_centerHorizontal="true"
         android:id="@+id/btnDone"
-        android:layout_below="@id/radioNetwork"
+        android:layout_below="@id/radioUpload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="networkOption"

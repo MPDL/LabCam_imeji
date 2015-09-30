@@ -30,6 +30,7 @@ import example.com.mpdlcamera.BackUpSettings;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.NewFileObserver;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.SettingsActivity;
@@ -199,20 +200,27 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             }
         });
 
+        if(sharedPreferences.contains("uploadStatus")) {
 
-        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
-        mReceiver.setReceiver(this);
-        Intent intent = new Intent(this, UploadService.class);
-        intent.putExtra("receiver", mReceiver);
-        this.startService(intent);
+            if(sharedPreferences.getString("uploadStatus","").equalsIgnoreCase("app")) {
 
-       /* Intent uploadIntent = new Intent(this, UploadService.class);
-        startService(uploadIntent);
+                UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
+                mReceiver.setReceiver(this);
+                Intent intent = new Intent(this, UploadService.class);
+                intent.putExtra("receiver", mReceiver);
+                this.startService(intent);
+            }
 
-        IntentFilter filter = new IntentFilter("Received");
-        filter.addCategory(Intent.CATEGORY_DEFAULT);
-        ResponseReceiver receiver = new ResponseReceiver();
-        registerReceiver(receiver,filter); */
+            else if(sharedPreferences.getString("uploadStatus","").equalsIgnoreCase("back")) {
+
+                Handler handler = new Handler();
+
+                NewFileObserver newFileObserver = new NewFileObserver(handler,this);
+                getApplicationContext().getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,false,newFileObserver);
+
+            }
+
+        }
     }
 
     @Override

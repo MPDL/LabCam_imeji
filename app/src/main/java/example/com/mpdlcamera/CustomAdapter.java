@@ -3,6 +3,8 @@ package example.com.mpdlcamera;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -97,6 +99,8 @@ public class CustomAdapter extends ArrayAdapter<FolderModel> {
             holder = new ViewHolder();
             holder.textView = (TextView) convertView.findViewById(R.id.folder);
             holder.fSwitch = (Switch) convertView.findViewById(R.id.fswitch);
+
+
             convertView.setTag(holder);
 
             holder.fSwitch.setOnClickListener(new View.OnClickListener() {
@@ -121,14 +125,12 @@ public class CustomAdapter extends ArrayAdapter<FolderModel> {
                     TextView tv = (TextView) rl.findViewById(R.id.folder);
                     String folder = tv.getText().toString();
 
+                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
 
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString(folder, "Off");
+                    editor.commit();
 
-                    Iterator folderIterator = permFolder.iterator();
-
-                    while (folderIterator.hasNext()) {
-                        if (folder.equalsIgnoreCase(folderIterator.next().toString()))
-                            permFolder.remove(folder);
-                    }
 
                 }
 
@@ -136,105 +138,27 @@ public class CustomAdapter extends ArrayAdapter<FolderModel> {
                 {
 
                     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+
+                    ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+                    String networkStatus;
+                    networkStatus = networkInfo.getTypeName();
+
+
                     prefOption = settings.getString("status", "");
+
 
                     if (prefOption.equalsIgnoreCase("both") || (prefOption.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
                         RelativeLayout rl = (RelativeLayout) buttonView.getParent();
                         TextView tv = (TextView) rl.findViewById(R.id.folder);
                         String folder = tv.getText().toString();
-                        permFolder.add(folder);
-                        //Toast.makeText(getApplicationContext(), folder + "is now synced", Toast.LENGTH_LONG).show();
 
-                        Uri uri;
-                        Cursor cursor;
-                        user = new User();
-                        user.setCompleteName("Kiran");
-                        user.save();
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(folder, "On");
+                        editor.commit();
 
-                        int column_index_data, column_index_folder_name, column_index_file_name;
-                        ArrayList<String> listOfAllImages = new ArrayList<String>();
-                        String absolutePathOfImage = null;
-                        String absoluteFileName = null;
-                        String absoluteFolderName = null;
-                        uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-                        String[] projection = {MediaStore.MediaColumns.DATA,
-                                MediaStore.Images.Media.BUCKET_DISPLAY_NAME, MediaStore.Images.Media.DISPLAY_NAME};
-
-                        cursor = mContext.getContentResolver().query(uri, projection, null,
-                                null, null);
-
-                        column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-
-
-                        column_index_folder_name = cursor
-                                .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-
-                        column_index_file_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
-
-                        HashMap<String, String> namePathMap = new HashMap<String, String>();
-
-                        while (cursor.moveToNext()) {
-                            absolutePathOfImage = cursor.getString(column_index_data);
-
-                            absoluteFolderName = cursor.getString(column_index_folder_name);
-
-                            absoluteFileName = cursor.getString(column_index_file_name);
-
-                            if (absoluteFolderName.equalsIgnoreCase(folder)) {
-
-
-                                listOfAllImages.add(absolutePathOfImage);
-
-                                namePathMap.put(absoluteFileName, absolutePathOfImage);
-                            }
-                        }
-
-
-                        Iterator hashIterator = namePathMap.keySet().iterator();
-                        while (hashIterator.hasNext()) {
-                            String fileName = (String) hashIterator.next();
-                            String filePath = (String) namePathMap.get(fileName);
-                            item.setFilename(fileName);
-                            meta.setTags(null);
-
-                            meta.setAddress("blabla");
-
-                            meta.setTitle(fileName);
-
-                            meta.setCreator(user.getCompleteName());
-
-                            item.setCollectionId(collectionID);
-
-                            item.setLocalPath(filePath);
-
-                            item.setMetadata(meta);
-
-                            item.setCreatedBy(user);
-
-                            meta.save();
-                            item.save();
-
-                            //  dataList.add(item);
-
-                       /* if(prefOption.equalsIgnoreCase("both")) {
-                            upload(item);
-                        }
-                        else if (prefOption.equalsIgnoreCase("wifi") && (networkStatus.equalsIgnoreCase("wifi"))) {
-                            upload(item);
-                        }
-                        else */
-                            upload(item);
 
                         }
-                   /* for(String imageInfo : listOfAllImages) {
-
-                        Bitmap bm = BitmapFactory.decodeFile(imageInfo);
-                        upload();
-                    } */
-
-
-                        // upload(dataList);
 
 
                     } else {
@@ -243,10 +167,9 @@ public class CustomAdapter extends ArrayAdapter<FolderModel> {
 
                 }
 
-                // upload(dataList)
 
-            }
-        });
+            });
+
 
 
         FolderModel folder = folderList.get(position);
@@ -258,93 +181,6 @@ public class CustomAdapter extends ArrayAdapter<FolderModel> {
         return convertView;
 
     }
-    private void upload(DataItem item) {
-        String jsonPart1 = "\"collectionId\" : \"" +
-                collectionID +
-                "\"";
-        Gson gson = new GsonBuilder()
-                .serializeNulls()
-                .excludeFieldsWithoutExposeAnnotation()
-                .create();
-        item.getMetadata().setDeviceID("1");
-        typedFile = new TypedFile("multipart/form-data", new File(item.getLocalPath()));
 
 
-        // json = "{" + jsonPart1 + "}";
-        json = "{" + jsonPart1 + "}";
-
-        Log.v(LOG_TAG, json);
-        RetrofitClient.uploadItem(typedFile, json, callback, username, password);
-
-
-    }
-
-    Callback<DataItem> callback = new Callback<DataItem>() {
-        @Override
-        @Produce
-        public void success(DataItem dataItem, Response response) {
-
-            Toast.makeText(mContext.getApplicationContext(), "Uploaded Successfully", Toast.LENGTH_LONG).show();
-            Log.v(LOG_TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
-
-
-
-
-          /*  List<DataItem> tempList =  dataList;
-            for(int i = 0; i<dataList.size(); i++){
-                DataItem d = tempList.get(i);
-                dataList.remove(d);
-            } */
-
-
-            if (new Select()
-                    .from(DataItem.class)
-                    .where("isLocal = ?", true)
-                    .execute().size() < 1) {
-                //upload a POI as Album on Imeji
-                // RetrofitClient.createPOI(createNewPOI(), callbackPoi, username, password);
-
-                //You cannot modify, add/remove, a List while iterating through it.
-                //The foreach loop you are using creates an Iterator object in the background.
-                // Use a regular for loop if you'd like to modify the list.
-
-//            for (DataItem item: dataList){
-//                //if(item.getFilename().equals(dataItem.getFilename())){
-//                    dataList.remove(item);
-//                //}
-//            }
-
-//            List<DataItem> tempList =  dataList;
-//            for(int i = 0; i<dataList.size(); i++){
-//                DataItem d = tempList.get(i);
-//                dataList.remove(d);
-//            }
-
-
-            }
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-
-            if (error == null || error.getResponse() == null) {
-                OttoSingleton.getInstance().post(new UploadEvent(null));
-                Toast.makeText(mContext.getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
-            } else {
-                OttoSingleton.getInstance().post(
-                        new UploadEvent(error.getResponse().getStatus()));
-                String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
-                if (jsonBody.contains("already exists")) {
-                    Toast.makeText(mContext.getApplicationContext(), "File already synced ", Toast.LENGTH_SHORT).show();
-                } else
-                    Toast.makeText(mContext.getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
-
-            }
-
-            //Log.v(LOG_TAG, jsonBody);
-
-            Log.v(LOG_TAG, String.valueOf(error));
-
-        }
-    };
 }
