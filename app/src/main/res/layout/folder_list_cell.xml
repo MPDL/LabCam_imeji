@@ -4,73 +4,69 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:background="@drawable/cell_bg_gradient"
-    android:padding="2dip" >
+    android:padding="1dip" >
 
-    <!--  ListView thumbnail
-    <com.android.volley.toolbox.NetworkImageView
-            android:id="@+id/thumbnail"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignParentLeft="true"
-            android:layout_marginRight="8dp" />
-    -->
 
     <ImageView
-        android:layout_width="220dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
         android:src="@drawable/imeji"
         android:id="@+id/list_item_cell_thumbnail"
         android:scaleType="centerCrop"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginRight="30dip"/>
+        android:layout_alignParentLeft="true"/>
 
-    <TextView
-        android:id="@+id/list_item_cell_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:layout_toRightOf="@+id/list_item_cell_thumbnail"
-        android:textColor="#040404"
-        android:layout_marginRight="25dip"
-        android:text="Title"
-        android:typeface="sans"
-        android:textSize="15dip"
-        android:textStyle="bold"/>
 
-    <!-- creator name-->
-    <TextView
-        android:id="@+id/list_item_user"
+
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_below="@id/list_item_cell_title"
-        android:textColor="#ffffff"
-        android:textSize="10dip"
-        android:text="Some Cool Guy"
-        android:layout_toRightOf="@+id/list_item_cell_thumbnail"
-     />
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/cell_bg_gradient"
+        android:gravity="bottom"
+        android:id="@+id/overlapLayout">
 
-    <!-- time -->
-    <!--<TextView-->
-        <!--android:id="@+id/list_item_cell_date"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_alignTop="@id/list_item_user"-->
-        <!--android:gravity="right"-->
-        <!--android:text="5:45"-->
-        <!--android:layout_marginRight="35dip"-->
-        <!--android:textSize="10dip"-->
-        <!--android:textColor="#10bcc9"-->
-        <!--android:textStyle="bold"/>-->
+        <TextView
+            android:id="@+id/list_item_cell_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:textColor="#ffffff"
+            android:layout_marginStart="35dip"
+            android:text="Title"
+            android:typeface="sans"
+            android:textSize="30dip"
+            android:textStyle="bold"/>
 
-    <!-- more details -->
-    <ImageView android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/noun_arrow"
-        android:id="@+id/arrow"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"/>
+        <!-- more details -->
+        <!--<ImageView android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:src="@drawable/noun_arrow"-->
+            <!--android:background="#ffffff"-->
+            <!--android:id="@+id/arrow"-->
+            <!--android:layout_gravity="end"-->
+            <!--android:layout_marginEnd="30dp"-->
+            <!--android:layout_alignParentRight="true"/>-->
+
+        <!-- creator name-->
+        <TextView
+            android:id="@+id/list_item_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#ffffff"
+            android:layout_marginStart="35dip"
+            android:layout_marginBottom="25dp"
+            android:textSize="10dip"
+            android:text="Some Cool Guy"
+            android:layout_toRightOf="@+id/list_item_cell_thumbnail"
+            />
+
+
+
+    </LinearLayout>
+
+
+
 
 </RelativeLayout>

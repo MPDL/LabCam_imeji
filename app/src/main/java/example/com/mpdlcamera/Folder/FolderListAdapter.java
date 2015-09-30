@@ -2,10 +2,13 @@ package example.com.mpdlcamera.Folder;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -50,6 +53,17 @@ public class FolderListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
+        WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+
+        Point size = new Point();
+        display.getSize(size);
+
+        Log.v(size.x  + " width", size.y  + "height");
+
+
+
+
         if (inflater == null)
             inflater = (LayoutInflater) activity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -61,6 +75,11 @@ public class FolderListAdapter extends BaseAdapter {
         TextView description = (TextView) convertView.findViewById(R.id.list_item_user);
         //TextView date = (TextView) convertView.findViewById(R.id.list_item_cell_date);
 
+        if (size.x > size.y) {
+            imageView.getLayoutParams().height = 2 * size.y /3;
+        } else {
+            imageView.getLayoutParams().height = 2 * size.y /3;
+        }
 
         if(folderItems.size()>0) {
             // getting item data for the row
