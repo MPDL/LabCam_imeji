@@ -138,6 +138,9 @@ public class SettingsActivity extends ListActivity {
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         password = mPrefs.getString("password", "");
+        if(!mPrefs.getString("collectionID", "").equals("")){
+            collectionID = mPrefs.getString("collectionID", "");
+        }
 
 
         //Generate listView from ArrayList

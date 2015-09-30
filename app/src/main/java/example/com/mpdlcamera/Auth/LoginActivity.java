@@ -12,9 +12,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import org.eclipse.jetty.util.MultiMap;
+import org.eclipse.jetty.util.UrlEncoded;
+import java.net.URL;
 import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Utils.DeviceStatus;
+
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -98,11 +102,12 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(activity, QRScannerActivity.class);
-                startActivityForResult(intent,INTENT_QR);
+                startActivityForResult(intent, INTENT_QR);
 
 
             }
         });
+
     }
 
 
@@ -115,15 +120,37 @@ public class LoginActivity extends AppCompatActivity {
 
                 Log.v(LOG_TAG, QRText);
 
-//                usernameView.setText();
-//                passwordView.setText();
-//                mPrefs = getSharedPreferences("myPref", 0);
-//                SharedPreferences.Editor mEditor = mPrefs.edit();
-//                mEditor.putString("username", username).apply();
-//                mEditor.putString("password", password).apply();
-//
-//                accountLogin();
+                try {
+                    URL u = new URL(QRText);
 
+                    String path = u.getPath();
+                    String collectionId = null;
+                    if(path != null) {
+                        collectionId = path.substring(path.lastIndexOf("/") + 1);
+                    }
+
+                    String query = u.getQuery();
+                    MultiMap<String> values = new MultiMap<String>();
+                    UrlEncoded.decodeTo(query, values, "UTF-8", 1000);
+
+                    System.out.println(collectionId);
+                    System.out.println(values.getString("username"));
+                    System.out.println(values.getString("password"));
+
+                    usernameView.setText(values.getString("username"));
+                    passwordView.setText(values.getString("password"));
+
+                    mPrefs = getSharedPreferences("myPref", 0);
+                    SharedPreferences.Editor mEditor = mPrefs.edit();
+                    mEditor.putString("username", values.getString("username")).apply();
+                    mEditor.putString("password", values.getString("password")).apply();
+                    mEditor.putString("collectionID", collectionId).apply();
+
+                    accountLogin();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // User cancelled the photo picking
@@ -139,6 +166,24 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+
+    private static void jettyUtil(String url) throws Exception {
+        URL u = new URL(url);
+
+        String path = u.getPath();
+        String collectionId = null;
+        if(path != null) {
+            collectionId = path.substring(path.lastIndexOf("/") + 1);
+        }
+
+        String query = u.getQuery();
+        MultiMap<String> values = new MultiMap<String>();
+        UrlEncoded.decodeTo(query, values, "UTF-8", 1000);
+
+        System.out.println(collectionId);
+        System.out.println(values.getString("username"));
+        System.out.println(values.getString("password"));
+    }
 
 
 }
