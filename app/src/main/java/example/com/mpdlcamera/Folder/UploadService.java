@@ -53,11 +53,14 @@ public class UploadService extends IntentService {
     public UploadService() {
         super("UploadService");
     }
+    private SharedPreferences mPrefs;
+
 
     private DataItem item = new DataItem();
     private MetaData meta = new MetaData();
-    private String username = DeviceStatus.username;
-    private String password = DeviceStatus.password;
+
+    private String username;
+    private String password;
     private User user = new User();
     private String collectionID = DeviceStatus.collectionID;
     public TypedFile typedFile;
@@ -78,6 +81,10 @@ public class UploadService extends IntentService {
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         String networkStatus;
         networkStatus = networkInfo.getTypeName();
+
+        mPrefs = this.getSharedPreferences("myPref", 0);
+        username = mPrefs.getString("username", "");
+        password = mPrefs.getString("password", "");
 
         Uri uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         String[] projection = {MediaStore.MediaColumns.DATA,
