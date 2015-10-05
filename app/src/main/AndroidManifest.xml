@@ -81,12 +81,12 @@
         </activity>
 
         <activity
-            android:name=".SettingsActivity"
+            android:name=".Upload.SettingsActivity"
             android:label="@string/title_activity_settings" >
         </activity>
 
         <activity
-            android:name=".BackUpSettings"
+            android:name=".Upload.BackUpSettings"
             android:label="@string/title_backup_activity" >
         </activity>
         

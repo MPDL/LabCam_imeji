@@ -16,7 +16,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import example.com.mpdlcamera.R;
-import example.com.mpdlcamera.SettingsActivity;
+import example.com.mpdlcamera.Upload.SettingsActivity;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 
