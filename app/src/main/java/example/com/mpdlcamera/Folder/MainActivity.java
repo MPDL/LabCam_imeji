@@ -4,10 +4,16 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,7 +65,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private ImejiFolder currentCollectionLocal = new ImejiFolder();
 
 
+    Toolbar toolbar;
+    CollapsingToolbarLayout collapsingToolbarLayout;
 
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle drawerToggle;
+
+    CoordinatorLayout rootLayout;
 
 
     Callback<List<ImejiFolder>> callback = new Callback<List<ImejiFolder>>() {
@@ -153,6 +165,22 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        drawerToggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, R.string.hello_world, R.string.hello_world);
+        drawerLayout.setDrawerListener(drawerToggle);
+
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayout);
+
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
+        collapsingToolbarLayout.setTitle("Design Library");
+
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -216,6 +244,19 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             }
 
         }
+    }
+
+
+    @Override
+    public void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override

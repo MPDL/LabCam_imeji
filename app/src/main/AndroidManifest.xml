@@ -18,7 +18,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:backupAgent=".Utils.BackupFileHelper"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme.WithoutActionBar" >
 
         <meta-data
             android:name="com.google.android.backup.api_key"
@@ -42,12 +42,7 @@
 
         <activity
             android:name=".Folder.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat"
-            android:parentActivityName=".Auth.LoginActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Auth.LoginActivity" />
+            android:label="@string/app_name">
         </activity>
 
         <activity
