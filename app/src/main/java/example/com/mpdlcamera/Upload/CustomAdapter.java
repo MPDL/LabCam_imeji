@@ -33,23 +33,11 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
 
     Context mContext;
 
-   /* public CustomAdapter(Context mContext,int resource,ArrayList<FolderModel> list ) {
-        super(mContext,resource);
-        this.mContext = mContext;
-    } */
 
-    ArrayList<String> permFolder = new ArrayList<String>();
     private final String LOG_TAG = CustomAdapter.class.getSimpleName();
-    private String username;
-    private String password;
+
     String prefOption;
-    String networkStatus;
-    private DataItem item = new DataItem();
-    private MetaData meta = new MetaData();
-    private String collectionID = DeviceStatus.collectionID;
-    private User user;
-    public TypedFile typedFile;
-    String json;
+
 
     private ArrayList<LocalGallery> folderList;
 
@@ -115,10 +103,7 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
                     editor.commit();
 
 
-                }
-
-                else if(isChecked)
-                {
+                } else if (isChecked) {
 
                     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
 
@@ -141,18 +126,17 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
                         editor.commit();
 
 
-                        }
-
-
-                    } else {
-                        Toast.makeText(mContext.getApplicationContext(), "Please Switch On Wifi or change your Network Preference", Toast.LENGTH_LONG).show();
                     }
 
+
+                } else {
+                    Toast.makeText(mContext.getApplicationContext(), "Please Switch On Wifi or change your Network Preference", Toast.LENGTH_LONG).show();
                 }
 
+            }
 
-            });
 
+        });
 
 
         LocalGallery folder = folderList.get(position);

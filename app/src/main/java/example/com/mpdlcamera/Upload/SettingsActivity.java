@@ -51,24 +51,18 @@ public class SettingsActivity extends ListActivity {
     private String password;
 
     private List<DataItem> dataList = new ArrayList<DataItem>();
-    private DataItem item = new DataItem();
-    private MetaData meta = new MetaData();
+
     SharedPreferences preferences;
     private User user;
     String status;
     Boolean fStatus;
-    String json;
-    // Boolean n;
+
 
 
     private SharedPreferences mPrefs;
-    public TypedFile typedFile;
 
 
     private CheckBox checkSyncAll;
-
-
-
 
 
     @Override
@@ -82,10 +76,9 @@ public class SettingsActivity extends ListActivity {
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         password = mPrefs.getString("password", "");
-        if(!mPrefs.getString("collectionID", "").equals("")){
+        if (!mPrefs.getString("collectionID", "").equals("")) {
             collectionID = mPrefs.getString("collectionID", "");
         }
-
 
 
         //Generate listView from ArrayList
@@ -117,7 +110,6 @@ public class SettingsActivity extends ListActivity {
 
         final ArrayList<String> folders = new ArrayList<String>();
 
-        //  final ArrayList<FolderModel> folders1 = new ArrayList<FolderModel>();
         Cursor cur = getContentResolver().query(images, albums, null, null, null);
 
 
@@ -146,20 +138,18 @@ public class SettingsActivity extends ListActivity {
         Iterator<String> folderIterator = imageFolders.iterator();
         while (folderIterator.hasNext()) {
             String now = folderIterator.next().toString();
-                     if(preferences.contains(now)) {
-                            status = preferences.getString(now,"");
-                       }
-                   else {
-                               status = "Off";
-                           }
-                       if(status.equalsIgnoreCase("On")) {
-                                fStatus = true;
-                           }
-                      else {
+            if (preferences.contains(now)) {
+                status = preferences.getString(now, "");
+            } else {
+                status = "Off";
+            }
+            if (status.equalsIgnoreCase("On")) {
+                fStatus = true;
+            } else {
 
-                                               fStatus = false;
-                           }
-                       LocalGallery folderOne = new LocalGallery(now, fStatus);
+                fStatus = false;
+            }
+            LocalGallery folderOne = new LocalGallery(now, fStatus);
             folderList.add(folderOne);
         }
 
@@ -198,9 +188,6 @@ public class SettingsActivity extends ListActivity {
             }
         });
     }
-
-
-
 
 
     public View getViewByPosition(int pos, ListView listView) {

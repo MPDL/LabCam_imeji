@@ -35,7 +35,6 @@ private Context context;
 
     private String collectionID = DeviceStatus.collectionID;
 
-    MainActivity app;
     private int latestId;
 
     public int getId() {

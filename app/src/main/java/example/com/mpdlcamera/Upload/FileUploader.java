@@ -48,16 +48,14 @@ public class FileUploader {
     }
 
 
-
     public void upload(DataItem item) {
 
         mPrefs = context.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         password = mPrefs.getString("password", "");
-        if(mPrefs.contains("collectionID")) {
-            collectionID = mPrefs.getString("collectionID","");
-        }
-        else
+        if (mPrefs.contains("collectionID")) {
+            collectionID = mPrefs.getString("collectionID", "");
+        } else
             collectionID = DeviceStatus.collectionID;
 
         String jsonPart1 = "\"collectionId\" : \"" +
@@ -99,9 +97,7 @@ public class FileUploader {
                         new UploadEvent(error.getResponse().getStatus()));
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                 if (jsonBody.contains("already exists")) {
-                    // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
-                }
-                else
+                } else
                     Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
 
             }

@@ -15,17 +15,14 @@ import example.com.mpdlcamera.Model.DataItem;
 public class NewFileObserver extends ContentObserver {
 
 
-
-
     private Context context;
 
     FileUploader fileUploader = new FileUploader();
 
-    //private FileUploader application;
 
     private ExecutorService queue;
 
-    public NewFileObserver(Handler handler,MainActivity application) {
+    public NewFileObserver(Handler handler, MainActivity application) {
         super(handler);
         this.context = application.getBaseContext();
     }
@@ -36,16 +33,13 @@ public class NewFileObserver extends ContentObserver {
      *
      * @param handler The handler to run {@link #onChange} on, or null if none.
      */
-    public NewFileObserver(Handler handler,  ExecutorService queue) {
+    public NewFileObserver(Handler handler, ExecutorService queue) {
         super(handler);
-
-      //  this.application = application;
         this.queue = queue;
     }
 
     @Override
     public void onChange(boolean selfChange) {
-        //super.onChange(selfChange);
 
         LatestImage imageLatest = new LatestImage(context);
         int imageId = imageLatest.getId();
@@ -56,25 +50,18 @@ public class NewFileObserver extends ContentObserver {
 
         DataItem item = imageLatest.getLatestItem();
 
-        if(item == null) {
+        if (item == null) {
             return;
-        }
-
-        else {
+        } else {
 
             FileUploader fileUploader = new FileUploader(context);
             fileUploader.upload(item);
-
 
 
         }
 
 
     }
-
-
-
-
 
 
 }
