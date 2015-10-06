@@ -1,4 +1,4 @@
-package example.com.mpdlcamera.Upload;
+package example.com.mpdlcamera.Settings;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -24,11 +24,10 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.LocalGallery;
-import example.com.mpdlcamera.Model.MetaData;
 import example.com.mpdlcamera.Model.User;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Upload.CustomAdapter;
 import example.com.mpdlcamera.Utils.DeviceStatus;
-import retrofit.mime.TypedFile;
 
 
 /**
@@ -36,7 +35,7 @@ import retrofit.mime.TypedFile;
  */
 
 
-public class SettingsActivity extends ListActivity {
+public class LocalAlbumSettingsActivity extends ListActivity {
 
 
     String networkStatus;
@@ -44,7 +43,7 @@ public class SettingsActivity extends ListActivity {
     ArrayList<String> permFolder;
     CustomAdapter switchAdapter;
 
-    private final String LOG_TAG = SettingsActivity.class.getSimpleName();
+    private final String LOG_TAG = LocalAlbumSettingsActivity.class.getSimpleName();
     //TODO set collection dynamically
     private String collectionID = DeviceStatus.collectionID;
     private String username;
@@ -69,7 +68,7 @@ public class SettingsActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.activity_local_album_settings);
 
         //CustomAdapter switchAdapter = new CustomAdapter(this, 1);
 
@@ -113,7 +112,7 @@ public class SettingsActivity extends ListActivity {
         Cursor cur = getContentResolver().query(images, albums, null, null, null);
 
 
-        checkSyncAll = (CheckBox) SettingsActivity.this.findViewById(R.id.syncAllCheck);
+        checkSyncAll = (CheckBox) LocalAlbumSettingsActivity.this.findViewById(R.id.syncAllCheck);
 
         //Logging the image count
         Log.i("ListingImages", " query count=" + cur.getCount());
