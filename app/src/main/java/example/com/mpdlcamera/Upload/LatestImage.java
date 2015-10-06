@@ -17,6 +17,7 @@ import example.com.mpdlcamera.Utils.DeviceStatus;
 /**
  * Created by kiran on 29.09.15.
  */
+
 public class LatestImage {
 
 private Context context;

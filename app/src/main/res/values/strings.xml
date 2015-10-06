@@ -20,7 +20,7 @@
     <string name="btn_done">done</string>
     <string name="app_text">Upload when the app is running</string>
     <string name="back_text">Upload in the background with wifi</string>
-
+    <string name="manual">Upload Manually</string>
 
 
 </resources>

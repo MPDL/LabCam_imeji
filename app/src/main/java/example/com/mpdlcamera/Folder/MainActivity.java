@@ -223,27 +223,19 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             }
         });
 
-        if(sharedPreferences.contains("uploadStatus")) {
-
-            if(sharedPreferences.getString("uploadStatus","").equalsIgnoreCase("app")) {
 
                 UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
                 mReceiver.setReceiver(this);
                 Intent intent = new Intent(this, UploadService.class);
                 intent.putExtra("receiver", mReceiver);
                 this.startService(intent);
-            }
 
-            else if(sharedPreferences.getString("uploadStatus","").equalsIgnoreCase("back")) {
 
                 Handler handler = new Handler();
 
                 NewFileObserver newFileObserver = new NewFileObserver(handler,this);
                 getApplicationContext().getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,false,newFileObserver);
 
-            }
-
-        }
     }
 
 
