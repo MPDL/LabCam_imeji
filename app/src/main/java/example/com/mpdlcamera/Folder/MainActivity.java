@@ -13,6 +13,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -28,14 +29,14 @@ import com.activeandroid.query.Select;
 import java.util.ArrayList;
 import java.util.List;
 
-import example.com.mpdlcamera.Upload.BackUpSettings;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
-import example.com.mpdlcamera.Upload.NewFileObserver;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
-import example.com.mpdlcamera.Upload.SettingsActivity;
+import example.com.mpdlcamera.Settings.BackUpOptionSettings;
+import example.com.mpdlcamera.Settings.SettingsActivity;
+import example.com.mpdlcamera.Upload.NewFileObserver;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
@@ -60,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     private FolderListAdapter adapter;
     private ListView listView;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter reAdapter;
+    private RecyclerView.LayoutManager reLayoutManager;
 
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
     private ImejiFolder currentCollectionLocal = new ImejiFolder();
@@ -186,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("Camera","On");
+        editor.putString("Camera", "On");
         //editor.putString("status", "wifi");
         editor.commit();
 
@@ -201,12 +205,25 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         Log.v(LOG_TAG, "size: " + collectionListLocal.size() + "");
 
 
+        //TODO
         adapter = new FolderListAdapter(activity, collectionListLocal);
 
         //gridview = (GridView) findViewById(R.id.folder_gridView);
         //registerForContextMenu(gridview);
 
         listView = (ListView) findViewById(R.id.folder_listView);
+
+//        // use this setting to improve performance if you know that changes
+//        // in content do not change the layout size of the RecyclerView
+//        recyclerView.setHasFixedSize(true);
+//
+//        // use a linear layout manager
+//        reLayoutManager = new LinearLayoutManager(this);
+//        recyclerView.setLayoutManager(reLayoutManager);
+//
+//        // specify an adapter (see also next example)
+//        reAdapter = new ReAdaptor(myDataset);
+
         listView.setAdapter(adapter);
 
 
@@ -273,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             return true;
         }
         if (id == R.id.backUp) {
-            Intent backUpIntent = new Intent(this, BackUpSettings.class);
+            Intent backUpIntent = new Intent(this, BackUpOptionSettings.class);
             startActivity(backUpIntent);
 
             return true;

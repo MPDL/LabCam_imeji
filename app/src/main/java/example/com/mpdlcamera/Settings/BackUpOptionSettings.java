@@ -1,4 +1,4 @@
-package example.com.mpdlcamera.Upload;
+package example.com.mpdlcamera.Settings;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,7 +16,7 @@ import example.com.mpdlcamera.R;
 /**
  * Created by kiran on 21.09.15.
  */
-public class BackUpSettings extends AppCompatActivity {
+public class BackUpOptionSettings extends AppCompatActivity {
 
 
 

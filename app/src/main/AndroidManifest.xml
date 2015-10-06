@@ -76,12 +76,18 @@
         </activity>
 
         <activity
-            android:name=".Upload.SettingsActivity"
-            android:label="@string/title_activity_settings" >
+            android:name=".Settings.LocalAlbumSettingsActivity"
+            android:label="@string/title_activity_local_album" >
         </activity>
 
         <activity
-            android:name=".Upload.BackUpSettings"
+            android:name=".Settings.SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
+
+
+        <activity
+            android:name=".Settings.BackUpOptionSettings"
             android:label="@string/title_backup_activity" >
         </activity>
         
