@@ -85,9 +85,13 @@
             android:label="@string/title_activity_settings" >
         </activity>
 
-
         <activity
             android:name=".Settings.BackUpOptionSettings"
+            android:label="@string/title_backup_activity" >
+        </activity>
+
+        <activity
+            android:name=".Settings.BackupSettingsActivity"
             android:label="@string/title_backup_activity" >
         </activity>
         

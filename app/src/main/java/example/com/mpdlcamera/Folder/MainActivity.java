@@ -35,6 +35,7 @@ import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Settings.BackUpOptionSettings;
+import example.com.mpdlcamera.Settings.BackupSettingsActivity;
 import example.com.mpdlcamera.Settings.SettingsActivity;
 import example.com.mpdlcamera.Upload.NewFileObserver;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
@@ -290,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             return true;
         }
         if (id == R.id.backUp) {
-            Intent backUpIntent = new Intent(this, BackUpOptionSettings.class);
+            Intent backUpIntent = new Intent(this, BackupSettingsActivity.class);
             startActivity(backUpIntent);
 
             return true;
