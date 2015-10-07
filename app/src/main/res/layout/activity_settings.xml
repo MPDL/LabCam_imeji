@@ -1,0 +1,158 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="example.com.mpdlcamera.Settings.SettingsActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_collapseMode="pin"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <!--
+    three views jump to sub setting pages
+    -->
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_below="@+id/toolbar"
+        android:gravity="left"
+        android:id="@+id/setting_backup">
+
+        <TextView
+            android:id="@+id/list_item_cell_title1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Backup Settings"
+            android:typeface="sans"
+            android:textSize="20dip"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/list_item_backup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:textSize="15dip"
+            android:text="Over Wi-Fi"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/setting_backup"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#80808080" >
+    </LinearLayout>
+
+
+
+
+
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/setting_backup"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:gravity="left"
+        android:id="@+id/setting_local">
+
+        <TextView
+            android:id="@+id/list_item_cell_title2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Choose local device folder to back up"
+            android:typeface="sans"
+            android:textSize="20dip"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/list_item_local"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:textSize="15dip"
+            android:text="camera"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/setting_local"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#80808080" >
+    </LinearLayout>
+
+
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/setting_local"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:gravity="left"
+        android:id="@+id/setting_server">
+
+        <TextView
+            android:id="@+id/list_item_cell_title3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Choose remote collection for backing up"
+            android:typeface="sans"
+            android:textSize="20dip"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/list_item_server"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:textSize="15dip"
+            android:text="spot collection name"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/setting_server"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#80808080" >
+    </LinearLayout>
+
+    <com.dd.processbutton.FlatButton
+        android:layout_centerHorizontal="true"
+        android:id="@+id/btnDone"
+        android:layout_below="@id/setting_server"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/btn_done" />
+
+</RelativeLayout>

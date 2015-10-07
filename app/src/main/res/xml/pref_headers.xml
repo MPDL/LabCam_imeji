@@ -3,15 +3,15 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="de.mpg.mpdl.www.datacollector.app.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="example.com.mpdlcamera.Settings.SettingsActivityBak$GeneralPreferenceFragment"
         android:title="@string/pref_header_general" />
 
     <header
-        android:fragment="de.mpg.mpdl.www.datacollector.app.SettingsActivity$NotificationPreferenceFragment"
+        android:fragment="example.com.mpdlcamera.Settings.SettingsActivityBak$NotificationPreferenceFragment"
         android:title="@string/pref_header_notifications" />
 
     <header
-        android:fragment="de.mpg.mpdl.www.datacollector.app.SettingsActivity$DataSyncPreferenceFragment"
+        android:fragment="example.com.mpdlcamera.Settings.SettingsActivityBak$DataSyncPreferenceFragment"
         android:title="@string/pref_header_data_sync" />
 
 </preference-headers>
