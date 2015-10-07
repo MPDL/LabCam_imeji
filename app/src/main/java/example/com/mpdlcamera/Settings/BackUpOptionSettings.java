@@ -27,49 +27,40 @@ public class BackUpOptionSettings extends AppCompatActivity {
         Button btnDone = (Button) findViewById(R.id.btnDone);
         RadioButton radOne = (RadioButton) findViewById(R.id.radioOne);
         RadioButton radTwo = (RadioButton) findViewById(R.id.radioTwo);
-        RadioButton radApp = (RadioButton) findViewById(R.id.radioApp);
-        RadioButton radBack = (RadioButton) findViewById(R.id.radioBack);
+        RadioButton radThree = (RadioButton) findViewById(R.id.radioThree);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (preferences.contains("status")) {
 
             String defOption = preferences.getString("status", "");
             if (defOption.equalsIgnoreCase("wifi")) {
                 radOne.setChecked(true);
-            } else
+            } else if(defOption.equalsIgnoreCase("both")) {
                 radTwo.setChecked(true);
+            }
+            else
+                radThree.setChecked(true);
 
         } else {
             radOne.setChecked(true);
         }
 
 
-        if (preferences.contains("uploadStatus")) {
-
-            String upOption = preferences.getString("uploadStatus", "");
-            if (upOption.equalsIgnoreCase("app")) {
-                radApp.setChecked(true);
-            } else
-                radBack.setChecked(true);
-
-        } else {
-            radApp.setChecked(true);
-        }
-
-
     }
 
+    /**
+     * On click event for the button in backup settings screen
+     * @param view
+     */
     public void networkOption(View view) {
 
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         final RadioGroup radioOptionGroup = (RadioGroup) findViewById(R.id.radioNetwork);
 
-        final RadioGroup radioUploadGroup = (RadioGroup) findViewById(R.id.radioUpload);
 
 
         int selectedId = radioOptionGroup.getCheckedRadioButtonId();
 
-        int selectedId2 = radioUploadGroup.getCheckedRadioButtonId();
 
 
         if (selectedId == R.id.radioOne) {
@@ -87,19 +78,13 @@ public class BackUpOptionSettings extends AppCompatActivity {
             editor.apply();
         }
 
-        if (selectedId2 == R.id.radioApp) {
+        if (selectedId == R.id.radioThree) {
 
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("uploadStatus", "app");
+            editor.putString("status", "manual");
             editor.apply();
         }
 
-        if (selectedId2 == R.id.radioBack) {
-
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString("uploadStatus", "back");
-            editor.apply();
-        }
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

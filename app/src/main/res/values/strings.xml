@@ -19,7 +19,11 @@
     <string name="btn_done">done</string>
     <string name="app_text">Upload when the app is running</string>
     <string name="back_text">Upload in the background with wifi</string>
-
+    <string name="manual">Upload Manually</string>
+    <string name="backup_photos">Backup Photos</string>
+    <string name="lau">Logout After Uploading</string>
+    <string name="rpfd">Remove Photos From Device</string>
+    <string name="rgl">Remove Geo Location</string>
 
 
 </resources>
