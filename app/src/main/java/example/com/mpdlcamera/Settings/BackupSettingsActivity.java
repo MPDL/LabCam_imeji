@@ -20,6 +20,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 
+import com.dd.processbutton.FlatButton;
+
 import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.R;
 
@@ -41,7 +43,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        TextView tv = (TextView) findViewById(R.id.textView);
+        TextView tv = (TextView) findViewById(R.id.backup_item);
         if(preferences.contains("status")) {
             String option = preferences.getString("status", "");
             if (option.equalsIgnoreCase("wifi")) {
@@ -54,7 +56,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
         else
            mOption = getString(R.string.wifi);
 
-        tv.setText("Backup Photos\n" + mOption);
+        tv.setText(mOption);
 
 
         if(preferences.contains("lau")) {
@@ -168,7 +170,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
 
                         popupWindow.dismiss();
                         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-                        TextView tv = (TextView) findViewById(R.id.textView);
+                        TextView tv = (TextView) findViewById(R.id.backup_item);
 
                         String option = preferences.getString("status", "");
                         if (option.equalsIgnoreCase("wifi")) {
@@ -177,7 +179,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
                             mOption = getString(R.string.wifidata);
                         } else
                             mOption = getString(R.string.manual);
-                        tv.setText("Backup Photos\n" + mOption);
+                        tv.setText(mOption);
                     }
                 });
 
@@ -257,6 +259,17 @@ public class BackupSettingsActivity extends AppCompatActivity {
                 }
 
 
+            }
+        });
+
+        FlatButton btnDone = (FlatButton) findViewById(R.id.btnDone);
+
+        btnDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent settingsIntent = new Intent(context, SettingsActivity.class );
+                startActivity(settingsIntent);
             }
         });
 

@@ -13,68 +13,91 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Medium Text"
         android:id="@+id/textView"
-        android:textSize="25dp"
+        android:textSize="20dip"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:paddingBottom="3dp"
-        android:paddingTop="3dp"/>
+        android:paddingTop="10dp"/>
 
-    <View
+    <TextView
+        android:id="@+id/backup_item"
+        android:layout_below="@+id/textView"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:textSize="15dip"
+
+
+
+        />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+        android:layout_below="@id/backup_item"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#80808080" >
+    </LinearLayout>
 
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/lau"
         android:id="@+id/lau"
-        android:textSize="25dp"
+        android:textSize="20dip"
 
-        android:layout_below="@+id/textView"
+        android:layout_below="@+id/backup_item"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:paddingBottom="3dp"
-        android:paddingTop="3dp"/>
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"/>
 
-    <View
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+        android:layout_below="@id/lau"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#80808080" >
+    </LinearLayout>
 
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/rpfd"
         android:id="@+id/rpfd"
-        android:textSize="25dp"
+        android:textSize="20dip"
 
         android:layout_below="@+id/lau"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:paddingBottom="3dp"
-        android:paddingTop="3dp"/>
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"/>
 
-    <View
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+        android:layout_below="@id/rpfd"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#80808080" >
+    </LinearLayout>
+
 
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/rgl"
-        android:textSize="25dp"
+        android:textSize="20dip"
 
         android:id="@+id/rgl"
         android:layout_below="@+id/rpfd"
@@ -82,6 +105,25 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:paddingBottom="3dp"
-        android:paddingTop="3dp"/>
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"/>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/rgl"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#80808080" >
+    </LinearLayout>
+
+
+    <com.dd.processbutton.FlatButton
+        android:layout_centerHorizontal="true"
+        android:id="@+id/btnDone"
+        android:layout_below="@id/rgl"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/btn_done" />
 </RelativeLayout>
