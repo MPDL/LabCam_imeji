@@ -8,12 +8,17 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -34,10 +39,19 @@ public class BackupSettingsActivity extends AppCompatActivity {
 
     Context context = this;
     String mOption = null;
+    private View rootView;
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.backup_settings_main);
+
+        rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+        toolbar = (Toolbar) findViewById(R.id.toolbarTwo);
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Switch lau = (Switch) findViewById(R.id.lau);
         Switch rpfd = (Switch) findViewById(R.id.rpfd);
@@ -59,6 +73,8 @@ public class BackupSettingsActivity extends AppCompatActivity {
            mOption = getString(R.string.wifi);
 
         tv.setText(mOption);
+
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.netOption);
 
 
         if(preferences.contains("lau")) {
@@ -94,7 +110,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
 
 
 
-        tv.setOnClickListener(new View.OnClickListener() {
+        linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -108,6 +124,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
 
                 popupWindow.setFocusable(true);
                 popupWindow.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                popupWindow.setAnimationStyle(R.style.AnimationPopup);
 
                 RadioButton radOne = (RadioButton) popupView.findViewById(R.id.radioOne);
 
@@ -115,6 +132,8 @@ public class BackupSettingsActivity extends AppCompatActivity {
                 RadioButton radThree = (RadioButton) popupView.findViewById(R.id.radioThree);
 
                 popupWindow.showAtLocation(findViewById(R.id.textView), Gravity.CENTER, 0, 0);
+
+
 
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
                 if (preferences.contains("status")) {
@@ -277,9 +296,19 @@ public class BackupSettingsActivity extends AppCompatActivity {
             }
         });
 
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent settingsIntent = new Intent(context, SettingsActivity.class );
+                startActivity(settingsIntent);
+            }
+        });
+
+
 
 
     }
+
 
 
 
