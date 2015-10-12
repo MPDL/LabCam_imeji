@@ -107,16 +107,6 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
 
                     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
 
-                    ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-                    NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-                    String networkStatus;
-                    networkStatus = networkInfo.getTypeName();
-
-
-                    prefOption = settings.getString("status", "");
-
-
-                    if (prefOption.equalsIgnoreCase("both") || (prefOption.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
                         RelativeLayout rl = (RelativeLayout) buttonView.getParent();
                         TextView tv = (TextView) rl.findViewById(R.id.folder);
                         String folder = tv.getText().toString();
@@ -126,11 +116,6 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
                         editor.commit();
 
 
-                    }
-
-
-                } else {
-                    Toast.makeText(mContext.getApplicationContext(), "Please Switch On Wifi or change your Network Preference", Toast.LENGTH_LONG).show();
                 }
 
             }

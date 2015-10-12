@@ -97,7 +97,6 @@ public class BackupSettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-                // PopupWindow ppWindow = new PopupWindow(inflater.inflate(R.layout.popup_backup, null, false), 600, 600, true);
 
                 View popupView = inflater.inflate(R.layout.popup_backup, null);
                 final PopupWindow popupWindow = new PopupWindow(

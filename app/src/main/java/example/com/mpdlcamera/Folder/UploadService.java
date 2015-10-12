@@ -116,48 +116,50 @@ public class UploadService extends IntentService {
                 String status = preferences.getString("status", "");
 
 
-                if (status.equalsIgnoreCase("both") || (status.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi"))))
+                if (status.equalsIgnoreCase("both") || (status.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
 
-                for (Map.Entry<String, String> entry : folderSyncMap.entrySet()) {
-
-
-                    if (entry.getValue().toString().equalsIgnoreCase("On")) {
-
-                        String folderName = (String) entry.getKey();
-
-                        while (cursor.moveToNext()) {
-
-                            if (folderName.equalsIgnoreCase(cursor.getString(column_index_folder_name))) {
+                    for (Map.Entry<String, String> entry : folderSyncMap.entrySet()) {
 
 
-                                String fileName = cursor.getString(column_index_file_name);
-                                String path = cursor.getString(column_index_data);
+                        if (entry.getValue().toString().equalsIgnoreCase("On")) {
 
-                                item.setFilename(fileName);
-                                meta.setTags(null);
+                            String folderName = (String) entry.getKey();
 
-                                meta.setAddress("blabla");
+                            while (cursor.moveToNext()) {
 
-                                meta.setTitle(fileName);
+                                if (folderName.equalsIgnoreCase(cursor.getString(column_index_folder_name))) {
 
-                                meta.setCreator(user.getCompleteName());
 
-                                item.setCollectionId(collectionID);
+                                    String fileName = cursor.getString(column_index_file_name);
+                                    String path = cursor.getString(column_index_data);
 
-                                item.setLocalPath(path);
+                                    item.setFilename(fileName);
+                                    meta.setTags(null);
 
-                                item.setMetadata(meta);
+                                    meta.setAddress("blabla");
 
-                                item.setCreatedBy(user);
+                                    meta.setTitle(fileName);
 
-                                meta.save();
-                                item.save();
+                                    meta.setCreator(user.getCompleteName());
 
-                                upload(item);
+                                    item.setCollectionId(collectionID);
+
+                                    item.setLocalPath(path);
+
+                                    item.setMetadata(meta);
+
+                                    item.setCreatedBy(user);
+
+                                    meta.save();
+                                    item.save();
+
+                                    upload(item);
+                                }
                             }
                         }
                     }
                 }
+
             }catch (Exception e) {
 
                 /* Sending error message back to activity */
@@ -187,7 +189,13 @@ public class UploadService extends IntentService {
 
         json = "{" + jsonPart1 + "}";
         Log.v(TAG, json);
-        RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+
+        if(isNetworkAvailable()) {
+            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+        }
+        else {
+            Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -208,7 +216,12 @@ public class UploadService extends IntentService {
 
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
-                Toast.makeText(mContext, "Upload failed", Toast.LENGTH_SHORT).show();
+                if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
+                    Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(mContext, "Upload failed", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 OttoSingleton.getInstance().post(
                         new UploadEvent(error.getResponse().getStatus()));
@@ -225,4 +238,11 @@ public class UploadService extends IntentService {
 
         }
     };
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 }
