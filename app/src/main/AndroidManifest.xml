@@ -81,6 +81,12 @@
         </activity>
 
         <activity
+            android:name=".Settings.RemoteCollectionSettingsActivity"
+            android:label="@string/title_activity_remote_collection" >
+        </activity>
+
+
+        <activity
             android:name=".Settings.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".Folder.MainActivity" >

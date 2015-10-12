@@ -27,6 +27,10 @@ public class ImejiFolder extends Model {
 
 
     @Expose
+    @Column(name = "modifiedDate")
+    private String modifiedDate;
+
+    @Expose
     //@Column(name = "contributors")
     private List<User> contributors;
 
@@ -96,5 +100,13 @@ public class ImejiFolder extends Model {
 
     public void setCoverItemUrl(String coverItemUrl) {
         this.coverItemUrl = coverItemUrl;
+    }
+
+    public String getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(String modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 }

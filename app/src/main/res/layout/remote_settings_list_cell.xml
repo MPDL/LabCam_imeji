@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="1dip" >
+
+
+    <TextView
+        android:id="@+id/setting_item_cell_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="35dip"
+        android:text="Title"
+        android:textSize="30dip"
+        android:typeface="sans"
+        android:textStyle="bold"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/setting_item_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dip"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_vertical"
+            android:layout_weight=".8"
+            android:textSize="10dip"
+            android:text="Some Cool Guy"/>
+
+        <RadioButton
+            android:id="@+id/radio_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:layout_marginEnd="10dp"
+            android:layout_weight=".1"
+            android:checked="false" />
+
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/setting_item_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="35dip"
+        android:layout_marginBottom="25dp"
+        android:textSize="10dip"
+        android:text="2015"/>
+</LinearLayout>

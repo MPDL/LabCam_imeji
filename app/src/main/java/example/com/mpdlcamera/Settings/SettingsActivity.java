@@ -9,12 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.dd.processbutton.FlatButton;
 
-import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.R;
 
 /**
@@ -24,7 +22,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
     private Activity activity = this;
-    private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private final String LOG_TAG = SettingsActivity.class.getSimpleName();
     private View rootView;
     Toolbar toolbar;
     String mOption;
@@ -42,10 +40,14 @@ public class SettingsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        TextView list_item_backup = (TextView) findViewById(R.id.list_item_backup);
-        TextView list_item_local = (TextView) findViewById(R.id.list_item_local);
-        TextView list_item_server = (TextView) findViewById(R.id.list_item_server);
         LinearLayout setting_backup = (LinearLayout) findViewById(R.id.setting_backup);
+        TextView list_item_backup = (TextView) findViewById(R.id.list_item_backup);
+
+        LinearLayout setting_local = (LinearLayout) findViewById(R.id.setting_local);
+        TextView list_item_local = (TextView) findViewById(R.id.list_item_local);
+
+        LinearLayout setting_server = (LinearLayout) findViewById(R.id.setting_server);
+        TextView list_item_server = (TextView) findViewById(R.id.list_item_server);
 
 
 
@@ -73,6 +75,25 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Intent settingsIntent = new Intent(activity, BackupSettingsActivity.class);
+                startActivity(settingsIntent);
+            }
+        });
+
+        setting_local.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent settingsIntent = new Intent(activity, LocalAlbumSettingsActivity.class);
+                startActivity(settingsIntent);
+            }
+        });
+
+
+        setting_server.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent settingsIntent = new Intent(activity, RemoteCollectionSettingsActivity.class);
                 startActivity(settingsIntent);
             }
         });

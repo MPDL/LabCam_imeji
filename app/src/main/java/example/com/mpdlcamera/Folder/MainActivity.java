@@ -34,8 +34,6 @@ import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
-import example.com.mpdlcamera.Settings.BackUpOptionSettings;
-import example.com.mpdlcamera.Settings.BackupSettingsActivity;
 import example.com.mpdlcamera.Settings.SettingsActivity;
 import example.com.mpdlcamera.Upload.NewFileObserver;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
@@ -242,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         });
 
 
+        //TODO why start upload here?
                 UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
                 mReceiver.setReceiver(this);
                 Intent intent = new Intent(this, UploadService.class);
@@ -254,6 +253,29 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 NewFileObserver newFileObserver = new NewFileObserver(handler,this);
                 getApplicationContext().getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,false,newFileObserver);
 
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateFolder();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        hidePDialog();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        hidePDialog();
     }
 
 
@@ -290,39 +312,15 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
             return true;
         }
-        if (id == R.id.backUp) {
-            Intent backUpIntent = new Intent(this, BackupSettingsActivity.class);
-            startActivity(backUpIntent);
-
-            return true;
-        }
+//        if (id == R.id.backUp) {
+//            Intent backUpIntent = new Intent(this, BackupSettingsActivity.class);
+//            startActivity(backUpIntent);
+//
+//            return true;
+//        }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateFolder();
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-    }
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        hidePDialog();
-
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        hidePDialog();
-    }
 
     private void hidePDialog() {
         if (pDialog != null) {

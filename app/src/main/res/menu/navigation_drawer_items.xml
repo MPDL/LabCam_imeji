@@ -11,10 +11,10 @@
             android:icon="@drawable/ic_action_location_found_dark"
             android:title="Folder"/>
 
-        <item
-            android:id="@+id/navItem3"
-            android:icon="@drawable/ic_action_location_found_dark"
-            android:title="Photos"/>
+        <!--<item-->
+            <!--android:id="@+id/navItem3"-->
+            <!--android:icon="@drawable/ic_action_location_found_dark"-->
+            <!--android:title="Photos"/>-->
 
         <item
             android:id="@+id/navItem4"
