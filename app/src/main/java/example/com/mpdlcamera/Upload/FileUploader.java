@@ -2,6 +2,8 @@ package example.com.mpdlcamera.Upload;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -70,7 +72,13 @@ public class FileUploader {
 
         json = "{" + jsonPart1 + "}";
         Log.v(TAG, json);
-        RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+
+        if(isNetworkAvailable()) {
+            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+        }
+        else {
+            Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -91,13 +99,19 @@ public class FileUploader {
 
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
-                Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
+                if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
+                    Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 OttoSingleton.getInstance().post(
                         new UploadEvent(error.getResponse().getStatus()));
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                 if (jsonBody.contains("already exists")) {
-                } else
+                }
+                else
                     Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
 
             }
@@ -106,4 +120,11 @@ public class FileUploader {
 
         }
     };
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 }

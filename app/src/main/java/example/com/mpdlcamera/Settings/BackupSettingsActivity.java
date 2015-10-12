@@ -3,6 +3,8 @@ package example.com.mpdlcamera.Settings;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -97,13 +99,15 @@ public class BackupSettingsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-                // PopupWindow ppWindow = new PopupWindow(inflater.inflate(R.layout.popup_backup, null, false), 600, 600, true);
 
                 View popupView = inflater.inflate(R.layout.popup_backup, null);
                 final PopupWindow popupWindow = new PopupWindow(
                         popupView,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                        400,
+                        380);
+
+                popupWindow.setFocusable(true);
+                popupWindow.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
                 RadioButton radOne = (RadioButton) popupView.findViewById(R.id.radioOne);
 
