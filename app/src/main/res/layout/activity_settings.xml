@@ -9,16 +9,43 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="example.com.mpdlcamera.Settings.SettingsActivity">
 
+    <!--<android.support.v7.widget.Toolbar-->
+        <!--android:id="@+id/toolbar"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="?attr/actionBarSize"-->
+        <!--app:layout_collapseMode="pin"-->
+        <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light"-->
+        <!--app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />-->
+
+
+    <!-- Toolbar show title -->
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:layout_collapseMode="pin"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        android:background="@color/primary">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="7dp"
+            android:orientation="horizontal"
+            android:background="@color/primary">
+
+            <TextView
+                android:id="@+id/locationText"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginEnd="50dp"
+                android:text="@string/action_settings"
+                android:textColor="@color/white"
+                android:gravity="center" />
+
+        </LinearLayout>
+    </android.support.v7.widget.Toolbar>
 
     <!--
-    three views jump to sub setting pages
+    three views for jumping to sub-setting pages
     -->
 
     <LinearLayout

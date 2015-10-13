@@ -2,14 +2,12 @@ package example.com.mpdlcamera.Settings;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.activeandroid.ActiveAndroid;
@@ -18,7 +16,6 @@ import com.activeandroid.query.Select;
 import java.util.ArrayList;
 import java.util.List;
 
-import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
@@ -59,6 +56,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity {
                 ActiveAndroid.setTransactionSuccessful();
             } finally{
                 ActiveAndroid.endTransaction();
+                Log.v(LOG_TAG, "size: " + collectionListLocal.size() + "");
 
                 adapter.notifyDataSetChanged();
                 pDialog.hide();
@@ -81,11 +79,11 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings_remote);
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
-//        toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        getSupportActionBar().setHomeButtonEnabled(true);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         mPrefs = this.getSharedPreferences("myPref", 0);
@@ -100,21 +98,21 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity {
 
 
         listView = (ListView) findViewById(R.id.settings_remote_listView);
-
+        listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         adapter = new SettingsListAdapter(activity, collectionListLocal);
         listView.setAdapter(adapter);
 
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                ImejiFolder folder = (ImejiFolder) adapter.getItem(position);
-
-                Intent showItemsIntent = new Intent(activity, ItemsActivity.class);
-                showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
-                startActivity(showItemsIntent);
-            }
-        });
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+//                ImejiFolder folder = (ImejiFolder) adapter.getItem(position);
+//
+//                Intent showItemsIntent = new Intent(activity, ItemsActivity.class);
+//                showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
+//                startActivity(showItemsIntent);
+//            }
+//        });
 
 
     }

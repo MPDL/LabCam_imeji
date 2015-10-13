@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity"
+    tools:context=".LoginActivity"
 
     android:background="#ffffff">
 
@@ -17,6 +17,22 @@
         android:layout_centerInParent="true"
         android:padding="10dp"
         android:id="@+id/linearLayout">
+
+
+
+        <com.wrapp.floatlabelededittext.FloatLabeledEditText
+            android:id="@+id/url_text_input_layout"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/serverURL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:hint="Server URL"
+                android:textColorHint="#cccccc"/>
+        </com.wrapp.floatlabelededittext.FloatLabeledEditText>
 
         <EditText
             android:id="@+id/userName"
@@ -53,17 +69,17 @@
             android:layout_margin="4dp"
             android:text="Login"
             />
+        <Button
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/qr"
+            android:id="@+id/qr_scanner"
+            android:layout_margin="4dp"
+            android:layout_gravity="center_horizontal"
+            />
     </LinearLayout>
 
-    <Button
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:background="@drawable/qr"
-        android:id="@+id/qr_scanner"
-        android:layout_below="@+id/linearLayout"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="74dp"
-        android:layout_marginStart="74dp" />
+
 
 
 

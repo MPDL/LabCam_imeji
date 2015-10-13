@@ -4,7 +4,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Settings.RemoteCollectionSettingsActivity">
+    tools:context=".Settings.RemoteCollectionSettingsActivity"
+    android:orientation="vertical">
+
+    <!-- Toolbar show title -->
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primary">
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="7dp"
+            android:orientation="horizontal"
+            android:background="@color/primary">
+
+            <TextView
+                android:id="@+id/locationText"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginEnd="50dp"
+                android:text="@string/title_activity_remote_collection"
+                android:textColor="@color/white"
+                android:gravity="center" />
+
+        </LinearLayout>
+    </android.support.v7.widget.Toolbar>
 
         <ListView
             android:layout_width="match_parent"

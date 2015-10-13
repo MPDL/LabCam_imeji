@@ -23,7 +23,7 @@ import example.com.mpdlcamera.Utils.DeviceStatus;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText usernameView, passwordView;
+    private EditText usernameView, passwordView, serverURLView;
     private Button signIn;
     private Button scan;
     private Activity activity = this;
@@ -31,6 +31,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private String username;
     private String password;
+    private String serverURL;
     private SharedPreferences mPrefs;
     private View rootView;
     private static final int INTENT_QR = 1001;
@@ -43,6 +44,7 @@ public class LoginActivity extends AppCompatActivity {
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
+        serverURLView = (EditText) findViewById(R.id.serverURL);
         usernameView = (EditText) findViewById(R.id.userName);
         passwordView = (EditText) findViewById(R.id.password);
         signIn = (Button) findViewById(R.id.btnSignIn);
@@ -53,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         mPrefs = this.getSharedPreferences("myPref", 0);
         usernameView.setText(mPrefs.getString("username", ""));
         passwordView.setText(mPrefs.getString("password", ""));
+        serverURLView.setText(mPrefs.getString("server", ""));
 
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override

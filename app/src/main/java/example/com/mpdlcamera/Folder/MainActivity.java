@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private Activity activity = this;
     //private FolderGridAdapter adapter;
     //private GridView gridview;
+    private NavigationView navigation;
 
     private FolderListAdapter adapter;
     private ListView listView;
@@ -186,6 +188,29 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
+
+
+        navigation = (NavigationView) findViewById(R.id.navigation);
+        navigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                int id = menuItem.getItemId();
+                switch (id) {
+                    case R.id.navItem1:
+                        break;
+                    case R.id.navItem2:
+                        break;
+                    case R.id.navItem3:
+                        Intent showSettingIntent = new Intent(activity, SettingsActivity.class);
+                        startActivity(showSettingIntent);
+                        break;
+                }
+                return false;
+            }
+        });
+
+
+
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -307,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            Intent showSettingIntent = new Intent(this, SettingsActivity.class);
+            Intent showSettingIntent = new Intent(activity, SettingsActivity.class);
             startActivity(showSettingIntent);
 
             return true;

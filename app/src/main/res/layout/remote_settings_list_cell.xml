@@ -10,10 +10,11 @@
         android:id="@+id/setting_item_cell_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="35dip"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="35dp"
+        android:layout_marginEnd="60dp"
         android:text="Title"
-        android:textSize="30dip"
+        android:textSize="25dip"
         android:typeface="sans"
         android:textStyle="bold"/>
 
@@ -26,8 +27,8 @@
             android:id="@+id/setting_item_user"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="35dip"
-            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="35dp"
             android:gravity="center_vertical"
             android:layout_weight=".8"
             android:textSize="10dip"
@@ -37,11 +38,11 @@
             android:id="@+id/radio_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColorHighlight="#ff76a2ff"
             android:gravity="end"
             android:layout_marginEnd="10dp"
             android:layout_weight=".1"
             android:checked="false" />
-
 
     </LinearLayout>
 
@@ -51,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="35dip"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="15dp"
         android:textSize="10dip"
         android:text="2015"/>
 </LinearLayout>
