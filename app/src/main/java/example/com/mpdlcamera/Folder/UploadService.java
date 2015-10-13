@@ -209,6 +209,18 @@ public class UploadService extends IntentService {
             Toast.makeText(mContext, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
             Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
+            mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+
+            if(mPrefs.contains("rpfd")) {
+
+                if(mPrefs.getString("rpfd","").equalsIgnoreCase("On")) {
+
+                    File file = typedFile.file();
+                    Boolean deleted = file.delete();
+                    Log.v(TAG, "deleted:" +deleted);
+                }
+
+            }
 
         }
 

@@ -1,9 +1,11 @@
 package example.com.mpdlcamera.Upload;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -37,14 +39,16 @@ public class FileUploader {
 
     private Context context;
 
+    private Activity act;
+
     private static final String TAG = "FileUploader";
     private String username;
     private String password;
 
-    public FileUploader(Context context) {
+    public FileUploader(Context context,Activity act) {
         this.context = context;
+        this.act = act;
     }
-
     public FileUploader() {
 
     }
@@ -90,6 +94,28 @@ public class FileUploader {
 
             Toast.makeText(context, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
             Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
+
+            mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+            if(mPrefs.contains("rpfd")) {
+
+                if(mPrefs.getString("rpfd","").equalsIgnoreCase("On")) {
+
+                    File file = typedFile.file();
+                    Boolean deleted = file.delete();
+                    Log.v(TAG, "deleted:" +deleted);
+                }
+
+            }
+
+            if(mPrefs.contains("lau")) {
+
+                if(mPrefs.getString("lau","").equalsIgnoreCase("On")) {
+
+                    act.finish();
+
+                }
+            }
 
 
         }

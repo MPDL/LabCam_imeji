@@ -3,14 +3,16 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="6dip">
+    android:padding="6dip"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp">
 
 
     <TextView
         android:id="@+id/folder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-         />
+        android:textSize="22dp" />
 
     <Switch
         android:id="@+id/fswitch"
@@ -20,7 +22,6 @@
         android:focusable="false"
         android:layout_alignBaseline="@+id/folder"
         android:layout_alignBottom="@+id/folder"
-        android:focusableInTouchMode="false"
-        />
+        android:focusableInTouchMode="false" />
 
 </RelativeLayout>

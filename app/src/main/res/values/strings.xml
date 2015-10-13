@@ -24,6 +24,8 @@
     <string name="lau">Logout After Uploading</string>
     <string name="rpfd">Remove Photos From Device</string>
     <string name="rgl">Remove Geo Location</string>
+    <string name="logout">All Files are Uploaded, Do you want to log out?</string>
+
 
 
 </resources>

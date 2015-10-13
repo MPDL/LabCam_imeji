@@ -2,9 +2,11 @@ package example.com.mpdlcamera.Folder;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -17,11 +19,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
@@ -30,6 +36,7 @@ import com.activeandroid.query.Select;
 import java.util.ArrayList;
 import java.util.List;
 
+import example.com.mpdlcamera.Auth.LoginActivity;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
@@ -397,6 +404,46 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 //ArrayAdapter arrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_2, results);
                 //listView.setAdapter(arrayAdapter);
                 Toast.makeText(this, "Files are synced", Toast.LENGTH_LONG).show();
+
+                mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+                if(mPrefs.contains("lau")) {
+
+                    if(mPrefs.getString("lau","").equalsIgnoreCase("On")) {
+
+                        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                        View popupView = inflater.inflate(R.layout.logout_confirm, null);
+                        final PopupWindow popupWindow = new PopupWindow(
+                                popupView,
+                                550,
+                                300);
+                        popupWindow.setFocusable(true);
+                        popupWindow.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                        popupWindow.setAnimationStyle(R.style.AnimationPopup);
+
+                        Button yes = (Button) popupView.findViewById(R.id.buttonYes);
+                        Button no = (Button) popupView.findViewById(R.id.buttonNo);
+                        popupWindow.showAtLocation(findViewById(R.id.navigation), Gravity.CENTER, 0, 0);
+
+                        yes.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                finish();
+                                Intent loginIntent = new Intent(activity, LoginActivity.class);
+                                startActivity(loginIntent);
+                            }
+                        });
+
+                        no.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                popupWindow.dismiss();
+                            }
+                        });
+
+                    }
+                }
 
                 break;
             case 2:

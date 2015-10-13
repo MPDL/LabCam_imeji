@@ -1,5 +1,6 @@
 package example.com.mpdlcamera.Upload;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
@@ -16,12 +17,15 @@ import example.com.mpdlcamera.Model.DataItem;
 /**
  * Created by kiran on 29.09.15.
  */
+
 public class NewFileObserver extends ContentObserver {
 
     SharedPreferences settings;
 
 
     private Context context;
+    private Activity act;
+
 
     FileUploader fileUploader = new FileUploader();
 
@@ -31,6 +35,8 @@ public class NewFileObserver extends ContentObserver {
     public NewFileObserver(Handler handler, MainActivity application) {
         super(handler);
         this.context = application.getBaseContext();
+        this.act = (Activity) application;
+
     }
 
 
@@ -71,7 +77,7 @@ public class NewFileObserver extends ContentObserver {
 
             if (prefOption.equalsIgnoreCase("both") || (prefOption.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
 
-                FileUploader fileUploader = new FileUploader(context);
+                FileUploader fileUploader = new FileUploader(context,act);
                 fileUploader.upload(item);
 
             }
