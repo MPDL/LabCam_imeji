@@ -19,4 +19,9 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
+    <style name="AnimationPopup">
+        <item name="@android:windowEnterAnimation">@anim/popup_open</item>
+        <item name="@android:windowExitAnimation">@anim/popup_close</item>
+    </style>
 </resources>

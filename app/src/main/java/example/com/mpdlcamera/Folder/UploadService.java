@@ -130,6 +130,7 @@ public class UploadService extends IntentService {
                                 if (folderName.equalsIgnoreCase(cursor.getString(column_index_folder_name))) {
 
 
+
                                     String fileName = cursor.getString(column_index_file_name);
                                     String path = cursor.getString(column_index_data);
 

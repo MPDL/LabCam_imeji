@@ -86,7 +86,7 @@ private Context context;
 
                     String folder = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME));
 
-                    if(preferences.contains(folder) && preferences.getString("uploadStatus","").equalsIgnoreCase("back")) {
+                    if(preferences.contains(folder)) {
 
                         String state = preferences.getString(folder,"");
                         if(state.equalsIgnoreCase("On")) {
