@@ -112,8 +112,8 @@ public class BackupSettingsActivity extends AppCompatActivity {
                 View popupView = inflater.inflate(R.layout.popup_backup, null);
                 final PopupWindow popupWindow = new PopupWindow(
                         popupView,
-                        400,
-                        380);
+                        580,
+                        440);
 
                 popupWindow.setFocusable(true);
                 popupWindow.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
