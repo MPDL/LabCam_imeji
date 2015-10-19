@@ -107,7 +107,7 @@ public class SettingsListAdapter extends BaseAdapter {
         System.out.println(LOG_TAG + " selectedPosition " + selectedPosition);
 
 
-        if(position !=0) {//TODO bug 可以把第一个cell做成静态的
+        if(position !=0) {//TODO bug make the first cell as static
             checkBox.setChecked(position == selectedPosition);
         }
         checkBox.setTag(position);
