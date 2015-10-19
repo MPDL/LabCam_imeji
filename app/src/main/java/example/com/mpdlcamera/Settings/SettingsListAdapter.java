@@ -20,6 +20,7 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
  * Created by allen on 12/10/15.
@@ -29,7 +30,8 @@ public class SettingsListAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private List<ImejiFolder> folderItems;
     private final String LOG_TAG = SettingsListAdapter.class.getSimpleName();
-    int selectedPosition = 0;
+    int selectedPosition;
+
 
     public SettingsListAdapter(Activity activity, List<ImejiFolder> folderItems) {
         this.activity = activity;
@@ -53,15 +55,15 @@ public class SettingsListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        Log.v("getView");
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
 
         WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
 
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
 
-        Log.v(size.x  + " width", size.y  + " height");
 
         if (inflater == null)
             inflater = (LayoutInflater) activity
@@ -74,10 +76,40 @@ public class SettingsListAdapter extends BaseAdapter {
         RadioButton checkBox = (RadioButton) convertView.findViewById(R.id.radio_button);
         TextView date = (TextView) convertView.findViewById(R.id.setting_item_date);
 
-        Log.v(LOG_TAG, " XX "+position);
-        Log.v(LOG_TAG, " XX " + selectedPosition);
 
-        checkBox.setChecked(position == selectedPosition);
+        String collectionId= preferences.getString("collectionID", DeviceStatus.collectionID);
+        System.out.println("collectionId" + " "+collectionId);
+
+        if(folderItems.size()>0) {
+
+            // getting item data for the row
+            ImejiFolder collection = folderItems.get(position);
+
+            //checkBox
+            if(collection.getImejiId().equals(collectionId)){
+                selectedPosition = position;
+                notifyDataSetChanged();
+            }
+
+            //title
+            title.setText(collection.getTitle());
+
+            // user
+            if(collection.getContributors() != null) {
+                user.setText(collection.getContributors().get(0).getCompleteName());
+            }
+            // date
+            date.setText(String.valueOf(collection.getModifiedDate()).split("\\+")[0]);
+        }
+
+
+        System.out.println(LOG_TAG + " position " + position);
+        System.out.println(LOG_TAG + " selectedPosition " + selectedPosition);
+
+
+        if(position !=0) {//TODO bug 可以把第一个cell做成静态的
+            checkBox.setChecked(position == selectedPosition);
+        }
         checkBox.setTag(position);
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,26 +119,14 @@ public class SettingsListAdapter extends BaseAdapter {
 
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("collectionID", folderItems.get(selectedPosition).id);
-                Log.v(LOG_TAG, " XX " + selectedPosition);
+//                System.out.println(LOG_TAG + " selectedPosition on click " + selectedPosition);
+//                System.out.println(preferences.getString("collectionID","default") + selectedPosition);
+
                 editor.apply();
             }
         });
 
-        if(folderItems.size()>0) {
-            // getting item data for the row
-            ImejiFolder collection = folderItems.get(position);
 
-            //title
-            title.setText(collection.getTitle());
-            Log.v("xxxxx",collection.getTitle() );
-
-            // user
-            if(collection.getContributors() != null) {
-                user.setText(collection.getContributors().get(0).getCompleteName());
-            }
-            // date
-            date.setText(String.valueOf(collection.getModifiedDate()).split("\\+")[0]);
-        }
         return convertView;
     }
 

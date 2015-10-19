@@ -55,8 +55,11 @@ public class LoginActivity extends AppCompatActivity {
         mPrefs = this.getSharedPreferences("myPref", 0);
         usernameView.setText(mPrefs.getString("username", ""));
         passwordView.setText(mPrefs.getString("password", ""));
-        serverURLView.setText(mPrefs.getString("server", ""));
-
+        if(!mPrefs.getString("server", "").equals("")) {
+            serverURLView.setText(mPrefs.getString("server", ""));
+        }else{
+            serverURLView.setText(DeviceStatus.BASE_URL);
+        }
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

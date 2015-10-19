@@ -3,7 +3,6 @@ package example.com.mpdlcamera.Settings;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -11,11 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -26,10 +21,8 @@ import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
-
 import com.dd.processbutton.FlatButton;
 
-import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.R;
 
 /**
@@ -47,7 +40,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
         setContentView(R.layout.backup_settings_main);
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
-        toolbar = (Toolbar) findViewById(R.id.toolbarTwo);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setHomeButtonEnabled(true);

@@ -36,7 +36,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity {
     private Activity activity = this;
     private final String LOG_TAG = RemoteCollectionSettingsActivity.class.getSimpleName();
     private View rootView;
-    Toolbar toolbar;
+    private Toolbar toolbar;
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
 
 
@@ -50,7 +50,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity {
                 for(ImejiFolder folder : folderList){
                     Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
                     Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
-
+                    folder.setImejiId(folder.id);
                     collectionListLocal.add(folder);
                 }
                 ActiveAndroid.setTransactionSuccessful();

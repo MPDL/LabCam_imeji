@@ -31,6 +31,7 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import java.util.ArrayList;
@@ -135,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                                 folder.setItems(dataList);
 
                                 folder.setCoverItemUrl(coverItem.getWebResolutionUrlUrl());
-
+                                folder.setImejiId(folder.id);
                                 folder.save();
 
                             }
@@ -145,9 +146,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 } finally {
                     ActiveAndroid.endTransaction();
 
-                    //adapter.notifyDataSetChanged();
-                    adapter = new FolderListAdapter(activity, collectionListLocal);
-                    listView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+//                    adapter = new FolderListAdapter(activity, collectionListLocal);
+//                    listView.setAdapter(adapter);
 
 
                     if(pDialog != null) {
@@ -307,6 +308,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     @Override
     public void onDestroy() {
         super.onDestroy();
+        new Delete().
+                from(ImejiFolder.class)
+                .execute();
         hidePDialog();
     }
 

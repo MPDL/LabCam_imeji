@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -36,7 +37,7 @@ import example.com.mpdlcamera.Utils.DeviceStatus;
 
 
 public class LocalAlbumSettingsActivity extends ListActivity {
-
+//TODO cannot set toolbar for ListActivity
 
     String networkStatus;
     String prefOption;
@@ -56,13 +57,10 @@ public class LocalAlbumSettingsActivity extends ListActivity {
     String status;
     Boolean fStatus;
 
-
-
     private SharedPreferences mPrefs;
-
-
     private CheckBox checkSyncAll;
-
+    private View rootView;
+    Toolbar toolbar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

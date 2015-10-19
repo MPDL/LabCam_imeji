@@ -20,19 +20,14 @@
 
 
 
-        <com.wrapp.floatlabelededittext.FloatLabeledEditText
-            android:id="@+id/url_text_input_layout"
-            android:layout_margin="10dp"
+        <EditText
+            android:id="@+id/serverURL"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <EditText
-                android:id="@+id/serverURL"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:hint="Server URL"
-                android:textColorHint="#cccccc"/>
-        </com.wrapp.floatlabelededittext.FloatLabeledEditText>
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:inputType="text"
+            android:hint="Server URL"
+            android:textColorHint="#cccccc"/>
 
         <EditText
             android:id="@+id/userName"

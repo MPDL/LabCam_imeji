@@ -17,6 +17,9 @@ public class ImejiFolder extends Model {
     //@Column(name = "ImejiId")
     public String id;
 
+    @Column(name = "ImejiId")
+    private String ImejiId;
+
     @Expose
     @Column(name = "title")
     private String title;
@@ -53,6 +56,14 @@ public class ImejiFolder extends Model {
 //    public void setId(String id) {
 //        this.id = id;
 //    }
+
+    public String getImejiId() {
+        return ImejiId;
+    }
+
+    public void setImejiId(String imejiId) {
+        ImejiId = imejiId;
+    }
 
     public List<DataItem> getItems() {
         return items;
