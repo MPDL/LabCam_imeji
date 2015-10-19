@@ -127,26 +127,12 @@
     </LinearLayout>
 
 
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/rgl"
-        android:textSize="20dip"
 
-        android:id="@+id/rgl"
-        android:layout_below="@+id/rpfd"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp"
-        android:paddingLeft="10dp"/>
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:layout_below="@id/rgl"
+        android:layout_below="@id/rpfd"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:background="#80808080" >
@@ -156,7 +142,7 @@
     <com.dd.processbutton.FlatButton
         android:layout_centerHorizontal="true"
         android:id="@+id/btnDone"
-        android:layout_below="@id/rgl"
+        android:layout_below="@id/rpfd"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"

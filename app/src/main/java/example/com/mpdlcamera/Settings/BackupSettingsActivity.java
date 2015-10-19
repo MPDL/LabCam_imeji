@@ -48,7 +48,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
 
         Switch lau = (Switch) findViewById(R.id.lau);
         Switch rpfd = (Switch) findViewById(R.id.rpfd);
-        Switch rgl = (Switch) findViewById(R.id.rgl);
+       // Switch rgl = (Switch) findViewById(R.id.rgl);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -91,7 +91,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
             rpfd.setChecked(false);
 
 
-        if(preferences.contains("rgl")) {
+      /*  if(preferences.contains("rgl")) {
             if(preferences.getString("rgl","").equalsIgnoreCase("On")) {
                 rgl.setChecked(true);
             }
@@ -101,7 +101,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
         else
             rgl.setChecked(false);
 
-
+        */
 
         linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -257,7 +257,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
             }
         });
 
-        rgl.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      /*  rgl.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
@@ -277,6 +277,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
 
             }
         });
+*/
 
         FlatButton btnDone = (FlatButton) findViewById(R.id.btnDone);
 

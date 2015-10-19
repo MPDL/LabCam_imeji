@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -36,8 +37,8 @@ import example.com.mpdlcamera.Utils.DeviceStatus;
  */
 
 
-public class LocalAlbumSettingsActivity extends ListActivity {
-//TODO cannot set toolbar for ListActivity
+public class LocalAlbumSettingsActivity extends AppCompatActivity {
+
 
     String networkStatus;
     String prefOption;
@@ -49,6 +50,9 @@ public class LocalAlbumSettingsActivity extends ListActivity {
     private String collectionID = DeviceStatus.collectionID;
     private String username;
     private String password;
+    private View rootView;
+    Toolbar toolbar;
+
 
     private List<DataItem> dataList = new ArrayList<DataItem>();
 
@@ -57,10 +61,13 @@ public class LocalAlbumSettingsActivity extends ListActivity {
     String status;
     Boolean fStatus;
 
+
+
     private SharedPreferences mPrefs;
+
+
     private CheckBox checkSyncAll;
-    private View rootView;
-    Toolbar toolbar;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,6 +76,12 @@ public class LocalAlbumSettingsActivity extends ListActivity {
         setContentView(R.layout.activity_local_album_settings);
 
         //CustomAdapter switchAdapter = new CustomAdapter(this, 1);
+        rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
@@ -152,11 +165,15 @@ public class LocalAlbumSettingsActivity extends ListActivity {
 
 
         switchAdapter = new CustomAdapter(this, R.layout.row, folderList);
-        setListAdapter(switchAdapter);
 
-        final ListView listView = getListView();
+        final ListView listViewLocal = (ListView) findViewById(R.id.listviewLocal);
+        listViewLocal.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-        final int size = getListAdapter().getCount();
+        listViewLocal.setAdapter(switchAdapter);
+
+        // final ListView listView = getListView();
+
+        final int size = listViewLocal.getAdapter().getCount();
 
 
         checkSyncAll.setOnClickListener(new View.OnClickListener() {
@@ -166,7 +183,7 @@ public class LocalAlbumSettingsActivity extends ListActivity {
 
 
                     for (int i = 0; i < size; i++) {
-                        RelativeLayout RelativeOne = (RelativeLayout) getViewByPosition(i, listView);
+                        RelativeLayout RelativeOne = (RelativeLayout) getViewByPosition(i, listViewLocal);
                         Switch mSwitch = (Switch) RelativeOne.findViewById(R.id.fswitch);
                         mSwitch.setChecked(true);
 
@@ -175,7 +192,7 @@ public class LocalAlbumSettingsActivity extends ListActivity {
                 if (!checkSyncAll.isChecked()) {
 
                     for (int i = 0; i < size; i++) {
-                        RelativeLayout RelativeOne = (RelativeLayout) getViewByPosition(i, listView);
+                        RelativeLayout RelativeOne = (RelativeLayout) getViewByPosition(i, listViewLocal);
                         Switch mSwitch = (Switch) RelativeOne.findViewById(R.id.fswitch);
                         mSwitch.setChecked(false);
 

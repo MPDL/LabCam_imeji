@@ -25,6 +25,7 @@
     <string name="rpfd">Remove Photos From Device</string>
     <string name="rgl">Remove Geo Location</string>
     <string name="logout">All Files are Uploaded, Do you want to log out?</string>
+    <string name="title_activity_local_album_settings">Local Album Settings</string>
 
 
 
