@@ -77,6 +77,16 @@
                 android:value=".Items.ItemsActivity" />
         </activity>
 
+        <activity
+            android:name=".Gallery.LocalImageActivity"
+            android:label="@string/title_local_activity"
+            android:parentActivityName=".Folder.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Folder.MainActivity" />
+        </activity>
+
+
 
         <!-- for settings-->
         <activity

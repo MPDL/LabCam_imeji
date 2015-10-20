@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.activeandroid.ActiveAndroid;
 
@@ -26,7 +29,7 @@ import retrofit.client.Response;
 /**
  * Created by allen on 03/09/15.
  */
-public class ItemsActivity extends Activity {
+public class ItemsActivity extends AppCompatActivity {
 
 
     private List<DataItem> dataList = new ArrayList<DataItem>();
@@ -39,6 +42,9 @@ public class ItemsActivity extends Activity {
     SharedPreferences mPrefs;
     private String username;
     private String password;
+
+
+    Toolbar toolbar;
 
     Callback<List<DataItem>> callbackItems = new Callback<List<DataItem>>() {
         @Override
@@ -81,6 +87,14 @@ public class ItemsActivity extends Activity {
         setContentView(R.layout.items_grid_view);
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        TextView titleView = (TextView) findViewById(R.id.title);
+
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         password = mPrefs.getString("password", "");
@@ -88,9 +102,12 @@ public class ItemsActivity extends Activity {
         Intent intent = activity.getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
             dataCollectionId = intent.getStringExtra(Intent.EXTRA_TEXT);
+            String title = intent.getStringExtra("folderTitle");
+
             getFolderItems(dataCollectionId);
 
 
+            titleView.setText(title);
             //adapter =  new CustomListAdapter(getActivity(), dataList);
             adapter = new ItemsGridAdapter(activity, dataList);
 

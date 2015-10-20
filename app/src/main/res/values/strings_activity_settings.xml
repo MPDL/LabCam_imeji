@@ -3,6 +3,8 @@
     <string name="title_activity_local_album">Local Album Settings</string>
     <string name="title_activity_remote_collection">Remote Collection Settings</string>
     <string name="title_activity_backup">Backup Settings</string>
+    <string name="title_activity_Items">Items</string>
+    <string name="title_activity_Images">Images</string>
 
     <!-- Strings related to Settings -->
 

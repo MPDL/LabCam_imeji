@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import example.com.mpdlcamera.Auth.LoginActivity;
+import example.com.mpdlcamera.Gallery.LocalImageActivity;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
@@ -205,12 +206,21 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 int id = menuItem.getItemId();
                 switch (id) {
                     case R.id.navItem1:
+                        Intent showLocalImageIntent = new Intent(activity, LocalImageActivity.class);
+                        startActivity(showLocalImageIntent);
+
                         break;
                     case R.id.navItem2:
+                        Intent showMainIntent = new Intent(activity, MainActivity.class);
+                        startActivity(showMainIntent);
+
                         break;
                     case R.id.navItem3:
                         Intent showSettingIntent = new Intent(activity, SettingsActivity.class);
                         startActivity(showSettingIntent);
+                        break;
+                    case R.id.navItem4:
+
                         break;
                 }
                 return false;
@@ -268,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
                 Intent showItemsIntent = new Intent(activity, ItemsActivity.class);
                 showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
+                showItemsIntent.putExtra("folderTitle", folder.getTitle());
                 startActivity(showItemsIntent);
             }
         });

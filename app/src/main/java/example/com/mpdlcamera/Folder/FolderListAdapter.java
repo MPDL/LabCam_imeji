@@ -80,6 +80,7 @@ public class FolderListAdapter extends BaseAdapter {
         if(folderItems.size()>0) {
             // getting item data for the row
             ImejiFolder collection = folderItems.get(position);
+            Log.v(LOG_TAG, collection.getTitle());
 
             if (collection.getItems() != null) {
                 if (collection.getItems().size() > 0) {
