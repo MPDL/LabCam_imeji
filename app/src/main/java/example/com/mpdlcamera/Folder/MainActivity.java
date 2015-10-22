@@ -422,9 +422,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
                 mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-                if(mPrefs.contains("lau")) {
+                if(mPrefs.contains("L_A_U")) {
 
-                    if(mPrefs.getString("lau","").equalsIgnoreCase("On")) {
+                    if(mPrefs.getBoolean("L_A_U", true)) {
 
                         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 

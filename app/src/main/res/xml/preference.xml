@@ -1,0 +1,29 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <PreferenceCategory
+        android:title="Backup Settings">
+        <ListPreference
+            android:key="status"
+            android:title="Backup Options"
+
+            android:entries="@array/listentries"
+            android:entryValues="@array/listvalues" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Other Settings">
+        <SwitchPreference
+            android:key="L_A_U"
+            android:title="@string/lau"
+             />
+
+        <SwitchPreference
+            android:key="R_P_F_D"
+            android:title="@string/rpfd"
+             />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

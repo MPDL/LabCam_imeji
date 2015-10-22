@@ -97,9 +97,9 @@ public class FileUploader {
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-            if(mPrefs.contains("rpfd")) {
+            if(mPrefs.contains("R_P_F_D")) {
 
-                if(mPrefs.getString("rpfd","").equalsIgnoreCase("On")) {
+                if(mPrefs.getBoolean("R_P_F_D",true)) {
 
                     File file = typedFile.file();
                     Boolean deleted = file.delete();
@@ -110,7 +110,7 @@ public class FileUploader {
 
             if(mPrefs.contains("lau")) {
 
-                if(mPrefs.getString("lau","").equalsIgnoreCase("On")) {
+                if(mPrefs.getBoolean("L_A_U", true)) {
 
                     act.finish();
 

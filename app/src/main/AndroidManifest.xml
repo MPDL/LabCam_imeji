@@ -132,6 +132,13 @@
             android:label="@string/title_backup_activity" >
         </activity>
 
+        <activity android:name=".Settings.PrefActivity"
+            android:parentActivityName=".Settings.BackupSettingsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Settings.SettingsActivity" />
+
+        </activity>
 
         <!--service-->
         <service android:name="example.com.mpdlcamera.Folder.UploadService"

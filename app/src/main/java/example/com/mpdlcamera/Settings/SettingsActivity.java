@@ -74,8 +74,8 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent settingsIntent = new Intent(activity, BackupSettingsActivity.class);
-                startActivity(settingsIntent);
+                Intent intentSetPref = new Intent(getApplicationContext(), PrefActivity.class);
+                startActivityForResult(intentSetPref, 0);
             }
         });
 
@@ -102,6 +102,23 @@ public class SettingsActivity extends AppCompatActivity {
 
 
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+    /*    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String prefList = sharedPreferences.getString("status", "");
+
+        tv.setText(prefList);
+
+        String statusLau = sharedPreferences.getString("lau","");
+
+
+*/
     }
 
 }

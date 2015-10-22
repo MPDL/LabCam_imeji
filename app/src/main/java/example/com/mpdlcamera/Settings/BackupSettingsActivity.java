@@ -34,6 +34,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
     String mOption = null;
     private View rootView;
     Toolbar toolbar;
+    TextView tv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +53,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        TextView tv = (TextView) findViewById(R.id.backup_item);
+        tv = (TextView) findViewById(R.id.backup_item_list);
         if(preferences.contains("status")) {
             String option = preferences.getString("status", "");
             if (option.equalsIgnoreCase("wifi")) {
@@ -70,7 +71,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.netOption);
 
 
-        if(preferences.contains("lau")) {
+    /*    if(preferences.contains("lau")) {
                 if(preferences.getString("lau","").equalsIgnoreCase("On")) {
                     lau.setChecked(true);
                 }
@@ -90,7 +91,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
         else
             rpfd.setChecked(false);
 
-
+*/
       /*  if(preferences.contains("rgl")) {
             if(preferences.getString("rgl","").equalsIgnoreCase("On")) {
                 rgl.setChecked(true);
@@ -106,7 +107,11 @@ public class BackupSettingsActivity extends AppCompatActivity {
         linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                Intent intentSetPref = new Intent(getApplicationContext(), PrefActivity.class);
+                startActivityForResult(intentSetPref,0);
+
+          /*      LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
                 View popupView = inflater.inflate(R.layout.popup_backup, null);
@@ -149,6 +154,9 @@ public class BackupSettingsActivity extends AppCompatActivity {
                 done.setOnClickListener(new Button.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
+                        Intent intentSetPref = new Intent(getApplicationContext(), PrefActivity.class);
+                        startActivityForResult(intentSetPref,0);
 
                         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -196,6 +204,8 @@ public class BackupSettingsActivity extends AppCompatActivity {
                         } else
                             mOption = getString(R.string.manual);
                         tv.setText(mOption);
+
+
                     }
                 });
 
@@ -208,13 +218,15 @@ public class BackupSettingsActivity extends AppCompatActivity {
                         popupWindow.dismiss();
                     }
                 });
+
+                */
             }
         });
 
 
 
 
-        lau.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+      /*  lau.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
@@ -256,6 +268,8 @@ public class BackupSettingsActivity extends AppCompatActivity {
 
             }
         });
+
+        */
 
       /*  rgl.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -302,6 +316,25 @@ public class BackupSettingsActivity extends AppCompatActivity {
 
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+    /*    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String prefList = sharedPreferences.getString("status", "");
+
+        tv.setText(prefList);
+
+        String statusLau = sharedPreferences.getString("lau","");
+
+
+*/
+    }
+
+
 
 
 
