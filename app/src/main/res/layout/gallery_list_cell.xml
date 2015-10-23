@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#4993ff"
+    android:padding="1dip" >
+
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:src="@drawable/imeji"
+        android:id="@+id/list_gallery_cell_thumbnail"
+        android:scaleType="centerCrop"
+        android:paddingTop="20dp"
+        android:paddingBottom="5dp"
+        android:paddingRight="20dp"
+        android:paddingLeft="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"/>
+
+    <TextView
+        android:id="@+id/list_item_gallery_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textColor="#ffffff"
+        android:layout_marginStart="35dip"
+        android:text="Title"
+        android:layout_centerHorizontal="true"
+        android:typeface="sans"
+        android:textSize="25dip"
+        android:textStyle="bold"
+
+        android:layout_below="@+id/list_gallery_cell_thumbnail"/>
+
+    <TextView
+        android:id="@+id/list_item_gallery_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textColor="#ffffff"
+        android:layout_marginStart="35dip"
+        android:layout_centerHorizontal="true"
+
+        android:text="Status"
+        android:typeface="sans"
+        android:textSize="30dip"
+        android:textStyle="bold"
+
+        android:layout_below="@+id/list_item_gallery_title"/>
+
+
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/cell_bg_gradient"
+        android:gravity="bottom"
+        android:id="@+id/overlapLayout">
+
+
+
+
+
+
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>
