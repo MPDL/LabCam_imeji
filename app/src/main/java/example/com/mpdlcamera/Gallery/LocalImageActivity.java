@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dd.CircularProgressButton;
 import com.squareup.otto.Produce;
 
 import java.io.File;
@@ -63,11 +63,11 @@ public class LocalImageActivity extends AppCompatActivity {
     private TypedFile typedFile;
     private String json;
 
-    Toolbar toolbar;
-    String title;
-    AbsListView.MultiChoiceModeListener mMultiChoiceModeListener;
+    private Toolbar toolbar;
+    private String folderPath;
+    private AbsListView.MultiChoiceModeListener mMultiChoiceModeListener;
 
-
+    private CircularProgressButton circularButton;
 
 
     Callback<DataItem> callback = new Callback<DataItem>() {
@@ -88,6 +88,8 @@ public class LocalImageActivity extends AppCompatActivity {
                     Log.v(LOG_TAG, "deleted:" +deleted);
                 }
             }
+
+            circularButton.setProgress(100);
 
         }
 
@@ -113,6 +115,7 @@ public class LocalImageActivity extends AppCompatActivity {
                     Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
 
             }
+            circularButton.setProgress(-1);
 
             Log.v(LOG_TAG, String.valueOf(error));
 
@@ -142,8 +145,12 @@ public class LocalImageActivity extends AppCompatActivity {
 
         Intent intent = activity.getIntent();
         if (intent != null) {
-            title = intent.getStringExtra("galleryTitle");
-            titleView.setText(title);
+            folderPath = intent.getStringExtra("galleryTitle");
+            if(folderPath != null) {
+                ///storage/emulated/0/DCIM/Screenshots
+                titleView.setText(folderPath.split("\\/")[folderPath.split("\\/").length -1]);
+                Log.v("title from Kiran", folderPath);
+            }
         }
 
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
@@ -158,9 +165,9 @@ public class LocalImageActivity extends AppCompatActivity {
 
 
         //TODO here fetch the image URIs by given CameraDirectory name(title)
-        title="Camera";
-        File CameraDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString());
-        File[] files = CameraDirectory.listFiles();
+        //title="Camera";
+        //File CameraDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString());
+        //File[] files = CameraDirectory.listFiles();
 
         //files are all the image folders
 //        10-21 12:36:25.493  21930-21930/example.com.mpdlcamera V/Images﹕ content://media/external/images/media
@@ -176,11 +183,11 @@ public class LocalImageActivity extends AppCompatActivity {
 //        }
 
 
-        final String CompleteCameraFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/" + title;
-        File folder = new File(CompleteCameraFolder);
+        //final String CompleteCameraFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/" + title;
+        File folder = new File(folderPath);
         File[] folderFiles = folder.listFiles();
 
-        Log.v("camera folder",CompleteCameraFolder);
+        Log.v("camera folder",folderPath);
 
         for (File imageFile : folderFiles) {
             Log.v("file",imageFile.toURI().toString() );
@@ -199,6 +206,8 @@ public class LocalImageActivity extends AppCompatActivity {
         gridView.setAdapter(adapter);
         //registerForContextMenu(gridView);
 
+        circularButton = (CircularProgressButton) findViewById(R.id.circularButton);
+
         gridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             private int nr = 0;
 
@@ -213,6 +222,8 @@ public class LocalImageActivity extends AppCompatActivity {
                 // TODO Auto-generated method stub
                 adapter.clearSelection();
                 toolbar.setVisibility(View.VISIBLE);
+                circularButton.setVisibility(View.GONE);
+
             }
 
             @Override
@@ -223,6 +234,7 @@ public class LocalImageActivity extends AppCompatActivity {
                 toolbar.setVisibility(View.GONE);
                 MenuInflater inflater = getMenuInflater();
                 inflater.inflate(R.menu.contextual_menu, menu);
+
                 return true;
             }
 
@@ -243,6 +255,10 @@ public class LocalImageActivity extends AppCompatActivity {
                         Log.v(LOG_TAG, " "+toBeUploadDataPathList.size());
 
                         Log.v(LOG_TAG, toBeUploadDataPathList.get(0));
+
+                        circularButton.setVisibility(View.VISIBLE);
+                        circularButton.setIndeterminateProgressMode(true); // turn on indeterminate progress
+                        circularButton.setProgress(50); // set progress > 0 & < 100 to display indeterminate progress
 
                         if(toBeUploadDataPathList != null) {
                             upload(toBeUploadDataPathList);
