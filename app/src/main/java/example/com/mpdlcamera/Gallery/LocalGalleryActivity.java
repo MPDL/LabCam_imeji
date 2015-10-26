@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ public class LocalGalleryActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         TextView titleView = (TextView) findViewById(R.id.title);
+
 
       //  titleView.setText("Local Gallery");
 

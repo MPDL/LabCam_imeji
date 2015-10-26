@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.provider.MediaStore;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import example.com.mpdlcamera.Model.Gallery;
 
@@ -18,18 +20,24 @@ public class Thumbnail {
 
     private Context context;
 
+    private ArrayList<String> galleries = new ArrayList<>();
+
     public Thumbnail(Context context) {
         this.context = context;
     }
 
 
-    public String getLatestImage(Gallery gallery) {
+    public String getLatestImage(Gallery gallery, Boolean flag) {
 
         matchGallery = false;
 
         String imPath = null;
 
+
+
         while(true) {
+
+            galleries.add(gallery.getGalleryName());
 
             String columns[] = new String[]{ MediaStore.Images.Media._ID, MediaStore.Images.Media.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME,};
 
@@ -64,7 +72,9 @@ public class Thumbnail {
                     Uri uri1 = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, Integer.toString(id));
 
 
-                    gallery.incrementCount();
+                    if(flag) {
+                        gallery.incrementCount();
+                    }
 
 
                     File file = new File(imPath);

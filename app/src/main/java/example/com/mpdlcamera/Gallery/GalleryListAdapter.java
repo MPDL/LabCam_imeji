@@ -4,7 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -17,6 +24,7 @@ import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -40,6 +48,8 @@ public class GalleryListAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private ArrayList<Gallery> galleries = new ArrayList<Gallery>();
     private String localPath;
+    private ArrayList<String> galleriesOne = new ArrayList<>();
+    boolean flag = false;
     Boolean matchGallery = false;
     SharedPreferences mPreferences;
     String status = "Off";
@@ -89,6 +99,17 @@ public class GalleryListAdapter extends BaseAdapter {
         if (convertView == null)
             convertView = inflater.inflate(R.layout.gallery_list_cell, null);
 
+        RelativeLayout relativeLayout = (RelativeLayout) convertView.findViewById(R.id.relOne);
+        ShapeDrawable rectShape = new ShapeDrawable();
+
+        Paint paint = rectShape.getPaint();
+
+        paint.setColor(Color.GRAY);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(5);
+        relativeLayout.setBackground(rectShape);
+
+
         ImageView imageView = (ImageView) convertView.findViewById(R.id.list_gallery_cell_thumbnail);
         TextView title = (TextView) convertView.findViewById(R.id.list_item_gallery_title);
         TextView mStatus = (TextView) convertView.findViewById(R.id.list_item_gallery_status);
@@ -108,8 +129,20 @@ public class GalleryListAdapter extends BaseAdapter {
             //Gallery gallery = galleryList.get(i);
             Log.v(LOG_TAG, gallery.getGalleryName());
             Thumbnail thumbnail = new Thumbnail(activity);
-            String imPath = thumbnail.getLatestImage(gallery);
-            //ListGalleries(gallery);
+        String imPath = null;
+
+            if(!galleriesOne.contains(gallery.getGalleryName())) {
+                flag = true;
+                imPath = thumbnail.getLatestImage(gallery,flag);
+                galleriesOne.add(gallery.getGalleryName());
+            }
+        else {
+                flag = false;
+                imPath = thumbnail.getLatestImage(gallery, flag);
+            }
+
+
+        //ListGalleries(gallery);
 
             if (gallery.getItems() != null) {
                 if (gallery.getItems().size() > 0) {
@@ -124,12 +157,23 @@ public class GalleryListAdapter extends BaseAdapter {
             String iPath = this.localPath;
 
 
+
            // File imgFile = new File(iPath);
             File imgFile1 = new File(imPath);
+
+            imageView.setImageResource(0);
+            Drawable draw = Drawable.createFromPath(imPath);
+        draw = resize(draw);
+
+        Bitmap b = ((BitmapDrawable)draw).getBitmap();
+
+      //  File f = (File) b;
+
             if(imgFile1.exists()) {
-                Picasso.with(activity)
-                        .load(imgFile1)
-                        .into(imageView);
+                imageView.setImageDrawable(draw);
+              /*  Picasso.with(activity)
+                        .load(b)
+                        .into(imageView); */
 
             }
         mPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
@@ -163,6 +207,13 @@ public class GalleryListAdapter extends BaseAdapter {
 
 
         return convertView;
+    }
+
+    private Drawable resize(Drawable image) {
+        Bitmap bitmap = ((BitmapDrawable) image).getBitmap();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap,
+                (int) (bitmap.getWidth() * 0.5), (int) (bitmap.getHeight() * 0.5), false);
+        return new BitmapDrawable(activity.getResources(), bitmapResized);
     }
 
 
