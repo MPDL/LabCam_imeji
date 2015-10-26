@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawerLayout"
-    android:background="#4993ff"
+    android:background="#deffe4"
     tools:context=".Gallery.LocalGalleryActivity">
 
 

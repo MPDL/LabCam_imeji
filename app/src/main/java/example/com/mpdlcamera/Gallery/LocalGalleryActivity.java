@@ -18,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import java.util.ArrayList;
@@ -132,6 +133,21 @@ public class LocalGalleryActivity extends AppCompatActivity {
         adapter = new GalleryListAdapter(activity, imageFolders );
 
         gridView.setAdapter(adapter);
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Gallery gallery = (Gallery) adapter.getItem(position);
+
+                Intent galleryImagesIntent = new Intent(activity, LocalImageActivity.class);
+                galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryName());
+
+                startActivity(galleryImagesIntent);
+
+            }
+        });
+
 
 
 

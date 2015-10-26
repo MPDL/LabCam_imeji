@@ -17,6 +17,8 @@ public class Gallery {
 
     List<Gallery> items;
 
+    Integer count = 0;
+
 
     public Gallery() {
 
@@ -66,6 +68,18 @@ public class Gallery {
     public Long getCoverId() { return coverId; }
 
     public void setCoverId(Long coverId) { this.coverId = coverId; }
+
+    public void incrementCount() {
+
+        this.count++;
+    }
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
+    }
 
 
 }

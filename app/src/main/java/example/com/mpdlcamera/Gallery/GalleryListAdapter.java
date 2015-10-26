@@ -2,9 +2,11 @@ package example.com.mpdlcamera.Gallery;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Display;
@@ -38,6 +40,8 @@ public class GalleryListAdapter extends BaseAdapter {
     private ArrayList<Gallery> galleries = new ArrayList<Gallery>();
     private String localPath;
     Boolean matchGallery = false;
+    SharedPreferences mPreferences;
+    String status = "Off";
 
 
     private void setLocalPath(String path) {
@@ -86,12 +90,14 @@ public class GalleryListAdapter extends BaseAdapter {
 
         ImageView imageView = (ImageView) convertView.findViewById(R.id.list_gallery_cell_thumbnail);
         TextView title = (TextView) convertView.findViewById(R.id.list_item_gallery_title);
+        TextView mStatus = (TextView) convertView.findViewById(R.id.list_item_gallery_status);
+
 
 
         if (size.x > size.y) {
-            imageView.getLayoutParams().height = 1 * size.y /3;
+            imageView.getLayoutParams().height = 1 * size.y /4;
         } else {
-            imageView.getLayoutParams().height = 1 * size.y /3;
+            imageView.getLayoutParams().height = 1 * size.y /4;
         }
 
        // for(int i=0; i<galleryList.size();i++) {
@@ -121,16 +127,27 @@ public class GalleryListAdapter extends BaseAdapter {
                         .into(imageView);
 
             }
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
 
-            //title
-            title.setText(gallery.getGalleryName());
+        if(mPreferences.contains(gallery.getGalleryName())) {
 
-            // user
-           // description.setText(collection.getDescription());
+            status = mPreferences.getString(gallery.getGalleryName(),"");
 
-            // date
-            //date.setText(String.valueOf(m.getCreatedDate()).split("\\+")[0]);
-   //     }
+
+
+        }
+
+        if(status.equalsIgnoreCase("On")) {
+
+            mStatus.setText("Activated");
+
+        }
+        else
+            mStatus.setText("Not Activated");
+
+        title.setText(gallery.getGalleryName() + "(" + gallery.getCount() + ")");
+
+
         return convertView;
     }
 
@@ -176,6 +193,8 @@ public class GalleryListAdapter extends BaseAdapter {
 
                     String id = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media._ID));
                     Uri uri1 = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, Integer.toString(cursor.getColumnIndex(MediaStore.Images.Media._ID)));
+
+                    gallery.incrementCount();
 
 
                  /*   File file = new File(uri1.getPath());
