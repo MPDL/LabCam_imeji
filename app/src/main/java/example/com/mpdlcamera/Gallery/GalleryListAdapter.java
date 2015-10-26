@@ -121,8 +121,9 @@ public class GalleryListAdapter extends BaseAdapter {
            // File imgFile = new File(iPath);
             File imgFile1 = new File(imPath);
             if(imgFile1.exists()) {
-                Bitmap bitmap = BitmapFactory.decodeFile(imgFile1.getAbsolutePath());
-                imageView.setImageBitmap(bitmap);
+               
+                Picasso.with(activity)
+                .load(imgFile1).into(imageView);
 
 
             }
