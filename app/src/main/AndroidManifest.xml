@@ -141,6 +141,7 @@
         </activity>
 
         <activity android:name=".Gallery.LocalGalleryActivity"
+            android:label="Local Gallery"
             android:parentActivityName=".Folder.MainActivity" >
 
         </activity>

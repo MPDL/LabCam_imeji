@@ -139,7 +139,11 @@ public class GalleryListAdapter extends BaseAdapter {
 
         if(status.equalsIgnoreCase("On")) {
 
-            mStatus.setText("Activated");
+            if(mPreferences.getString("UStatus","").equalsIgnoreCase("true")) {
+                mStatus.setText("Uploaded");
+            }
+            else
+                mStatus.setText("Uploading");
 
         }
         else
@@ -197,10 +201,13 @@ public class GalleryListAdapter extends BaseAdapter {
                     gallery.incrementCount();
 
 
-                 /*   File file = new File(uri1.getPath());
+                   File file = new File(uri1.getPath());
                     String path = file.getAbsolutePath();
 
-                    File dir = new File(path);
+                    gallery.setGalleryPath(path);
+
+
+                 /*   File dir = new File(path);
                     File[] files = dir.listFiles(); */
                     // int numberOfImages = files.length;
 

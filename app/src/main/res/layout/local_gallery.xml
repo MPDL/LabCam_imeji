@@ -35,6 +35,7 @@
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
+                    android:title="Local Gallery"
                     app:layout_collapseMode="pin"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -49,7 +50,7 @@
             android:id="@+id/gallery_gridView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:numColumns="3"
+            android:numColumns="2"
             android:verticalSpacing="0dp"
             android:horizontalSpacing="0dp"
             android:gravity="center"

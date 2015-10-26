@@ -233,6 +233,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("Camera", "On");
+        editor.putString("UStatus","false");
         //editor.putString("status", "wifi");
         editor.commit();
 
@@ -420,7 +421,12 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 //listView.setAdapter(arrayAdapter);
                 Toast.makeText(this, "Files are synced", Toast.LENGTH_LONG).show();
 
+
                 mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+                SharedPreferences.Editor e = mPrefs.edit();
+                e.putString("UStatus","true");
+                e.commit();
 
                 if(mPrefs.contains("L_A_U")) {
 

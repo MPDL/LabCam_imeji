@@ -61,14 +61,17 @@ public class LocalGalleryActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setHomeButtonEnabled(true);
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         drawerToggle = new ActionBarDrawerToggle(LocalGalleryActivity.this, drawerLayout, R.string.hello_world, R.string.hello_world);
         drawerLayout.setDrawerListener(drawerToggle);
 
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
-        collapsingToolbarLayout.setTitle("Design Library");
+       // collapsingToolbarLayout.setTitle("Design Library");
+
+        rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+
 
         navigation = (NavigationView) findViewById(R.id.navigation);
         navigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -141,7 +144,7 @@ public class LocalGalleryActivity extends AppCompatActivity {
                 Gallery gallery = (Gallery) adapter.getItem(position);
 
                 Intent galleryImagesIntent = new Intent(activity, LocalImageActivity.class);
-                galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryName());
+                galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
 
                 startActivity(galleryImagesIntent);
 
