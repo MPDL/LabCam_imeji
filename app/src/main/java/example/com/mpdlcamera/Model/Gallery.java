@@ -19,6 +19,16 @@ public class Gallery {
 
     Integer count = 0;
 
+    public String getGalleryPath() {
+        return galleryPath;
+    }
+
+    public void setGalleryPath(String galleryPath) {
+        this.galleryPath = galleryPath;
+    }
+
+    String galleryPath = null;
+
 
     public Gallery() {
 
