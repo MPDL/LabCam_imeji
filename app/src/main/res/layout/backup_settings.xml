@@ -9,7 +9,6 @@
     tools:context="example.com.mpdlcamera.Settings.BackUpOptionSettings"
     android:id="@+id/toplayout">
 
-
     <RadioGroup
         android:id="@+id/radioNetwork"
         android:layout_width="wrap_content"
@@ -39,7 +38,6 @@
             android:layout_height="wrap_content"
             android:text="@string/manual"
             android:id="@+id/radioThree"
-
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 

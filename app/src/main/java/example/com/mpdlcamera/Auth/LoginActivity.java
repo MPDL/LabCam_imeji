@@ -56,10 +56,12 @@ public class LoginActivity extends AppCompatActivity {
         usernameView.setText(mPrefs.getString("username", ""));
         passwordView.setText(mPrefs.getString("password", ""));
         if(!mPrefs.getString("server", "").equals("")) {
-            serverURLView.setText(mPrefs.getString("server", ""));
+            serverURL = mPrefs.getString("server", "");
         }else{
-            serverURLView.setText(DeviceStatus.BASE_URL);
+            serverURL = DeviceStatus.BASE_URL;
         }
+        serverURLView.setText(serverURL);
+
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -69,6 +71,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 username = usernameView.getText().toString();
                 password = passwordView.getText().toString();
+                serverURL = serverURLView.getText().toString();
 
                 usernameView.setError(null);
                 passwordView.setError(null);
@@ -95,6 +98,7 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.putString("username", username).apply();
                     mEditor.putString("password", password).apply();
+                    mEditor.putString("server", serverURL).apply();
                     DeviceStatus.showSnackbar(rootView, "Login Successfully");
 
                     accountLogin();

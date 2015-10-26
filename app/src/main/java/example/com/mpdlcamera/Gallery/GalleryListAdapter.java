@@ -3,8 +3,6 @@ package example.com.mpdlcamera.Gallery;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -21,13 +19,10 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.Gallery;
-import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
 
 /**
@@ -121,9 +116,12 @@ public class GalleryListAdapter extends BaseAdapter {
            // File imgFile = new File(iPath);
             File imgFile1 = new File(imPath);
             if(imgFile1.exists()) {
-                Bitmap bitmap = BitmapFactory.decodeFile(imgFile1.getAbsolutePath());
-                imageView.setImageBitmap(bitmap);
+//                Bitmap bitmap = BitmapFactory.decodeFile(imgFile1.getAbsolutePath());
+//                imageView.setImageBitmap(bitmap);
 
+                Picasso.with(activity)
+                        .load(imgFile1)
+                        .into(imageView);
 
             }
 

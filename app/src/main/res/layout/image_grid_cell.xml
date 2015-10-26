@@ -10,7 +10,7 @@
             android:background="#8cf7f3ff"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/image"
+            android:id="@+id/image_view"
             android:gravity="center"
             android:layout_gravity="center" />
 

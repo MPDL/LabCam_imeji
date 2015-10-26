@@ -1,6 +1,5 @@
 package example.com.mpdlcamera.Settings;
 
-import android.app.ListActivity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -117,6 +116,11 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
         Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        for(int i = 0; i<albums.length ;i++){
+            Log.i("albums",  albums[i]);
+        }
+
+        Log.i("Images",  images.toString());
 
         final ArrayList<String> folders = new ArrayList<String>();
 

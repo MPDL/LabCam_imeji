@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="#ffffff"
     android:orientation="vertical"
-    tools:context=".Items.ItemsActivity">
+    tools:context=".Gallery.LocalImageActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -36,10 +36,12 @@
         android:id="@+id/image_gridView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:listSelector="@drawable/list_selector"
         android:numColumns="2"
         android:verticalSpacing="0dp"
         android:horizontalSpacing="0dp"
         android:gravity="center"
+        android:choiceMode="multipleChoice"
         android:stretchMode="columnWidth"/>
 
 </LinearLayout>
