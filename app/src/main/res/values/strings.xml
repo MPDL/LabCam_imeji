@@ -28,6 +28,10 @@
     <string name="logout">All Files are Uploaded, Do you want to log out?</string>
     <string name="title_activity_local_album_settings">Local Album Settings</string>
 
-
+    <string name="Upload">Upload</string>
+    <string name="Error">Error</string>
+    <string name="Complete">Upload Successful</string>
+    <string name="Success">Success</string>
+    <string name="Loading">Loading..</string>
 
 </resources>

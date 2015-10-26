@@ -39,6 +39,7 @@ import java.util.List;
 
 import example.com.mpdlcamera.Auth.LoginActivity;
 import example.com.mpdlcamera.Gallery.LocalGalleryActivity;
+import example.com.mpdlcamera.Gallery.LocalImageActivity;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
@@ -220,6 +221,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                         startActivity(showSettingIntent);
                         break;
                     case R.id.navItem4:
+                        Intent showALocalImageIntent = new Intent(activity, LocalImageActivity.class);
+                        startActivity(showALocalImageIntent);
 
                         break;
                 }

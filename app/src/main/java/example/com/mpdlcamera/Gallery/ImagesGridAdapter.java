@@ -103,7 +103,7 @@ public class ImagesGridAdapter extends BaseAdapter {
         grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light)); //default color
 
         if (mSelection.get(position) != null) {
-            grid.setBackgroundColor(activity.getResources().getColor(android.R.color.holo_blue_light));// this is a selected position so make it red
+            grid.setBackgroundColor(activity.getResources().getColor(android.R.color.holo_blue_dark));// this is a selected position so make it red
         }
 
         ImageView imageView = (ImageView) grid.findViewById(R.id.image_view);

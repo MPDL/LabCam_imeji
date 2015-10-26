@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -21,13 +22,26 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.squareup.otto.Produce;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.Otto.OttoSingleton;
+import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Retrofit.RetrofitClient;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 import example.com.mpdlcamera.Utils.ImageFileFilter;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
+import retrofit.mime.TypedFile;
 
 /**
  * Created by allen on 03/09/15.
@@ -35,6 +49,8 @@ import example.com.mpdlcamera.Utils.ImageFileFilter;
 public class LocalImageActivity extends AppCompatActivity {
 
     private List<String> dataPathList = new ArrayList<String>();
+    private List<String> toBeUploadDataPathList = new ArrayList<String>();
+
     public  ImagesGridAdapter adapter;
     private GridView gridView;
     private View rootView;
@@ -44,10 +60,65 @@ public class LocalImageActivity extends AppCompatActivity {
     private SharedPreferences mPrefs;
     private String username;
     private String password;
+    private TypedFile typedFile;
+    private String json;
 
     Toolbar toolbar;
     String title;
     AbsListView.MultiChoiceModeListener mMultiChoiceModeListener;
+
+
+
+
+    Callback<DataItem> callback = new Callback<DataItem>() {
+        @Override
+        @Produce
+        public void success(DataItem dataItem, Response response) {
+
+            Toast.makeText(activity, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
+            Log.v(LOG_TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
+
+            mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
+
+            if(mPrefs.contains("rpfd")) {
+                if(mPrefs.getString("rpfd","").equalsIgnoreCase("On")) {
+
+                    File file = typedFile.file();
+                    Boolean deleted = file.delete();
+                    Log.v(LOG_TAG, "deleted:" +deleted);
+                }
+            }
+
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+
+            if (error == null || error.getResponse() == null) {
+                OttoSingleton.getInstance().post(new UploadEvent(null));
+                if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
+                    Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                OttoSingleton.getInstance().post(
+                        new UploadEvent(error.getResponse().getStatus()));
+                String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
+                if (jsonBody.contains("already exists")) {
+                    // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
+                }
+                else
+                    Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
+
+            }
+
+            Log.v(LOG_TAG, String.valueOf(error));
+
+        }
+    };
+
 
 
     @Override
@@ -67,14 +138,13 @@ public class LocalImageActivity extends AppCompatActivity {
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         password = mPrefs.getString("password", "");
+        dataCollectionId = mPrefs.getString("collectionID", DeviceStatus.collectionID);
 
         Intent intent = activity.getIntent();
-        if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
-            dataCollectionId = intent.getStringExtra(Intent.EXTRA_TEXT);
-            String title = intent.getStringExtra("galleryTitle");
+        if (intent != null) {
+            title = intent.getStringExtra("galleryTitle");
             titleView.setText(title);
         }
-
 
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
         Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -169,6 +239,14 @@ public class LocalImageActivity extends AppCompatActivity {
                         //TODO handle uploading logic
 //                        nr = 0;
 //                        adapter.clearSelection();
+
+                        Log.v(LOG_TAG, " "+toBeUploadDataPathList.size());
+
+                        Log.v(LOG_TAG, toBeUploadDataPathList.get(0));
+
+                        if(toBeUploadDataPathList != null) {
+                            upload(toBeUploadDataPathList);
+                        }
                         mode.finish();
                 }
 
@@ -184,6 +262,7 @@ public class LocalImageActivity extends AppCompatActivity {
                 if (checked) {
                     nr++;
                     adapter.setNewSelection(position, checked);
+                    toBeUploadDataPathList.add(dataPathList.get(position));
                 } else {
                     nr--;
                     adapter.removeSelection(position);
@@ -226,7 +305,8 @@ public class LocalImageActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_select) {
-            Log.v(LOG_TAG,"slected");
+            Log.v(LOG_TAG, "slected");
+
             return true;
         }
         if (id == R.id.item_delete) {
@@ -245,7 +325,20 @@ public class LocalImageActivity extends AppCompatActivity {
 
 
 
+    private void upload(List<String> fileList) {
+        String jsonPart1 = "\"collectionId\" : \"" +
+                dataCollectionId +
+                "\"";
 
+        for (String filePath : fileList) {
+            typedFile = new TypedFile("multipart/form-data", new File(filePath));
+
+            json ="{" + jsonPart1  +"}";
+
+            Log.v(LOG_TAG, json);
+            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+        }
+    }
 
 
 
