@@ -119,6 +119,8 @@ public class GalleryListAdapter extends BaseAdapter {
             }
             title.setText(gallery.getGalleryName());
 
+            String gpath = gallery.getGalleryPath();
+
             String iPath = this.localPath;
 
 

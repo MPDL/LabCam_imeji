@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -59,6 +60,10 @@ public class LocalGalleryActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         gridView = (GridView) findViewById(R.id.gallery_gridView);
         setSupportActionBar(toolbar);
+
+        TextView titleView = (TextView) findViewById(R.id.title);
+
+      //  titleView.setText("Local Gallery");
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
