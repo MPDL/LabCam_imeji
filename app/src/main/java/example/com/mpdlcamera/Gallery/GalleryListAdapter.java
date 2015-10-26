@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -91,6 +92,7 @@ public class GalleryListAdapter extends BaseAdapter {
         ImageView imageView = (ImageView) convertView.findViewById(R.id.list_gallery_cell_thumbnail);
         TextView title = (TextView) convertView.findViewById(R.id.list_item_gallery_title);
         TextView mStatus = (TextView) convertView.findViewById(R.id.list_item_gallery_status);
+        ProgressBar progressBar = (ProgressBar) convertView.findViewById(R.id.progBar);
 
 
 
@@ -105,7 +107,8 @@ public class GalleryListAdapter extends BaseAdapter {
             Gallery gallery = galleryList.get(position);
             //Gallery gallery = galleryList.get(i);
             Log.v(LOG_TAG, gallery.getGalleryName());
-            String imPath = getLatestImage(gallery);
+            Thumbnail thumbnail = new Thumbnail(activity);
+            String imPath = thumbnail.getLatestImage(gallery);
             //ListGalleries(gallery);
 
             if (gallery.getItems() != null) {
@@ -115,6 +118,8 @@ public class GalleryListAdapter extends BaseAdapter {
                 }
             }
             title.setText(gallery.getGalleryName());
+
+            String gpath = gallery.getGalleryPath();
 
             String iPath = this.localPath;
 
@@ -141,13 +146,18 @@ public class GalleryListAdapter extends BaseAdapter {
 
             if(mPreferences.getString("UStatus","").equalsIgnoreCase("true")) {
                 mStatus.setText("Uploaded");
+                progressBar.setVisibility(View.GONE);
+
             }
             else
                 mStatus.setText("Uploading");
 
+
         }
         else
             mStatus.setText("Not Activated");
+             progressBar.setVisibility(View.GONE);
+
 
         title.setText(gallery.getGalleryName() + "(" + gallery.getCount() + ")");
 
@@ -156,115 +166,7 @@ public class GalleryListAdapter extends BaseAdapter {
     }
 
 
-    public String getLatestImage(Gallery gallery) {
 
-        matchGallery = false;
-
-        String imPath = null;
-
-        while(true) {
-
-            String columns[] = new String[]{ MediaStore.Images.Media._ID, MediaStore.Images.Media.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME,};
-
-            Uri image = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-            Cursor cursor = activity.getContentResolver().query(image,columns,null,null,null);
-
-
-            while (cursor.moveToNext()) {
-
-
-
-
-                String folder = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME));
-
-                if(matchGallery.equals(true) && !folder.equalsIgnoreCase(gallery.getGalleryName())) {
-                    return imPath;
-                }
-
-                if (folder.equalsIgnoreCase(gallery.getGalleryName())) {
-
-
-                    matchGallery = true;
-
-                    imPath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-
-                  //  setLocalPath(localPath);
-
-
-
-                  //  String magic = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.MINI_THUMB_MAGIC));
-
-                    String id = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media._ID));
-                    Uri uri1 = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, Integer.toString(cursor.getColumnIndex(MediaStore.Images.Media._ID)));
-
-                    gallery.incrementCount();
-
-
-                   File file = new File(uri1.getPath());
-                    String path = file.getAbsolutePath();
-
-                    gallery.setGalleryPath(path);
-
-
-                 /*   File dir = new File(path);
-                    File[] files = dir.listFiles(); */
-                    // int numberOfImages = files.length;
-
-
-                }
-
-            }
-            cursor.close();
-            }
-
-
-        }
-
-    public void ListGalleries(Gallery gallery) {
-
-        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        String[] projection = {MediaStore.Images.Media._ID, MediaStore.Images.Media.BUCKET_ID,
-                MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
-
-        Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
-
-        ArrayList<String> ids = new ArrayList<String>();
-        //galleries.clear();
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                Gallery album = new Gallery();
-
-                int columnIndex = cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_ID);
-                album.setBucketId(cursor.getString(columnIndex));
-
-                if (!ids.contains(album.getBucketId())) {
-                    columnIndex = cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-                    album.setGalleryName(cursor.getString(columnIndex));
-
-                    columnIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
-                    album.setCoverId(cursor.getLong(columnIndex));
-                    Uri uri1 = Uri.withAppendedPath( MediaStore.Images.Media.EXTERNAL_CONTENT_URI, Integer.toString(columnIndex));
-
-                  /*  try {
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), uri1);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } */
-
-                    galleries.add(album);
-                    ids.add(album.getBucketId());
-                } else {
-                     //Gallery gallery2 = galleries.get(ids.indexOf(album.getBucketId()));
-
-                }
-            }
-            cursor.close();
-
-
-        }
-
-    }
 
 
 }
