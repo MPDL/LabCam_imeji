@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -152,13 +151,8 @@ public class LocalGalleryActivity extends AppCompatActivity {
                 galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
 
                 startActivity(galleryImagesIntent);
-
             }
         });
-
-
-
-
 
     }
 }

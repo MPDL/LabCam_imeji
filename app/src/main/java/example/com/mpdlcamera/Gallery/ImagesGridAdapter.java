@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -31,7 +32,7 @@ public class ImagesGridAdapter extends BaseAdapter {
     private List<String> dataItems;
     private final String LOG_TAG = ImagesGridAdapter.class.getSimpleName();
     private HashMap<Integer, Boolean> mSelection = new HashMap<Integer, Boolean>();
-
+    CheckBox checkBox;
 
     public ImagesGridAdapter(Activity c, List<String> dataItems) {
         this.activity = c;
@@ -63,6 +64,13 @@ public class ImagesGridAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public CheckBox getCheckBox() {
+        return checkBox;
+    }
+
+    public void setCheckBox(CheckBox checkBox) {
+        this.checkBox = checkBox;
+    }
 
     public int getCount() {
         return dataItems.size();
@@ -99,11 +107,14 @@ public class ImagesGridAdapter extends BaseAdapter {
         }else{
             grid = convertView;
         }
+        checkBox = (CheckBox) grid.findViewById(R.id.checkBox);
 
         grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light)); //default color
 
         if (mSelection.get(position) != null) {
             grid.setBackgroundColor(activity.getResources().getColor(android.R.color.holo_blue_dark));// this is a selected position so make it red
+            //checkBox.setVisibility(View.VISIBLE);
+            //checkBox.setChecked(true);
         }
 
         ImageView imageView = (ImageView) grid.findViewById(R.id.image_view);

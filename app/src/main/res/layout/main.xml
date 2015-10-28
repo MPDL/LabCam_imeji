@@ -20,13 +20,13 @@
             android:layout_height="wrap_content"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-            <android.support.design.widget.CollapsingToolbarLayout
-                android:id="@+id/collapsingToolbarLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:contentScrim="?attr/colorPrimary"
-                app:expandedTitleMarginStart="@dimen/expanded_toolbar_title_margin_start"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            <!--<android.support.design.widget.CollapsingToolbarLayout-->
+                <!--android:id="@+id/collapsingToolbarLayout"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--app:contentScrim="?attr/colorPrimary"-->
+                <!--app:expandedTitleMarginStart="@dimen/expanded_toolbar_title_margin_start"-->
+                <!--app:layout_scrollFlags="scroll|exitUntilCollapsed">-->
 
                 <!--<ImageView-->
                     <!--android:layout_width="match_parent"-->
@@ -40,11 +40,12 @@
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
+                    android:title="Collections"
                     app:layout_collapseMode="pin"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-            </android.support.design.widget.CollapsingToolbarLayout>
+            <!--</android.support.design.widget.CollapsingToolbarLayout>-->
 
         </android.support.design.widget.AppBarLayout>
 

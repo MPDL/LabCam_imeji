@@ -224,6 +224,8 @@ public class LocalImageActivity extends AppCompatActivity {
                 toolbar.setVisibility(View.VISIBLE);
                 circularButton.setVisibility(View.GONE);
 
+                //adapter.getCheckBox().setVisibility(View.GONE);
+
             }
 
             @Override
@@ -232,6 +234,9 @@ public class LocalImageActivity extends AppCompatActivity {
                 nr = 0;
 
                 toolbar.setVisibility(View.GONE);
+
+                //adapter.getCheckBox().setVisibility(View.VISIBLE);
+
                 MenuInflater inflater = getMenuInflater();
                 inflater.inflate(R.menu.contextual_menu, menu);
 
@@ -279,9 +284,13 @@ public class LocalImageActivity extends AppCompatActivity {
                     nr++;
                     adapter.setNewSelection(position, checked);
                     toBeUploadDataPathList.add(dataPathList.get(position));
+                    //adapter.getCheckBox().setChecked(true);
+
                 } else {
                     nr--;
                     adapter.removeSelection(position);
+                    //adapter.getCheckBox().setChecked(false);
+
                 }
                 mode.setTitle(nr + " selected");
 

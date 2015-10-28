@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -39,7 +40,6 @@ import java.util.List;
 
 import example.com.mpdlcamera.Auth.LoginActivity;
 import example.com.mpdlcamera.Gallery.LocalGalleryActivity;
-import example.com.mpdlcamera.Gallery.LocalImageActivity;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
@@ -190,11 +190,12 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayout);
 
-        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
-        collapsingToolbarLayout.setTitle("Design Library");
+        //collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
+        //collapsingToolbarLayout.setTitle("Design Library");
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
@@ -221,15 +222,12 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                         startActivity(showSettingIntent);
                         break;
                     case R.id.navItem4:
-                        Intent showALocalImageIntent = new Intent(activity, LocalImageActivity.class);
-                        startActivity(showALocalImageIntent);
 
                         break;
                 }
                 return false;
             }
         });
-
 
 
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -251,7 +249,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         Log.v(LOG_TAG, "size: " + collectionListLocal.size() + "");
 
 
-        //TODO
         adapter = new FolderListAdapter(activity, collectionListLocal);
 
         //gridview = (GridView) findViewById(R.id.folder_gridView);
@@ -299,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 Handler handler = new Handler();
 
                 NewFileObserver newFileObserver = new NewFileObserver(handler,this);
-                getApplicationContext().getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,false,newFileObserver);
+                getApplicationContext().getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,false, newFileObserver);
 
     }
 
@@ -363,12 +360,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
             return true;
         }
-//        if (id == R.id.backUp) {
-//            Intent backUpIntent = new Intent(this, BackupSettingsActivity.class);
-//            startActivity(backUpIntent);
-//
-//            return true;
-//        }
+        if (id == R.id.homeAsUp) {
+            drawerLayout.openDrawer(GravityCompat.START);
+            return true;
+
+        }
         return super.onOptionsItemSelected(item);
     }
 
