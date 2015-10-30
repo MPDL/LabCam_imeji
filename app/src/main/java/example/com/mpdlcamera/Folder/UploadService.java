@@ -34,6 +34,8 @@ import example.com.mpdlcamera.Model.User;
 import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
+import example.com.mpdlcamera.SQLite.FileId;
+import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -54,6 +56,7 @@ public class UploadService extends IntentService {
         super("UploadService");
     }
     private SharedPreferences mPrefs;
+    FileId fileId;
 
 
     private DataItem item = new DataItem();
@@ -65,6 +68,7 @@ public class UploadService extends IntentService {
     private String collectionID;
     public TypedFile typedFile;
     String json;
+
 
 
     /*
@@ -111,8 +115,10 @@ public class UploadService extends IntentService {
             try {
 
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences preferencesFiles = getSharedPreferences("gallery", Context.MODE_PRIVATE);
+                SharedPreferences preferencesFolders = getSharedPreferences("folder", Context.MODE_PRIVATE);
                 HashMap<String, String> folderSyncMap = new HashMap<String, String>();
-                folderSyncMap = (HashMap) preferences.getAll();
+                folderSyncMap = (HashMap) preferencesFolders.getAll();
                 String status = preferences.getString("status", "");
 
 
@@ -120,41 +126,65 @@ public class UploadService extends IntentService {
 
                     for (Map.Entry<String, String> entry : folderSyncMap.entrySet()) {
 
+                      //  if(String.valueOf())entry.getValue().toString().
 
-                        if (entry.getValue().toString().equalsIgnoreCase("On")) {
+                        if (String.valueOf(entry.getValue()).equalsIgnoreCase("On")) {
 
                             String folderName = (String) entry.getKey();
+
+                            String dir = preferencesFiles.getString(folderName,"");
+
+                            File folder = new File(dir);
+                            File[] folderFiles = folder.listFiles();
+
+                            for(File imageFile : folderFiles) {
+
+                                String imageName = imageFile.toURI().toString();
+                                MySQLiteHelper db = new MySQLiteHelper(mContext);
+
+
+                            }
+
+
 
                             while (cursor.moveToNext()) {
 
                                 if (folderName.equalsIgnoreCase(cursor.getString(column_index_folder_name))) {
 
 
-
                                     String fileName = cursor.getString(column_index_file_name);
                                     String path = cursor.getString(column_index_data);
 
-                                    item.setFilename(fileName);
-                                    meta.setTags(null);
+                                    MySQLiteHelper db = new MySQLiteHelper(mContext);
 
-                                    meta.setAddress("blabla");
+                                    Boolean b = db.getFile(fileName);
 
-                                    meta.setTitle(fileName);
+                                    if(!b)
 
-                                    meta.setCreator(user.getCompleteName());
+                                    {
+                                        item.setFilename(fileName);
 
-                                    item.setCollectionId(collectionID);
+                                        meta.setTags(null);
 
-                                    item.setLocalPath(path);
+                                        meta.setAddress("blabla");
 
-                                    item.setMetadata(meta);
+                                        meta.setTitle(fileName);
 
-                                    item.setCreatedBy(user);
+                                        meta.setCreator(user.getCompleteName());
 
-                                    meta.save();
-                                    item.save();
+                                        item.setCollectionId(collectionID);
 
-                                    upload(item);
+                                        item.setLocalPath(path);
+
+                                        item.setMetadata(meta);
+
+                                        item.setCreatedBy(user);
+
+                                        meta.save();
+                                        item.save();
+
+                                        upload(item);
+                                    }
                                 }
                             }
                         }
@@ -205,6 +235,12 @@ public class UploadService extends IntentService {
         @Override
         @Produce
         public void success(DataItem dataItem, Response response) {
+
+            MySQLiteHelper db = new MySQLiteHelper(mContext);
+
+            FileId fileId = new FileId(dataItem.getFilename(),"yes");
+
+            db.insertFile(fileId);
 
             Toast.makeText(mContext, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
             Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());

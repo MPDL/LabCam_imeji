@@ -231,9 +231,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
 
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences preferences = getSharedPreferences("folder",Context.MODE_PRIVATE);
+        SharedPreferences.Editor ed = preferences.edit();
+        ed.putString("Camera", "On");
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("Camera", "On");
+
+
         editor.putString("UStatus","false");
         //editor.putString("status", "wifi");
         editor.commit();

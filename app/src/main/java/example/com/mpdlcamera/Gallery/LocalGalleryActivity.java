@@ -64,48 +64,16 @@ public class LocalGalleryActivity extends AppCompatActivity {
         TextView titleView = (TextView) findViewById(R.id.title);
 
 
+        titleView.setText("Local Gallery");
       //  titleView.setText("Local Gallery");
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        drawerToggle = new ActionBarDrawerToggle(LocalGalleryActivity.this, drawerLayout, R.string.hello_world, R.string.hello_world);
-        drawerLayout.setDrawerListener(drawerToggle);
-
-        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
-       // collapsingToolbarLayout.setTitle("Design Library");
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
 
-        navigation = (NavigationView) findViewById(R.id.navigation);
-        navigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                switch (id) {
-                    case R.id.navItem1:
-                        Intent showLocalImageIntent = new Intent(activity, LocalGalleryActivity.class);
-                        startActivity(showLocalImageIntent);
-
-                        break;
-                    case R.id.navItem2:
-                        Intent showMainIntent = new Intent(activity, MainActivity.class);
-                        startActivity(showMainIntent);
-
-                        break;
-                    case R.id.navItem3:
-                        Intent showSettingIntent = new Intent(activity, SettingsActivity.class);
-                        startActivity(showSettingIntent);
-                        break;
-                    case R.id.navItem4:
-
-                        break;
-                }
-                return false;
-            }
-        });
 
 
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
@@ -149,10 +117,23 @@ public class LocalGalleryActivity extends AppCompatActivity {
 
                 Gallery gallery = (Gallery) adapter.getItem(position);
 
-                Intent galleryImagesIntent = new Intent(activity, LocalImageActivity.class);
-                galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
+                String status = preferences.getString(gallery.getGalleryName(),"");
 
-                startActivity(galleryImagesIntent);
+                if(status.equalsIgnoreCase("On")) {
+
+                    Intent activatedGalleryIntent = new Intent(activity, ActivatedGalleryActivity.class);
+                    activatedGalleryIntent.putExtra("galleryName", gallery.getGalleryName());
+                    activatedGalleryIntent.putExtra("galleryPath", gallery.getGalleryPath());
+
+                    startActivity(activatedGalleryIntent);
+
+                }
+                else {
+                    Intent galleryImagesIntent = new Intent(activity, LocalImageActivity.class);
+                    galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
+
+                    startActivity(galleryImagesIntent);
+                }
             }
         });
 

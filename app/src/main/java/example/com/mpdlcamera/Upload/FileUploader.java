@@ -14,11 +14,14 @@ import com.google.gson.GsonBuilder;
 import com.squareup.otto.Produce;
 
 import java.io.File;
+import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
+import example.com.mpdlcamera.SQLite.FileId;
+import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -37,7 +40,7 @@ public class FileUploader {
     private SharedPreferences mPrefs;
 
 
-    private Context context;
+    private Context context=null;
 
     private Activity act;
 
@@ -52,6 +55,7 @@ public class FileUploader {
     public FileUploader() {
 
     }
+
 
 
     public void upload(DataItem item) {
@@ -91,6 +95,15 @@ public class FileUploader {
         @Override
         @Produce
         public void success(DataItem dataItem, Response response) {
+
+            MySQLiteHelper db = new MySQLiteHelper(context);
+
+            FileId fileId = new FileId(dataItem.getFilename(),"yes");
+
+            db.insertFile(fileId);
+
+            List<FileId> fileIds;
+            fileIds = db.getAllFiles();
 
             Toast.makeText(context, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
             Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());

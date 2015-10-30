@@ -73,7 +73,7 @@ private Context context;
         user.save();
         String columns[] = new String[]{ MediaStore.Images.Media._ID, MediaStore.Images.Media.DATA, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.MIME_TYPE, MediaStore.Images.Media.BUCKET_DISPLAY_NAME, MediaStore.Images.Media.MINI_THUMB_MAGIC };
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences preferences = context.getSharedPreferences("folder", Context.MODE_PRIVATE);
 
         while (true) {
 

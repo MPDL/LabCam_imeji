@@ -96,7 +96,8 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
                     TextView tv = (TextView) rl.findViewById(R.id.folder);
                     String folder = tv.getText().toString();
 
-                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+                //    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+                    SharedPreferences settings = mContext.getSharedPreferences("folder", Context.MODE_PRIVATE);
 
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putString(folder, "Off");
@@ -105,7 +106,8 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
 
                 } else if (isChecked) {
 
-                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+                   // SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+                    SharedPreferences settings = mContext.getSharedPreferences("folder", Context.MODE_PRIVATE);
 
                         RelativeLayout rl = (RelativeLayout) buttonView.getParent();
                         TextView tv = (TextView) rl.findViewById(R.id.folder);

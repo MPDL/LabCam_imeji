@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -56,6 +57,8 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
     private List<DataItem> dataList = new ArrayList<DataItem>();
 
     SharedPreferences preferences;
+    SharedPreferences preferencesFiles;
+    SharedPreferences preferencesFolders;
     private User user;
     String status;
     Boolean fStatus;
@@ -105,6 +108,8 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
         prefOption = preferences.getString("status", "");
 
 
+
+
     }
 
     /*
@@ -112,9 +117,10 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
      */
     private void displayListView() {
 
-        String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
+        String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME,MediaStore.Images.Media.DATA};
         Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferencesFolders = getSharedPreferences("folder", Context.MODE_PRIVATE);
+        preferencesFiles = getSharedPreferences("gallery", Context.MODE_PRIVATE);
 
         for(int i = 0; i<albums.length ;i++){
             Log.i("albums",  albums[i]);
@@ -134,10 +140,18 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
 
         if (cur.moveToFirst()) {
             String album;
+            String fPath;
             int albumLocation = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+            int path = cur.getColumnIndex(MediaStore.Images.Media.DATA);
 
             do {
                 album = cur.getString(albumLocation);
+                fPath = cur.getString(path);
+                File file = new File(fPath);
+                String dir = file.getParent();
+                SharedPreferences.Editor editor = preferencesFiles.edit();
+                editor.putString(album,dir);
+                editor.commit();
                 folders.add(album);
                 Log.i("ListingImages", " album=" + album);
             } while (cur.moveToNext());
@@ -152,8 +166,8 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
         Iterator<String> folderIterator = imageFolders.iterator();
         while (folderIterator.hasNext()) {
             String now = folderIterator.next().toString();
-            if (preferences.contains(now)) {
-                status = preferences.getString(now, "");
+            if (preferencesFolders.contains(now)) {
+                status = preferencesFolders.getString(now, "");
             } else {
                 status = "Off";
             }

@@ -61,13 +61,7 @@ public class Thumbnail {
 
                     imPath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
 
-                    //  setLocalPath(localPath);
 
-
-
-                    //  String magic = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.MINI_THUMB_MAGIC));
-
-                    //String id = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media._ID));
                     Integer id = cursor.getColumnIndex(MediaStore.Images.Media._ID);
                     Uri uri1 = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, Integer.toString(id));
 
@@ -79,14 +73,9 @@ public class Thumbnail {
 
                     File file = new File(imPath);
                     String dir = file.getParent();
-                    //String path = file.getAbsolutePath();
+
 
                     gallery.setGalleryPath(dir);
-
-
-                 /*   File dir = new File(path);
-                    File[] files = dir.listFiles(); */
-                    // int numberOfImages = files.length;
 
 
                 }

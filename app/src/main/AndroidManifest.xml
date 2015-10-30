@@ -146,6 +146,10 @@
 
         </activity>
 
+        <activity android:name=".Gallery.ActivatedGalleryActivity"
+            android:label="Activated Gallery"
+            android:parentActivityName=".Gallery.LocalGalleryActivity" ></activity>
+
         <!--service-->
         <service android:name="example.com.mpdlcamera.Folder.UploadService"
                  android:enabled="true">

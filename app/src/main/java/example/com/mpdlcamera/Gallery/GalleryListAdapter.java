@@ -3,18 +3,15 @@ package example.com.mpdlcamera.Gallery;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+
 import android.graphics.drawable.ShapeDrawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
+
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -53,6 +50,11 @@ public class GalleryListAdapter extends BaseAdapter {
     Boolean matchGallery = false;
     SharedPreferences mPreferences;
     String status = "Off";
+    TextView title;
+    TextView mStatus;
+    ProgressBar progressBar;
+    ImageView imageView;
+    Point size;
 
 
     private void setLocalPath(String path) {
@@ -89,7 +91,7 @@ public class GalleryListAdapter extends BaseAdapter {
 
         WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
-        Point size = new Point();
+        size = new Point();
         display.getSize(size);
 
 
@@ -104,17 +106,15 @@ public class GalleryListAdapter extends BaseAdapter {
 
         Paint paint = rectShape.getPaint();
 
-        paint.setColor(Color.GRAY);
+        paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(5);
+        paint.setStrokeWidth(1);
         relativeLayout.setBackground(rectShape);
 
-
-        ImageView imageView = (ImageView) convertView.findViewById(R.id.list_gallery_cell_thumbnail);
-        TextView title = (TextView) convertView.findViewById(R.id.list_item_gallery_title);
-        TextView mStatus = (TextView) convertView.findViewById(R.id.list_item_gallery_status);
-        ProgressBar progressBar = (ProgressBar) convertView.findViewById(R.id.progBar);
-
+        imageView = (ImageView) convertView.findViewById(R.id.list_gallery_cell_thumbnail);
+        title = (TextView) convertView.findViewById(R.id.list_item_gallery_title);
+        mStatus = (TextView) convertView.findViewById(R.id.list_item_gallery_status);
+        progressBar = (ProgressBar) convertView.findViewById(R.id.progBar);
 
 
         if (size.x > size.y) {
@@ -128,61 +128,59 @@ public class GalleryListAdapter extends BaseAdapter {
             Gallery gallery = galleryList.get(position);
             //Gallery gallery = galleryList.get(i);
             Log.v(LOG_TAG, gallery.getGalleryName());
-            Thumbnail thumbnail = new Thumbnail(activity);
+
+            simplify(gallery);
+
+        return convertView;
+    }
+
+    private void simplify(Gallery gallery) {
+
+        Thumbnail thumbnail = new Thumbnail(activity);
         String imPath = null;
 
-            if(!galleriesOne.contains(gallery.getGalleryName())) {
-                flag = true;
-                imPath = thumbnail.getLatestImage(gallery,flag);
-                galleriesOne.add(gallery.getGalleryName());
-            }
+        if(!galleriesOne.contains(gallery.getGalleryName())) {
+            flag = true;
+            imPath = thumbnail.getLatestImage(gallery,flag);
+            galleriesOne.add(gallery.getGalleryName());
+        }
         else {
-                flag = false;
-                imPath = thumbnail.getLatestImage(gallery, flag);
-            }
+            flag = false;
+            imPath = thumbnail.getLatestImage(gallery, flag);
+        }
 
 
         //ListGalleries(gallery);
 
-            if (gallery.getItems() != null) {
-                if (gallery.getItems().size() > 0) {
-                    Gallery m = gallery.getItems().get(0);
-
-                }
-            }
-            title.setText(gallery.getGalleryName());
-
-            String gpath = gallery.getGalleryPath();
-
-            String iPath = this.localPath;
-
-
-
-           // File imgFile = new File(iPath);
-            File imgFile1 = new File(imPath);
-
-            imageView.setImageResource(0);
-            Drawable draw = Drawable.createFromPath(imPath);
-        draw = resize(draw);
-
-        Bitmap b = ((BitmapDrawable)draw).getBitmap();
-
-      //  File f = (File) b;
-
-            if(imgFile1.exists()) {
-                imageView.setImageDrawable(draw);
-              /*  Picasso.with(activity)
-                        .load(b)
-                        .into(imageView); */
+        if (gallery.getItems() != null) {
+            if (gallery.getItems().size() > 0) {
+                Gallery m = gallery.getItems().get(0);
 
             }
+        }
+        title.setText(gallery.getGalleryName());
+
+        String gpath = gallery.getGalleryPath();
+
+        String iPath = this.localPath;
+        // File imgFile = new File(iPath);
+        File imgFile1 = new File(imPath);
+
+        Uri uri = Uri.fromFile(imgFile1);
+
+        if(imgFile1.exists()) {
+          // imageView.setImageDrawable(draw);
+               Picasso.with(activity)
+                        .load(uri)
+                       .resize(size.x / 2, size.y)
+                       .centerInside()
+                        .into(imageView);
+        }
         mPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
 
         if(mPreferences.contains(gallery.getGalleryName())) {
 
             status = mPreferences.getString(gallery.getGalleryName(),"");
-
-
 
         }
 
@@ -195,27 +193,17 @@ public class GalleryListAdapter extends BaseAdapter {
             }
             else
                 mStatus.setText("Uploading");
-
-
+                progressBar.setVisibility(View.VISIBLE);
         }
         else
             mStatus.setText("Not Activated");
-             progressBar.setVisibility(View.GONE);
-
+        progressBar.setVisibility(View.GONE);
 
         title.setText(gallery.getGalleryName() + "(" + gallery.getCount() + ")");
 
 
-        return convertView;
-    }
 
-    private Drawable resize(Drawable image) {
-        Bitmap bitmap = ((BitmapDrawable) image).getBitmap();
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap,
-                (int) (bitmap.getWidth() * 0.5), (int) (bitmap.getHeight() * 0.5), false);
-        return new BitmapDrawable(activity.getResources(), bitmapResized);
     }
-
 
 
 
