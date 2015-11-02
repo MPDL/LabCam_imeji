@@ -125,6 +125,7 @@ public class GalleryGridAdapter extends BaseAdapter {
 
                 button.setVisibility(View.INVISIBLE);
         }
+
         grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light));
 
 

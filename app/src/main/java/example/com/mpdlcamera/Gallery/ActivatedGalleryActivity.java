@@ -1,21 +1,30 @@
 package example.com.mpdlcamera.Gallery;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.ContextMenu;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,17 +32,22 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import example.com.mpdlcamera.Auth.LoginActivity;
+import example.com.mpdlcamera.Folder.UploadService;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.Utils.ImageFileFilter;
 
 /**
  * Created by kiran on 29.10.15.
  */
-public class ActivatedGalleryActivity extends AppCompatActivity {
+public class ActivatedGalleryActivity extends AppCompatActivity implements UploadResultReceiver.Receiver {
 
 
     private final String LOG_TAG = ActivatedGalleryActivity.class.getSimpleName();
     private List<String> toBeDeleteImagePathList = new ArrayList<String>();
+    private SharedPreferences mPrefs;
+
 
 
 
@@ -192,6 +206,12 @@ public class ActivatedGalleryActivity extends AppCompatActivity {
         });
 
 
+        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
+        mReceiver.setReceiver(this);
+        Intent intentNew = new Intent(this, UploadService.class);
+        intentNew.putExtra("receiver", mReceiver);
+        this.startService(intentNew);
+
     }
 
     private void delete(List<String> toBeDeleteImagePathList) {
@@ -265,5 +285,83 @@ public class ActivatedGalleryActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        switch (resultCode) {
+            case 0:
+
+                setProgressBarIndeterminateVisibility(true);
+                break;
+            case 1:
+                /* Hide progress & extract result from bundle */
+                setProgressBarIndeterminateVisibility(false);
+
+                //  String[] results = resultData.getStringArray("result");
+
+                /* Update ListView with result */
+                //ArrayAdapter arrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_2, results);
+                //listView.setAdapter(arrayAdapter);
+                Toast.makeText(this, "Files are synced", Toast.LENGTH_LONG).show();
+
+
+
+
+                mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+                SharedPreferences.Editor e = mPrefs.edit();
+                e.putString("UStatus","true");
+                e.commit();
+                adapter.notifyDataSetChanged();
+//                Intent showLocalImageIntent = new Intent(activity, LocalGalleryActivity.class);
+//                startActivity(showLocalImageIntent);
+
+
+
+                if(mPrefs.contains("L_A_U")) {
+
+                    if(mPrefs.getBoolean("L_A_U", true)) {
+
+                        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                        View popupView = inflater.inflate(R.layout.logout_confirm, null);
+                        final PopupWindow popupWindow = new PopupWindow(
+                                popupView,
+                                550,
+                                300);
+                        popupWindow.setFocusable(true);
+                        popupWindow.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                        popupWindow.setAnimationStyle(R.style.AnimationPopup);
+
+                        Button yes = (Button) popupView.findViewById(R.id.buttonYes);
+                        Button no = (Button) popupView.findViewById(R.id.buttonNo);
+                        popupWindow.showAtLocation(findViewById(R.id.navigation), Gravity.CENTER, 0, 0);
+
+                        yes.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                finish();
+                                Intent loginIntent = new Intent(activity, LoginActivity.class);
+                                startActivity(loginIntent);
+                            }
+                        });
+
+                        no.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                popupWindow.dismiss();
+                            }
+                        });
+
+                    }
+                }
+
+                break;
+            case 2:
+                /* Handle the error */
+                String error = resultData.getString(Intent.EXTRA_TEXT);
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                break;
+        }
+    }
 
 }

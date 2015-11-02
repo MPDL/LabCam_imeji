@@ -17,7 +17,8 @@
         android:id="@+id/list_gallery_cell_thumbnail"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:scaleType="fitXY"/>
+        android:scaleType="fitXY"
+        android:background="@drawable/custom_border"/>
         <!--android:adjustViewBounds="true"-->
 
         <!--android:paddingTop="20dp"
@@ -57,14 +58,15 @@
         android:layout_alignParentBottom="true"
         android:background="@drawable/cell_bg_gradient"
         android:gravity="bottom"
-        android:id="@+id/bottomLayout">
+        android:id="@+id/bottomLayout"
+        android:layout_below="@+id/list_gallery_cell_thumbnail">
 
 
     <TextView
         android:id="@+id/list_item_gallery_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="15dp"
         android:textColor="#ffffff"
         android:layout_marginStart="10dip"
         android:text="Title"
@@ -84,9 +86,21 @@
         android:layout_height="wrap_content"
         android:textColor="#ffffff"
         android:layout_marginStart="10dip"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="25dp"
         android:textSize="@dimen/text_size"
         android:text="status"
+        android:layout_toRightOf="@+id/list_gallery_cell_thumbnail"
+        />
+
+        <TextView
+        android:id="@+id/list_item_gallery_ucount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#ffffff"
+        android:layout_marginStart="10dip"
+        android:layout_marginBottom="10dp"
+        android:textSize="@dimen/text_size"
+        android:text=""
         android:layout_toRightOf="@+id/list_gallery_cell_thumbnail"
         />
     <!--android:layout_below="@+id/list_item_gallery_title"

@@ -35,11 +35,12 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
          public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
            this.context = context;
+            // this.onCreate();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // SQL statement to create book table
+        // SQL statement to create file table
         String CREATE_FILE_TABLE = "CREATE TABLE file ( " +
                 "filename TEXT PRIMARY KEY, " +
                 "status TEXT" + ")";
@@ -68,6 +69,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
        // MySQLiteHelper dbHelper = new MySQLiteHelper(context);
         SQLiteDatabase db = this.getWritableDatabase();
+        //this.onCreate(db);
 
         // 2. create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
@@ -86,14 +88,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public Boolean getFile(String fileName) {
 
         SQLiteDatabase db = this.getReadableDatabase();
+
         Cursor cursor;
 
        try {
-           cursor =
-                   db.query(TABLE_FILE, // a. table
+           cursor =  db.query(TABLE_FILE, // a. table
                            COLUMNS, // b. column names
-                           " filename = " + // c. selections
-                                   fileName, // d. selections args
+                           " filename = ?",// c. selections
+                                   new String[] {fileName}, // d. selections args
                            null, // e. group by
                            null, // f. having
                            null, // g. order by
@@ -108,6 +110,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
            if(e.getMessage().toString().contains("no such column")) {
                return false;
            }
+           return false;
 
        }
 

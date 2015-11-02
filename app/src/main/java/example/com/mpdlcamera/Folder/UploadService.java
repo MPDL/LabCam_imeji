@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -266,6 +267,7 @@ public class UploadService extends IntentService {
         public void success(DataItem dataItem, Response response) {
 
             MySQLiteHelper db = new MySQLiteHelper(mContext);
+           //SQLiteDatabase dBase = mContext.get
 
             FileId fileId = new FileId(dataItem.getFilename(),"yes");
 

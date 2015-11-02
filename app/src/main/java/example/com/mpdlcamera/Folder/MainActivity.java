@@ -245,9 +245,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
 
-        editor.putString("UStatus","false");
+        editor.putString("UStatus", "false");
         //editor.putString("status", "wifi");
         editor.commit();
+
+
 
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
@@ -437,6 +439,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 SharedPreferences.Editor e = mPrefs.edit();
                 e.putString("UStatus","true");
                 e.commit();
+//                Intent showLocalImageIntent = new Intent(activity, LocalGalleryActivity.class);
+//                startActivity(showLocalImageIntent);
+
+
 
                 if(mPrefs.contains("L_A_U")) {
 

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -35,6 +36,8 @@ import java.util.prefs.PreferenceChangeListener;
 
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.SQLite.FileId;
+import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 
 /**
  * Created by kiran on 22.10.15.
@@ -55,6 +58,7 @@ public class GalleryListAdapter extends BaseAdapter {
     String status = "Off";
     TextView title;
     TextView mStatus;
+    TextView upCount;
     String gh;
     ProgressBar progressBar;
     ImageView imageView;
@@ -119,6 +123,7 @@ public class GalleryListAdapter extends BaseAdapter {
         title = (TextView) convertView.findViewById(R.id.list_item_gallery_title);
         mStatus = (TextView) convertView.findViewById(R.id.list_item_gallery_status);
         progressBar = (ProgressBar) convertView.findViewById(R.id.progBar);
+        upCount = (TextView) convertView.findViewById(R.id.list_item_gallery_ucount);
 
         SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 
@@ -186,6 +191,7 @@ public class GalleryListAdapter extends BaseAdapter {
         SharedPreferences mPreferences = activity.getSharedPreferences("folder", Context.MODE_PRIVATE);
         SharedPreferences nPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
 
+        int uCount = getUploadingCount(gallery);
         if(mPreferences.contains(gallery.getGalleryName())) {
 
             status = mPreferences.getString(gallery.getGalleryName(), "");
@@ -196,27 +202,56 @@ public class GalleryListAdapter extends BaseAdapter {
                 if (nPreferences.getString("UStatus", "").equalsIgnoreCase("true")) {
                     gh = "Uploaded....";
                     progressBar.setVisibility(View.INVISIBLE);
+                    upCount.setVisibility(View.INVISIBLE);
 
                 } else {
                     gh = "Uploading";
+                    upCount.setText(gallery.getCount()-uCount + "file(s) are remaining");
                     progressBar.setVisibility(View.VISIBLE);
                 }
             } else {
                 gh = "Not Activated";
                 progressBar.setVisibility(View.INVISIBLE);
+                upCount.setVisibility(View.INVISIBLE);
             }
 
 
             title.setText(gallery.getGalleryName() + "(" + gallery.getCount() + ")");
             mStatus.setText(gh);
+           // upCount.setVisibility(View.INVISIBLE);
         }
         else {
             title.setText(gallery.getGalleryName() + "(" + gallery.getCount() + ")");
             mStatus.setText("Not Activated");
+            upCount.setVisibility(View.INVISIBLE);
 
         }
 
         return convertView;
+    }
+
+    private int getUploadingCount(Gallery gallery) {
+
+        Integer uCount = 0;
+        String fPath = gallery.getGalleryPath();
+        File dir = new File(fPath);
+        File[] files = dir.listFiles();
+        MySQLiteHelper db = new MySQLiteHelper(activity);
+        SQLiteDatabase dBase = db.getWritableDatabase();
+
+        List<FileId> fileIds = db.getAllFiles();
+
+        for(File imageFile : files) {
+
+            String fileName = imageFile.getName();
+            if(db.getFile(fileName)){
+                uCount++;
+            }
+        }
+
+        return uCount;
+
+
     }
 
 /*    private void simplify(Gallery gallery) {
