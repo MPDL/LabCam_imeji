@@ -139,15 +139,44 @@ public class UploadService extends IntentService {
 
                             for(File imageFile : folderFiles) {
 
-                                String imageName = imageFile.toURI().toString();
+                                String imageName = imageFile.getName().toString();
                                 MySQLiteHelper db = new MySQLiteHelper(mContext);
+
+                                Boolean b = db.getFile(imageName);
+
+                                if(!b)
+
+                                {
+                                    item.setFilename(imageName);
+
+                                    meta.setTags(null);
+
+                                    meta.setAddress("blabla");
+
+                                    meta.setTitle(imageName);
+
+                                    meta.setCreator(user.getCompleteName());
+
+                                    item.setCollectionId(collectionID);
+
+                                    item.setLocalPath(imageFile.toString());
+
+                                    item.setMetadata(meta);
+
+                                    item.setCreatedBy(user);
+
+                                    meta.save();
+                                    item.save();
+
+                                    upload(item);
+                                }
 
 
                             }
 
 
 
-                            while (cursor.moveToNext()) {
+/*                            while (cursor.moveToNext()) {
 
                                 if (folderName.equalsIgnoreCase(cursor.getString(column_index_folder_name))) {
 
@@ -186,7 +215,7 @@ public class UploadService extends IntentService {
                                         upload(item);
                                     }
                                 }
-                            }
+                            }*/
                         }
                     }
                 }
