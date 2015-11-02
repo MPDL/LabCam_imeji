@@ -5,6 +5,7 @@
     <dimen name="activity_horizontal_margin">64dp</dimen>
     <dimen name="margintopOne">200dp</dimen>
     <dimen name="margintopTwo">180dp</dimen>
+    <dimen name="text_size">25sp</dimen>
 
 
 </resources>

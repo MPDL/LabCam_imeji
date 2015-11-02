@@ -305,7 +305,17 @@ public class UploadService extends IntentService {
                         new UploadEvent(error.getResponse().getStatus()));
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                 if (jsonBody.contains("already exists")) {
-                   // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
+
+                    MySQLiteHelper db = new MySQLiteHelper(mContext);
+                    String fileName = typedFile.fileName();
+                    FileId fileId = new FileId(fileName,"yes");
+                    db.insertFile(fileId);
+
+
+
+
+
+                    // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
                 }
                 else
                     Toast.makeText(mContext, "Upload failed", Toast.LENGTH_SHORT).show();

@@ -9,7 +9,9 @@ import android.graphics.Paint;
 import android.graphics.Point;
 
 import android.graphics.drawable.ShapeDrawable;
+import android.location.GpsStatus;
 import android.net.Uri;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 
 import android.util.Log;
@@ -29,6 +31,7 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.PreferenceChangeListener;
 
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.R;
@@ -48,10 +51,11 @@ public class GalleryListAdapter extends BaseAdapter {
     private ArrayList<String> galleriesOne = new ArrayList<>();
     boolean flag = false;
     Boolean matchGallery = false;
-    SharedPreferences mPreferences;
+  //  SharedPreferences mPreferences;
     String status = "Off";
     TextView title;
     TextView mStatus;
+    String gh;
     ProgressBar progressBar;
     ImageView imageView;
     Point size;
@@ -116,6 +120,16 @@ public class GalleryListAdapter extends BaseAdapter {
         mStatus = (TextView) convertView.findViewById(R.id.list_item_gallery_status);
         progressBar = (ProgressBar) convertView.findViewById(R.id.progBar);
 
+        SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                System.out.println(key);
+            }
+        };
+
+        SharedPreferences oPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        oPreferences.registerOnSharedPreferenceChangeListener(listener);
 
         if (size.x > size.y) {
             imageView.getLayoutParams().height = 1 * size.y /4;
@@ -129,12 +143,83 @@ public class GalleryListAdapter extends BaseAdapter {
             //Gallery gallery = galleryList.get(i);
             Log.v(LOG_TAG, gallery.getGalleryName());
 
-            simplify(gallery);
+        Thumbnail thumbnail = new Thumbnail(activity);
+        String imPath = null;
+
+        if(!galleriesOne.contains(gallery.getGalleryName())) {
+            flag = true;
+            imPath = thumbnail.getLatestImage(gallery,flag);
+            galleriesOne.add(gallery.getGalleryName());
+        }
+        else {
+            flag = false;
+            imPath = thumbnail.getLatestImage(gallery, flag);
+        }
+
+
+        //ListGalleries(gallery);
+
+        if (gallery.getItems() != null) {
+            if (gallery.getItems().size() > 0) {
+                Gallery m = gallery.getItems().get(0);
+
+            }
+        }
+       // title.setText(gallery.getGalleryName());
+
+        String gpath = gallery.getGalleryPath();
+
+        String iPath = this.localPath;
+        // File imgFile = new File(iPath);
+        File imgFile1 = new File(imPath);
+
+        Uri uri = Uri.fromFile(imgFile1);
+
+        if(imgFile1.exists()) {
+            // imageView.setImageDrawable(draw);
+            Picasso.with(activity)
+                    .load(uri)
+                    .resize(size.x / 2, size.y)
+                    .centerInside()
+                    .into(imageView);
+        }
+        SharedPreferences mPreferences = activity.getSharedPreferences("folder", Context.MODE_PRIVATE);
+        SharedPreferences nPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+
+        if(mPreferences.contains(gallery.getGalleryName())) {
+
+            status = mPreferences.getString(gallery.getGalleryName(), "");
+
+
+            if (status.equalsIgnoreCase("On")) {
+
+                if (nPreferences.getString("UStatus", "").equalsIgnoreCase("true")) {
+                    gh = "Uploaded....";
+                    progressBar.setVisibility(View.INVISIBLE);
+
+                } else {
+                    gh = "Uploading";
+                    progressBar.setVisibility(View.VISIBLE);
+                }
+            } else {
+                gh = "Not Activated";
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+
+
+            title.setText(gallery.getGalleryName() + "(" + gallery.getCount() + ")");
+            mStatus.setText(gh);
+        }
+        else {
+            title.setText(gallery.getGalleryName() + "(" + gallery.getCount() + ")");
+            mStatus.setText("Not Activated");
+
+        }
 
         return convertView;
     }
 
-    private void simplify(Gallery gallery) {
+/*    private void simplify(Gallery gallery) {
 
         Thumbnail thumbnail = new Thumbnail(activity);
         String imPath = null;
@@ -176,7 +261,8 @@ public class GalleryListAdapter extends BaseAdapter {
                        .centerInside()
                         .into(imageView);
         }
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        SharedPreferences mPreferences = activity.getSharedPreferences("folder", Context.MODE_PRIVATE);
+        SharedPreferences nPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
 
         if(mPreferences.contains(gallery.getGalleryName())) {
 
@@ -186,24 +272,30 @@ public class GalleryListAdapter extends BaseAdapter {
 
         if(status.equalsIgnoreCase("On")) {
 
-            if(mPreferences.getString("UStatus","").equalsIgnoreCase("true")) {
-                mStatus.setText("Uploaded");
-                progressBar.setVisibility(View.GONE);
+            if(nPreferences.getString("UStatus","").equalsIgnoreCase("true")) {
+                gh="Uploaded....";
+                progressBar.setVisibility(View.INVISIBLE);
 
             }
-            else
-                mStatus.setText("Uploading");
+            else {
+                gh="Uploading";
                 progressBar.setVisibility(View.VISIBLE);
+            }
         }
-        else
-            mStatus.setText("Not Activated");
-        progressBar.setVisibility(View.GONE);
+        else {
+            gh="Not Activated";
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+
 
         title.setText(gallery.getGalleryName() + "(" + gallery.getCount() + ")");
+        mStatus.setText(gh);
 
 
 
-    }
+
+
+    }*/
 
 
 
