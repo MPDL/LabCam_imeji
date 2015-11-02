@@ -119,6 +119,8 @@ public class SettingsListAdapter extends BaseAdapter {
 
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("collectionID", folderItems.get(selectedPosition).id);
+                editor.putString("remoteServer", folderItems.get(selectedPosition).getTitle());
+
 //                System.out.println(LOG_TAG + " selectedPosition on click " + selectedPosition);
 //                System.out.println(preferences.getString("collectionID","default") + selectedPosition);
 

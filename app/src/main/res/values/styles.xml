@@ -10,7 +10,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">#006f7b</item>
         <item name="colorPrimaryDark">#1565C0</item>
-        <item name="colorAccent">#2196F3</item>
+        <item name="colorAccent">#006f7b</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

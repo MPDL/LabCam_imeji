@@ -26,6 +26,8 @@ public class SettingsActivity extends AppCompatActivity {
     private View rootView;
     Toolbar toolbar;
     String mOption;
+    String localDevice;
+    String remoteServer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,7 +52,6 @@ public class SettingsActivity extends AppCompatActivity {
         TextView list_item_server = (TextView) findViewById(R.id.list_item_server);
 
 
-
         FlatButton btnDone = (FlatButton) findViewById(R.id.btnDone);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -64,11 +65,19 @@ public class SettingsActivity extends AppCompatActivity {
             } else
                 mOption = getString(R.string.manual);
         }
-        else
+        else {
             mOption = getString(R.string.wifi);
+        }
+
+        if(preferences.contains("remoteServer")) {
+            remoteServer = preferences.getString("remoteServer", "");
+        }else{
+            remoteServer = "please choose a remote folder";
+        }
 
         list_item_backup.setText(mOption);
-
+        //list_item_local.setText(localDevice);
+        list_item_server.setText(remoteServer);
 
         setting_backup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,28 +106,11 @@ public class SettingsActivity extends AppCompatActivity {
                 startActivity(settingsIntent);
             }
         });
-
-
-
-
-
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-
-    /*    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        String prefList = sharedPreferences.getString("status", "");
-
-        tv.setText(prefList);
-
-        String statusLau = sharedPreferences.getString("lau","");
-
-
-*/
     }
 
 }

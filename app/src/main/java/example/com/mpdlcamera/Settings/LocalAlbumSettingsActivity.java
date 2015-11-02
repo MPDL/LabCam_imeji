@@ -150,7 +150,7 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
                 File file = new File(fPath);
                 String dir = file.getParent();
                 SharedPreferences.Editor editor = preferencesFiles.edit();
-                editor.putString(album,dir);
+                editor.putString(album, dir);
                 editor.commit();
                 folders.add(album);
                 Log.i("ListingImages", " album=" + album);

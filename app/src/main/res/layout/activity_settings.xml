@@ -181,6 +181,9 @@
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:textColor="@android:color/white"
+        app:pb_colorNormal="@color/primary"
+        app:pb_colorPressed="@android:color/holo_blue_dark"
         android:text="@string/btn_done" />
 
 </RelativeLayout>
