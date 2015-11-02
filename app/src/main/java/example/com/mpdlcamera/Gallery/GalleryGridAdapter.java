@@ -59,9 +59,10 @@ public class GalleryGridAdapter extends BaseAdapter {
     }
 
 
-    public GalleryGridAdapter(Activity activity, List<String> galleryItems) {
+    public GalleryGridAdapter(Activity activity, List<String> galleryItems, Context context) {
         this.activity = activity;
         this.galleryItems = galleryItems;
+        this.context = context;
     }
 
     public void clearSelection() {

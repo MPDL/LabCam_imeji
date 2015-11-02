@@ -86,7 +86,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity {
             }
         }
 
-        adapter = new GalleryGridAdapter(activity, imagePathList);
+        adapter = new GalleryGridAdapter(activity, imagePathList, this);
 
         gridView = (GridView) findViewById(R.id.image_gridView);
 
