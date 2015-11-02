@@ -122,7 +122,7 @@ public class GalleryListAdapter extends BaseAdapter {
         imageView = (ImageView) convertView.findViewById(R.id.list_gallery_cell_thumbnail);
         title = (TextView) convertView.findViewById(R.id.list_item_gallery_title);
         mStatus = (TextView) convertView.findViewById(R.id.list_item_gallery_status);
-        progressBar = (ProgressBar) convertView.findViewById(R.id.progBar);
+      //  progressBar = (ProgressBar) convertView.findViewById(R.id.progBar);
         upCount = (TextView) convertView.findViewById(R.id.list_item_gallery_ucount);
 
         SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -192,6 +192,7 @@ public class GalleryListAdapter extends BaseAdapter {
         SharedPreferences nPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
 
         int uCount = getUploadingCount(gallery);
+        int fCount = gallery.getCount();
         if(mPreferences.contains(gallery.getGalleryName())) {
 
             status = mPreferences.getString(gallery.getGalleryName(), "");
@@ -201,27 +202,34 @@ public class GalleryListAdapter extends BaseAdapter {
 
                 if (nPreferences.getString("UStatus", "").equalsIgnoreCase("true")) {
                     gh = "Uploaded....";
-                    progressBar.setVisibility(View.INVISIBLE);
+                  //  progressBar.setVisibility(View.INVISIBLE);
                     upCount.setVisibility(View.INVISIBLE);
 
                 } else {
                     gh = "Uploading";
                     upCount.setText(gallery.getCount()-uCount + "file(s) are remaining");
-                    progressBar.setVisibility(View.VISIBLE);
+                 //   progressBar.setVisibility(View.INVISIBLE);
                 }
             } else {
                 gh = "Not Activated";
-                progressBar.setVisibility(View.INVISIBLE);
+              //  progressBar.setVisibility(View.INVISIBLE);
                 upCount.setVisibility(View.INVISIBLE);
             }
 
 
-            title.setText(gallery.getGalleryName() + "(" + gallery.getCount() + ")");
+            if(gallery.getGalleryName().equalsIgnoreCase("Camera")) {
+                title.setText(gallery.getGalleryName() + "(" + (fCount-1) + ")");
+            }
+            else  title.setText(gallery.getGalleryName() + "(" + (fCount) + ")");
+
             mStatus.setText(gh);
            // upCount.setVisibility(View.INVISIBLE);
         }
-        else {
-            title.setText(gallery.getGalleryName() + "(" + gallery.getCount() + ")");
+        else {if(gallery.getGalleryName().equalsIgnoreCase("Camera")) {
+            title.setText(gallery.getGalleryName() + "(" + (fCount-1) + ")");
+        }
+            else title.setText(gallery.getGalleryName() + "(" + (fCount) + ")");
+
             mStatus.setText("Not Activated");
             upCount.setVisibility(View.INVISIBLE);
 

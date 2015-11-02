@@ -191,6 +191,12 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
             }
         });
 
+        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
+        mReceiver.setReceiver(this);
+        Intent intentNew = new Intent(this, UploadService.class);
+        intentNew.putExtra("receiver", mReceiver);
+        this.startService(intentNew);
+
         gridView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -206,11 +212,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
         });
 
 
-        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
-        mReceiver.setReceiver(this);
-        Intent intentNew = new Intent(this, UploadService.class);
-        intentNew.putExtra("receiver", mReceiver);
-        this.startService(intentNew);
+
 
     }
 
@@ -221,6 +223,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
             File file = new File(imagePath);
             Boolean deleted = file.delete();
             Log.v(LOG_TAG, "deleted:" +deleted);
+          //  adapter.notifyDataSetChanged();
 
         }
 
