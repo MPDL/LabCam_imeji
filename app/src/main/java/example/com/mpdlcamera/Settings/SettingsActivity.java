@@ -11,8 +11,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.dd.processbutton.FlatButton;
-
 import example.com.mpdlcamera.R;
 
 /**
@@ -52,7 +50,7 @@ public class SettingsActivity extends AppCompatActivity {
         TextView list_item_server = (TextView) findViewById(R.id.list_item_server);
 
 
-        FlatButton btnDone = (FlatButton) findViewById(R.id.btnDone);
+        //FlatButton btnDone = (FlatButton) findViewById(R.id.btnDone);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 

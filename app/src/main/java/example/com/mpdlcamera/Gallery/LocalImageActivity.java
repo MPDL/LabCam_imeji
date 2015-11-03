@@ -253,7 +253,6 @@ public class LocalImageActivity extends AppCompatActivity {
                         adapter.clearSelection();
                         mode.finish();
                     case R.id.item_upload:
-                        //TODO handle uploading logic
 //                        nr = 0;
 //                        adapter.clearSelection();
 
@@ -279,7 +278,6 @@ public class LocalImageActivity extends AppCompatActivity {
                                                   int position,
                                                   long id,
                                                   boolean checked) {
-                // TODO Auto-generated method stub
                 if (checked) {
                     nr++;
                     adapter.setNewSelection(position, checked);
@@ -305,8 +303,6 @@ public class LocalImageActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
                                            int position, long arg3) {
-                // TODO Auto-generated method stub
-
                 gridView.setItemChecked(position, !adapter.isPositionChecked(position));
                 return false;
             }

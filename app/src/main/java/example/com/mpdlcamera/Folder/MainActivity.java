@@ -15,6 +15,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -188,14 +189,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         drawerToggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, R.string.hello_world, R.string.hello_world);
         drawerLayout.setDrawerListener(drawerToggle);
 
-        getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayout);
-
-        //collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
-        //collapsingToolbarLayout.setTitle("Design Library");
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
@@ -367,7 +364,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         if (id == R.id.homeAsUp) {
             drawerLayout.openDrawer(GravityCompat.START);
             return true;
-
         }
         return super.onOptionsItemSelected(item);
     }
