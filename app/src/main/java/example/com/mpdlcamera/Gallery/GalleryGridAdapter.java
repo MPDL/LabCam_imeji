@@ -23,6 +23,7 @@ import java.util.Set;
 
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.SQLite.FileId;
 import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 
 /**
@@ -59,9 +60,10 @@ public class GalleryGridAdapter extends BaseAdapter {
     }
 
 
-    public GalleryGridAdapter(Activity activity, List<String> galleryItems) {
+    public GalleryGridAdapter(Activity activity, List<String> galleryItems, Context context) {
         this.activity = activity;
         this.galleryItems = galleryItems;
+        this.context = context;
     }
 
     public void clearSelection() {
@@ -112,14 +114,18 @@ public class GalleryGridAdapter extends BaseAdapter {
         File dir = new File(filep);
         String file = dir.getName();
 
-        MySQLiteHelper db = new MySQLiteHelper(activity);
+        MySQLiteHelper db = new MySQLiteHelper(context);
 
-        Boolean b = db.getFile(file);
+        boolean b = db.getFile(file);
+        //boolean b = true;
+
+        List<FileId> fileIds = db.getAllFiles();
 
         if(!b) {
 
                 button.setVisibility(View.INVISIBLE);
         }
+
         grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light));
 
 

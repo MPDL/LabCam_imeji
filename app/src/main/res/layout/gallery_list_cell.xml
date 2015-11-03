@@ -17,7 +17,8 @@
         android:id="@+id/list_gallery_cell_thumbnail"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:scaleType="fitXY"/>
+        android:scaleType="fitXY"
+        android:background="@drawable/custom_border"/>
         <!--android:adjustViewBounds="true"-->
 
         <!--android:paddingTop="20dp"
@@ -26,31 +27,52 @@
         android:paddingLeft="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="20dp"ver
         -->
 
+<!--<LinearLayout-->
+    <!--android:orientation="vertical"-->
 
-    <ProgressBar
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:gravity="center_vertical|center_horizontal">-->
+   <!-- <ProgressBar
         android:id="@+id/progBar"
-        android:layout_marginTop="90dp"
-        android:layout_marginLeft="90dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:indeterminate="true"
         android:visibility="visible"/>
+-->
+<!--</LinearLayout>-->
+    <!--android:layout_marginTop="90dp"-->
+    <!--android:layout_marginLeft="90dp"-->
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/cell_bg_gradient"
+        android:gravity="bottom"
+        android:id="@+id/bottomLayout"
+        android:layout_below="@+id/list_gallery_cell_thumbnail">
+
 
     <TextView
         android:id="@+id/list_item_gallery_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#f3f9ff"
+        android:layout_marginTop="15dp"
+        android:textColor="#000000"
+        android:layout_marginStart="10dip"
         android:text="Title"
-        android:layout_marginTop="180dp"
-        android:layout_marginLeft="20dp"
         android:typeface="sans"
         android:textSize="@dimen/text_size"
-
-        android:textStyle="bold"></TextView>
+        android:textStyle="bold"/>
         <!--android:layout_marginTop="5dp"-->
 
         <!--android:layout_marginStart="35dip"-->
@@ -60,38 +82,31 @@
 
     <TextView
         android:id="@+id/list_item_gallery_status"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
-        android:layout_marginLeft="20dp"
-
-        android:textColor="#f1fff2"
-
-
-
-
-        android:text="Status"
-        android:typeface="sans"
+        android:textColor="#000000"
+        android:layout_marginStart="10dip"
+        android:layout_marginBottom="25dp"
         android:textSize="@dimen/text_size"
-        android:textStyle="bold"
+        android:text="status"
+        android:layout_toRightOf="@+id/list_gallery_cell_thumbnail"
+        />
 
+        <TextView
+        android:id="@+id/list_item_gallery_ucount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:layout_marginStart="10dip"
+        android:layout_marginBottom="10dp"
+        android:textSize="@dimen/text_size"
+        android:text=""
+        android:layout_toRightOf="@+id/list_gallery_cell_thumbnail"
         />
     <!--android:layout_below="@+id/list_item_gallery_title"
     android:layout_marginTop="2dp"
     android:layout_marginStart="35dip"
     android:paddingBottom="10dp"-->
-
-
-
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/cell_bg_gradient"
-        android:gravity="bottom"
-        android:id="@+id/overlapLayout">
 
 
 

@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -139,15 +140,44 @@ public class UploadService extends IntentService {
 
                             for(File imageFile : folderFiles) {
 
-                                String imageName = imageFile.toURI().toString();
+                                String imageName = imageFile.getName().toString();
                                 MySQLiteHelper db = new MySQLiteHelper(mContext);
+
+                                Boolean b = db.getFile(imageName);
+
+                                if(!b)
+
+                                {
+                                    item.setFilename(imageName);
+
+                                    meta.setTags(null);
+
+                                    meta.setAddress("blabla");
+
+                                    meta.setTitle(imageName);
+
+                                    meta.setCreator(user.getCompleteName());
+
+                                    item.setCollectionId(collectionID);
+
+                                    item.setLocalPath(imageFile.toString());
+
+                                    item.setMetadata(meta);
+
+                                    item.setCreatedBy(user);
+
+                                    meta.save();
+                                    item.save();
+
+                                    upload(item);
+                                }
 
 
                             }
 
 
 
-                            while (cursor.moveToNext()) {
+/*                            while (cursor.moveToNext()) {
 
                                 if (folderName.equalsIgnoreCase(cursor.getString(column_index_folder_name))) {
 
@@ -186,7 +216,7 @@ public class UploadService extends IntentService {
                                         upload(item);
                                     }
                                 }
-                            }
+                            }*/
                         }
                     }
                 }
@@ -237,6 +267,7 @@ public class UploadService extends IntentService {
         public void success(DataItem dataItem, Response response) {
 
             MySQLiteHelper db = new MySQLiteHelper(mContext);
+           //SQLiteDatabase dBase = mContext.get
 
             FileId fileId = new FileId(dataItem.getFilename(),"yes");
 
@@ -276,7 +307,17 @@ public class UploadService extends IntentService {
                         new UploadEvent(error.getResponse().getStatus()));
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                 if (jsonBody.contains("already exists")) {
-                   // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
+
+                    MySQLiteHelper db = new MySQLiteHelper(mContext);
+                    String fileName = typedFile.fileName();
+                    FileId fileId = new FileId(fileName,"yes");
+                    db.insertFile(fileId);
+
+
+
+
+
+                    // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
                 }
                 else
                     Toast.makeText(mContext, "Upload failed", Toast.LENGTH_SHORT).show();
