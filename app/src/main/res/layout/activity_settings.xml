@@ -37,9 +37,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
                 android:layout_marginEnd="50dp"
+                android:textSize="20dp"
                 android:text="@string/action_settings"
                 android:textColor="@color/white"
-                android:gravity="center" />
+                 />
 
         </LinearLayout>
     </android.support.v7.widget.Toolbar>

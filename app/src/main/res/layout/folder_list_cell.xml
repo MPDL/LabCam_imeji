@@ -33,10 +33,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:textColor="#ffffff"
-            android:layout_marginStart="35dip"
+            android:layout_marginStart="35dp"
             android:text="Title"
             android:typeface="sans"
-            android:textSize="30dip"
+            android:textSize="30dp"
             android:textStyle="bold"/>
 
         <!-- more details -->
@@ -55,9 +55,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="#ffffff"
-            android:layout_marginStart="35dip"
+            android:layout_marginStart="35dp"
             android:layout_marginBottom="25dp"
-            android:textSize="10dip"
+            android:textSize="15dp"
             android:text="Some Cool Guy"
             android:layout_toRightOf="@+id/list_item_cell_thumbnail"
             />

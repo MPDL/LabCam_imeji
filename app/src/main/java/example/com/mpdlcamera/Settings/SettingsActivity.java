@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,6 +28,9 @@ public class SettingsActivity extends AppCompatActivity {
     String localDevice;
     String remoteServer;
 
+    TextView list_item_backup;
+    TextView list_item_local;
+    TextView list_item_server;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,41 +45,17 @@ public class SettingsActivity extends AppCompatActivity {
 
 
         LinearLayout setting_backup = (LinearLayout) findViewById(R.id.setting_backup);
-        TextView list_item_backup = (TextView) findViewById(R.id.list_item_backup);
+        list_item_backup = (TextView) findViewById(R.id.list_item_backup);
 
         LinearLayout setting_local = (LinearLayout) findViewById(R.id.setting_local);
-        TextView list_item_local = (TextView) findViewById(R.id.list_item_local);
+        list_item_local = (TextView) findViewById(R.id.list_item_local);
 
         LinearLayout setting_server = (LinearLayout) findViewById(R.id.setting_server);
-        TextView list_item_server = (TextView) findViewById(R.id.list_item_server);
+        list_item_server = (TextView) findViewById(R.id.list_item_server);
 
 
         //FlatButton btnDone = (FlatButton) findViewById(R.id.btnDone);
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        if(preferences.contains("status")) {
-            String option = preferences.getString("status", "");
-            if (option.equalsIgnoreCase("wifi")) {
-                mOption = getString(R.string.wifi);
-            } else if (option.equalsIgnoreCase("both")) {
-                mOption = getString(R.string.wifidata);
-            } else
-                mOption = getString(R.string.manual);
-        }
-        else {
-            mOption = getString(R.string.wifi);
-        }
-
-        if(preferences.contains("remoteServer")) {
-            remoteServer = preferences.getString("remoteServer", "");
-        }else{
-            remoteServer = "please choose a remote folder";
-        }
-
-        list_item_backup.setText(mOption);
-        //list_item_local.setText(localDevice);
-        list_item_server.setText(remoteServer);
 
         setting_backup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,6 +91,38 @@ public class SettingsActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (preferences.contains("status")) {
+            String option = preferences.getString("status", "");
+            if (option.equalsIgnoreCase("wifi")) {
+                mOption = getString(R.string.wifi);
+            } else if (option.equalsIgnoreCase("both")) {
+                mOption = getString(R.string.wifidata);
+            } else
+                mOption = getString(R.string.manual);
+        } else {
+            mOption = getString(R.string.wifi);
+        }
+
+        if (preferences.contains("remoteServer")) {
+            remoteServer = preferences.getString("remoteServer", "");
+        } else {
+            remoteServer = "please choose a remote folder";
+        }
+
+        Log.v(LOG_TAG, "current collection: "+preferences.getString("collectionID", ""));
+
+        list_item_backup.setText(mOption);
+        //list_item_local.setText(localDevice);
+        list_item_server.setText(remoteServer);
+    }
 }
 
 
