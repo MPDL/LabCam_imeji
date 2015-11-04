@@ -339,14 +339,16 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     @Override
     public void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
         drawerToggle.syncState();
+        super.onPostCreate(savedInstanceState);
+
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
         drawerToggle.onConfigurationChanged(newConfig);
+        super.onConfigurationChanged(newConfig);
+
     }
 
     @Override
@@ -374,9 +376,12 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             drawerLayout.openDrawer(GravityCompat.START);
             return true;
         }
+
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
-
 
     private void hidePDialog() {
         if (pDialog != null) {
