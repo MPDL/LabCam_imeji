@@ -57,6 +57,7 @@ public class UploadService extends IntentService {
         super("UploadService");
     }
     private SharedPreferences mPrefs;
+    private SharedPreferences nPrefs;
     FileId fileId;
 
 
@@ -238,6 +239,13 @@ public class UploadService extends IntentService {
     }
 
     private void upload(DataItem item) {
+        nPrefs = this.getSharedPreferences("myPref", 0);
+        if(mPrefs.contains("collectionID")) {
+            collectionID = mPrefs.getString("collectionID","");
+        }
+        else
+            collectionID = DeviceStatus.collectionID;
+
         String jsonPart1 = "\"collectionId\" : \"" +
                 collectionID +
                 "\"";
@@ -278,9 +286,9 @@ public class UploadService extends IntentService {
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 
-            if(mPrefs.contains("rpfd")) {
+            if(mPrefs.contains("R_P_F_D")) {
 
-                if(mPrefs.getString("rpfd","").equalsIgnoreCase("On")) {
+                if(mPrefs.getBoolean("R_P_F_D",true)) {
 
                     File file = typedFile.file();
                     Boolean deleted = file.delete();

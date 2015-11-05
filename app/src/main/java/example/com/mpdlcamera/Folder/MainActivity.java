@@ -445,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
 
 
-                if(mPrefs.contains("L_A_U")) {
+ /*               if(mPrefs.contains("L_A_U")) {
 
                     if(mPrefs.getBoolean("L_A_U", true)) {
 
@@ -481,7 +481,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                         });
 
                     }
-                }
+                }*/
 
                 break;
             case 2:

@@ -192,7 +192,7 @@ public class LocalGalleryActivity extends AppCompatActivity implements UploadRes
 
 
 
-                if(mPrefs.contains("L_A_U")) {
+/*                if(mPrefs.contains("L_A_U")) {
 
                     if(mPrefs.getBoolean("L_A_U", true)) {
 
@@ -228,7 +228,7 @@ public class LocalGalleryActivity extends AppCompatActivity implements UploadRes
                         });
 
                     }
-                }
+                }*/
 
                 break;
             case 2:

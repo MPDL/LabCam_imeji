@@ -2,6 +2,7 @@ package example.com.mpdlcamera.Upload;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -38,6 +39,7 @@ public class FileUploader {
     public TypedFile typedFile;
     String json;
     private SharedPreferences mPrefs;
+    private SharedPreferences nPrefs;
 
 
     private Context context=null;
@@ -121,11 +123,19 @@ public class FileUploader {
 
             }
 
-            if(mPrefs.contains("lau")) {
+            if(mPrefs.contains("L_A_U")) {
 
                 if(mPrefs.getBoolean("L_A_U", true)) {
 
-                    act.finish();
+                    Intent intent = new Intent(act, PopupActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    act.startActivity(intent);
+
+                    nPrefs = act.getSharedPreferences("logout", Context.MODE_PRIVATE);
+
+                    if(nPrefs.getString("option","").equalsIgnoreCase("yes")) {
+                        act.finish();
+                    }
 
                 }
             }

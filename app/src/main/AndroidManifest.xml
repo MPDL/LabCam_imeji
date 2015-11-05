@@ -150,6 +150,13 @@
             android:label="Activated Gallery"
             android:parentActivityName=".Gallery.LocalGalleryActivity" ></activity>
 
+        <activity android:name=".Upload.PopupActivity"
+            android:label="Logout Confirmation"
+            android:launchMode="singleInstance"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Dialog"></activity>
+
         <!--service-->
         <service android:name="example.com.mpdlcamera.Folder.UploadService"
                  android:enabled="true">

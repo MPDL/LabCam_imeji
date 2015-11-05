@@ -10,8 +10,9 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="example.com.mpdlcamera.Folder.MainActivity"
-    android:background="@layout/custom_border">
+    android:background="#f2ffed"
+    tools:context="example.com.mpdlcamera.Folder.MainActivity">
+
 
 
     <TextView
@@ -24,7 +25,8 @@
         android:id="@+id/textView2"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textColor="#000000" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -32,12 +34,11 @@
         android:layout_height="wrap_content"
         android:text="Yes!"
         android:id="@+id/buttonYes"
-        android:layout_marginRight="30dp"
-        android:layout_marginEnd="57dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginLeft="83dp"
+        android:layout_marginStart="83dp"
         android:layout_below="@+id/textView2"
-        android:layout_toLeftOf="@+id/buttonNo"
-        android:layout_toStartOf="@+id/buttonNo" />
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignStart="@+id/textView2" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
@@ -46,9 +47,9 @@
         android:text="No!"
         android:id="@+id/buttonNo"
 
-        android:layout_marginRight="70dp"
-        android:layout_marginEnd="108dp"
         android:layout_alignTop="@+id/buttonYes"
-        android:layout_alignRight="@+id/textView2"
-        android:layout_alignEnd="@+id/textView2" />
+        android:layout_toRightOf="@+id/buttonYes"
+        android:layout_toEndOf="@+id/buttonYes"
+        android:layout_marginLeft="69dp"
+        android:layout_marginStart="69dp" />
 </RelativeLayout>
