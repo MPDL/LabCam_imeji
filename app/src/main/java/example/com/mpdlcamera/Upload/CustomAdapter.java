@@ -2,9 +2,6 @@ package example.com.mpdlcamera.Upload;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,17 +11,11 @@ import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.LocalGallery;
-import example.com.mpdlcamera.Model.MetaData;
-import example.com.mpdlcamera.Model.User;
 import example.com.mpdlcamera.R;
-import example.com.mpdlcamera.Utils.DeviceStatus;
-import retrofit.mime.TypedFile;
 
 /**
  * Created by kiran on 23.09.15.

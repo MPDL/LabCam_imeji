@@ -1,6 +1,7 @@
 package example.com.mpdlcamera.Settings;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,6 +12,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import example.com.mpdlcamera.R;
 
@@ -111,6 +115,27 @@ public class SettingsActivity extends AppCompatActivity {
             mOption = getString(R.string.wifi);
         }
 
+
+        SharedPreferences preferencesFolders = getSharedPreferences("folder", Context.MODE_PRIVATE);
+        HashMap<String, String> folderSyncMap = new HashMap<String, String>();
+        folderSyncMap = (HashMap) preferencesFolders.getAll();
+
+        localDevice = "";
+        for (Map.Entry<String, String> entry : folderSyncMap.entrySet()) {
+            if (String.valueOf(entry.getValue()).equalsIgnoreCase("On")) {
+                if(!String.valueOf(entry.getValue()).equalsIgnoreCase("null")) {
+                    if(localDevice.equals("")){
+                        localDevice = String.valueOf(entry.getKey());
+                    }else {
+                        localDevice = localDevice + " , " + String.valueOf(entry.getKey());
+                    }
+                }
+            }
+
+        }
+
+
+
         if (preferences.contains("remoteServer")) {
             remoteServer = preferences.getString("remoteServer", "");
         } else {
@@ -120,7 +145,7 @@ public class SettingsActivity extends AppCompatActivity {
         Log.v(LOG_TAG, "current collection: "+preferences.getString("collectionID", ""));
 
         list_item_backup.setText(mOption);
-        //list_item_local.setText(localDevice);
+        list_item_local.setText(localDevice);
         list_item_server.setText(remoteServer);
     }
 }
