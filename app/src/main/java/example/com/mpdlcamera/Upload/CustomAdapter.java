@@ -50,10 +50,11 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
+
         ViewHolder holder = null;
         Log.v("ConvertView", String.valueOf(position));
 
-        if (convertView == null) {
+        if (true) {
             LayoutInflater vi = (LayoutInflater) mContext.getSystemService(
                     Context.LAYOUT_INFLATER_SERVICE);
             convertView = vi.inflate(R.layout.row, null);

@@ -1,6 +1,7 @@
 package example.com.mpdlcamera.Auth;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -99,6 +100,10 @@ public class LoginActivity extends AppCompatActivity {
                     mEditor.putString("username", username).apply();
                     mEditor.putString("password", password).apply();
                     mEditor.putString("server", serverURL).apply();
+                    SharedPreferences preferences = getSharedPreferences("folder", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor ed = preferences.edit();
+                    ed.putString("Camera", "On");
+                    ed.commit();
                     DeviceStatus.showSnackbar(rootView, "Login Successfully");
 
                     accountLogin();

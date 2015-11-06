@@ -11,12 +11,18 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,6 +50,8 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
     String prefOption;
     ArrayList<String> permFolder;
     CustomAdapter switchAdapter;
+    Boolean checkAll=null;
+    ListView listViewLocal;
 
     private final String LOG_TAG = LocalAlbumSettingsActivity.class.getSimpleName();
     //TODO set collection dynamically
@@ -57,11 +65,13 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
     private List<DataItem> dataList = new ArrayList<DataItem>();
 
     SharedPreferences preferences;
+    Context context = this;
     SharedPreferences preferencesFiles;
     SharedPreferences preferencesFolders;
     private User user;
     String status;
     Boolean fStatus;
+    ArrayList<String> imageFolders;
 
 
 
@@ -135,6 +145,13 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
 
         checkSyncAll = (CheckBox) LocalAlbumSettingsActivity.this.findViewById(R.id.syncAllCheck);
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        if(preferences.contains("syncall")) {
+            if(preferences.getBoolean("syncall",true)) {
+                checkSyncAll.setChecked(true);
+            }
+        }
+
         //Logging the image count
         Log.i("ListingImages", " query count=" + cur.getCount());
 
@@ -156,8 +173,7 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
                 Log.i("ListingImages", " album=" + album);
             } while (cur.moveToNext());
         }
-
-        ArrayList<String> imageFolders = new ArrayList<String>();
+        imageFolders = new ArrayList<String>();
         imageFolders = new ArrayList<String>(new LinkedHashSet<String>(folders));
 
         ArrayList<LocalGallery> folderList = new ArrayList<LocalGallery>();
@@ -184,8 +200,8 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
 
         switchAdapter = new CustomAdapter(this, R.layout.row, folderList);
 
-        final ListView listViewLocal = (ListView) findViewById(R.id.listviewLocal);
-        listViewLocal.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        listViewLocal = (ListView) findViewById(R.id.listviewLocal);
+        listViewLocal.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
         listViewLocal.setAdapter(switchAdapter);
 
@@ -198,23 +214,81 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (checkSyncAll.isChecked()) {
+                    checkAll = true;
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+                    SharedPreferences preferences1 = getSharedPreferences("folder", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor ed1 = preferences1.edit();
+                    SharedPreferences.Editor ed = preferences.edit();
+                    ed.putBoolean("syncall",true);
+                    ed.commit();
+                    ArrayList<LocalGallery> folderList = new ArrayList<LocalGallery>();
 
+                    Iterator<String> folderIterator = imageFolders.iterator();
 
-                    for (int i = 0; i < size; i++) {
-                        RelativeLayout RelativeOne = (RelativeLayout) getViewByPosition(i, listViewLocal);
-                        Switch mSwitch = (Switch) RelativeOne.findViewById(R.id.fswitch);
-                        mSwitch.setChecked(true);
-
+                    while (folderIterator.hasNext()) {
+                        String now = folderIterator.next().toString();
+                        fStatus = true;
+                        ed1.putString(now,"On");
+                        ed1.commit();
+                        LocalGallery folderOne = new LocalGallery(now, fStatus);
+                        folderList.add(folderOne);
                     }
+
+                    switchAdapter = new CustomAdapter(context, R.layout.row, folderList);
+
+                    listViewLocal = (ListView) findViewById(R.id.listviewLocal);
+                    listViewLocal.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+                    listViewLocal.setAdapter(switchAdapter);
+                    switchAdapter.notifyDataSetChanged();
+
+
+
+//                    for (int i = 0; i < size; i++) {
+//                        checkAll = true;
+//                       // switchAdapter.getView()
+//                       // ((ArrayAdapter<LocalGallery>) listViewLocal.getAdapter()).notifyDataSetChanged();
+//                        //switchAdapter.notifyDataSetChanged();
+//
+//                       // listViewLocal.setItemChecked(i,true);
+//                      //  RelativeLayout RelativeOne = (RelativeLayout) getViewByPosition(i, listViewLocal);
+//                      //  Switch mSwitch = (Switch) RelativeOne.findViewById(R.id.fswitch);
+//                      //  mSwitch.setChecked(true);
+//
+//                    }
+                   // switchAdapter.notifyDataSetChanged();
                 }
                 if (!checkSyncAll.isChecked()) {
+                    checkAll = false;
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+                    SharedPreferences preferences1 = getSharedPreferences("folder", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor ed1 = preferences1.edit();
+                    SharedPreferences.Editor ed = preferences.edit();
+                    ed.putBoolean("syncall",false);
+                    ed.commit();
+                    ArrayList<LocalGallery> folderList = new ArrayList<LocalGallery>();
 
-                    for (int i = 0; i < size; i++) {
-                        RelativeLayout RelativeOne = (RelativeLayout) getViewByPosition(i, listViewLocal);
-                        Switch mSwitch = (Switch) RelativeOne.findViewById(R.id.fswitch);
-                        mSwitch.setChecked(false);
+                    Iterator<String> folderIterator = imageFolders.iterator();
 
+                    while (folderIterator.hasNext()) {
+                        String now = folderIterator.next().toString();
+                        fStatus = false;
+                        ed1.putString(now,"Off");
+                        ed1.commit();
+                        LocalGallery folderOne = new LocalGallery(now, fStatus);
+                        folderList.add(folderOne);
                     }
+
+                    switchAdapter = new CustomAdapter(context, R.layout.row, folderList);
+
+                    listViewLocal = (ListView) findViewById(R.id.listviewLocal);
+                    listViewLocal.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+                    listViewLocal.setAdapter(switchAdapter);
+                    switchAdapter.notifyDataSetChanged();
+
+
+                    // switchAdapter.notifyDataSetChanged();
                 }
 
             }
@@ -233,6 +307,150 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
             return listView.getChildAt(childIndex);
         }
     }
+
+    public class CustomAdapter extends ArrayAdapter<LocalGallery> {
+
+        Context mContext;
+
+
+        private final String LOG_TAG = CustomAdapter.class.getSimpleName();
+
+        String prefOption;
+
+
+        private ArrayList<LocalGallery> folderList;
+
+        public CustomAdapter(Context context, int textViewResourceId,
+                             ArrayList<LocalGallery> folderList) {
+            super(context, textViewResourceId, folderList);
+            this.mContext = context;
+            this.folderList = new ArrayList<LocalGallery>();
+            this.folderList.addAll(folderList);
+        }
+
+        private class ViewHolder {
+            TextView textView;
+            Switch fSwitch;
+
+        }
+
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+
+            ViewHolder holder = null;
+            Log.v("ConvertView", String.valueOf(position));
+
+            if (true) {
+                LayoutInflater vi = (LayoutInflater) mContext.getSystemService(
+                        Context.LAYOUT_INFLATER_SERVICE);
+                convertView = vi.inflate(R.layout.row, null);
+
+                holder = new ViewHolder();
+                holder.textView = (TextView) convertView.findViewById(R.id.folder);
+                holder.fSwitch = (Switch) convertView.findViewById(R.id.fswitch);
+
+
+                convertView.setTag(holder);
+
+                /*if(checkAll != null && checkAll)
+                {
+                    for(int i = 0; i<switchAdapter.getCount(); i++) {
+
+                        RelativeLayout RelativeOne = (RelativeLayout) getViewByPosition(i, listViewLocal);
+                        Switch sw = (Switch) RelativeOne.findViewById(R.id.fswitch);
+                        LocalGallery folder = (LocalGallery) sw.getTag();
+
+                        folder.setSelected(true);
+                    }
+                }
+                if(checkAll != null && !checkAll)
+                {
+                    for(int i = 0; i<switchAdapter.getCount(); i++) {
+
+                        RelativeLayout RelativeOne = (RelativeLayout) getViewByPosition(i, listViewLocal);
+                        Switch sw = (Switch) RelativeOne.findViewById(R.id.fswitch);
+                        LocalGallery folder = (LocalGallery) sw.getTag();
+
+                        folder.setSelected(false);
+                    }
+                }
+*/
+                holder.fSwitch.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        Switch sw = (Switch) v;
+                        LocalGallery folder = (LocalGallery) sw.getTag();
+
+                        if(checkAll != null) {
+                            if (!sw.isChecked() && checkAll) {
+                                checkSyncAll.setChecked(false);
+                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+                                SharedPreferences.Editor ed = preferences.edit();
+                                ed.putBoolean("syncall",false);
+                                ed.commit();
+                            }
+                        }
+                        folder.setSelected(sw.isChecked());
+                    }
+                });
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            holder.fSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                    if (!isChecked) {
+
+                        RelativeLayout rl = (RelativeLayout) buttonView.getParent();
+                        TextView tv = (TextView) rl.findViewById(R.id.folder);
+                        String folder = tv.getText().toString();
+
+                        //    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+                        SharedPreferences settings = mContext.getSharedPreferences("folder", Context.MODE_PRIVATE);
+
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(folder, "Off");
+                        editor.commit();
+
+
+                    } else if (isChecked) {
+
+                        // SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
+                        SharedPreferences settings = mContext.getSharedPreferences("folder", Context.MODE_PRIVATE);
+
+                        RelativeLayout rl = (RelativeLayout) buttonView.getParent();
+                        TextView tv = (TextView) rl.findViewById(R.id.folder);
+                        String folder = tv.getText().toString();
+
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(folder, "On");
+                        editor.commit();
+
+
+                    }
+
+                }
+
+
+            });
+
+
+            LocalGallery folder = folderList.get(position);
+            holder.textView.setText(folder.getGallery());
+
+            holder.fSwitch.setChecked(folder.isSelected());
+            holder.fSwitch.setTag(folder);
+
+            return convertView;
+
+        }
+
+
+    }
+
 }
 
 
