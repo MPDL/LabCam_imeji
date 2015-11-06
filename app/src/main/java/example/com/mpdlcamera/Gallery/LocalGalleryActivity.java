@@ -92,7 +92,7 @@ public class LocalGalleryActivity extends AppCompatActivity implements UploadRes
 
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
         Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences = getSharedPreferences("folder", Context.MODE_PRIVATE);
 
 
         final ArrayList<Gallery> folders = new ArrayList<Gallery>();

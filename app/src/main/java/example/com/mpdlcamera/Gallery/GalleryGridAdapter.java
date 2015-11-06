@@ -29,6 +29,7 @@ import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 /**
  * Created by kiran on 30.10.15.
  */
+
 public class GalleryGridAdapter extends BaseAdapter {
 
     private Activity activity;
@@ -111,6 +112,7 @@ public class GalleryGridAdapter extends BaseAdapter {
         Button buttonCloud = (Button) grid.findViewById(R.id.cloud);
         Button buttonUploading = (Button) grid.findViewById(R.id.uploading);
         String filep = (String) this.getItem(position);
+        buttonUploading.setVisibility(View.INVISIBLE);
 
         File dir = new File(filep);
         String file = dir.getName();
@@ -125,7 +127,7 @@ public class GalleryGridAdapter extends BaseAdapter {
         if(!b) {
 
                 buttonCloud.setVisibility(View.INVISIBLE);
-               // buttonUploading.setVisibility(View.VISIBLE);
+                buttonUploading.setVisibility(View.VISIBLE);
         }
 
         grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light));
