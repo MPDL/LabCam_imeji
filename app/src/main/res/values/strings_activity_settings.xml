@@ -5,6 +5,8 @@
     <string name="title_activity_backup">Backup Settings</string>
     <string name="title_activity_Items">Items</string>
     <string name="title_activity_Images">Images</string>
+    <string name="title_backup_settings">Backup Settings</string>
+
 
     <!-- Strings related to Settings -->
 

@@ -15,6 +15,7 @@ import example.com.mpdlcamera.R;
 /**
  * Created by kiran on 22.10.15.
  */
+/*
 public class PrefFragment extends PreferenceFragment {
 
     private SwitchPreference switchPreferenceLau;
@@ -87,3 +88,4 @@ public class PrefFragment extends PreferenceFragment {
 
     }
 }
+*/

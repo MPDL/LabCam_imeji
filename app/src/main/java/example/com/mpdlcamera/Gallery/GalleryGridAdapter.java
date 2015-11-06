@@ -108,7 +108,8 @@ public class GalleryGridAdapter extends BaseAdapter {
             grid = convertView;
         }
 
-        Button button = (Button) grid.findViewById(R.id.cloud);
+        Button buttonCloud = (Button) grid.findViewById(R.id.cloud);
+        Button buttonUploading = (Button) grid.findViewById(R.id.uploading);
         String filep = (String) this.getItem(position);
 
         File dir = new File(filep);
@@ -123,7 +124,8 @@ public class GalleryGridAdapter extends BaseAdapter {
 
         if(!b) {
 
-                button.setVisibility(View.INVISIBLE);
+                buttonCloud.setVisibility(View.INVISIBLE);
+               // buttonUploading.setVisibility(View.VISIBLE);
         }
 
         grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light));

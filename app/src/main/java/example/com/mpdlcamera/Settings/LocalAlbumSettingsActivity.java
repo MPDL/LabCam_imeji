@@ -43,7 +43,7 @@ import example.com.mpdlcamera.Utils.DeviceStatus;
  */
 
 
-public class LocalAlbumSettingsActivity extends AppCompatActivity {
+public class LocalAlbumSettingsActivity extends AppCompatActivity  {
 
 
     String networkStatus;
@@ -258,7 +258,8 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
 //                    }
                    // switchAdapter.notifyDataSetChanged();
                 }
-                if (!checkSyncAll.isChecked()) {
+               // else if (!checkSyncAll.isChecked()) {
+                else {
                     checkAll = false;
                     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
                     SharedPreferences preferences1 = getSharedPreferences("folder", Context.MODE_PRIVATE);
@@ -377,10 +378,14 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
                     }
                 }
 */
-                holder.fSwitch.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        Switch sw = (Switch) v;
-                        LocalGallery folder = (LocalGallery) sw.getTag();
+
+              //  holder.fSwitch.setOnCheckedChangeListener(switchChangeListener);
+        holder.fSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                      Switch sw = (Switch) buttonView;
+                     LocalGallery folder = (LocalGallery) sw.getTag();
 
                         if(checkAll != null) {
                             if (!sw.isChecked() && checkAll) {
@@ -388,6 +393,24 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
                                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
                                 SharedPreferences.Editor ed = preferences.edit();
                                 ed.putBoolean("syncall",false);
+                                ed.commit();
+                            }
+                        }
+                        folder.setSelected(sw.isChecked());
+                    }
+                });
+                holder.fSwitch.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Switch sw = (Switch) v;
+                        LocalGallery folder = (LocalGallery) sw.getTag();
+
+                        if (checkAll != null) {
+                            if (!sw.isChecked() && checkAll) {
+                                checkSyncAll.setChecked(false);
+                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+                                SharedPreferences.Editor ed = preferences.edit();
+                                ed.putBoolean("syncall", false);
                                 ed.commit();
                             }
                         }
@@ -416,7 +439,8 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
                         editor.commit();
 
 
-                    } else if (isChecked) {
+//                    } else if (isChecked) {
+                    } else {
 
                         // SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
                         SharedPreferences settings = mContext.getSharedPreferences("folder", Context.MODE_PRIVATE);

@@ -54,6 +54,8 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
         ViewHolder holder = null;
         Log.v("ConvertView", String.valueOf(position));
 
+
+
         if (true) {
             LayoutInflater vi = (LayoutInflater) mContext.getSystemService(
                     Context.LAYOUT_INFLATER_SERVICE);

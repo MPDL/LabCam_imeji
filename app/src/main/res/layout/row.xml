@@ -19,9 +19,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:focusable="false"
         android:layout_alignBaseline="@+id/folder"
-        android:layout_alignBottom="@+id/folder"
-        android:focusableInTouchMode="false" />
+        android:layout_alignBottom="@+id/folder"/>
+        <!--android:focusable="false"-->
+
+        <!--android:focusableInTouchMode="false" />-->
 
 </RelativeLayout>

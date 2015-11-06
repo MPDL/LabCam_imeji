@@ -25,6 +25,15 @@
         android:layout_gravity="right|top"
         android:clickable="false"
         />
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/uploading"
+        android:id="@+id/uploading"
+        android:layout_margin="4dp"
+        android:layout_gravity="right|top"
+        android:clickable="false"
+        />
 
 
 </FrameLayout>

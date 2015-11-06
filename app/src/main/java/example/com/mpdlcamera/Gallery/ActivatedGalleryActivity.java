@@ -304,7 +304,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                 /* Update ListView with result */
                 //ArrayAdapter arrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_2, results);
                 //listView.setAdapter(arrayAdapter);
-                Toast.makeText(this, "Files are synced", Toast.LENGTH_LONG).show();
+              //  Toast.makeText(this, "Files are synced", Toast.LENGTH_LONG).show();
 
 
 
@@ -320,7 +320,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
 
 
 
-                if(mPrefs.contains("L_A_U")) {
+/*                if(mPrefs.contains("L_A_U")) {
 
                     if(mPrefs.getBoolean("L_A_U", true)) {
 
@@ -356,7 +356,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                         });
 
                     }
-                }
+                }*/
 
                 break;
             case 2:
