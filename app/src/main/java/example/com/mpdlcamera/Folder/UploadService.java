@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -20,7 +19,6 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.activeandroid.query.Select;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.otto.Produce;
@@ -79,133 +77,89 @@ public class UploadService extends IntentService {
      */
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.d(TAG, "Service Started!");
+        if(isNetworkAvailable()) {
+            Log.d(TAG, "Service Started!");
 
-        user.setCompleteName("Kiran");
-        user.save();
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        String networkStatus;
-        networkStatus = networkInfo.getTypeName();
+            user.setCompleteName("Kiran");
+            user.save();
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+            String networkStatus = networkInfo.getTypeName();
 
-        mPrefs = this.getSharedPreferences("myPref", 0);
-        username = mPrefs.getString("username", "");
-        password = mPrefs.getString("password", "");
-        if(mPrefs.contains("collectionID")) {
-            collectionID = mPrefs.getString("collectionID","");
-        }
-        else
-           collectionID = DeviceStatus.collectionID;
+            mPrefs = this.getSharedPreferences("myPref", 0);
+            username = mPrefs.getString("username", "");
+            password = mPrefs.getString("password", "");
+            if(mPrefs.contains("collectionID")) {
+                collectionID = mPrefs.getString("collectionID","");
+            }
+            else
+               collectionID = DeviceStatus.collectionID;
 
-        Uri uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        String[] projection = {MediaStore.MediaColumns.DATA,
-                MediaStore.Images.Media.BUCKET_DISPLAY_NAME, MediaStore.Images.Media.DISPLAY_NAME};
-        Cursor cursor = this.getContentResolver().query(uri, projection, null,
-                null, null);
+            Uri uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            String[] projection = {MediaStore.MediaColumns.DATA,
+                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME, MediaStore.Images.Media.DISPLAY_NAME};
+            Cursor cursor = this.getContentResolver().query(uri, projection, null,
+                    null, null);
 
-        int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-
-
-        int column_index_folder_name = cursor
-                .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-
-        int column_index_file_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
-        final ResultReceiver receiver = intent.getParcelableExtra("receiver");
-
-        Bundle bundle = new Bundle();
-
-            try {
-
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-                SharedPreferences preferencesFiles = getSharedPreferences("gallery", Context.MODE_PRIVATE);
-                SharedPreferences preferencesFolders = getSharedPreferences("folder", Context.MODE_PRIVATE);
-                HashMap<String, String> folderSyncMap = new HashMap<String, String>();
-                folderSyncMap = (HashMap) preferencesFolders.getAll();
-                String status = preferences.getString("status", "");
+            int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
 
 
-                if (status.equalsIgnoreCase("both") || (status.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
+            int column_index_folder_name = cursor
+                    .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
 
-                    for (Map.Entry<String, String> entry : folderSyncMap.entrySet()) {
+            int column_index_file_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
+            final ResultReceiver receiver = intent.getParcelableExtra("receiver");
 
-                      //  if(String.valueOf())entry.getValue().toString().
+            Bundle bundle = new Bundle();
 
-                        if (String.valueOf(entry.getValue()).equalsIgnoreCase("On")) {
+                try {
 
-                            String folderName = (String) entry.getKey();
-
-                            String dir = preferencesFiles.getString(folderName,"");
-
-                            File folder = new File(dir);
-                            File[] folderFiles = folder.listFiles();
-
-                            for(File imageFile : folderFiles) {
-
-                                String imageName = imageFile.getName().toString();
-                                MySQLiteHelper db = new MySQLiteHelper(mContext);
-
-                                Boolean b = db.getFile(imageName);
-
-                                if(!b)
-
-                                {
-                                    item.setFilename(imageName);
-
-                                    meta.setTags(null);
-
-                                    meta.setAddress("blabla");
-
-                                    meta.setTitle(imageName);
-
-                                    meta.setCreator(user.getCompleteName());
-
-                                    item.setCollectionId(collectionID);
-
-                                    item.setLocalPath(imageFile.toString());
-
-                                    item.setMetadata(meta);
-
-                                    item.setCreatedBy(user);
-
-                                    meta.save();
-                                    item.save();
-
-                                    upload(item);
-                                }
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                    SharedPreferences preferencesFiles = getSharedPreferences("gallery", Context.MODE_PRIVATE);
+                    SharedPreferences preferencesFolders = getSharedPreferences("folder", Context.MODE_PRIVATE);
+                    HashMap<String, String> folderSyncMap = new HashMap<String, String>();
+                    folderSyncMap = (HashMap) preferencesFolders.getAll();
+                    String status = preferences.getString("status", "");
 
 
-                            }
+                    if (status.equalsIgnoreCase("both") || (status.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
 
+                        for (Map.Entry<String, String> entry : folderSyncMap.entrySet()) {
 
+                          //  if(String.valueOf())entry.getValue().toString().
 
-/*                            while (cursor.moveToNext()) {
+                            if (String.valueOf(entry.getValue()).equalsIgnoreCase("On")) {
 
-                                if (folderName.equalsIgnoreCase(cursor.getString(column_index_folder_name))) {
+                                String folderName = (String) entry.getKey();
 
+                                String dir = preferencesFiles.getString(folderName,"");
 
-                                    String fileName = cursor.getString(column_index_file_name);
-                                    String path = cursor.getString(column_index_data);
+                                File folder = new File(dir);
+                                File[] folderFiles = folder.listFiles();
 
+                                for(File imageFile : folderFiles) {
+
+                                    String imageName = imageFile.getName().toString();
                                     MySQLiteHelper db = new MySQLiteHelper(mContext);
 
-                                    Boolean b = db.getFile(fileName);
+                                    Boolean b = db.getFile(imageName);
 
                                     if(!b)
 
                                     {
-                                        item.setFilename(fileName);
+                                        item.setFilename(imageName);
 
                                         meta.setTags(null);
 
                                         meta.setAddress("blabla");
 
-                                        meta.setTitle(fileName);
+                                        meta.setTitle(imageName);
 
                                         meta.setCreator(user.getCompleteName());
 
                                         item.setCollectionId(collectionID);
 
-                                        item.setLocalPath(path);
+                                        item.setLocalPath(imageFile.toString());
 
                                         item.setMetadata(meta);
 
@@ -216,26 +170,72 @@ public class UploadService extends IntentService {
 
                                         upload(item);
                                     }
+
+
                                 }
-                            }*/
+
+
+
+    /*                            while (cursor.moveToNext()) {
+
+                                    if (folderName.equalsIgnoreCase(cursor.getString(column_index_folder_name))) {
+
+
+                                        String fileName = cursor.getString(column_index_file_name);
+                                        String path = cursor.getString(column_index_data);
+
+                                        MySQLiteHelper db = new MySQLiteHelper(mContext);
+
+                                        Boolean b = db.getFile(fileName);
+
+                                        if(!b)
+
+                                        {
+                                            item.setFilename(fileName);
+
+                                            meta.setTags(null);
+
+                                            meta.setAddress("blabla");
+
+                                            meta.setTitle(fileName);
+
+                                            meta.setCreator(user.getCompleteName());
+
+                                            item.setCollectionId(collectionID);
+
+                                            item.setLocalPath(path);
+
+                                            item.setMetadata(meta);
+
+                                            item.setCreatedBy(user);
+
+                                            meta.save();
+                                            item.save();
+
+                                            upload(item);
+                                        }
+                                    }
+                                }*/
+                            }
                         }
                     }
+
+                }catch (Exception e) {
+
+                    /* Sending error message back to activity */
+                    bundle.putString(Intent.EXTRA_TEXT, e.toString());
+                    receiver.send(0, bundle);
                 }
 
-            }catch (Exception e) {
-
-                /* Sending error message back to activity */
-                bundle.putString(Intent.EXTRA_TEXT, e.toString());
-                receiver.send(0, bundle);
-            }
-
-            receiver.send(1, Bundle.EMPTY);
+                receiver.send(1, Bundle.EMPTY);
 
 
 
-        Log.d(TAG, "Service Stopping!");
-        this.stopSelf(); //self destructing service.
-
+            Log.d(TAG, "Service Stopping!");
+            this.stopSelf(); //self destructing service.
+        }else {
+            Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void upload(DataItem item) {
