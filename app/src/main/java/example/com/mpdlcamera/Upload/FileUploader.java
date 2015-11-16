@@ -98,9 +98,12 @@ public class FileUploader {
         @Produce
         public void success(DataItem dataItem, Response response) {
 
+            nPrefs = context.getSharedPreferences("myPref", 0);
+            collectionID = mPrefs.getString("collectionID","");
             MySQLiteHelper db = new MySQLiteHelper(context);
 
-            FileId fileId = new FileId(dataItem.getFilename(),"yes");
+            String fileNamePlusId = dataItem.getFilename() + collectionID;
+            FileId fileId = new FileId(fileNamePlusId,"yes");
 
             db.insertFile(fileId);
 
