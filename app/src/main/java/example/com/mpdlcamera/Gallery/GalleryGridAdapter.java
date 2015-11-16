@@ -2,6 +2,7 @@ package example.com.mpdlcamera.Gallery;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.net.Uri;
 import android.util.Log;
@@ -116,17 +117,20 @@ public class GalleryGridAdapter extends BaseAdapter {
 
         File dir = new File(filep);
         String file = dir.getName();
+        SharedPreferences preferences = context.getSharedPreferences("myPref",0);
+        String CollectionId = preferences.getString("collectionID","");
+        String fileCollectionName = file + CollectionId;
 
         MySQLiteHelper db = new MySQLiteHelper(context);
 
-        boolean b = db.getFile(file);
+        boolean b = db.getFile(fileCollectionName);
         //boolean b = true;
 
         List<FileId> fileIds = db.getAllFiles();
 
         if(!b) {
 
-                buttonCloud.setVisibility(View.INVISIBLE);
+                buttonCloud.setVisibility(View.GONE);
                 buttonUploading.setVisibility(View.VISIBLE);
         }
 

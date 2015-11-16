@@ -2,6 +2,16 @@
 <menu xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android" >
 
+
+    <item
+        android:id="@+id/item_upload"
+        android:icon="@android:drawable/ic_menu_upload"
+        android:showAsAction="ifRoom|withText"
+        android:title="Upload"
+        android:titleCondensed="Upload"
+        tools:ignore="AppCompatResource">
+    </item>
+
     <item
         android:id="@+id/item_upload_local"
         android:icon="@android:drawable/ic_menu_upload"

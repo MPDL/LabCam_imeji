@@ -28,15 +28,28 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dd.CircularProgressButton;
+import com.squareup.otto.Produce;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import example.com.mpdlcamera.Auth.LoginActivity;
 import example.com.mpdlcamera.Folder.UploadService;
+import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.Otto.OttoSingleton;
+import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 import example.com.mpdlcamera.Utils.ImageFileFilter;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.mime.TypedByteArray;
+import retrofit.mime.TypedFile;
 
 /**
  * Created by kiran on 29.10.15.
@@ -47,7 +60,8 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
     private final String LOG_TAG = ActivatedGalleryActivity.class.getSimpleName();
     private List<String> toBeDeleteImagePathList = new ArrayList<String>();
     private SharedPreferences mPrefs;
-
+    private TypedFile typedFile;
+    private CircularProgressButton circularButton;
 
 
 
@@ -60,7 +74,57 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
     public  GalleryGridAdapter adapter;
     private GridView gridView;
 
+    Callback<DataItem> callback = new Callback<DataItem>() {
+        @Override
+        @Produce
+        public void success(DataItem dataItem, Response response) {
 
+            Toast.makeText(activity, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
+            Log.v(LOG_TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
+
+            mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
+
+            if(mPrefs.contains("R_P_F_D")) {
+                if(mPrefs.getBoolean("R_P_F_D",true)) {
+
+                    File file = typedFile.file();
+                    Boolean deleted = file.delete();
+                    Log.v(LOG_TAG, "deleted111:" +deleted);
+                }
+            }
+
+            circularButton.setProgress(100);
+
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+
+            if (error == null || error.getResponse() == null) {
+                OttoSingleton.getInstance().post(new UploadEvent(null));
+                if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
+                    Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                OttoSingleton.getInstance().post(
+                        new UploadEvent(error.getResponse().getStatus()));
+                String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
+                if (jsonBody.contains("already exists")) {
+                    // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
+                }
+                else
+                    Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
+
+            }
+            circularButton.setProgress(-1);
+
+            Log.v(LOG_TAG, String.valueOf(error));
+
+        }
+    };
 
 
     @Override
@@ -145,19 +209,34 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                 // TODO Auto-generated method stub
                 switch (item.getItemId()) {
 
-                    case R.id.item_delete:
+                    case R.id.item_upload:
                         nr = 0;
                         Integer count = 0;
+
+                        if(toBeDeleteImagePathList != null) {
+                            upload(toBeDeleteImagePathList);
+                            count = toBeDeleteImagePathList.size();
+                            Toast.makeText(activity, "" + count + " files uploaded", Toast.LENGTH_SHORT).show();
+                        /*    Intent newIntent = new Intent(activity, ActivatedGalleryActivity.class);
+                            newIntent.putExtra("galleryName", galleryName);
+                            newIntent.putExtra("galleryPath", galleryPath);
+                            startActivity(newIntent);*/
+                        }
+
+
+                    case R.id.item_delete:
+                        nr = 0;
+                        //Integer count = 0;
 
                         //adapter.clearSelection();
                         if(toBeDeleteImagePathList != null) {
                             delete(toBeDeleteImagePathList);
                             count = toBeDeleteImagePathList.size();
-                            Toast.makeText(activity, "" + count + " files deleted", Toast.LENGTH_SHORT).show();
-                            Intent newIntent = new Intent(activity, ActivatedGalleryActivity.class);
+                            Toast.makeText(activity, ""  + " files deleted", Toast.LENGTH_SHORT).show();
+                            /*Intent newIntent = new Intent(activity, ActivatedGalleryActivity.class);
                             newIntent.putExtra("galleryName", galleryName);
                             newIntent.putExtra("galleryPath", galleryPath);
-                            startActivity(newIntent);
+                            startActivity(newIntent);*/
                         }
 
                         mode.finish();
@@ -191,11 +270,11 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
             }
         });
 
-        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
+       /* UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
         mReceiver.setReceiver(this);
         Intent intentNew = new Intent(this, UploadService.class);
         intentNew.putExtra("receiver", mReceiver);
-        this.startService(intentNew);
+        this.startService(intentNew);*/
 
         gridView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
@@ -222,8 +301,33 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
 
             File file = new File(imagePath);
             Boolean deleted = file.delete();
-            Log.v(LOG_TAG, "deleted:" +deleted);
+            Log.v(LOG_TAG, "##deleted:" + deleted);
           //  adapter.notifyDataSetChanged();
+
+        }
+
+
+    }
+
+    private void upload(List<String> toBeDeleteImagePathList) {
+
+        mPrefs = activity.getSharedPreferences("myPref", 0);
+        String username = mPrefs.getString("username", "");
+        String password = mPrefs.getString("password", "");
+        String dataCollectionId = mPrefs.getString("collectionID", DeviceStatus.collectionID);
+
+        String jsonPart1 = "\"collectionId\" : \"" +
+                dataCollectionId +
+                "\"";
+
+        for (String filePath : toBeDeleteImagePathList) {
+            typedFile = new TypedFile("multipart/form-data", new File(filePath));
+
+            String json ="{" + jsonPart1  +"}";
+
+            Log.v(LOG_TAG, json);
+            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+            Log.v(LOG_TAG, "##upload:" + filePath);
 
         }
 
@@ -238,55 +342,6 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
     }
 
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.action_select) {
-            Log.v(LOG_TAG, "slected");
-
-            return true;
-        }
-        if (id == R.id.item_delete) {
-            Log.v(LOG_TAG,"delete");
-
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle("Are you sure to delete?");
-        AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        menu.add(1, cmi.position, 0, "Delete");
-        menu.add(2, cmi.position, 0, "Cancel");
-    }
-
-
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if(item.getTitle().equals("Delete")){
-
-            Log.v("", String.valueOf(item.getItemId()));
-        }
-        else if(item.getTitle().equals("Cancel")){
-            Log.v("", String.valueOf(item.getItemId()));
-        }
-        else {
-            return false;
-
-        }
-        // Return false to allow normal context menu processing to proceed,
-        //        true to consume it here.
-        return true;
-    }
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {

@@ -92,15 +92,25 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         Cursor cursor;
 
        try {
-           cursor =  db.query(TABLE_FILE, // a. table
-                           COLUMNS, // b. column names
-                           " filename = ?",// c. selections
-                                   new String[] {fileName}, // d. selections args
-                           null, // e. group by
-                           null, // f. having
-                           null, // g. order by
-                           null); // h. limit
+//           cursor =  db.query(TABLE_FILE, // a. table
+//                           COLUMNS, // b. column names
+//                           " filename = ?",// c. selections
+//                                   new String[] {fileName}, // d. selections args
+//                           null, // e. group by
+//                           null, // f. having
+//                           null, // g. order by
+//                           null); // h. limit
 
+          // cursor = db.rawQuery("select * from file where filename = ('" + fileName + "')",null);
+
+           String Query = "Select * from " + TABLE_FILE + " where " + KEY_FILENAME + " = " + "'" + fileName + "'";
+           cursor = db.rawQuery(Query, null);
+           if(cursor.getCount() <= 0){
+               cursor.close();
+               return false;
+           }
+           cursor.close();
+           return true;
 
 
        }
@@ -129,7 +139,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         Log.d("getFile(" + fileName + ")", file.toString());
 
         return file;*/
-        return true;
+       // return true;
 
     }
 
