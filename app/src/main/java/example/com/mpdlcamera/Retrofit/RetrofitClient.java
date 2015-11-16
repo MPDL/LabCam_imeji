@@ -4,7 +4,6 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
-import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.client.Response;
 import retrofit.mime.TypedFile;
@@ -13,10 +12,15 @@ import retrofit.mime.TypedFile;
  * Created by allen on 27/08/15.
  */
 public class RetrofitClient {
-    private final String LOG_TAG = RetrofitClient.class.getSimpleName();
-    private static final String REST_SERVER = DeviceStatus.BASE_URL;
+    private static String REST_SERVER;
 
+    public static String getRestServer() {
+        return REST_SERVER;
+    }
 
+    public static void setRestServer(String restServer) {
+        REST_SERVER = restServer;
+    }
 
     public static void login(String username, String password){
         ImejiAPI imejiAPI = ServiceGenerator.

@@ -19,6 +19,7 @@ import java.net.URL;
 
 import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 
 
@@ -61,6 +62,9 @@ public class LoginActivity extends AppCompatActivity {
         }else{
             serverURL = DeviceStatus.BASE_URL;
         }
+
+        RetrofitClient.setRestServer(serverURL);
+
         serverURLView.setText(serverURL);
 
         signIn.setOnClickListener(new View.OnClickListener() {

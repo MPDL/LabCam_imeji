@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
-import android.preference.PreferenceManager;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +30,7 @@ public class SettingsListAdapter extends BaseAdapter {
     private List<ImejiFolder> folderItems;
     private final String LOG_TAG = SettingsListAdapter.class.getSimpleName();
     int selectedPosition;
+    private SharedPreferences mPrefs;
 
 
     public SettingsListAdapter(Activity activity, List<ImejiFolder> folderItems) {
@@ -56,7 +56,8 @@ public class SettingsListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Log.v("getView");
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        //final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        mPrefs =  activity.getSharedPreferences("myPref", 0);
 
         WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
@@ -77,7 +78,7 @@ public class SettingsListAdapter extends BaseAdapter {
         TextView date = (TextView) convertView.findViewById(R.id.setting_item_date);
 
 
-        String collectionId= preferences.getString("collectionID", DeviceStatus.collectionID);
+        String collectionId= mPrefs.getString("collectionID", DeviceStatus.collectionID);
         System.out.println("collectionId" + " "+collectionId);
 
         if(folderItems.size()>0) {
@@ -117,7 +118,7 @@ public class SettingsListAdapter extends BaseAdapter {
                 selectedPosition = (Integer)view.getTag();
                 notifyDataSetChanged();
 
-                SharedPreferences.Editor editor = preferences.edit();
+                SharedPreferences.Editor editor = mPrefs.edit();
                 editor.putString("collectionID", folderItems.get(selectedPosition).id);
                 editor.putString("remoteServer", folderItems.get(selectedPosition).getTitle());
 

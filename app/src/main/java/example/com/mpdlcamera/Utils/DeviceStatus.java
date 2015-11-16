@@ -19,7 +19,7 @@ public class DeviceStatus {
     public static final String password = "";
     public static final String collectionID = "0L5yLxP_AphUMtIi";
     public static final String queryKeyword = "MPDLCam";
-    public static final String BASE_URL = "http://qa-imeji.mpdl.mpg.de/rest/";
+    public static final String BASE_URL = "http://dev-faces.mpdl.mpg.de/rest/";
 
     // Checks whether the device currently has a network connection
     public static boolean isNetworkEnabled(Activity activity) {
