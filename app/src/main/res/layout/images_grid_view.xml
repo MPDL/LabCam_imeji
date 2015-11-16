@@ -42,7 +42,7 @@
         android:layout_height="match_parent"
         android:padding="0dip">
         <GridView
-            android:id="@+id/image_gridView"
+            android:id="@+id/image_gridView_local"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:listSelector="@drawable/list_selector"
@@ -55,7 +55,7 @@
 
         <com.dd.CircularProgressButton
             android:visibility="gone"
-            android:id="@+id/circularButton"
+            android:id="@+id/circularButton_local"
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:layout_marginTop="1dp"

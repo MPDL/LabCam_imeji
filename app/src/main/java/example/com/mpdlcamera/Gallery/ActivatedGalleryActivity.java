@@ -1,30 +1,22 @@
 package example.com.mpdlcamera.Gallery;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ActionMode;
-import android.view.ContextMenu;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,8 +27,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import example.com.mpdlcamera.Auth.LoginActivity;
-import example.com.mpdlcamera.Folder.UploadService;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
@@ -58,7 +48,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
 
 
     private final String LOG_TAG = ActivatedGalleryActivity.class.getSimpleName();
-    private List<String> toBeDeleteImagePathList = new ArrayList<String>();
+    private List<String> selectedDataPathList = new ArrayList<String>();
     private SharedPreferences mPrefs;
     private TypedFile typedFile;
     private CircularProgressButton circularButton;
@@ -199,7 +189,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                 //adapter.getCheckBox().setVisibility(View.VISIBLE);
 
                 MenuInflater inflater = getMenuInflater();
-                inflater.inflate(R.menu.contextual_menu_delete, menu);
+                inflater.inflate(R.menu.contextual_menu, menu);
 
                 return true;
             }
@@ -209,37 +199,43 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                 // TODO Auto-generated method stub
                 switch (item.getItemId()) {
 
-                    case R.id.item_upload:
+                    case R.id.item_delete:
                         nr = 0;
                         Integer count = 0;
 
-                        if(toBeDeleteImagePathList != null) {
-                            upload(toBeDeleteImagePathList);
-                            count = toBeDeleteImagePathList.size();
-                            Toast.makeText(activity, "" + count + " files uploaded", Toast.LENGTH_SHORT).show();
-                        /*    Intent newIntent = new Intent(activity, ActivatedGalleryActivity.class);
-                            newIntent.putExtra("galleryName", galleryName);
-                            newIntent.putExtra("galleryPath", galleryPath);
-                            startActivity(newIntent);*/
+                        if(selectedDataPathList != null) {
+                            delete(selectedDataPathList);
+                            for(String str: selectedDataPathList){
+                                imagePathList.remove(str);
+                            }
+                            adapter.notifyDataSetChanged();
+
                         }
+                        selectedDataPathList.clear();
+                        mode.finish();
+                        break;
 
 
-                    case R.id.item_delete:
+                    case R.id.item_upload:
                         nr = 0;
                         //Integer count = 0;
 
-                        //adapter.clearSelection();
-                        if(toBeDeleteImagePathList != null) {
-                            delete(toBeDeleteImagePathList);
-                            count = toBeDeleteImagePathList.size();
-                            Toast.makeText(activity, ""  + " files deleted", Toast.LENGTH_SHORT).show();
-                            /*Intent newIntent = new Intent(activity, ActivatedGalleryActivity.class);
-                            newIntent.putExtra("galleryName", galleryName);
-                            newIntent.putExtra("galleryPath", galleryPath);
-                            startActivity(newIntent);*/
-                        }
+                        Log.v(LOG_TAG,"##upload");
 
+                        Log.v(LOG_TAG, " "+selectedDataPathList.size());
+
+                        Log.v(LOG_TAG, selectedDataPathList.get(0));
+
+                        circularButton.setVisibility(View.VISIBLE);
+                        circularButton.setIndeterminateProgressMode(true); // turn on indeterminate progress
+                        circularButton.setProgress(50); // set progress > 0 & < 100 to display indeterminate progress
+
+                        if(selectedDataPathList != null) {
+                            upload(selectedDataPathList);
+                        }
+                        selectedDataPathList.clear();
                         mode.finish();
+                        break;
                 }
 
                 return false;
@@ -254,7 +250,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                 if (checked) {
                     nr++;
                     adapter.setNewSelection(position, checked);
-                    toBeDeleteImagePathList.add(imagePathList.get(position));
+                    selectedDataPathList.add(imagePathList.get(position));
 
                     // toBeUploadDataPathList.add(dataPathList.get(position));
                     //adapter.getCheckBox().setChecked(true);
@@ -262,6 +258,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                 } else {
                     nr--;
                     adapter.removeSelection(position);
+                    selectedDataPathList.remove(imagePathList.get(position));
                     //adapter.getCheckBox().setChecked(false);
 
                 }

@@ -198,12 +198,12 @@ public class LocalImageActivity extends AppCompatActivity {
 
 
         //rootView = inflater.inflate(R.layout.fragment_section_list_swipe, container, false);
-        gridView = (GridView) findViewById(R.id.image_gridView);
+        gridView = (GridView) findViewById(R.id.image_gridView_local);
         //listView = (SwipeMenuListView) rootView.findViewById(R.id.listView);
         gridView.setAdapter(adapter);
         //registerForContextMenu(gridView);
 
-        circularButton = (CircularProgressButton) findViewById(R.id.circularButton);
+        circularButton = (CircularProgressButton) findViewById(R.id.circularButton_local);
 
         gridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             private int nr = 0;
@@ -251,14 +251,9 @@ public class LocalImageActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.item_delete_local:
                         nr = 0;
-//                        adapter.clearSelection();
                         Log.v(LOG_TAG,"##delete");
                         if(selectedDataPathList != null) {
                             delete(selectedDataPathList);
-//                            Intent newIntent = new Intent(activity, ActivatedGalleryActivity.class);
-//                            newIntent.putExtra("galleryName", galleryName);
-//                            newIntent.putExtra("galleryPath", galleryPath);
-//                            startActivity(newIntent);
                             for(String str: selectedDataPathList){
                                 dataPathList.remove(str);
                             }
@@ -266,6 +261,7 @@ public class LocalImageActivity extends AppCompatActivity {
 
                         }
                         selectedDataPathList.clear();
+                        adapter.clearSelection();
 
                         mode.finish();
                         break;
@@ -287,6 +283,8 @@ public class LocalImageActivity extends AppCompatActivity {
                             upload(selectedDataPathList);
                         }
                         selectedDataPathList.clear();
+                        adapter.clearSelection();
+
                         mode.finish();
                         break;
 

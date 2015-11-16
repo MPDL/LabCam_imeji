@@ -4,6 +4,15 @@
 
     <item
         android:id="@+id/item_delete"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:showAsAction="ifRoom|withText"
+        android:title="Delete"
+        android:titleCondensed="Delete"
+        tools:ignore="AppCompatResource">
+    </item>
+
+    <item
+        android:id="@+id/item_upload"
         android:icon="@android:drawable/ic_menu_upload"
         android:showAsAction="ifRoom|withText"
         android:title="Upload"
@@ -11,13 +20,6 @@
         tools:ignore="AppCompatResource">
     </item>
 
-    <item
-        android:id="@+id/item_upload"
-        android:icon="@android:drawable/ic_menu_delete"
-        android:showAsAction="ifRoom|withText"
-        android:title="Delete"
-        android:titleCondensed="Delete"
-        tools:ignore="AppCompatResource">
-    </item>
+
 
 </menu>
