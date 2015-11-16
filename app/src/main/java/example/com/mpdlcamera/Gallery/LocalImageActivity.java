@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ActionMode;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -49,7 +48,7 @@ import retrofit.mime.TypedFile;
 public class LocalImageActivity extends AppCompatActivity {
 
     private List<String> dataPathList = new ArrayList<String>();
-    private List<String> toBeUploadDataPathList = new ArrayList<String>();
+    private List<String> selectedDataPathList = new ArrayList<String>();
 
     public  ImagesGridAdapter adapter;
     private GridView gridView;
@@ -109,11 +108,11 @@ public class LocalImageActivity extends AppCompatActivity {
                         new UploadEvent(error.getResponse().getStatus()));
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                 if (jsonBody.contains("already exists")) {
-                    // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
                 }
-                else
+                else {
                     Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
-
+                }
             }
             circularButton.setProgress(-1);
 
@@ -121,8 +120,6 @@ public class LocalImageActivity extends AppCompatActivity {
 
         }
     };
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -238,7 +235,9 @@ public class LocalImageActivity extends AppCompatActivity {
                 //adapter.getCheckBox().setVisibility(View.VISIBLE);
 
                 MenuInflater inflater = getMenuInflater();
-                inflater.inflate(R.menu.contextual_menu, menu);
+                inflater.inflate(R.menu.contextual_menu_local, menu);
+//                menu.add(Menu.NONE, R.id.item_delete_local, Menu.NONE, "Delete");
+//                menu.add(Menu.NONE, R.id.item_upload_local, Menu.NONE, "Upload");
 
                 return true;
             }
@@ -246,28 +245,51 @@ public class LocalImageActivity extends AppCompatActivity {
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 // TODO Auto-generated method stub
-                switch (item.getItemId()) {
+                int id = item.getItemId();
+                Log.v(LOG_TAG, ""+ id);
 
-                    case R.id.item_delete:
+                switch (item.getItemId()) {
+                    case R.id.item_delete_local:
                         nr = 0;
-                        adapter.clearSelection();
+//                        adapter.clearSelection();
+                        Log.v(LOG_TAG,"##delete");
+                        if(selectedDataPathList != null) {
+                            delete(selectedDataPathList);
+//                            Intent newIntent = new Intent(activity, ActivatedGalleryActivity.class);
+//                            newIntent.putExtra("galleryName", galleryName);
+//                            newIntent.putExtra("galleryPath", galleryPath);
+//                            startActivity(newIntent);
+                            for(String str: selectedDataPathList){
+                                dataPathList.remove(str);
+                            }
+                            adapter.notifyDataSetChanged();
+
+                        }
+                        selectedDataPathList.clear();
+
                         mode.finish();
-                    case R.id.item_upload:
+                        break;
+
+                    case R.id.item_upload_local:
 //                        nr = 0;
 //                        adapter.clearSelection();
+                        Log.v(LOG_TAG,"##upload");
 
-                        Log.v(LOG_TAG, " "+toBeUploadDataPathList.size());
+                        Log.v(LOG_TAG, " "+selectedDataPathList.size());
 
-                        Log.v(LOG_TAG, toBeUploadDataPathList.get(0));
+                        Log.v(LOG_TAG, selectedDataPathList.get(0));
 
                         circularButton.setVisibility(View.VISIBLE);
                         circularButton.setIndeterminateProgressMode(true); // turn on indeterminate progress
                         circularButton.setProgress(50); // set progress > 0 & < 100 to display indeterminate progress
 
-                        if(toBeUploadDataPathList != null) {
-                            upload(toBeUploadDataPathList);
+                        if(selectedDataPathList != null) {
+                            upload(selectedDataPathList);
                         }
+                        selectedDataPathList.clear();
                         mode.finish();
+                        break;
+
                 }
 
                 return false;
@@ -281,12 +303,13 @@ public class LocalImageActivity extends AppCompatActivity {
                 if (checked) {
                     nr++;
                     adapter.setNewSelection(position, checked);
-                    toBeUploadDataPathList.add(dataPathList.get(position));
+                    selectedDataPathList.add(dataPathList.get(position));
                     //adapter.getCheckBox().setChecked(true);
 
                 } else {
                     nr--;
                     adapter.removeSelection(position);
+                    selectedDataPathList.remove(dataPathList.get(position));
                     //adapter.getCheckBox().setChecked(false);
 
                 }
@@ -330,17 +353,6 @@ public class LocalImageActivity extends AppCompatActivity {
 
             return true;
         }
-        if (id == R.id.item_delete) {
-            Log.v(LOG_TAG,"delete");
-
-            return true;
-        }
-
-        if (id == R.id.item_upload) {
-            Log.v(LOG_TAG,"upload");
-
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -362,38 +374,17 @@ public class LocalImageActivity extends AppCompatActivity {
     }
 
 
+    private void delete(List<String> toBeDeleteImagePathList) {
+        for(String imagePath : toBeDeleteImagePathList) {
 
+            File file = new File(imagePath);
+            Boolean deleted = file.delete();
+            Log.v(LOG_TAG, "deleted:" + deleted);
+            //  adapter.notifyDataSetChanged();
 
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.setHeaderTitle("Are you sure to delete?");
-        AdapterView.AdapterContextMenuInfo cmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        menu.add(1, cmi.position, 0, "Delete");
-        menu.add(2, cmi.position, 0, "Cancel");
+        }
     }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        if(item.getTitle().equals("Delete")){
-//            new Delete().from(DataItem.class).
-//                    where("filename = ?", dataList.get(item.getItemId()).getFilename()).execute();
-//            dataList.remove(item.getItemId());
-//            adapter.notifyDataSetChanged();
-            Log.v("", String.valueOf(item.getItemId()));
-        }
-        else if(item.getTitle().equals("Cancel")){
-            Log.v("", String.valueOf(item.getItemId()));
-        }
-        else {
-            return false;
-
-        }
-        // Return false to allow normal context menu processing to proceed,
-        //        true to consume it here.
-        return true;
-    }
 
 
 }
