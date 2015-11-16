@@ -158,6 +158,9 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
 
         gridView = (GridView) findViewById(R.id.image_gridView);
 
+        circularButton = (CircularProgressButton) findViewById(R.id.circularButton);
+
+
         gridView.setAdapter(adapter);
 
 
