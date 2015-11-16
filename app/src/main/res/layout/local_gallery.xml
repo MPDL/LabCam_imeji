@@ -43,7 +43,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="fill_parent"
                     android:layout_marginEnd="50dp"
-                    android:layout_marginTop="17dp"
+                    android:layout_marginTop="13dp"
                     android:text="@string/title_activity_Images"
                     android:textColor="@color/white"
                     android:textSize="20dp"/>
