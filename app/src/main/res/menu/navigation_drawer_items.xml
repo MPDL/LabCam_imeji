@@ -4,21 +4,21 @@
     <group android:checkableBehavior="all">
         <item
             android:id="@+id/navItem1"
-            android:icon="@drawable/ic_action_location_found_dark"
+            android:icon="@drawable/device_folder_64px"
             android:title="Device Folders"/>
         <item
             android:id="@+id/navItem2"
-            android:icon="@drawable/ic_action_location_found_dark"
+            android:icon="@drawable/collections_64px"
             android:title="Collections"/>
 
         <item
             android:id="@+id/navItem3"
-            android:icon="@drawable/ic_action_location_found_dark"
+            android:icon="@drawable/settings_64px"
             android:title="Settings"/>
 
         <item
         android:id="@+id/navItem4"
-        android:icon="@drawable/ic_action_location_found_dark"
+        android:icon="@drawable/logout_64px"
         android:title="Logout"/>
     </group>
 
