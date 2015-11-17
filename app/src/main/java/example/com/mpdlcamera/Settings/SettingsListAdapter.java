@@ -29,7 +29,7 @@ public class SettingsListAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private List<ImejiFolder> folderItems;
     private final String LOG_TAG = SettingsListAdapter.class.getSimpleName();
-    int selectedPosition;
+    int selectedPosition = -1;
     private SharedPreferences mPrefs;
 
 
@@ -106,11 +106,10 @@ public class SettingsListAdapter extends BaseAdapter {
 
         System.out.println(LOG_TAG + " position " + position);
         System.out.println(LOG_TAG + " selectedPosition " + selectedPosition);
+        System.out.println(LOG_TAG + " ## ");
 
 
-        if(position !=0) {//TODO bug make the first cell as static
-            checkBox.setChecked(position == selectedPosition);
-        }
+        checkBox.setChecked(position == selectedPosition);
         checkBox.setTag(position);
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
