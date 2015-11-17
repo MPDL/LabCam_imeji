@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -101,7 +100,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onResume();
 
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences preferences =  activity.getSharedPreferences("myPref", 0);
 
         if (preferences.contains("status")) {
             String option = preferences.getString("status", "");
