@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -102,7 +103,7 @@ public class FileUploader {
             String collectionId = mPrefs.getString("collectionID","");
             MySQLiteHelper db = new MySQLiteHelper(context);
 
-            String fileNamePlusId = dataItem.getFilename() + collectionId;
+            String fileNamePlusId = dataItem.getFilename() + collectionID;
             FileId fileId = new FileId(fileNamePlusId,"yes");
 
             db.insertFile(fileId);
@@ -121,6 +122,9 @@ public class FileUploader {
 
                     File file = typedFile.file();
                     Boolean deleted = file.delete();
+                    Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    scanIntent.setData(Uri.fromFile(file));
+                    context.sendBroadcast(scanIntent);
                     Log.v(TAG, "deleted:" +deleted);
                     Toast.makeText(context, "Uploaded and deleted", Toast.LENGTH_SHORT).show();
                 }

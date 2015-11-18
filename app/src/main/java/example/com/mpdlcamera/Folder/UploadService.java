@@ -282,7 +282,7 @@ public class UploadService extends IntentService {
             MySQLiteHelper db = new MySQLiteHelper(mContext);
            //SQLiteDatabase dBase = mContext.get
 
-            String fileNamePlusId = dataItem.getFilename() + collectionId;
+            String fileNamePlusId = dataItem.getFilename() + collectionID;
             FileId fileId = new FileId(fileNamePlusId,"yes");
 
             db.insertFile(fileId);
