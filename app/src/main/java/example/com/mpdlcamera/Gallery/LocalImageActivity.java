@@ -52,7 +52,8 @@ public class LocalImageActivity extends AppCompatActivity {
     private List<String> dataPathList = new ArrayList<String>();
     private List<String> selectedDataPathList = new ArrayList<String>();
 
-    public  ImagesGridAdapter adapter;
+    public GalleryGridAdapter adapter;
+//    public  ImagesGridAdapter adapter;
     private GridView gridView;
     private View rootView;
     private String dataCollectionId;
@@ -94,6 +95,7 @@ public class LocalImageActivity extends AppCompatActivity {
                     Log.v(LOG_TAG, "deleted:" +deleted);
                 }
             }
+            adapter.notifyDataSetChanged();
 
             circularButton.setProgress(100);
 
@@ -131,7 +133,7 @@ public class LocalImageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.images_grid_view);
+        setContentView(R.layout.active_gallery_gridview);
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -166,27 +168,6 @@ public class LocalImageActivity extends AppCompatActivity {
 
         Log.v("Images",  images.toString());
 
-
-
-        //TODO here fetch the image URIs by given CameraDirectory name(title)
-        //title="Camera";
-        //File CameraDirectory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString());
-        //File[] files = CameraDirectory.listFiles();
-
-        //files are all the image folders
-//        10-21 12:36:25.493  21930-21930/example.com.mpdlcamera V/Images﹕ content://media/external/images/media
-//        10-21 12:36:25.493  21930-21930/example.com.mpdlcamera V/file﹕ file:/storage/emulated/0/DCIM/Camera/
-//        10-21 12:36:25.503  21930-21930/example.com.mpdlcamera V/file﹕ file:/storage/emulated/0/DCIM/.thumbnails/
-//        10-21 12:36:25.503  21930-21930/example.com.mpdlcamera V/file﹕ file:/storage/emulated/0/DCIM/Screenshots/
-
-//        for (File CurFile : files) {
-//            if (CurFile.isDirectory()) {
-//                CameraDirectory=CurFile;
-//                break;
-//            }
-//        }
-
-
         //final String CompleteCameraFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/" + title;
         File folder = new File(folderPath);
         File[] folderFiles = folder.listFiles();
@@ -201,16 +182,17 @@ public class LocalImageActivity extends AppCompatActivity {
             }
         }
 
-        adapter = new ImagesGridAdapter(activity, dataPathList);
+        //TODO change adaptor to Kiran's
+        adapter = new GalleryGridAdapter(activity, dataPathList, this);
 
 
         //rootView = inflater.inflate(R.layout.fragment_section_list_swipe, container, false);
-        gridView = (GridView) findViewById(R.id.image_gridView_local);
+        gridView = (GridView) findViewById(R.id.image_gridView);
         //listView = (SwipeMenuListView) rootView.findViewById(R.id.listView);
         gridView.setAdapter(adapter);
         //registerForContextMenu(gridView);
 
-        circularButton = (CircularProgressButton) findViewById(R.id.circularButton_local);
+        circularButton = (CircularProgressButton) findViewById(R.id.circularButton);
 
         gridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             private int nr = 0;
@@ -364,6 +346,10 @@ public class LocalImageActivity extends AppCompatActivity {
 
 
     private void upload(List<String> fileList) {
+        circularButton.setVisibility(View.VISIBLE);
+        circularButton.setIndeterminateProgressMode(true); // turn on indeterminate progress
+        circularButton.setProgress(50);
+
         String jsonPart1 = "\"collectionId\" : \"" +
                 dataCollectionId +
                 "\"";

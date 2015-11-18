@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.SQLite.FileId;
 import example.com.mpdlcamera.SQLite.MySQLiteHelper;
@@ -113,7 +112,7 @@ public class GalleryGridAdapter extends BaseAdapter {
         Button buttonCloud = (Button) grid.findViewById(R.id.cloud);
         Button buttonUploading = (Button) grid.findViewById(R.id.uploading);
         String filep = (String) this.getItem(position);
-        buttonUploading.setVisibility(View.INVISIBLE);
+        //buttonUploading.setVisibility(View.INVISIBLE);
 
         File dir = new File(filep);
         String file = dir.getName();
@@ -128,10 +127,13 @@ public class GalleryGridAdapter extends BaseAdapter {
 
         List<FileId> fileIds = db.getAllFiles();
 
+        //not uploaded
         if(!b) {
-
                 buttonCloud.setVisibility(View.GONE);
                 buttonUploading.setVisibility(View.VISIBLE);
+        }else{
+            buttonUploading.setVisibility(View.GONE);
+            buttonCloud.setVisibility(View.VISIBLE);
         }
 
         grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light));

@@ -89,6 +89,8 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                     Log.v(LOG_TAG, "deleted111:" +deleted);
                 }
             }
+            adapter.notifyDataSetChanged();
+
 
             circularButton.setProgress(100);
 
