@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         public void failure(RetrofitError error) {
             Log.v(LOG_TAG, "get list failed");
             Log.v(LOG_TAG, error.toString());
-            DeviceStatus.showToast(activity, "update data failed");
+          //  DeviceStatus.showToast(activity, "update data failed");
         }
     };
 
