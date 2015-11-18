@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 
 import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 
 /**
  * Created by kiran on 29.09.15.
@@ -25,6 +26,7 @@ public class NewFileObserver extends ContentObserver {
 
     private Context context;
     private Activity act;
+    private SharedPreferences mPrefs;
 
 
     FileUploader fileUploader = new FileUploader();
@@ -78,7 +80,21 @@ public class NewFileObserver extends ContentObserver {
             if (prefOption.equalsIgnoreCase("both") || (prefOption.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
 
                 FileUploader fileUploader = new FileUploader(context,act);
-                fileUploader.upload(item);
+                String imageName = item.getFilename();
+                mPrefs = context.getSharedPreferences("myPref", 0);
+                String collectionId = mPrefs.getString("collectionID", "");
+
+                String imageCollectionName = imageName + collectionId;
+
+                MySQLiteHelper db = new MySQLiteHelper(context);
+
+                Boolean b = db.getFile(imageCollectionName);
+
+                if(!b) {
+
+                    fileUploader.upload(item);
+
+                }
 
             }
 

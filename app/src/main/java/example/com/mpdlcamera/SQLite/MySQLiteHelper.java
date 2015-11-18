@@ -91,7 +91,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         Cursor cursor;
 
-       try {
+        //  try {
 //           cursor =  db.query(TABLE_FILE, // a. table
 //                           COLUMNS, // b. column names
 //                           " filename = ?",// c. selections
@@ -101,28 +101,28 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 //                           null, // g. order by
 //                           null); // h. limit
 
-          // cursor = db.rawQuery("select * from file where filename = ('" + fileName + "')",null);
+        // cursor = db.rawQuery("select * from file where filename = ('" + fileName + "')",null);
 
-           String Query = "Select * from " + TABLE_FILE + " where " + KEY_FILENAME + " = " + "'" + fileName + "'";
-           cursor = db.rawQuery(Query, null);
-           if(cursor.getCount() <= 0){
-               cursor.close();
-               return false;
-           }
-           cursor.close();
-           return true;
+        String Query = "Select * from " + TABLE_FILE + " where " + KEY_FILENAME + " = " + "'" + fileName + "'";
+        cursor = db.rawQuery(Query, null);
+        if (cursor.getCount() <= 0) {
+            cursor.close();
+            return false;
+        }
+        cursor.close();
+        return true;
+
+    }
+    //   }
+
+//       catch (SQLiteException e) {
+//
+//           if(e.getMessage().toString().contains("no such column")) {
+//               return false;
+//           }
+//           return false;
 
 
-       }
-
-       catch (SQLiteException e) {
-
-           if(e.getMessage().toString().contains("no such column")) {
-               return false;
-           }
-           return false;
-
-       }
 
 
        /* if (cursor != null)
@@ -141,7 +141,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         return file;*/
        // return true;
 
-    }
+  //  }
 
     public List<FileId> getAllFiles() {
         List<FileId> fileIds = new LinkedList<FileId>();

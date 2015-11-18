@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -87,7 +88,7 @@ public class FileUploader {
             RetrofitClient.uploadItem(typedFile, json, callback, username, password);
         }
         else {
-            Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -99,7 +100,7 @@ public class FileUploader {
         public void success(DataItem dataItem, Response response) {
 
             nPrefs = context.getSharedPreferences("myPref", 0);
-            collectionID = mPrefs.getString("collectionID","");
+            String collectionId = mPrefs.getString("collectionID","");
             MySQLiteHelper db = new MySQLiteHelper(context);
 
             String fileNamePlusId = dataItem.getFilename() + collectionID;
@@ -121,6 +122,9 @@ public class FileUploader {
 
                     File file = typedFile.file();
                     Boolean deleted = file.delete();
+                    Intent scanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                    scanIntent.setData(Uri.fromFile(file));
+                    context.sendBroadcast(scanIntent);
                     Log.v(TAG, "deleted:" +deleted);
                     Toast.makeText(context, "Uploaded and deleted", Toast.LENGTH_SHORT).show();
                 }
@@ -153,10 +157,10 @@ public class FileUploader {
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
                 if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
-                    Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
+                  //  Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 OttoSingleton.getInstance().post(
@@ -164,8 +168,8 @@ public class FileUploader {
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                 if (jsonBody.contains("already exists")) {
                 }
-                else
-                    Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
+              //  else
+                //    Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
 
             }
 

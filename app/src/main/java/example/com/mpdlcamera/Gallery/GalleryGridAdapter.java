@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -128,13 +129,20 @@ public class GalleryGridAdapter extends BaseAdapter {
         List<FileId> fileIds = db.getAllFiles();
 
         //not uploaded
+        String status = null;
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        if(pref.contains("status")) {
+            status = pref.getString("status","");
+        }
+
         if(!b) {
                 buttonCloud.setVisibility(View.GONE);
                 buttonUploading.setVisibility(View.VISIBLE);
-        }else{
-            buttonUploading.setVisibility(View.GONE);
-            buttonCloud.setVisibility(View.VISIBLE);
-        }
+            }
+            else {
+                buttonUploading.setVisibility(View.GONE);
+                buttonCloud.setVisibility(View.VISIBLE);
+            }
 
         grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light));
 

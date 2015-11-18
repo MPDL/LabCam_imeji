@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         public void failure(RetrofitError error) {
             Log.v(LOG_TAG, "get list failed");
             Log.v(LOG_TAG, error.toString());
-            DeviceStatus.showToast(activity, "update data failed");
+          //  DeviceStatus.showToast(activity, "update data failed");
         }
     };
 
@@ -470,7 +470,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 /* Update ListView with result */
                 //ArrayAdapter arrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_2, results);
                 //listView.setAdapter(arrayAdapter);
-                Toast.makeText(this, "Files are synced", Toast.LENGTH_LONG).show();
+             //   Toast.makeText(this, "Files are synced", Toast.LENGTH_LONG).show();
 
 
                 mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
