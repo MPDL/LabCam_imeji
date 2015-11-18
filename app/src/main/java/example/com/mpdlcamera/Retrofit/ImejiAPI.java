@@ -69,7 +69,7 @@ public interface ImejiAPI {
     void getCollections(Callback<List<ImejiFolder>> callback);
 
     //get all items by collection id
-    @GET("/collections/{id}/items")
+    @GET("/collections/{id}/items?size=100")
     void getCollectionItems(@Path("id") String collectionId,
                             Callback<List<DataItem>> callback);
 
