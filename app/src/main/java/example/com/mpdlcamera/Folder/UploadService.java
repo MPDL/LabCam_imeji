@@ -299,6 +299,8 @@ public class UploadService extends IntentService {
                     File file = typedFile.file();
                     Boolean deleted = file.delete();
                     Log.v(TAG, "deleted:" +deleted);
+                    Toast.makeText(mContext, "Uploaded and deleted", Toast.LENGTH_SHORT).show();
+
                 }
 
             }
