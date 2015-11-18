@@ -67,6 +67,11 @@ public class PrefActivity extends AppCompatActivity{
             switchPreferenceLau = (SwitchPreference) findPreference("L_A_U");
             switchPreferenceRpfd = (SwitchPreference) findPreference("R_P_F_D");
             backupPreference = (ListPreference) findPreference("status");
+            if(mPrefs.contains("status")) {
+                backupPreference.setSummary(mPrefs.getString("status",""));
+            }
+            else
+                backupPreference.setSummary("wifi");
 
             if(backupPreference != null) {
 

@@ -6,10 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
@@ -36,6 +39,7 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
     private ImejiFolder currentCollectionLocal = new ImejiFolder();
+
+    SharedPreferences preferencesFiles;
 
 
     Toolbar toolbar;
@@ -242,6 +248,41 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         editor.putString("UStatus", "false");
         //editor.putString("status", "wifi");
         editor.commit();
+
+        String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME,MediaStore.Images.Media.DATA};
+        Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        preferencesFiles = getSharedPreferences("gallery", Context.MODE_PRIVATE);
+
+        for(int i = 0; i<albums.length ;i++){
+            Log.i("albums",  albums[i]);
+        }
+
+        Cursor cur = getContentResolver().query(images, albums, null, null, null);
+
+       // final ArrayList<String> folders = new ArrayList<String>();
+
+        if (cur.moveToFirst()) {
+            String album;
+            String fPath;
+            int albumLocation = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+            int path = cur.getColumnIndex(MediaStore.Images.Media.DATA);
+
+            do {
+                album = cur.getString(albumLocation);
+                fPath = cur.getString(path);
+                File file = new File(fPath);
+                String dir = file.getParent();
+                SharedPreferences.Editor ed = preferencesFiles.edit();
+                ed.putString(album, dir);
+                ed.commit();
+               // folders.add(album);
+                Log.i("ListingImages", " album=" + album);
+            } while (cur.moveToNext());
+        }
+
+
+
+
 
 
 

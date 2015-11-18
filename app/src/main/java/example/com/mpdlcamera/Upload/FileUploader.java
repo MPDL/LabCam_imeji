@@ -122,6 +122,7 @@ public class FileUploader {
                     File file = typedFile.file();
                     Boolean deleted = file.delete();
                     Log.v(TAG, "deleted:" +deleted);
+                    Toast.makeText(context, "Uploaded and deleted", Toast.LENGTH_SHORT).show();
                 }
 
             }
