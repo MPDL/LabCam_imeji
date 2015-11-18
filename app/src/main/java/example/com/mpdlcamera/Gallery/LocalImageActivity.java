@@ -34,6 +34,8 @@ import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
+import example.com.mpdlcamera.SQLite.FileId;
+import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import example.com.mpdlcamera.Utils.ImageFileFilter;
 import retrofit.Callback;
@@ -76,6 +78,11 @@ public class LocalImageActivity extends AppCompatActivity {
 
             Toast.makeText(activity, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
             Log.v(LOG_TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
+
+            MySQLiteHelper db = new MySQLiteHelper(activity);
+            String fileNamePlusId = dataItem.getFilename() + dataCollectionId;
+            FileId fileId = new FileId(fileNamePlusId,"yes");
+            db.insertFile(fileId);
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 

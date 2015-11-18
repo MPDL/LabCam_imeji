@@ -32,6 +32,8 @@ import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
+import example.com.mpdlcamera.SQLite.FileId;
+import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import example.com.mpdlcamera.Utils.ImageFileFilter;
@@ -52,7 +54,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
     private SharedPreferences mPrefs;
     private TypedFile typedFile;
     private CircularProgressButton circularButton;
-
+    private String dataCollectionId;
 
 
     private View rootView;
@@ -71,6 +73,11 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
 
             Toast.makeText(activity, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
             Log.v(LOG_TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
+
+            MySQLiteHelper db = new MySQLiteHelper(activity);
+            String fileNamePlusId = dataItem.getFilename() + dataCollectionId;
+            FileId fileId = new FileId(fileNamePlusId,"yes");
+            db.insertFile(fileId);
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
@@ -314,7 +321,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
         mPrefs = activity.getSharedPreferences("myPref", 0);
         String username = mPrefs.getString("username", "");
         String password = mPrefs.getString("password", "");
-        String dataCollectionId = mPrefs.getString("collectionID", DeviceStatus.collectionID);
+        dataCollectionId = mPrefs.getString("collectionID", DeviceStatus.collectionID);
 
         String jsonPart1 = "\"collectionId\" : \"" +
                 dataCollectionId +
