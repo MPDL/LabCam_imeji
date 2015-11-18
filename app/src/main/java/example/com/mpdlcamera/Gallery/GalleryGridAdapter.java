@@ -128,7 +128,7 @@ public class GalleryGridAdapter extends BaseAdapter {
 
         List<FileId> fileIds = db.getAllFiles();
 
-        if(!b) {
+        if(!b ) {
 
                 buttonCloud.setVisibility(View.GONE);
                 buttonUploading.setVisibility(View.VISIBLE);

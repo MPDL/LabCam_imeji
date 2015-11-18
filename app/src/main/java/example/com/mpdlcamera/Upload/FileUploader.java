@@ -87,7 +87,7 @@ public class FileUploader {
             RetrofitClient.uploadItem(typedFile, json, callback, username, password);
         }
         else {
-            Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -153,10 +153,10 @@ public class FileUploader {
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
                 if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
-                    Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
+                  //  Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 OttoSingleton.getInstance().post(
@@ -164,8 +164,8 @@ public class FileUploader {
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                 if (jsonBody.contains("already exists")) {
                 }
-                else
-                    Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
+              //  else
+                //    Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
 
             }
 

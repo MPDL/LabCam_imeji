@@ -76,7 +76,7 @@ public class LocalImageActivity extends AppCompatActivity {
         @Produce
         public void success(DataItem dataItem, Response response) {
 
-            Toast.makeText(activity, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(activity, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
             Log.v(LOG_TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
             MySQLiteHelper db = new MySQLiteHelper(activity);
@@ -105,20 +105,20 @@ public class LocalImageActivity extends AppCompatActivity {
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
                 if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
-                    Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+                //    Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
+              //      Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 OttoSingleton.getInstance().post(
                         new UploadEvent(error.getResponse().getStatus()));
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                 if (jsonBody.contains("already exists")) {
-                    Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
+                 //   Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
+                 //   Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
                 }
             }
             circularButton.setProgress(-1);

@@ -71,7 +71,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
         @Produce
         public void success(DataItem dataItem, Response response) {
 
-            Toast.makeText(activity, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(activity, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
             Log.v(LOG_TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
             MySQLiteHelper db = new MySQLiteHelper(activity);
@@ -100,10 +100,10 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
                 if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
-                    Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+               //     Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
+               //     Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 OttoSingleton.getInstance().post(
@@ -112,8 +112,8 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                 if (jsonBody.contains("already exists")) {
                     // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
                 }
-                else
-                    Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
+              //  else
+               //     Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
 
             }
             circularButton.setProgress(-1);

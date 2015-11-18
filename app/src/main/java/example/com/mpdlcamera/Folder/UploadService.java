@@ -237,7 +237,7 @@ public class UploadService extends IntentService {
             Log.d(TAG, "Service Stopping!");
             this.stopSelf(); //self destructing service.
         }else {
-            Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -266,7 +266,7 @@ public class UploadService extends IntentService {
             RetrofitClient.uploadItem(typedFile, json, callback, username, password);
         }
         else {
-            Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -313,10 +313,10 @@ public class UploadService extends IntentService {
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
                 if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
-                    Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Toast.makeText(mContext, "Upload failed", Toast.LENGTH_SHORT).show();
+                  //  Toast.makeText(mContext, "Upload failed", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 OttoSingleton.getInstance().post(
@@ -335,8 +335,8 @@ public class UploadService extends IntentService {
 
                     // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
                 }
-                else
-                    Toast.makeText(mContext, "Upload failed", Toast.LENGTH_SHORT).show();
+               // else
+                    //Toast.makeText(mContext, "Upload failed", Toast.LENGTH_SHORT).show();
 
             }
 
