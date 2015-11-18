@@ -141,8 +141,8 @@ public class UploadService extends IntentService {
 
                                     String imageName = imageFile.getName().toString();
                                     nPrefs = getSharedPreferences("myPref", 0);
-                                    collectionID = mPrefs.getString("collectionID","");
-                                    String imageCollectionName = imageName + collectionID;
+                                    String collectionId = mPrefs.getString("collectionID","");
+                                    String imageCollectionName = imageName + collectionId;
                                     MySQLiteHelper db = new MySQLiteHelper(mContext);
 
                                     Boolean b = db.getFile(imageCollectionName);
@@ -278,11 +278,11 @@ public class UploadService extends IntentService {
         public void success(DataItem dataItem, Response response) {
 
             nPrefs = getSharedPreferences("myPref", 0);
-            collectionID = mPrefs.getString("collectionID","");
+            String collectionId = mPrefs.getString("collectionID","");
             MySQLiteHelper db = new MySQLiteHelper(mContext);
            //SQLiteDatabase dBase = mContext.get
 
-            String fileNamePlusId = dataItem.getFilename() + collectionID;
+            String fileNamePlusId = dataItem.getFilename() + collectionId;
             FileId fileId = new FileId(fileNamePlusId,"yes");
 
             db.insertFile(fileId);
