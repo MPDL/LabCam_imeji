@@ -3,18 +3,13 @@ package example.com.mpdlcamera.Gallery;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-
 import android.graphics.drawable.ShapeDrawable;
-import android.location.GpsStatus;
 import android.net.Uri;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
-
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -32,7 +27,6 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.PreferenceChangeListener;
 
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.R;
@@ -122,7 +116,6 @@ public class GalleryListAdapter extends BaseAdapter {
         imageView = (ImageView) convertView.findViewById(R.id.list_gallery_cell_thumbnail);
         title = (TextView) convertView.findViewById(R.id.list_item_gallery_title);
         mStatus = (TextView) convertView.findViewById(R.id.list_item_gallery_status);
-      //  progressBar = (ProgressBar) convertView.findViewById(R.id.progBar);
         upCount = (TextView) convertView.findViewById(R.id.list_item_gallery_ucount);
 
         SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -137,9 +130,9 @@ public class GalleryListAdapter extends BaseAdapter {
         oPreferences.registerOnSharedPreferenceChangeListener(listener);
 
         if (size.x > size.y) {
-            imageView.getLayoutParams().height = 1 * size.y /4;
+            imageView.getLayoutParams().height = size.x /3;
         } else {
-            imageView.getLayoutParams().height = 1 * size.y /4;
+            imageView.getLayoutParams().height = size.y /3;
         }
 
        // for(int i=0; i<galleryList.size();i++) {
@@ -203,7 +196,7 @@ public class GalleryListAdapter extends BaseAdapter {
                 if (nPreferences.getString("UStatus", "").equalsIgnoreCase("true")) {
                     gh = "Uploaded....";
                   //  progressBar.setVisibility(View.INVISIBLE);
-                    upCount.setVisibility(View.INVISIBLE);
+                    upCount.setVisibility(View.GONE);
 
                 } else {
                     gh = "Uploading";
@@ -213,7 +206,7 @@ public class GalleryListAdapter extends BaseAdapter {
             } else {
                 gh = "Not Activated";
               //  progressBar.setVisibility(View.INVISIBLE);
-                upCount.setVisibility(View.INVISIBLE);
+                upCount.setVisibility(View.GONE);
             }
 
 
@@ -231,7 +224,7 @@ public class GalleryListAdapter extends BaseAdapter {
             else title.setText(gallery.getGalleryName() + "(" + (fCount) + ")");
 
             mStatus.setText("Not Activated");
-            upCount.setVisibility(View.INVISIBLE);
+            upCount.setVisibility(View.GONE);
 
         }
 

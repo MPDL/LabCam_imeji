@@ -16,7 +16,7 @@
 
     <dimen name="codelab_fab_margin_right">0.1dp</dimen>
     <dimen name="codelab_fab_margin_bottom">0.1dp</dimen>
-    <dimen name="text_size">18sp</dimen>
+    <dimen name="text_size">15sp</dimen>
     <dimen name="margintopOne">120dp</dimen>
     <dimen name="margintopTwo">95dp</dimen>
 
