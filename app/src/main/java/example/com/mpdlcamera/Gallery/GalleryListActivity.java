@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,34 +17,25 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.GridView;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
-import example.com.mpdlcamera.Auth.LoginActivity;
-import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Folder.UploadService;
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.R;
-import example.com.mpdlcamera.Settings.SettingsActivity;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 
 /**
  * Created by kiran on 22.10.15.
  */
 
-public class LocalGalleryActivity extends AppCompatActivity implements UploadResultReceiver.Receiver {
+public class GalleryListActivity extends AppCompatActivity implements UploadResultReceiver.Receiver {
 
     Toolbar toolbar;
     private View rootView;

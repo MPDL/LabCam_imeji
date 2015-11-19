@@ -28,20 +28,17 @@ import example.com.mpdlcamera.SQLite.FileId;
 import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 
 /**
- * Created by kiran on 30.10.15.
+ *  Created by allen on 27/08/15.
  */
 
-public class GalleryGridAdapter extends BaseAdapter {
+public class LocalImageAdapter extends BaseAdapter {
 
     private Activity activity;
-    private Context context;
+    private Boolean isActiveFolder;
     private List<String> galleryItems;
     private HashMap<Integer, Boolean> mSelection = new HashMap<Integer, Boolean>();
 
 
-    public GalleryGridAdapter(Context context) {
-        this.context = context;
-    }
     public void setNewSelection(int position, boolean value) {
         mSelection.put(position, value);
         notifyDataSetChanged();
@@ -62,10 +59,10 @@ public class GalleryGridAdapter extends BaseAdapter {
     }
 
 
-    public GalleryGridAdapter(Activity activity, List<String> galleryItems, Context context) {
+    public LocalImageAdapter(Activity activity, List<String> galleryItems, Boolean isActiveFolder) {
         this.activity = activity;
         this.galleryItems = galleryItems;
-        this.context = context;
+        this.isActiveFolder = isActiveFolder;
     }
 
     public void clearSelection() {
@@ -117,32 +114,47 @@ public class GalleryGridAdapter extends BaseAdapter {
 
         File dir = new File(filep);
         String file = dir.getName();
-        SharedPreferences preferences = context.getSharedPreferences("myPref",0);
+        SharedPreferences preferences = activity.getSharedPreferences("myPref", 0);
         String CollectionId = preferences.getString("collectionID","");
         String fileCollectionName = file + CollectionId;
 
-        MySQLiteHelper db = new MySQLiteHelper(context);
+        MySQLiteHelper db = new MySQLiteHelper(activity);
 
         boolean b = db.getFile(fileCollectionName);
         //boolean b = true;
 
         List<FileId> fileIds = db.getAllFiles();
 
-        //not uploaded
         String status = null;
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(activity);
         if(pref.contains("status")) {
             status = pref.getString("status","");
         }
 
-        if(!b) {
-                buttonCloud.setVisibility(View.GONE);
-                buttonUploading.setVisibility(View.VISIBLE);
-            }
-            else {
-                buttonUploading.setVisibility(View.GONE);
+        if(isActiveFolder) {
+            //not uploaded for active folder
+            if (!b) {
+                if (status.equalsIgnoreCase("manual")) {
+                    buttonCloud.setVisibility(View.GONE);
+                    buttonUploading.setVisibility(View.GONE);
+                } else {
+                    buttonCloud.setVisibility(View.GONE);
+                    buttonUploading.setVisibility(View.VISIBLE);
+                }
+            } else{ //uploaded
                 buttonCloud.setVisibility(View.VISIBLE);
+                buttonUploading.setVisibility(View.GONE);
             }
+        }else {
+            //not uploaded for non-active folder
+            if (!b) {
+                buttonCloud.setVisibility(View.GONE);
+                buttonUploading.setVisibility(View.GONE);
+            } else { //uploaded
+                buttonCloud.setVisibility(View.VISIBLE);
+                buttonUploading.setVisibility(View.GONE);
+            }
+        }
 
         grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light));
 

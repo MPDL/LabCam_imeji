@@ -63,7 +63,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
     private String galleryName;
     private String galleryPath;
     private List<String> imagePathList = new ArrayList<String>();
-    public  GalleryGridAdapter adapter;
+    public LocalImageAdapter adapter;
     private GridView gridView;
 
     Callback<DataItem> callback = new Callback<DataItem>() {
@@ -163,7 +163,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
             }
         }
 
-        adapter = new GalleryGridAdapter(activity, imagePathList, this);
+        adapter = new LocalImageAdapter(activity, imagePathList, true);
 
         gridView = (GridView) findViewById(R.id.image_gridView);
 

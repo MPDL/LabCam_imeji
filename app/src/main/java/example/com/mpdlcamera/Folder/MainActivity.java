@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,15 +23,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
@@ -43,8 +38,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import example.com.mpdlcamera.Auth.LoginActivity;
-import example.com.mpdlcamera.Gallery.LocalGalleryActivity;
+import example.com.mpdlcamera.Gallery.GalleryListActivity;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
@@ -211,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 int id = menuItem.getItemId();
                 switch (id) {
                     case R.id.navItem1:
-                        Intent showLocalImageIntent = new Intent(activity, LocalGalleryActivity.class);
+                        Intent showLocalImageIntent = new Intent(activity, GalleryListActivity.class);
                         startActivity(showLocalImageIntent);
 
                         break;

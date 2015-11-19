@@ -52,7 +52,7 @@ public class LocalImageActivity extends AppCompatActivity {
     private List<String> dataPathList = new ArrayList<String>();
     private List<String> selectedDataPathList = new ArrayList<String>();
 
-    public GalleryGridAdapter adapter;
+    public LocalImageAdapter adapter;
 //    public  ImagesGridAdapter adapter;
     private GridView gridView;
     private View rootView;
@@ -182,9 +182,7 @@ public class LocalImageActivity extends AppCompatActivity {
             }
         }
 
-        //TODO change adaptor to Kiran's
-        adapter = new GalleryGridAdapter(activity, dataPathList, this);
-
+        adapter = new LocalImageAdapter(activity, dataPathList, false);
 
         //rootView = inflater.inflate(R.layout.fragment_section_list_swipe, container, false);
         gridView = (GridView) findViewById(R.id.image_gridView);

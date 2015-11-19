@@ -80,7 +80,7 @@
         <activity
             android:name=".Gallery.LocalImageActivity"
             android:label="@string/title_local_activity"
-            android:parentActivityName=".Gallery.LocalGalleryActivity" >
+            android:parentActivityName=".Gallery.GalleryListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Folder.MainActivity" />
@@ -140,7 +140,7 @@
 
         </activity>
 
-        <activity android:name=".Gallery.LocalGalleryActivity"
+        <activity android:name=".Gallery.GalleryListActivity"
             android:label="Local Gallery"
             android:parentActivityName=".Folder.MainActivity" >
 
@@ -148,7 +148,7 @@
 
         <activity android:name=".Gallery.ActivatedGalleryActivity"
             android:label="Activated Gallery"
-            android:parentActivityName=".Gallery.LocalGalleryActivity" ></activity>
+            android:parentActivityName=".Gallery.GalleryListActivity" ></activity>
 
         <activity android:name=".Upload.PopupActivity"
             android:label="Logout Confirmation"
