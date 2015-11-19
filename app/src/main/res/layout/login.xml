@@ -31,7 +31,8 @@
             android:inputType="text"
             android:hint="Server URL"
             android:textColorHint="#cccccc"
-            android:drawableLeft="@drawable/url_64px_grey"/>
+            android:drawableLeft="@drawable/url_32px"
+            android:drawablePadding="20dp"/>
 
         <EditText
             android:id="@+id/userName"
@@ -45,7 +46,8 @@
             android:padding="10dp"
             android:hint="Username"
             android:textColorHint="#cccccc"
-            android:drawableLeft="@drawable/user_64px_grey"/>
+            android:drawableLeft="@drawable/user_32px"
+            android:drawablePadding="20dp"/>
         <EditText
             android:id="@+id/password"
             android:layout_width="match_parent"
@@ -59,7 +61,8 @@
             android:hint="Password"
             android:textColorHint="#cccccc"
             android:password="true"
-            android:drawableLeft="@drawable/password_64px_grey"/>
+            android:drawableLeft="@drawable/password_32px"
+            android:drawablePadding="20dp"/>
 
         <Button
             android:id="@+id/btnSignIn"
