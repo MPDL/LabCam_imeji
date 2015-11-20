@@ -23,8 +23,8 @@ public class DeviceStatus {
 
     // Checks whether the device currently has a network connection
     public static boolean isNetworkEnabled(Activity activity) {
-        ConnectivityManager connMgr = (ConnectivityManager)  activity.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        ConnectivityManager connectivityManager = (ConnectivityManager)  activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null) {
             return networkInfo.isConnected();
         } else {

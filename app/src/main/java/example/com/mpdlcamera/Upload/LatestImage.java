@@ -38,6 +38,10 @@ private Context context;
 
     private int latestId;
 
+
+    /*
+        get the id of the image.
+     */
     public int getId() {
 
 
@@ -65,6 +69,9 @@ private Context context;
         return latestId;
     }
 
+    /*
+        get the latest image of the gallery
+     */
         public DataItem getLatestItem() {
 
         DataItem item = null;
@@ -126,6 +133,9 @@ private Context context;
     }
 
 
+    /*
+        returns the maximum ID (recent image) of the gallery
+     */
     private void setMaxIdFromDatabase()
     {
         String columns[] = new String[]{ MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.MINI_THUMB_MAGIC };

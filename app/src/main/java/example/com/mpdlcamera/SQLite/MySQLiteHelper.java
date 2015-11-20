@@ -22,13 +22,16 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         private static final int DATABASE_VERSION = 1;
 
+        //new database with the name "FileDB" with the columns filename,collectionID and status
         private static final String DATABASE_NAME = "FileDB";
 
         private static final String TABLE_FILE = "file";
 
         private static final String KEY_FILENAME = "filename";
 
+
         private static final String KEY_STATUS = "status";
+
 
     private static final String[] COLUMNS = {KEY_FILENAME, KEY_STATUS};
 
@@ -37,6 +40,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
            this.context = context;
             // this.onCreate();
     }
+
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -60,6 +64,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
 
 
+    /*
+        inserts the file row into the database
+     */
     public void insertFile(FileId fileId) {
         //for logging
         Log.d("addFile", fileId.toString());
@@ -85,6 +92,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    /*
+        returns the row having the file in the database
+     */
     public Boolean getFile(String fileName) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -143,6 +153,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
   //  }
 
+    /*
+        list all the records of the database
+     */
     public List<FileId> getAllFiles() {
         List<FileId> fileIds = new LinkedList<FileId>();
 

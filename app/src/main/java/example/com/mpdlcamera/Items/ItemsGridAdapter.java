@@ -29,8 +29,8 @@ public class ItemsGridAdapter extends BaseAdapter {
     private List<DataItem> dataItems;
     private final String LOG_TAG = ItemsGridAdapter.class.getSimpleName();
 
-    public ItemsGridAdapter(Activity c, List<DataItem> dataItems) {
-        this.activity = c;
+    public ItemsGridAdapter(Activity activity, List<DataItem> dataItems) {
+        this.activity = activity;
         this.dataItems = dataItems;
     }
 
@@ -52,8 +52,8 @@ public class ItemsGridAdapter extends BaseAdapter {
         View grid;
 
 
-        WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
+        WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
 
         Point size = new Point();
         display.getSize(size);
@@ -71,16 +71,16 @@ public class ItemsGridAdapter extends BaseAdapter {
         ImageView imageView = (ImageView) grid.findViewById(R.id.item_image);
         TextView title = (TextView) grid.findViewById(R.id.item_title);
 
-        DataItem m = dataItems.get(position);
+        DataItem dataItem = dataItems.get(position);
 
         Picasso.with(activity)
-                .load(m.getWebResolutionUrlUrl())
+                .load(dataItem.getWebResolutionUrlUrl())
                 .resize(size.x / 2, size.y)
                 .centerInside()
                 .into(imageView);
 
 
-        title.setText(m.getFilename());
+        title.setText(dataItem.getFilename());
 
         return grid;
     }

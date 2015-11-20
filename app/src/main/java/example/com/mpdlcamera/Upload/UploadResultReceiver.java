@@ -19,9 +19,13 @@ public class UploadResultReceiver extends ResultReceiver {
         mReceiver = receiver;
     }
 
+    /*
+        receiver method which runs when it gets the result
+     */
     public interface Receiver {
         public void onReceiveResult(int resultCode, Bundle resultData);
     }
+
 
     @Override
     protected void onReceiveResult(int resultCode, Bundle resultData) {

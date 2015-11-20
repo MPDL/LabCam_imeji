@@ -17,6 +17,7 @@ import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 
 /**
  * Created by kiran on 29.09.15.
+ * The Content Observer method which observes the recent file added to the file system.
  */
 
 public class NewFileObserver extends ContentObserver {
@@ -34,6 +35,9 @@ public class NewFileObserver extends ContentObserver {
 
     private ExecutorService queue;
 
+    /*
+        constructor method for the file observer
+     */
     public NewFileObserver(Handler handler, MainActivity application) {
         super(handler);
         this.context = application.getBaseContext();
@@ -52,6 +56,9 @@ public class NewFileObserver extends ContentObserver {
         this.queue = queue;
     }
 
+    /*
+        method which runs when the file changes in the file system.
+     */
     @Override
     public void onChange(boolean selfChange) {
 
@@ -59,8 +66,8 @@ public class NewFileObserver extends ContentObserver {
 
         String prefOption = settings.getString("status", "");
 
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         String networkStatus;
         networkStatus = networkInfo.getTypeName();
 
@@ -88,9 +95,9 @@ public class NewFileObserver extends ContentObserver {
 
                 MySQLiteHelper db = new MySQLiteHelper(context);
 
-                Boolean b = db.getFile(imageCollectionName);
+                Boolean flag = db.getFile(imageCollectionName);
 
-                if(!b) {
+                if(!flag) {
 
                     fileUploader.upload(item);
 

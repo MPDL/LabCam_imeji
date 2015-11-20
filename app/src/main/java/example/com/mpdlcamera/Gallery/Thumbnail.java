@@ -27,11 +27,14 @@ public class Thumbnail {
     }
 
 
+    /*
+        returns the latest image of the gallery(thumbnail)
+     */
     public String getLatestImage(Gallery gallery, Boolean flag) {
 
         matchGallery = false;
 
-        String imPath = null;
+        String imagePath = null;
 
 
 
@@ -51,7 +54,7 @@ public class Thumbnail {
                 String folder = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME));
 
                 if(matchGallery.equals(true) && !folder.equalsIgnoreCase(gallery.getGalleryName())) {
-                    return imPath;
+                    return imagePath;
                 }
 
                 if (folder.equalsIgnoreCase(gallery.getGalleryName())) {
@@ -59,7 +62,7 @@ public class Thumbnail {
 
                     matchGallery = true;
 
-                    imPath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+                    imagePath = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
 
 
                     Integer id = cursor.getColumnIndex(MediaStore.Images.Media._ID);
@@ -71,11 +74,11 @@ public class Thumbnail {
                     }
 
 
-                    File file = new File(imPath);
-                    String dir = file.getParent();
+                    File file = new File(imagePath);
+                    String directory = file.getParent();
 
 
-                    gallery.setGalleryPath(dir);
+                    gallery.setGalleryPath(directory);
 
 
                 }

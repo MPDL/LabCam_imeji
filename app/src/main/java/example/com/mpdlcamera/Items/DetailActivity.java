@@ -52,8 +52,8 @@ public class DetailActivity extends Activity {
             //mAttacher.setScaleType(ImageView.ScaleType.CENTER_CROP); // no scale , cut by center
             //mAttacher.setScaleType(ImageView.ScaleType.FIT_XY);  //no scale, show the original photo
 
-            WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-            Display display = wm.getDefaultDisplay();
+            WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+            Display display = windowManager.getDefaultDisplay();
 
             Point size = new Point();
             display.getSize(size);

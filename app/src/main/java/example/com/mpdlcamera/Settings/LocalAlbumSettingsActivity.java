@@ -50,7 +50,7 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
     String prefOption;
     ArrayList<String> permFolder;
     CustomAdapter switchAdapter;
-    Boolean checkAll=null;
+    Boolean checkAll = null;
     ListView listViewLocal;
 
     private final String LOG_TAG = LocalAlbumSettingsActivity.class.getSimpleName();
@@ -157,17 +157,17 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
 
         if (cur.moveToFirst()) {
             String album;
-            String fPath;
+            String filePath;
             int albumLocation = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
             int path = cur.getColumnIndex(MediaStore.Images.Media.DATA);
 
             do {
                 album = cur.getString(albumLocation);
-                fPath = cur.getString(path);
-                File file = new File(fPath);
-                String dir = file.getParent();
+                filePath = cur.getString(path);
+                File file = new File(filePath);
+                String directory = file.getParent();
                 SharedPreferences.Editor editor = preferencesFiles.edit();
-                editor.putString(album, dir);
+                editor.putString(album, directory);
                 editor.commit();
                 folders.add(album);
                 Log.i("ListingImages", " album=" + album);
@@ -297,14 +297,14 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
     }
 
 
-    public View getViewByPosition(int pos, ListView listView) {
+    public View getViewByPosition(int position, ListView listView) {
         final int firstListItemPosition = listView.getFirstVisiblePosition();
         final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
 
-        if (pos < firstListItemPosition || pos > lastListItemPosition) {
-            return listView.getAdapter().getView(pos, null, listView);
+        if (position < firstListItemPosition || position > lastListItemPosition) {
+            return listView.getAdapter().getView(position, null, listView);
         } else {
-            final int childIndex = pos - firstListItemPosition;
+            final int childIndex = position - firstListItemPosition;
             return listView.getChildAt(childIndex);
         }
     }
@@ -336,6 +336,9 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
         }
 
 
+        /*
+            creates the view everytime the screen refreshes
+         */
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -380,15 +383,18 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
 */
 
               //  holder.fSwitch.setOnCheckedChangeListener(switchChangeListener);
+                /*
+                listener method for the check change of the switch
+                 */
         holder.fSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-                      Switch sw = (Switch) buttonView;
-                     LocalGallery folder = (LocalGallery) sw.getTag();
+                      Switch switchOne = (Switch) buttonView;
+                     LocalGallery folder = (LocalGallery) switchOne.getTag();
 
                         if(checkAll != null) {
-                            if (!sw.isChecked() && checkAll) {
+                            if (!switchOne.isChecked() && checkAll) {
                                 checkSyncAll.setChecked(false);
                                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
                                 SharedPreferences.Editor ed = preferences.edit();
@@ -396,17 +402,20 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
                                 ed.commit();
                             }
                         }
-                        folder.setSelected(sw.isChecked());
+                        folder.setSelected(switchOne.isChecked());
                     }
                 });
+                                /*
+                listener method for the check change of the switch
+                 */
                 holder.fSwitch.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Switch sw = (Switch) v;
-                        LocalGallery folder = (LocalGallery) sw.getTag();
+                        Switch switchOne = (Switch) v;
+                        LocalGallery folder = (LocalGallery) switchOne.getTag();
 
                         if (checkAll != null) {
-                            if (!sw.isChecked() && checkAll) {
+                            if (!switchOne.isChecked() && checkAll) {
                                 checkSyncAll.setChecked(false);
                                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
                                 SharedPreferences.Editor ed = preferences.edit();
@@ -414,22 +423,25 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
                                 ed.commit();
                             }
                         }
-                        folder.setSelected(sw.isChecked());
+                        folder.setSelected(switchOne.isChecked());
                     }
                 });
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
 
+                            /*
+                listener method for the check change of the switch
+                 */
             holder.fSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                     if (!isChecked) {
 
-                        RelativeLayout rl = (RelativeLayout) buttonView.getParent();
-                        TextView tv = (TextView) rl.findViewById(R.id.folder);
-                        String folder = tv.getText().toString();
+                        RelativeLayout relativeLayout = (RelativeLayout) buttonView.getParent();
+                        TextView textView = (TextView) relativeLayout.findViewById(R.id.folder);
+                        String folder = textView.getText().toString();
 
                         //    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
                         SharedPreferences settings = mContext.getSharedPreferences("folder", Context.MODE_PRIVATE);
@@ -445,9 +457,9 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
                         // SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
                         SharedPreferences settings = mContext.getSharedPreferences("folder", Context.MODE_PRIVATE);
 
-                        RelativeLayout rl = (RelativeLayout) buttonView.getParent();
-                        TextView tv = (TextView) rl.findViewById(R.id.folder);
-                        String folder = tv.getText().toString();
+                        RelativeLayout relativeLayout = (RelativeLayout) buttonView.getParent();
+                        TextView textView = (TextView) relativeLayout.findViewById(R.id.folder);
+                        String folder = textView.getText().toString();
 
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString(folder, "On");

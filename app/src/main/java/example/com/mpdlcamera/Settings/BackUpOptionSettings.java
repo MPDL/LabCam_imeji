@@ -24,24 +24,24 @@ public class BackUpOptionSettings extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.backup_settings);
-        Button btnDone = (Button) findViewById(R.id.btnDone);
-        RadioButton radOne = (RadioButton) findViewById(R.id.radioOne);
-        RadioButton radTwo = (RadioButton) findViewById(R.id.radioTwo);
-        RadioButton radThree = (RadioButton) findViewById(R.id.radioThree);
+        Button buttonDone = (Button) findViewById(R.id.btnDone);
+        RadioButton radioOne = (RadioButton) findViewById(R.id.radioOne);
+        RadioButton radioTwo = (RadioButton) findViewById(R.id.radioTwo);
+        RadioButton radioThree = (RadioButton) findViewById(R.id.radioThree);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (preferences.contains("status")) {
 
             String defOption = preferences.getString("status", "");
             if (defOption.equalsIgnoreCase("wifi")) {
-                radOne.setChecked(true);
+                radioOne.setChecked(true);
             } else if(defOption.equalsIgnoreCase("both")) {
-                radTwo.setChecked(true);
+                radioTwo.setChecked(true);
             }
             else
-                radThree.setChecked(true);
+                radioThree.setChecked(true);
 
         } else {
-            radOne.setChecked(true);
+            radioOne.setChecked(true);
         }
 
 

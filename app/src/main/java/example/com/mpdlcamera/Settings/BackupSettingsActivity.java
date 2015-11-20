@@ -34,7 +34,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
     String mOption = null;
     private View rootView;
     Toolbar toolbar;
-    TextView tv;
+    TextView textView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,13 +47,13 @@ public class BackupSettingsActivity extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Switch lau = (Switch) findViewById(R.id.lau);
-        Switch rpfd = (Switch) findViewById(R.id.rpfd);
+        Switch logoutAfterUpload = (Switch) findViewById(R.id.lau);
+        Switch removePhotos = (Switch) findViewById(R.id.rpfd);
        // Switch rgl = (Switch) findViewById(R.id.rgl);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        tv = (TextView) findViewById(R.id.backup_item_list);
+        textView = (TextView) findViewById(R.id.backup_item_list);
         if(preferences.contains("status")) {
             String option = preferences.getString("status", "");
             if (option.equalsIgnoreCase("wifi")) {
@@ -66,7 +66,7 @@ public class BackupSettingsActivity extends AppCompatActivity {
         else
            mOption = getString(R.string.wifi);
 
-        tv.setText(mOption);
+        textView.setText(mOption);
 
         LinearLayout linearLayout = (LinearLayout) findViewById(R.id.netOption);
 
@@ -317,6 +317,9 @@ public class BackupSettingsActivity extends AppCompatActivity {
 
     }
 
+    /*
+
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

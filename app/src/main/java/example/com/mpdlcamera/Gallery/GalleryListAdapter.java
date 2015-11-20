@@ -53,7 +53,7 @@ public class GalleryListAdapter extends BaseAdapter {
     TextView title;
     TextView mStatus;
     TextView upCount;
-    String gh;
+    String message;
     ProgressBar progressBar;
     ImageView imageView;
     Point size;
@@ -88,6 +88,9 @@ public class GalleryListAdapter extends BaseAdapter {
     }
 
 
+    /*
+            reloads the view everytime the screen refreshes
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -104,14 +107,14 @@ public class GalleryListAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.gallery_list_cell, null);
 
         RelativeLayout relativeLayout = (RelativeLayout) convertView.findViewById(R.id.relOne);
-        ShapeDrawable rectShape = new ShapeDrawable();
+        ShapeDrawable rectangleShape = new ShapeDrawable();
 
-        Paint paint = rectShape.getPaint();
+        Paint paint = rectangleShape.getPaint();
 
         paint.setColor(Color.WHITE);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(1);
-        relativeLayout.setBackground(rectShape);
+        relativeLayout.setBackground(rectangleShape);
 
         imageView = (ImageView) convertView.findViewById(R.id.list_gallery_cell_thumbnail);
         title = (TextView) convertView.findViewById(R.id.list_item_gallery_title);
@@ -142,16 +145,16 @@ public class GalleryListAdapter extends BaseAdapter {
             Log.v(LOG_TAG, gallery.getGalleryName());
 
         Thumbnail thumbnail = new Thumbnail(activity);
-        String imPath = null;
+        String imagePath = null;
 
         if(!galleriesOne.contains(gallery.getGalleryName())) {
             flag = true;
-            imPath = thumbnail.getLatestImage(gallery,flag);
+            imagePath = thumbnail.getLatestImage(gallery,flag);
             galleriesOne.add(gallery.getGalleryName());
         }
         else {
             flag = false;
-            imPath = thumbnail.getLatestImage(gallery, flag);
+            imagePath = thumbnail.getLatestImage(gallery, flag);
         }
 
 
@@ -159,21 +162,21 @@ public class GalleryListAdapter extends BaseAdapter {
 
         if (gallery.getItems() != null) {
             if (gallery.getItems().size() > 0) {
-                Gallery m = gallery.getItems().get(0);
+                Gallery galleryTwo = gallery.getItems().get(0);
 
             }
         }
        // title.setText(gallery.getGalleryName());
 
-        String gpath = gallery.getGalleryPath();
+        String galleryPath = gallery.getGalleryPath();
 
         String iPath = this.localPath;
         // File imgFile = new File(iPath);
-        File imgFile1 = new File(imPath);
+        File imageFile = new File(imagePath);
 
-        Uri uri = Uri.fromFile(imgFile1);
+        Uri uri = Uri.fromFile(imageFile);
 
-        if(imgFile1.exists()) {
+        if(imageFile.exists()) {
             // imageView.setImageDrawable(draw);
             Picasso.with(activity)
                     .load(uri)
@@ -193,18 +196,18 @@ public class GalleryListAdapter extends BaseAdapter {
 
             if (status.equalsIgnoreCase("On")) {
 
-                if (nPreferences.getString("UStatus", "").equalsIgnoreCase("true")) {
-                    gh = "Uploaded....";
+                if (nPreferences.getString("UploadStatus", "").equalsIgnoreCase("true")) {
+                    message = "Uploaded....";
                   //  progressBar.setVisibility(View.INVISIBLE);
                     upCount.setVisibility(View.GONE);
 
                 } else {
-                    gh = "Uploading";
+                    message = "Uploading";
                     upCount.setText(gallery.getCount()-uCount + "file(s) are remaining");
                  //   progressBar.setVisibility(View.INVISIBLE);
                 }
             } else {
-                gh = "Not Activated";
+                message = "Not Activated";
               //  progressBar.setVisibility(View.INVISIBLE);
                 upCount.setVisibility(View.GONE);
             }
@@ -215,7 +218,7 @@ public class GalleryListAdapter extends BaseAdapter {
             }
             else  title.setText(gallery.getGalleryName() + "(" + (fCount) + ")");
 
-            mStatus.setText(gh);
+            mStatus.setText(message);
            // upCount.setVisibility(View.INVISIBLE);
         }
         else {if(gallery.getGalleryName().equalsIgnoreCase("Camera")) {
@@ -231,12 +234,15 @@ public class GalleryListAdapter extends BaseAdapter {
         return convertView;
     }
 
+    /*
+        returns the uploading count of the gallery
+     */
     private int getUploadingCount(Gallery gallery) {
 
-        Integer uCount = 0;
-        String fPath = gallery.getGalleryPath();
-        File dir = new File(fPath);
-        File[] files = dir.listFiles();
+        Integer uploadCount = 0;
+        String folderPath = gallery.getGalleryPath();
+        File directory = new File(folderPath);
+        File[] files = directory.listFiles();
         MySQLiteHelper db = new MySQLiteHelper(activity);
         SQLiteDatabase dBase = db.getWritableDatabase();
 
@@ -246,11 +252,11 @@ public class GalleryListAdapter extends BaseAdapter {
 
             String fileName = imageFile.getName();
             if(db.getFile(fileName)){
-                uCount++;
+                uploadCount++;
             }
         }
 
-        return uCount;
+        return uploadCount;
 
 
     }

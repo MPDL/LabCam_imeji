@@ -87,8 +87,8 @@ public class LocalImageActivity extends AppCompatActivity {
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
-            if(mPrefs.contains("R_P_F_D")) {
-                if(mPrefs.getBoolean("R_P_F_D",true)) {
+            if(mPrefs.contains("RemovePhotosAfterUpload")) {
+                if(mPrefs.getBoolean("RemovePhotosAfterUpload",true)) {
 
                     File file = typedFile.file();
                     Boolean deleted = file.delete();
@@ -100,6 +100,7 @@ public class LocalImageActivity extends AppCompatActivity {
             circularButton.setProgress(100);
 
         }
+
 
         @Override
         public void failure(RetrofitError error) {
@@ -193,7 +194,7 @@ public class LocalImageActivity extends AppCompatActivity {
         circularButton = (CircularProgressButton) findViewById(R.id.circularButton);
 
         gridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            private int nr = 0;
+            private int selectedCount = 0;
 
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -215,7 +216,7 @@ public class LocalImageActivity extends AppCompatActivity {
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 // TODO Auto-generated method stub
-                nr = 0;
+                selectedCount = 0;
 
                 toolbar.setVisibility(View.GONE);
 
@@ -237,7 +238,7 @@ public class LocalImageActivity extends AppCompatActivity {
 
                 switch (item.getItemId()) {
                     case R.id.item_delete_local:
-                        nr = 0;
+                        selectedCount = 0;
                         Log.v(LOG_TAG,"##delete");
                         if(selectedDataPathList != null) {
                             delete(selectedDataPathList);
@@ -256,7 +257,7 @@ public class LocalImageActivity extends AppCompatActivity {
                     case R.id.item_upload_local:
 //                        nr = 0;
 //                        adapter.clearSelection();
-                        Log.v(LOG_TAG,"##upload");
+                        Log.v(LOG_TAG,"upload");
 
                         Log.v(LOG_TAG, " "+selectedDataPathList.size());
 
@@ -286,19 +287,19 @@ public class LocalImageActivity extends AppCompatActivity {
                                                   long id,
                                                   boolean checked) {
                 if (checked) {
-                    nr++;
+                    selectedCount++;
                     adapter.setNewSelection(position, checked);
                     selectedDataPathList.add(dataPathList.get(position));
                     //adapter.getCheckBox().setChecked(true);
 
                 } else {
-                    nr--;
+                    selectedCount--;
                     adapter.removeSelection(position);
                     selectedDataPathList.remove(dataPathList.get(position));
                     //adapter.getCheckBox().setChecked(false);
 
                 }
-                mode.setTitle(nr + " selected");
+                mode.setTitle(selectedCount + " selected");
 
             }
         });
@@ -334,7 +335,7 @@ public class LocalImageActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_select) {
-            Log.v(LOG_TAG, "slected");
+            Log.v(LOG_TAG, "selected");
 
             return true;
         }
@@ -343,6 +344,9 @@ public class LocalImageActivity extends AppCompatActivity {
 
 
 
+    /*
+        upload the selected files
+     */
     private void upload(List<String> fileList) {
         circularButton.setVisibility(View.VISIBLE);
         circularButton.setIndeterminateProgressMode(true); // turn on indeterminate progress
@@ -363,6 +367,9 @@ public class LocalImageActivity extends AppCompatActivity {
     }
 
 
+    /*
+        delete the selected files
+     */
     private void delete(List<String> toBeDeleteImagePathList) {
         for(String imagePath : toBeDeleteImagePathList) {
 

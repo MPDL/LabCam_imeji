@@ -64,8 +64,8 @@ public class PrefActivity extends AppCompatActivity{
             ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             PreferenceManager preferenceManager = getPreferenceManager();
 
-            switchPreferenceLau = (SwitchPreference) findPreference("L_A_U");
-            switchPreferenceRpfd = (SwitchPreference) findPreference("R_P_F_D");
+            switchPreferenceLau = (SwitchPreference) findPreference("LogoutAfterUpload");
+            switchPreferenceRpfd = (SwitchPreference) findPreference("RemovePhotosAfterUpload");
             backupPreference = (ListPreference) findPreference("status");
             if(mPrefs.contains("status")) {
                 backupPreference.setSummary(mPrefs.getString("status",""));
@@ -95,7 +95,7 @@ public class PrefActivity extends AppCompatActivity{
                         Boolean statusLau = ((Boolean) newValue).booleanValue();
 
                         SharedPreferences.Editor e = mPrefs.edit();
-                        e.putBoolean("L_A_U", statusLau);
+                        e.putBoolean("LogoutAfterUpload", statusLau);
                         e.commit();
                         return  true;
                     }
@@ -108,10 +108,10 @@ public class PrefActivity extends AppCompatActivity{
                 switchPreferenceRpfd.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        Boolean statusRpfd = ((Boolean) newValue).booleanValue();
+                        Boolean statusRemove = ((Boolean) newValue).booleanValue();
 
                         SharedPreferences.Editor e = mPrefs.edit();
-                        e.putBoolean("R_P_F_D", statusRpfd);
+                        e.putBoolean("RemovePhotosAfterUpload", statusRemove);
                         e.commit();
                         return true;
                     }
@@ -123,6 +123,9 @@ public class PrefActivity extends AppCompatActivity{
         }
     }
 
+    /*
+        method for the selection of options
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -133,6 +136,7 @@ public class PrefActivity extends AppCompatActivity{
 
         return super.onOptionsItemSelected(item);
     }
+
 
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;

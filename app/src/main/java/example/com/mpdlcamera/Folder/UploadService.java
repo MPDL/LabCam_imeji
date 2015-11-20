@@ -82,8 +82,8 @@ public class UploadService extends IntentService {
 
             user.setCompleteName("Kiran");
             user.save();
-            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
             String networkStatus = networkInfo.getTypeName();
 
             mPrefs = this.getSharedPreferences("myPref", 0);
@@ -132,9 +132,9 @@ public class UploadService extends IntentService {
 
                                 String folderName = (String) entry.getKey();
 
-                                String dir = preferencesFiles.getString(folderName,"");
+                                String directoryPath = preferencesFiles.getString(folderName,"");
 
-                                File folder = new File(dir);
+                                File folder = new File(directoryPath);
                                 File[] folderFiles = folder.listFiles();
 
                                 for(File imageFile : folderFiles) {
@@ -143,11 +143,11 @@ public class UploadService extends IntentService {
                                     nPrefs = getSharedPreferences("myPref", 0);
                                     String collectionId = mPrefs.getString("collectionID","");
                                     String imageCollectionName = imageName + collectionId;
-                                    MySQLiteHelper db = new MySQLiteHelper(mContext);
+                                    MySQLiteHelper database = new MySQLiteHelper(mContext);
 
-                                    Boolean b = db.getFile(imageCollectionName);
+                                    Boolean fileFlag = database.getFile(imageCollectionName);
 
-                                    if(!b)
+                                    if(!fileFlag)
 
                                     {
                                         item.setFilename(imageName);
@@ -241,6 +241,9 @@ public class UploadService extends IntentService {
         }
     }
 
+    /*
+    uploads the dataitem
+     */
     private void upload(DataItem item) {
         nPrefs = this.getSharedPreferences("myPref", 0);
         if(mPrefs.contains("collectionID")) {
@@ -268,7 +271,6 @@ public class UploadService extends IntentService {
         else {
             //Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
         }
-
     }
 
 
@@ -292,9 +294,9 @@ public class UploadService extends IntentService {
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
 
-            if(mPrefs.contains("R_P_F_D")) {
+            if(mPrefs.contains("RemovePhotosAfterUpload")) {
 
-                if(mPrefs.getBoolean("R_P_F_D",true)) {
+                if(mPrefs.getBoolean("RemovePhotosAfterUpload",true)) {
 
                     File file = typedFile.file();
                     Boolean deleted = file.delete();
@@ -345,6 +347,9 @@ public class UploadService extends IntentService {
         }
     };
 
+    /*
+        checks whether the network is available or not
+     */
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);

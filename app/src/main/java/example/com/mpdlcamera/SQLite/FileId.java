@@ -10,6 +10,9 @@ public class FileId {
 
     public FileId(){}
 
+    /*
+        constructor for the fileId with the filename and the status
+     */
     public FileId(String fileName, String status) {
 
         this.fileName = fileName;

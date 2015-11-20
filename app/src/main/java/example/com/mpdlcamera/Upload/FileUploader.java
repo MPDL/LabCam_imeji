@@ -61,6 +61,9 @@ public class FileUploader {
 
 
 
+    /*
+        method which uploads the dataitem
+     */
     public void upload(DataItem item) {
 
         mPrefs = context.getSharedPreferences("myPref", 0);
@@ -94,6 +97,9 @@ public class FileUploader {
     }
 
 
+    /*
+        callback method for upload
+     */
     Callback<DataItem> callback = new Callback<DataItem>() {
         @Override
         @Produce
@@ -116,9 +122,9 @@ public class FileUploader {
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-            if(mPrefs.contains("R_P_F_D")) {
+            if(mPrefs.contains("RemovePhotosAfterUpload")) {
 
-                if(mPrefs.getBoolean("R_P_F_D",true)) {
+                if(mPrefs.getBoolean("RemovePhotosAfterUpload",true)) {
 
                     File file = typedFile.file();
                     Boolean deleted = file.delete();
@@ -131,9 +137,9 @@ public class FileUploader {
 
             }
 
-            if(mPrefs.contains("L_A_U")) {
+            if(mPrefs.contains("LogoutAfterUpload")) {
 
-                if(mPrefs.getBoolean("L_A_U", true)) {
+                if(mPrefs.getBoolean("LogoutAfterUpload", true)) {
 
                     Intent intent = new Intent(act, PopupActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -178,6 +184,9 @@ public class FileUploader {
         }
     };
 
+    /*
+        method which returns the value whether the network available or not
+     */
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

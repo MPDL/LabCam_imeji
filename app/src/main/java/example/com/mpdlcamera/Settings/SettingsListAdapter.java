@@ -53,14 +53,17 @@ public class SettingsListAdapter extends BaseAdapter {
         return position;
     }
 
+    /*
+        creates the view everytime the screen refreshes
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Log.v("getView");
         //final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
         mPrefs =  activity.getSharedPreferences("myPref", 0);
 
-        WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
+        WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
 

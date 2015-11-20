@@ -81,12 +81,12 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
-            if(mPrefs.contains("R_P_F_D")) {
-                if(mPrefs.getBoolean("R_P_F_D",true)) {
+            if(mPrefs.contains("RemovePhotosAfterUpload")) {
+                if(mPrefs.getBoolean("RemovePhotosAfterUpload",true)) {
 
                     File file = typedFile.file();
                     Boolean deleted = file.delete();
-                    Log.v(LOG_TAG, "deleted111:" +deleted);
+                    Log.v(LOG_TAG, "deleted:" +deleted);
                 }
             }
             adapter.notifyDataSetChanged();
@@ -175,7 +175,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
 
 
         gridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            private int nr = 0;
+            private int selectedCount = 0;
 
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -194,7 +194,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 // TODO Auto-generated method stub
-                nr = 0;
+                selectedCount = 0;
 
                 toolbar.setVisibility(View.GONE);
 
@@ -212,7 +212,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                 switch (item.getItemId()) {
 
                     case R.id.item_delete:
-                        nr = 0;
+                        selectedCount = 0;
                         Integer count = 0;
 
                         if(selectedDataPathList != null) {
@@ -229,7 +229,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
 
 
                     case R.id.item_upload:
-                        nr = 0;
+                        selectedCount = 0;
                         //Integer count = 0;
 
                         Log.v(LOG_TAG,"##upload");
@@ -260,7 +260,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                                                   boolean checked) {
                 // TODO Auto-generated method stub
                 if (checked) {
-                    nr++;
+                    selectedCount++;
                     adapter.setNewSelection(position, checked);
                     selectedDataPathList.add(imagePathList.get(position));
 
@@ -268,13 +268,13 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                     //adapter.getCheckBox().setChecked(true);
 
                 } else {
-                    nr--;
+                    selectedCount--;
                     adapter.removeSelection(position);
                     selectedDataPathList.remove(imagePathList.get(position));
                     //adapter.getCheckBox().setChecked(false);
 
                 }
-                mode.setTitle(nr + " selected");
+                mode.setTitle(selectedCount + " selected");
 
             }
         });
@@ -304,6 +304,9 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
 
     }
 
+    /*
+        deletes the selected images
+     */
     private void delete(List<String> toBeDeleteImagePathList) {
 
         for(String imagePath : toBeDeleteImagePathList) {
@@ -318,6 +321,9 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
 
     }
 
+    /*
+        uploads the selected files
+     */
     private void upload(List<String> toBeDeleteImagePathList) {
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
@@ -352,6 +358,9 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
 
 
 
+    /*
+        method which receives the result from the activity
+     */
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
         switch (resultCode) {
@@ -376,7 +385,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
                 mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
                 SharedPreferences.Editor e = mPrefs.edit();
-                e.putString("UStatus","true");
+                e.putString("UploadStatus","true");
                 e.commit();
                 adapter.notifyDataSetChanged();
 //                Intent showLocalImageIntent = new Intent(activity, LocalGalleryActivity.class);

@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
 
-        editor.putString("UStatus", "false");
+        editor.putString("UploadStatus", "false");
         //editor.putString("status", "wifi");
         editor.commit();
 
@@ -257,14 +257,14 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         if (cur.moveToFirst()) {
             String album;
-            String fPath;
+            String folderPath;
             int albumLocation = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
             int path = cur.getColumnIndex(MediaStore.Images.Media.DATA);
 
             do {
                 album = cur.getString(albumLocation);
-                fPath = cur.getString(path);
-                File file = new File(fPath);
+                folderPath = cur.getString(path);
+                File file = new File(folderPath);
                 String dir = file.getParent();
                 SharedPreferences.Editor ed = preferencesFiles.edit();
                 ed.putString(album, dir);
@@ -328,6 +328,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
 
         //TODO why start upload here?
+
                 UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
                 mReceiver.setReceiver(this);
                 Intent intent = new Intent(this, UploadService.class);
@@ -470,7 +471,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
                 SharedPreferences.Editor e = mPrefs.edit();
-                e.putString("UStatus","true");
+                e.putString("UploadStatus","true");
                 e.commit();
 //                Intent showLocalImageIntent = new Intent(activity, LocalGalleryActivity.class);
 //                startActivity(showLocalImageIntent);

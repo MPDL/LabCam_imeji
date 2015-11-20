@@ -97,10 +97,10 @@ public class GalleryListActivity extends AppCompatActivity implements UploadResu
             do {
                 Gallery album = new Gallery();
                 album.setGalleryName(cur.getString(albumLocation));
-                String curr = cur.getString(albumLocation);
-                if(!folders1.contains(curr)) {
+                String currentAlbum = cur.getString(albumLocation);
+                if(!folders1.contains(currentAlbum)) {
                     folders.add(album);
-                    folders1.add(curr);
+                    folders1.add(currentAlbum);
                 }
 
                 Log.i("ListingImages", " album=" + album);
@@ -173,7 +173,7 @@ public class GalleryListActivity extends AppCompatActivity implements UploadResu
                 mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
                 SharedPreferences.Editor e = mPrefs.edit();
-                e.putString("UStatus","true");
+                e.putString("UploadStatus","true");
                 e.commit();
                 adapter.notifyDataSetChanged();
 

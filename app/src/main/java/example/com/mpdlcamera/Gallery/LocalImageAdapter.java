@@ -86,12 +86,15 @@ public class LocalImageAdapter extends BaseAdapter {
         return position;
     }
 
+    /*
+        reloads the view everytime the screen refreshes
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         View grid;
-        WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
-        Display display = wm.getDefaultDisplay();
+        WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
 
 
         Point size = new Point();
@@ -109,18 +112,18 @@ public class LocalImageAdapter extends BaseAdapter {
 
         Button buttonCloud = (Button) grid.findViewById(R.id.cloud);
         Button buttonUploading = (Button) grid.findViewById(R.id.uploading);
-        String filep = (String) this.getItem(position);
+        String positionFile = (String) this.getItem(position);
         //buttonUploading.setVisibility(View.INVISIBLE);
 
-        File dir = new File(filep);
-        String file = dir.getName();
+        File directory = new File(positionFile);
+        String file = directory.getName();
         SharedPreferences preferences = activity.getSharedPreferences("myPref", 0);
         String CollectionId = preferences.getString("collectionID","");
         String fileCollectionName = file + CollectionId;
 
         MySQLiteHelper db = new MySQLiteHelper(activity);
 
-        boolean b = db.getFile(fileCollectionName);
+        boolean flag = db.getFile(fileCollectionName);
         //boolean b = true;
 
         List<FileId> fileIds = db.getAllFiles();
@@ -133,7 +136,7 @@ public class LocalImageAdapter extends BaseAdapter {
 
         if(isActiveFolder) {
             //not uploaded for active folder
-            if (!b) {
+            if (!flag) {
                 if (status.equalsIgnoreCase("manual")) {
                     buttonCloud.setVisibility(View.GONE);
                     buttonUploading.setVisibility(View.GONE);
@@ -147,7 +150,7 @@ public class LocalImageAdapter extends BaseAdapter {
             }
         }else {
             //not uploaded for non-active folder
-            if (!b) {
+            if (!flag) {
                 buttonCloud.setVisibility(View.GONE);
                 buttonUploading.setVisibility(View.GONE);
             } else { //uploaded

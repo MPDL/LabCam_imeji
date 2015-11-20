@@ -47,6 +47,9 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
     }
 
 
+    /*
+        creates the view everytime the screen refreshes
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -70,25 +73,28 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
 
             holder.fSwitch.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    Switch sw = (Switch) v;
-                    LocalGallery folder = (LocalGallery) sw.getTag();
+                    Switch mSwitch = (Switch) v;
+                    LocalGallery folder = (LocalGallery) mSwitch.getTag();
 
-                    folder.setSelected(sw.isChecked());
+                    folder.setSelected(mSwitch.isChecked());
                 }
             });
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
+        /*
+            listener method for the switch
+         */
         holder.fSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 if (!isChecked) {
 
-                    RelativeLayout rl = (RelativeLayout) buttonView.getParent();
-                    TextView tv = (TextView) rl.findViewById(R.id.folder);
-                    String folder = tv.getText().toString();
+                    RelativeLayout relativeLayout = (RelativeLayout) buttonView.getParent();
+                    TextView textView = (TextView) relativeLayout.findViewById(R.id.folder);
+                    String folder = textView.getText().toString();
 
                 //    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
                     SharedPreferences settings = mContext.getSharedPreferences("folder", Context.MODE_PRIVATE);
@@ -103,9 +109,9 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
                    // SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(mContext);
                     SharedPreferences settings = mContext.getSharedPreferences("folder", Context.MODE_PRIVATE);
 
-                        RelativeLayout rl = (RelativeLayout) buttonView.getParent();
-                        TextView tv = (TextView) rl.findViewById(R.id.folder);
-                        String folder = tv.getText().toString();
+                        RelativeLayout relativeLayout = (RelativeLayout) buttonView.getParent();
+                        TextView textView = (TextView) relativeLayout.findViewById(R.id.folder);
+                        String folder = textView.getText().toString();
 
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString(folder, "On");
