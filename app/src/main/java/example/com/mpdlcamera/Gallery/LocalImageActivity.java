@@ -87,6 +87,9 @@ public class LocalImageActivity extends AppCompatActivity {
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
+            /*
+                Delete the file if the setting "Remove the photos after upload" is On
+             */
             if(mPrefs.contains("RemovePhotosAfterUpload")) {
                 if(mPrefs.getBoolean("RemovePhotosAfterUpload",true)) {
 

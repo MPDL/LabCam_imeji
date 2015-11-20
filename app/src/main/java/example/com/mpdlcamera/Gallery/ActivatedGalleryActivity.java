@@ -66,6 +66,10 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
     public LocalImageAdapter adapter;
     private GridView gridView;
 
+
+    /*
+        Callback method for the upload process
+     */
     Callback<DataItem> callback = new Callback<DataItem>() {
         @Override
         @Produce
@@ -143,6 +147,9 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = activity.getIntent();
+        /*
+            Sending the galleryname and the corresponding gallerypath for the next activity
+         */
         if (intent != null) {
             galleryName = intent.getStringExtra("galleryName");
             galleryPath = intent.getStringExtra("galleryPath");

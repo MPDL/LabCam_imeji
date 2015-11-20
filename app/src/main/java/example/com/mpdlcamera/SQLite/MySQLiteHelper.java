@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * Created by kiran on 30.10.15.
+ * SQLite Helper class for the database
  */
 public class MySQLiteHelper extends SQLiteOpenHelper {
 
@@ -22,14 +23,16 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
         private static final int DATABASE_VERSION = 1;
 
-        //new database with the name "FileDB" with the columns filename,collectionID and status
+        //new database with the name "FileDB" with the columns (filename+collectionID) and status
         private static final String DATABASE_NAME = "FileDB";
 
+        // table name "file"
         private static final String TABLE_FILE = "file";
 
+        //First Column name "filename"
         private static final String KEY_FILENAME = "filename";
 
-
+        //Second Column name "status" (whether its uploaded or not)
         private static final String KEY_STATUS = "status";
 
 
@@ -42,6 +45,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     }
 
 
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         // SQL statement to create file table
@@ -49,23 +53,23 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 "filename TEXT PRIMARY KEY, " +
                 "status TEXT" + ")";
 
-        // create books table
+        // create file table
         db.execSQL(CREATE_FILE_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Drop older books table if existed
+        // Drop older file table if existed
         db.execSQL("DROP TABLE IF EXISTS books");
 
-        // create fresh books table
+        // create fresh file table
         this.onCreate(db);
     }
 
 
 
     /*
-        inserts the file row into the database
+        inserts the file row into the table
      */
     public void insertFile(FileId fileId) {
         //for logging
@@ -171,13 +175,14 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                 file = new FileId();
                 file.setFileName((cursor.getString(0)));
                 file.setStatus(cursor.getString(1));
-               // book.setAuthor(cursor.getString(2));
 
-                // Add book to books
+
+                // Add file to files
                 fileIds.add(file);
             } while (cursor.moveToNext());
         }
 
+        //Log all the files which are present in the file table
         Log.d("getAllFiles()", fileIds.toString());
 
         return fileIds;

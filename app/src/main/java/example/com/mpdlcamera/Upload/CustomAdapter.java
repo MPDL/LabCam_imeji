@@ -100,7 +100,7 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
                     SharedPreferences settings = mContext.getSharedPreferences("folder", Context.MODE_PRIVATE);
 
                     SharedPreferences.Editor editor = settings.edit();
-                    editor.putString(folder, "Off");
+                    editor.putString(folder, "Off"); //add the status as OFF for the file in the shared preferences.
                     editor.commit();
 
 
@@ -114,7 +114,7 @@ public class CustomAdapter extends ArrayAdapter<LocalGallery> {
                         String folder = textView.getText().toString();
 
                         SharedPreferences.Editor editor = settings.edit();
-                        editor.putString(folder, "On");
+                        editor.putString(folder, "On");  //add the status as ON for the file in the shared preferences.
                         editor.commit();
 
 

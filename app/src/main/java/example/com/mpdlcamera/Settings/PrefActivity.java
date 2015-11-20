@@ -44,6 +44,7 @@ public class PrefActivity extends AppCompatActivity{
         fragmentTransaction.commit();
     }
 
+    //Fragment class which is used to set the preference values for backup settings
     public static class PrefFragment extends PreferenceFragment {
 
         private SwitchPreference switchPreferenceLau;
@@ -67,11 +68,14 @@ public class PrefActivity extends AppCompatActivity{
             switchPreferenceLau = (SwitchPreference) findPreference("LogoutAfterUpload");
             switchPreferenceRpfd = (SwitchPreference) findPreference("RemovePhotosAfterUpload");
             backupPreference = (ListPreference) findPreference("status");
+
+            //set the summary value depending on the preference values
             if(mPrefs.contains("status")) {
                 backupPreference.setSummary(mPrefs.getString("status",""));
             }
             else
                 backupPreference.setSummary("wifi");
+
 
             if(backupPreference != null) {
 
@@ -87,6 +91,7 @@ public class PrefActivity extends AppCompatActivity{
 
             }
 
+            //Logout after uploading
             if(switchPreferenceLau != null) {
 
                 switchPreferenceLau.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -103,6 +108,7 @@ public class PrefActivity extends AppCompatActivity{
 
             }
 
+            //Remove the Photos after uploading
             if(switchPreferenceRpfd != null) {
 
                 switchPreferenceRpfd.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {

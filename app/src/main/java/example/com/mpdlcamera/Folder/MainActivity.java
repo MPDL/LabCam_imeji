@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     CoordinatorLayout rootLayout;
 
 
+
     Callback<List<ImejiFolder>> callback = new Callback<List<ImejiFolder>>() {
         @Override
         public void success(List<ImejiFolder> folderList, Response response) {
@@ -255,6 +256,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
        // final ArrayList<String> folders = new ArrayList<String>();
 
+        /*
+            set the folder path and folder names in shared preferences
+         */
         if (cur.moveToFirst()) {
             String album;
             String folderPath;
@@ -329,6 +333,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         //TODO why start upload here?
 
+                /*
+                    The background service which uploads the files starts here
+                 */
                 UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
                 mReceiver.setReceiver(this);
                 Intent intent = new Intent(this, UploadService.class);
@@ -338,6 +345,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
                 Handler handler = new Handler();
 
+            /*
+                NewFile observer which looks for the new file added to the file system starts here
+             */
                 NewFileObserver newFileObserver = new NewFileObserver(handler,this);
                 getApplicationContext().getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,false, newFileObserver);
 

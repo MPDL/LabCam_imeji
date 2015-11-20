@@ -2,6 +2,7 @@ package example.com.mpdlcamera.SQLite;
 
 /**
  * Created by kiran on 30.10.15.
+ * Class created for the ease of storing uploaded files(filename+collectionId) in database
  */
 public class FileId {
 

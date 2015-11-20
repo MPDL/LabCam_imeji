@@ -54,7 +54,7 @@ public class Thumbnail {
                 String folder = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME));
 
                 if(matchGallery.equals(true) && !folder.equalsIgnoreCase(gallery.getGalleryName())) {
-                    return imagePath;
+                    return imagePath;//returns the image(imagePath) if the folder is selected and if it is the last image of the gallery
                 }
 
                 if (folder.equalsIgnoreCase(gallery.getGalleryName())) {

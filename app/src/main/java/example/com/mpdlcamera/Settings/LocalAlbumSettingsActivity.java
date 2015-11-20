@@ -123,7 +123,7 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
     }
 
     /*
-    Displaying the ListView by using adapter
+        Displaying the ListView by using adapter
      */
     private void displayListView() {
 
@@ -179,6 +179,7 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
         ArrayList<LocalGallery> folderList = new ArrayList<LocalGallery>();
 
 
+        // check the status of the folder in Shared Preferences and set the flag.
         Iterator<String> folderIterator = imageFolders.iterator();
         while (folderIterator.hasNext()) {
             String now = folderIterator.next().toString();
@@ -240,7 +241,7 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
                     listViewLocal.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 
                     listViewLocal.setAdapter(switchAdapter);
-                    switchAdapter.notifyDataSetChanged();
+                    switchAdapter.notifyDataSetChanged(); //refreshes the adapter if there are any changes
 
 
 
@@ -297,6 +298,7 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
     }
 
 
+    //returns the view for the position
     public View getViewByPosition(int position, ListView listView) {
         final int firstListItemPosition = listView.getFirstVisiblePosition();
         final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
@@ -309,6 +311,8 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
         }
     }
 
+
+    //the adapter class which contains all the conents for the listView
     public class CustomAdapter extends ArrayAdapter<LocalGallery> {
 
         Context mContext;

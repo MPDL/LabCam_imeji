@@ -5,6 +5,7 @@ import android.app.backup.FileBackupHelper;
 
 /**
  * Created by kiran on 22.09.15.
+ * the helper which associates for the backup of the files
  */
 public class BackupFileHelper extends BackupAgentHelper {
 

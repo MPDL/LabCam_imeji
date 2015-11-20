@@ -33,6 +33,8 @@ import example.com.mpdlcamera.Upload.UploadResultReceiver;
 
 /**
  * Created by kiran on 22.10.15.
+ * This class has to receive the broadcast message from the file system upon the entry of new file, so this implements Receiver method of
+ * UploadResultReceiver class
  */
 
 public class GalleryListActivity extends AppCompatActivity implements UploadResultReceiver.Receiver {
@@ -90,6 +92,9 @@ public class GalleryListActivity extends AppCompatActivity implements UploadResu
 
         Cursor cur = getContentResolver().query(images, albums, null, null, null);
 
+        /*
+            Listing out all the image folders(Galleries) in the file system.
+         */
         if (cur.moveToFirst()) {
 
             int albumLocation = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
@@ -125,6 +130,9 @@ public class GalleryListActivity extends AppCompatActivity implements UploadResu
 
                 if(status.equalsIgnoreCase("On")) {
 
+                    /*
+                        Sending the galleryname and the gallerypath to the next activity(for the activated gallery)
+                     */
                     Intent activatedGalleryIntent = new Intent(activity, ActivatedGalleryActivity.class);
                     activatedGalleryIntent.putExtra("galleryName", gallery.getGalleryName());
                     activatedGalleryIntent.putExtra("galleryPath", gallery.getGalleryPath());
@@ -133,6 +141,9 @@ public class GalleryListActivity extends AppCompatActivity implements UploadResu
 
                 }
                 else {
+                    /*
+                        Sending the gallerytitle for the next activity(not activated gallery)
+                     */
                     Intent galleryImagesIntent = new Intent(activity, LocalImageActivity.class);
                     galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
 
@@ -141,6 +152,9 @@ public class GalleryListActivity extends AppCompatActivity implements UploadResu
             }
         });
 
+        /*
+            The background service which uploads the files in the filesystem starts here
+         */
         UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
         mReceiver.setReceiver(this);
         Intent intent = new Intent(this, UploadService.class);

@@ -40,7 +40,7 @@ private Context context;
 
 
     /*
-        get the id of the image.
+        returns the ImageID of the latest image(which is added to the file system)
      */
     public int getId() {
 
@@ -70,7 +70,7 @@ private Context context;
     }
 
     /*
-        get the latest image of the gallery
+        get the latest image
      */
         public DataItem getLatestItem() {
 
@@ -134,7 +134,7 @@ private Context context;
 
 
     /*
-        returns the maximum ID (recent image) of the gallery
+        returns the maximum ID (recent image) of the file system
      */
     private void setMaxIdFromDatabase()
     {

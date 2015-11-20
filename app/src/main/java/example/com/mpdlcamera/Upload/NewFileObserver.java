@@ -57,7 +57,7 @@ public class NewFileObserver extends ContentObserver {
     }
 
     /*
-        method which runs when the file changes in the file system.
+        method which runs when there is any change in the file system
      */
     @Override
     public void onChange(boolean selfChange) {
@@ -84,6 +84,7 @@ public class NewFileObserver extends ContentObserver {
             return;
         } else {
 
+            //Upload the files only when the settings is not "manual" so check for the other two options
             if (prefOption.equalsIgnoreCase("both") || (prefOption.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
 
                 FileUploader fileUploader = new FileUploader(context,act);
@@ -97,7 +98,7 @@ public class NewFileObserver extends ContentObserver {
 
                 Boolean flag = db.getFile(imageCollectionName);
 
-                if(!flag) {
+                if(!flag) { // check whether the files is already in the database(if its there, it means the file has been uploaded
 
                     fileUploader.upload(item);
 

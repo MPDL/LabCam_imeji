@@ -70,7 +70,7 @@ public class FileUploader {
         username = mPrefs.getString("username", "");
         password = mPrefs.getString("password", "");
         if (mPrefs.contains("collectionID")) {
-            collectionID = mPrefs.getString("collectionID", "");
+            collectionID = mPrefs.getString("collectionID", ""); // get the CollectionID from the preferences and use the appropriate ColletionID
         } else
             collectionID = DeviceStatus.collectionID;
 
@@ -122,6 +122,7 @@ public class FileUploader {
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
+            //Delete the photos if the settings "Remove the Photos After upload" is on
             if(mPrefs.contains("RemovePhotosAfterUpload")) {
 
                 if(mPrefs.getBoolean("RemovePhotosAfterUpload",true)) {
@@ -137,6 +138,7 @@ public class FileUploader {
 
             }
 
+            //Logout from the app if the settings "Logout after upload" is on
             if(mPrefs.contains("LogoutAfterUpload")) {
 
                 if(mPrefs.getBoolean("LogoutAfterUpload", true)) {

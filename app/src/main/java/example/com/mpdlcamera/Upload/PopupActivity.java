@@ -13,6 +13,7 @@ import example.com.mpdlcamera.R;
 
 /**
  * Created by kiran on 05.11.15.
+ * Activity for the popup which asks the user for the confirmation of logout
  */
 public class PopupActivity extends Activity {
 
@@ -27,6 +28,7 @@ public class PopupActivity extends Activity {
         Button yes = (Button) findViewById(R.id.buttonYes);
         Button no = (Button) findViewById(R.id.buttonNo);
 
+        //If it is yes, then logout
         yes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -37,6 +39,7 @@ public class PopupActivity extends Activity {
             }
         });
 
+        //If it is no, then dismiss the popup window to do nothing
         no.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
