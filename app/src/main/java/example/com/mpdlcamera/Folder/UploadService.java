@@ -315,6 +315,7 @@ public class UploadService extends IntentService {
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
                 if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
+                    //If the error has something to do with the network connection then toast about the network c
                     //Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
                 }
                 else {
@@ -324,11 +325,12 @@ public class UploadService extends IntentService {
                 OttoSingleton.getInstance().post(
                         new UploadEvent(error.getResponse().getStatus()));
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
-                if (jsonBody.contains("already exists")) {
+                if (jsonBody.contains("already exists")) { //If the jsonbody contains already exists error toast the same
 
                     MySQLiteHelper db = new MySQLiteHelper(mContext);
                     String fileName = typedFile.fileName();
-                    FileId fileId = new FileId(fileName,"yes");
+                    String fileCollectionName = fileName + collectionID;
+                    FileId fileId = new FileId(fileCollectionName,"yes");
                     db.insertFile(fileId);
 
 

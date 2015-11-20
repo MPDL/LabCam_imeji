@@ -189,6 +189,16 @@ public class GalleryListAdapter extends BaseAdapter {
 
         int uCount = getUploadingCount(gallery);
         int fCount = gallery.getCount();
+
+        File directory = new File(galleryPath);
+        int fCount2 = 0;
+
+        for (File  file : directory.listFiles())
+        {
+            String fName = file.getName();
+            if(!file.isDirectory() && (fName.endsWith("jpg") || fName.endsWith("jpeg") || fName.endsWith("png") || fName.endsWith("gif")))
+                fCount2++;
+        }
         if(mPreferences.contains(gallery.getGalleryName())) {
 
             status = mPreferences.getString(gallery.getGalleryName(), "");
@@ -214,17 +224,17 @@ public class GalleryListAdapter extends BaseAdapter {
 
 
             if(gallery.getGalleryName().equalsIgnoreCase("Camera")) {
-                title.setText(gallery.getGalleryName() + "(" + (fCount-1) + ")");
+                title.setText(gallery.getGalleryName() + "(" + (fCount2) + ")");
             }
-            else  title.setText(gallery.getGalleryName() + "(" + (fCount) + ")");
+            else  title.setText(gallery.getGalleryName() + "(" + (fCount2) + ")");
 
             mStatus.setText(message);
            // upCount.setVisibility(View.INVISIBLE);
         }
         else {if(gallery.getGalleryName().equalsIgnoreCase("Camera")) {
-            title.setText(gallery.getGalleryName() + "(" + (fCount-1) + ")");
+            title.setText(gallery.getGalleryName() + "(" + (fCount2) + ")");
         }
-            else title.setText(gallery.getGalleryName() + "(" + (fCount) + ")");
+            else title.setText(gallery.getGalleryName() + "(" + (fCount2) + ")");
 
             mStatus.setText("Not Activated");
             upCount.setVisibility(View.GONE);

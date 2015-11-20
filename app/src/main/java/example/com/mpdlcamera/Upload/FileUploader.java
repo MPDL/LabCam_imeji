@@ -166,6 +166,7 @@ public class FileUploader {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
                 if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
                     //Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+                    //
                 }
                 else {
                   //  Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
@@ -187,7 +188,7 @@ public class FileUploader {
     };
 
     /*
-        method which returns the value whether the network available or not
+        method which returns the value whether the network is available or not
      */
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager

@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutorService;
 
 import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.SQLite.FileId;
 import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 
 /**
@@ -24,6 +25,9 @@ public class NewFileObserver extends ContentObserver {
 
     SharedPreferences settings;
 
+    MySQLiteHelper db;
+
+    SharedPreferences nPrefs;
 
     private Context context;
     private Activity act;
@@ -92,15 +96,21 @@ public class NewFileObserver extends ContentObserver {
                 mPrefs = context.getSharedPreferences("myPref", 0);
                 String collectionId = mPrefs.getString("collectionID", "");
 
-                String imageCollectionName = imageName + collectionId;
+                String imageCollectionName = item.getFilename() + collectionId;
 
-                MySQLiteHelper db = new MySQLiteHelper(context);
+                db = new MySQLiteHelper(context);
 
                 Boolean flag = db.getFile(imageCollectionName);
 
                 if(!flag) { // check whether the files is already in the database(if its there, it means the file has been uploaded
 
                     fileUploader.upload(item);
+
+                    nPrefs = context.getSharedPreferences("myPref", 0);
+                    String collectionID = mPrefs.getString("collectionID","");
+                    String fileNamePlusId = item.getFilename() + collectionID;
+                    FileId fileId = new FileId(fileNamePlusId,"yes");
+                    db.insertFile(fileId);
 
                 }
 

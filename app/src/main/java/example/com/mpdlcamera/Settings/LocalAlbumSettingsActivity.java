@@ -115,8 +115,7 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
         networkStatus = networkInfo.getTypeName();
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        prefOption = preferences.getString("status", "");
-
+        prefOption = preferences.getString("status", ""); //get
 
 
 
@@ -146,6 +145,7 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
         checkSyncAll = (CheckBox) LocalAlbumSettingsActivity.this.findViewById(R.id.syncAllCheck);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        //Sync all if the settings for sync all is true in Shared Preferences
         if(preferences.contains("syncall")) {
             if(preferences.getBoolean("syncall",true)) {
                 checkSyncAll.setChecked(true);
@@ -211,13 +211,14 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
         final int size = listViewLocal.getAdapter().getCount();
 
 
+        //OnCLickListener for the Sync All check button
         checkSyncAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (checkSyncAll.isChecked()) {
                     checkAll = true;
                     SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-                    SharedPreferences preferences1 = getSharedPreferences("folder", Context.MODE_PRIVATE);
+                    SharedPreferences preferences1 = getSharedPreferences("folder", Context.MODE_PRIVATE); //get the gallery path of the corresponding gallery from the shared preferences
                     SharedPreferences.Editor ed1 = preferences1.edit();
                     SharedPreferences.Editor ed = preferences.edit();
                     ed.putBoolean("syncall",true);
@@ -226,6 +227,7 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
 
                     Iterator<String> folderIterator = imageFolders.iterator();
 
+                    // Iterate through all the folders and set them checked in view as well as shared preferences
                     while (folderIterator.hasNext()) {
                         String now = folderIterator.next().toString();
                         fStatus = true;
@@ -272,6 +274,7 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
 
                     Iterator<String> folderIterator = imageFolders.iterator();
 
+                    //Iterate through all the folders and set them unchecked in the view as well as in the shared preferences
                     while (folderIterator.hasNext()) {
                         String now = folderIterator.next().toString();
                         fStatus = false;
@@ -431,7 +434,7 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
                     }
                 });
             } else {
-                holder = (ViewHolder) convertView.getTag();
+                holder = (ViewHolder) convertView.getTag(); // View Holder to hold the status for the files
             }
 
                             /*
