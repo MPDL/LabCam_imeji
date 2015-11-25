@@ -97,51 +97,60 @@ public class NewFileObserver extends ContentObserver {
         } else {
 
             //Upload the files only when the settings is not "manual" so check for the other two options
-            if(networkStatus != null) {
-            if (prefOption.equalsIgnoreCase("both") || (prefOption.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
+            //  point:
+            do {
+                ConnectivityManager connectivityManager1 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo1 = connectivityManager1.getActiveNetworkInfo();
+                if(networkInfo1 != null) {
+                    networkStatus = networkInfo1.getTypeName();
+                }
+                if (networkStatus != null) {
+                    if (prefOption.equalsIgnoreCase("both") || (prefOption.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
 
-                FileUploader fileUploader = new FileUploader(context,act);
-                String imageName = item.getFilename();
-                mPrefs = context.getSharedPreferences("myPref", 0);
-                String collectionId = mPrefs.getString("collectionID", "");
+                        FileUploader fileUploader = new FileUploader(context, act);
+                        String imageName = item.getFilename();
+                        mPrefs = context.getSharedPreferences("myPref", 0);
+                        String collectionId = mPrefs.getString("collectionID", "");
 
-                String imageCollectionName = item.getFilename() + collectionId;
+                        String imageCollectionName = item.getFilename() + collectionId;
 
-                db = new MySQLiteHelper(context);
+                        db = new MySQLiteHelper(context);
 
-                String fileStatus = db.getFileStatus(imageCollectionName);
+                        String fileStatus = db.getFileStatus(imageCollectionName);
 
-                if(fileStatus.equalsIgnoreCase("not present") || fileStatus.equalsIgnoreCase("failed")) { // check whether the files is already in the database(if its there, it means the file has been uploaded
+                        if (fileStatus.equalsIgnoreCase("not present") || fileStatus.equalsIgnoreCase("failed")) { // check whether the files is already in the database(if its there, it means the file has been uploaded
 
-                    fileUploader.upload(item);
+                            fileUploader.upload(item);
 
-                 //   SharedPreferences filePreferences = context.
-                    String fileNamePlusId = item.getFilename() + collectionID;
+                            //   SharedPreferences filePreferences = context.
+                            String fileNamePlusId = item.getFilename() + collectionID;
 
-                    if(!(db.getFileStatus(fileNamePlusId).equalsIgnoreCase("not present"))) {
+                            if (!(db.getFileStatus(fileNamePlusId).equalsIgnoreCase("not present"))) {
 
-                        db.updateFileStatus(fileNamePlusId,"uploaded");
-                        //  FileId fileId = new FileId(fileNamePlusId, "uploaded");
+                                db.updateFileStatus(fileNamePlusId, "uploaded");
+                                //  FileId fileId = new FileId(fileNamePlusId, "uploaded");
+
+                            } else {
+                                FileId fileId = new FileId(fileNamePlusId, "uploaded");
+                                db.insertFile(fileId);
+
+                            }
+                            // FileId fileId = new FileId(fileNamePlusId,"uploading");
+                            // db.insertFile(fileId);
+
+                        }
 
                     }
-                    else {
-                        FileId fileId = new FileId(fileNamePlusId, "uploaded");
-                        db.insertFile(fileId);
-
-                    }
-                   // FileId fileId = new FileId(fileNamePlusId,"uploading");
-                   // db.insertFile(fileId);
 
                 }
-
             }
+            while (networkStatus == null);
 
+//            else if(networkStatus == null ) {
+//
+//                    break point;
+//            }
 
 
         }
-
-
-    }
-
-
 } }

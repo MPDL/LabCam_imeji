@@ -46,6 +46,7 @@ public class GalleryListAdapter extends BaseAdapter {
     private ArrayList<Gallery> galleries = new ArrayList<Gallery>();
     private String localPath;
     private ArrayList<String> galleriesOne = new ArrayList<>();
+    private String CollectionId;
     boolean flag = false;
     Boolean matchGallery = false;
   //  SharedPreferences mPreferences;
@@ -186,6 +187,8 @@ public class GalleryListAdapter extends BaseAdapter {
         }
         SharedPreferences mPreferences = activity.getSharedPreferences("folder", Context.MODE_PRIVATE);
         SharedPreferences nPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        SharedPreferences filePreferences = activity.getSharedPreferences("myPref", 0);
+        CollectionId = filePreferences.getString("collectionID","");
 
         int uCount = getUploadingCount(gallery);
         int fCount = gallery.getCount();
@@ -207,7 +210,7 @@ public class GalleryListAdapter extends BaseAdapter {
             if (status.equalsIgnoreCase("On")) {
 
                 if (nPreferences.getString("UploadStatus", "").equalsIgnoreCase("true")) {
-                    message = "Uploaded....";
+                    message = "Uploaded";
                   //  progressBar.setVisibility(View.INVISIBLE);
                     upCount.setVisibility(View.GONE);
 
@@ -261,7 +264,8 @@ public class GalleryListAdapter extends BaseAdapter {
         for(File imageFile : files) {
 
             String fileName = imageFile.getName();
-            if(db.getFile(fileName)){
+            String filePlusId = fileName + CollectionId;
+            if(db.getFileStatus(filePlusId).equalsIgnoreCase("uploaded")){
                 uploadCount++;
             }
         }

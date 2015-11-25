@@ -123,7 +123,7 @@ public class LocalImageAdapter extends BaseAdapter {
 
         MySQLiteHelper db = new MySQLiteHelper(activity);
 
-        boolean flag = db.getFile(fileCollectionName);
+        String fileStatus = db.getFileStatus(fileCollectionName);
         //boolean b = true;
 
         List<FileId> fileIds = db.getAllFiles();
@@ -136,27 +136,39 @@ public class LocalImageAdapter extends BaseAdapter {
 
         if(isActiveFolder) {
             //not uploaded for active folder
-            if (!flag) {
-                if (status.equalsIgnoreCase("manual")) {
+            if (fileStatus.equalsIgnoreCase("not present") || fileStatus.equalsIgnoreCase("failed")) {
+              //  if (status.equalsIgnoreCase("manual")) {
                     buttonCloud.setVisibility(View.GONE);
                     buttonUploading.setVisibility(View.GONE);
-                } else {
-                    buttonCloud.setVisibility(View.GONE);
-                    buttonUploading.setVisibility(View.VISIBLE);
+               // } else {
+                //    buttonCloud.setVisibility(View.GONE);
+                //    buttonUploading.setVisibility(View.GONE);
                 }
-            } else{ //uploaded
+             else if(fileStatus.equalsIgnoreCase("uploading")){ //uploading
+                buttonCloud.setVisibility(View.GONE);
+                buttonUploading.setVisibility(View.VISIBLE);
+            }
+              else {
+
                 buttonCloud.setVisibility(View.VISIBLE);
                 buttonUploading.setVisibility(View.GONE);
-            }
+        }
+
         }else {
             //not uploaded for non-active folder
-            if (!flag) {
+            if (fileStatus.equalsIgnoreCase("not present") || fileStatus.equalsIgnoreCase("failed")) {
                 buttonCloud.setVisibility(View.GONE);
                 buttonUploading.setVisibility(View.GONE);
-            } else { //uploaded
+            } else if(fileStatus.equalsIgnoreCase("uploading")){ //uploading
+                buttonCloud.setVisibility(View.GONE);
+                buttonUploading.setVisibility(View.VISIBLE);
+            }
+            else {
+
                 buttonCloud.setVisibility(View.VISIBLE);
                 buttonUploading.setVisibility(View.GONE);
             }
+
         }
 
         grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light));

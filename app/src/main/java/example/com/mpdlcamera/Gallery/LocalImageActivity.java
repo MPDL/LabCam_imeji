@@ -82,8 +82,9 @@ public class LocalImageActivity extends AppCompatActivity {
 
             MySQLiteHelper db = new MySQLiteHelper(activity);
             String fileNamePlusId = dataItem.getFilename() + dataCollectionId;
-            FileId fileId = new FileId(fileNamePlusId,"yes");
+            FileId fileId = new FileId(fileNamePlusId,"uploaded");
             db.insertFile(fileId);
+
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
@@ -108,6 +109,11 @@ public class LocalImageActivity extends AppCompatActivity {
         @Override
         public void failure(RetrofitError error) {
 
+            MySQLiteHelper db = new MySQLiteHelper(activity);
+            String fileNamePlusId = typedFile.fileName() + dataCollectionId;
+            FileId fileId = new FileId(fileNamePlusId,"failed");
+            db.insertFile(fileId);
+
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
                 if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
@@ -122,6 +128,8 @@ public class LocalImageActivity extends AppCompatActivity {
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                 if (jsonBody.contains("already exists")) {
                     Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
+                    //FileId newFileId = new FileId(fileNamePlusId,"")
+                    db.updateFileStatus(fileNamePlusId,"uploaded");
                 }
                 else {
                     Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
@@ -347,9 +355,9 @@ public class LocalImageActivity extends AppCompatActivity {
 
 
 
-    /*
-        upload the selected files
-     */
+        /*
+            upload the selected files
+        */
     private void upload(List<String> fileList) {
         circularButton.setVisibility(View.VISIBLE);
         circularButton.setIndeterminateProgressMode(true); // turn on indeterminate progress
@@ -360,12 +368,24 @@ public class LocalImageActivity extends AppCompatActivity {
                 "\"";
 
         for (String filePath : fileList) {
-            typedFile = new TypedFile("multipart/form-data", new File(filePath));
+            File file = new File(filePath);
+            File imageFile = file.getAbsoluteFile();
+            String fileName = imageFile.getName();
+            String filePlusId = fileName + dataCollectionId;
+            MySQLiteHelper db = new MySQLiteHelper(activity);
+            FileId fileId = new FileId(filePlusId,"uploaded");
+            String status = db.getFileStatus(filePlusId);
+            if(status.equalsIgnoreCase("not present") || status.equalsIgnoreCase("failed")) {
+                db.insertFile(fileId);
 
-            json ="{" + jsonPart1  +"}";
 
-            Log.v(LOG_TAG, json);
-            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+                typedFile = new TypedFile("multipart/form-data", new File(filePath));
+
+                json = "{" + jsonPart1 + "}";
+
+                Log.v(LOG_TAG, json);
+                RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+            }
         }
     }
 

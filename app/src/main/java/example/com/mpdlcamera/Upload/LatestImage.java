@@ -101,18 +101,18 @@ private Context context;
                             item = new DataItem();
                             item.setFilename(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME)));
                             item.setLocalPath(cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA)));
-                            meta.setTags(null);
-                            meta.setAddress("blabla");
-                            meta.setTitle(item.getFilename());
-                            meta.setCreator(user.getCompleteName());
+                          //  meta.setTags(null);
+                          //  meta.setAddress("blabla");
+                          //  meta.setTitle(item.getFilename());
+                          //  meta.setCreator(user.getCompleteName());
 
                             item.setCollectionId(collectionID);
 
-                            item.setMetadata(meta);
+                          //  item.setMetadata(meta);
 
-                            item.setCreatedBy(user);
+                          //  item.setCreatedBy(user);
 
-                            meta.save();
+                          //  meta.save();
                             item.save();
                             break;
 

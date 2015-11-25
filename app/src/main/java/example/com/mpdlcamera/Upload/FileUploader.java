@@ -81,7 +81,7 @@ public class FileUploader {
                 .serializeNulls()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
-        item.getMetadata().setDeviceID("1");
+//        item.getMetadata().setDeviceID("1");
         typedFile = new TypedFile("multipart/form-data", new File(item.getLocalPath()));
 
         json = "{" + jsonPart1 + "}";
@@ -110,9 +110,21 @@ public class FileUploader {
             MySQLiteHelper db = new MySQLiteHelper(context);
 
             String fileNamePlusId = dataItem.getFilename() + collectionID;
-            FileId fileId = new FileId(fileNamePlusId,"yes");
 
-            db.insertFile(fileId);
+            if(!(db.getFileStatus(fileNamePlusId).equalsIgnoreCase("not present"))) {
+
+                db.updateFileStatus(fileNamePlusId,"uploaded");
+                //  FileId fileId = new FileId(fileNamePlusId, "uploaded");
+
+            }
+            else {
+                FileId fileId = new FileId(fileNamePlusId, "uploaded");
+                db.insertFile(fileId);
+
+            }
+          //  FileId fileId = new FileId(fileNamePlusId,"uploaded");
+
+          //  db.insertFile(fileId);
 
             List<FileId> fileIds;
             fileIds = db.getAllFiles();
@@ -162,6 +174,13 @@ public class FileUploader {
         @Override
         public void failure(RetrofitError error) {
 
+
+            MySQLiteHelper db = new MySQLiteHelper(context);
+            String fileName = typedFile.fileName();
+            String fileCollectionName = fileName + collectionID;
+
+            db.updateFileStatus(fileCollectionName,"failed");
+
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
                 if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
@@ -176,6 +195,19 @@ public class FileUploader {
                         new UploadEvent(error.getResponse().getStatus()));
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                 if (jsonBody.contains("already exists")) {
+
+
+                    if(!(db.getFileStatus(fileCollectionName).equalsIgnoreCase("not present"))) {
+
+                        db.updateFileStatus(fileCollectionName,"uploaded");
+                        //  FileId fileId = new FileId(fileNamePlusId, "uploaded");
+
+                    }
+                    else {
+                        FileId fileId = new FileId(fileCollectionName, "uploaded");
+                        db.insertFile(fileId);
+
+                    }
                 }
               //  else
                 //    Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();

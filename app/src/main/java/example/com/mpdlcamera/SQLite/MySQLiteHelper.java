@@ -99,7 +99,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     /*
         returns the row having the file in the database
      */
-    public Boolean getFile(String fileName) {
+    public String getFileStatus(String fileName) {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -118,13 +118,34 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         // cursor = db.rawQuery("select * from file where filename = ('" + fileName + "')",null);
 
         String Query = "Select * from " + TABLE_FILE + " where " + KEY_FILENAME + " = " + "'" + fileName + "'";
-        cursor = db.rawQuery(Query, null);
+        String status = null;
+                cursor = db.rawQuery(Query, null);
         if (cursor.getCount() <= 0) {
             cursor.close();
-            return false;
+            return "not present";
         }
-        cursor.close();
-        return true;
+        else {
+            if(cursor != null && cursor.moveToFirst()) {
+                // num = cursor.getString(cursor.getColumnIndex("ContactNumber"));
+
+                status = cursor.getString(cursor.getColumnIndex(KEY_STATUS));
+            }
+            cursor.close();
+            return status;
+        }
+
+    }
+
+
+    public void updateFileStatus(String fileCollectionName, String status) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor;
+
+        String Query = "UPDATE " + TABLE_FILE + " SET " + KEY_STATUS + " = " + "'" + status + "'" + " where " + KEY_FILENAME + " = " + "'" + fileCollectionName + "'";
+
+        db.execSQL(Query);
 
     }
     //   }

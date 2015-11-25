@@ -25,6 +25,7 @@ import com.squareup.otto.Produce;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import example.com.mpdlcamera.Model.DataItem;
@@ -145,33 +146,48 @@ public class UploadService extends IntentService {
                                     String imageCollectionName = imageName + collectionId;
                                     MySQLiteHelper database = new MySQLiteHelper(mContext);
 
-                                    Boolean fileFlag = database.getFile(imageCollectionName);
+                                    String fileStatus = database.getFileStatus(imageCollectionName);
 
-                                    if(!fileFlag)
+                                    if(fileStatus.equalsIgnoreCase("not present") || fileStatus.equalsIgnoreCase("failed"))
 
                                     {
+
                                         item.setFilename(imageName);
 
-                                        meta.setTags(null);
+                                    //    meta.setTags(null);
 
-                                        meta.setAddress("blabla");
+                                    //    meta.setAddress("blabla");
 
-                                        meta.setTitle(imageName);
+                                    //    meta.setTitle(imageName);
 
-                                        meta.setCreator(user.getCompleteName());
+                                     //   meta.setCreator(user.getCompleteName());
 
                                         item.setCollectionId(collectionID);
 
-                                        item.setLocalPath(imageFile.toString());
+                                          item.setLocalPath(imageFile.toString());
 
-                                        item.setMetadata(meta);
+                                     //   item.setMetadata(meta);
 
-                                        item.setCreatedBy(user);
+                                       // item.setCreatedBy(user);
 
-                                        meta.save();
+                                        //meta.save();
                                         item.save();
 
                                         upload(item);
+
+                                        if(!(database.getFileStatus(imageCollectionName).equalsIgnoreCase("not present"))) {
+
+                                            database.updateFileStatus(imageCollectionName,"uploading");
+                                            //  FileId fileId = new FileId(fileNamePlusId, "uploaded");
+
+                                        }
+                                        else {
+                                            FileId fileId = new FileId(imageCollectionName, "uploading");
+                                            database.insertFile(fileId);
+
+                                        }
+                                     //   FileId fileId = new FileId(imageCollectionName,"uploading");
+
                                     }
 
 
@@ -259,7 +275,7 @@ public class UploadService extends IntentService {
                 .serializeNulls()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
-        item.getMetadata().setDeviceID("1");
+       // item.getMetadata().setDeviceID("1");
         typedFile = new TypedFile("multipart/form-data", new File(item.getLocalPath()));
 
         json = "{" + jsonPart1 + "}";
@@ -285,9 +301,21 @@ public class UploadService extends IntentService {
            //SQLiteDatabase dBase = mContext.get
 
             String fileNamePlusId = dataItem.getFilename() + collectionID;
-            FileId fileId = new FileId(fileNamePlusId,"yes");
 
-            db.insertFile(fileId);
+            if(!(db.getFileStatus(fileNamePlusId).equalsIgnoreCase("not present"))) {
+
+                db.updateFileStatus(fileNamePlusId,"uploaded");
+              //  FileId fileId = new FileId(fileNamePlusId, "uploaded");
+
+            }
+            else {
+                FileId fileId = new FileId(fileNamePlusId, "uploaded");
+                db.insertFile(fileId);
+
+            }
+
+            List<FileId> fileIds = db.getAllFiles();
+          //  db.insertFile(fileId);
 
             Toast.makeText(mContext, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
             Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
@@ -312,6 +340,14 @@ public class UploadService extends IntentService {
         @Override
         public void failure(RetrofitError error) {
 
+            MySQLiteHelper db = new MySQLiteHelper(mContext);
+            String fileName = typedFile.fileName();
+            String fileCollectionName = fileName + collectionID;
+
+            db.updateFileStatus(fileCollectionName,"failed");
+
+
+
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
                 if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
@@ -325,13 +361,23 @@ public class UploadService extends IntentService {
                 OttoSingleton.getInstance().post(
                         new UploadEvent(error.getResponse().getStatus()));
                 String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
-                if (jsonBody.contains("already exists")) { //If the jsonbody contains already exists error toast the same
+                if (jsonBody.contains("already exists")) { //If the jsonbody contains "already exists" error toast the same
 
-                    MySQLiteHelper db = new MySQLiteHelper(mContext);
-                    String fileName = typedFile.fileName();
-                    String fileCollectionName = fileName + collectionID;
-                    FileId fileId = new FileId(fileCollectionName,"yes");
-                    db.insertFile(fileId);
+
+                    if(!(db.getFileStatus(fileCollectionName).equalsIgnoreCase("not present"))) {
+
+                        db.updateFileStatus(fileCollectionName,"uploaded");
+                        //  FileId fileId = new FileId(fileNamePlusId, "uploaded");
+
+                    }
+                    else {
+                        FileId fileId = new FileId(fileCollectionName, "uploaded");
+                        db.insertFile(fileId);
+
+                    }
+
+                  //  FileId fileId = new FileId(fileCollectionName,"uploaded");
+                  //  db.insertFile(fileId);
 
 
 
