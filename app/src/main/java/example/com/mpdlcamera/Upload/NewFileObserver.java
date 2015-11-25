@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import java.util.concurrent.ExecutorService;
 
@@ -32,7 +33,7 @@ public class NewFileObserver extends ContentObserver {
     private Context context;
     private Activity act;
     private SharedPreferences mPrefs;
-
+    private String collectionID;
 
     FileUploader fileUploader = new FileUploader();
 
@@ -66,14 +67,21 @@ public class NewFileObserver extends ContentObserver {
     @Override
     public void onChange(boolean selfChange) {
 
+        Log.v("observer","started");
+
         settings = PreferenceManager.getDefaultSharedPreferences(context);
 
         String prefOption = settings.getString("status", "");
 
+        nPrefs = context.getSharedPreferences("myPref", 0);
+        collectionID = nPrefs.getString("collectionID", "");
+
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        String networkStatus;
-        networkStatus = networkInfo.getTypeName();
+        String networkStatus = null;
+        if(networkInfo != null) {
+            networkStatus = networkInfo.getTypeName();
+        }
 
         LatestImage imageLatest = new LatestImage(context);
         int imageId = imageLatest.getId();
@@ -89,6 +97,7 @@ public class NewFileObserver extends ContentObserver {
         } else {
 
             //Upload the files only when the settings is not "manual" so check for the other two options
+            if(networkStatus != null) {
             if (prefOption.equalsIgnoreCase("both") || (prefOption.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
 
                 FileUploader fileUploader = new FileUploader(context,act);
@@ -100,21 +109,33 @@ public class NewFileObserver extends ContentObserver {
 
                 db = new MySQLiteHelper(context);
 
-                Boolean flag = db.getFile(imageCollectionName);
+                String fileStatus = db.getFileStatus(imageCollectionName);
 
-                if(!flag) { // check whether the files is already in the database(if its there, it means the file has been uploaded
+                if(fileStatus.equalsIgnoreCase("not present") || fileStatus.equalsIgnoreCase("failed")) { // check whether the files is already in the database(if its there, it means the file has been uploaded
 
                     fileUploader.upload(item);
 
-                    nPrefs = context.getSharedPreferences("myPref", 0);
-                    String collectionID = mPrefs.getString("collectionID","");
+                 //   SharedPreferences filePreferences = context.
                     String fileNamePlusId = item.getFilename() + collectionID;
-                    FileId fileId = new FileId(fileNamePlusId,"yes");
-                    db.insertFile(fileId);
+
+                    if(!(db.getFileStatus(fileNamePlusId).equalsIgnoreCase("not present"))) {
+
+                        db.updateFileStatus(fileNamePlusId,"uploaded");
+                        //  FileId fileId = new FileId(fileNamePlusId, "uploaded");
+
+                    }
+                    else {
+                        FileId fileId = new FileId(fileNamePlusId, "uploaded");
+                        db.insertFile(fileId);
+
+                    }
+                   // FileId fileId = new FileId(fileNamePlusId,"uploading");
+                   // db.insertFile(fileId);
 
                 }
 
             }
+
 
 
         }
@@ -123,4 +144,4 @@ public class NewFileObserver extends ContentObserver {
     }
 
 
-}
+} }
