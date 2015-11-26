@@ -90,11 +90,10 @@ public class UploadService extends IntentService {
             mPrefs = this.getSharedPreferences("myPref", 0);
             username = mPrefs.getString("username", "");
             password = mPrefs.getString("password", "");
-            if(mPrefs.contains("collectionID")) {
-                collectionID = mPrefs.getString("collectionID","");
-            }
-            else
-               collectionID = DeviceStatus.collectionID;
+            if (mPrefs.contains("collectionID")) {
+                collectionID = mPrefs.getString("collectionID", "");
+            } else
+                collectionID = DeviceStatus.collectionID;
 
             Uri uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
             String[] projection = {MediaStore.MediaColumns.DATA,
@@ -102,6 +101,9 @@ public class UploadService extends IntentService {
             Cursor cursor = this.getContentResolver().query(uri, projection, null,
                     null, null);
 
+            final ResultReceiver receiver = intent.getParcelableExtra("receiver");
+
+            if(cursor != null) {
             int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
 
 
@@ -109,50 +111,49 @@ public class UploadService extends IntentService {
                     .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
 
             int column_index_file_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
-            final ResultReceiver receiver = intent.getParcelableExtra("receiver");
 
             Bundle bundle = new Bundle();
 
-                try {
+            try {
 
-                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-                    SharedPreferences preferencesFiles = getSharedPreferences("gallery", Context.MODE_PRIVATE);
-                    SharedPreferences preferencesFolders = getSharedPreferences("folder", Context.MODE_PRIVATE);
-                    HashMap<String, String> folderSyncMap = new HashMap<String, String>();
-                    folderSyncMap = (HashMap) preferencesFolders.getAll();
-                    String status = preferences.getString("status", "");
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences preferencesFiles = getSharedPreferences("gallery", Context.MODE_PRIVATE);
+                SharedPreferences preferencesFolders = getSharedPreferences("folder", Context.MODE_PRIVATE);
+                HashMap<String, String> folderSyncMap = new HashMap<String, String>();
+                folderSyncMap = (HashMap) preferencesFolders.getAll();
+                String status = preferences.getString("status", "");
 
 
-                    if (status.equalsIgnoreCase("both") || (status.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
+                if (status.equalsIgnoreCase("both") || (status.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
 
-                        for (Map.Entry<String, String> entry : folderSyncMap.entrySet()) {
+                    for (Map.Entry<String, String> entry : folderSyncMap.entrySet()) {
 
-                          //  if(String.valueOf())entry.getValue().toString().
+                        //  if(String.valueOf())entry.getValue().toString().
 
-                            if (String.valueOf(entry.getValue()).equalsIgnoreCase("On")) {
+                        if (String.valueOf(entry.getValue()).equalsIgnoreCase("On")) {
 
-                                String folderName = (String) entry.getKey();
+                            String folderName = (String) entry.getKey();
 
-                                String directoryPath = preferencesFiles.getString(folderName,"");
+                            String directoryPath = preferencesFiles.getString(folderName, "");
 
-                                File folder = new File(directoryPath);
-                                File[] folderFiles = folder.listFiles();
+                            File folder = new File(directoryPath);
+                            File[] folderFiles = folder.listFiles();
 
-                                for(File imageFile : folderFiles) {
+                            for (File imageFile : folderFiles) {
 
-                                    String imageName = imageFile.getName().toString();
-                                    nPrefs = getSharedPreferences("myPref", 0);
-                                    String collectionId = mPrefs.getString("collectionID","");
-                                    String imageCollectionName = imageName + collectionId;
-                                    MySQLiteHelper database = new MySQLiteHelper(mContext);
+                                String imageName = imageFile.getName().toString();
+                                nPrefs = getSharedPreferences("myPref", 0);
+                                String collectionId = mPrefs.getString("collectionID", "");
+                                String imageCollectionName = imageName + collectionId;
+                                MySQLiteHelper database = new MySQLiteHelper(mContext);
 
-                                    String fileStatus = database.getFileStatus(imageCollectionName);
+                                String fileStatus = database.getFileStatus(imageCollectionName);
 
-                                    if(fileStatus.equalsIgnoreCase("not present") || fileStatus.equalsIgnoreCase("failed"))
+                                if (fileStatus.equalsIgnoreCase("not present") || fileStatus.equalsIgnoreCase("failed"))
 
-                                    {
+                                {
 
-                                        item.setFilename(imageName);
+                                    item.setFilename(imageName);
 
                                     //    meta.setTags(null);
 
@@ -160,38 +161,37 @@ public class UploadService extends IntentService {
 
                                     //    meta.setTitle(imageName);
 
-                                     //   meta.setCreator(user.getCompleteName());
+                                    //   meta.setCreator(user.getCompleteName());
 
-                                        item.setCollectionId(collectionID);
+                                    item.setCollectionId(collectionID);
 
-                                          item.setLocalPath(imageFile.toString());
+                                    item.setLocalPath(imageFile.toString());
 
-                                     //   item.setMetadata(meta);
+                                    //   item.setMetadata(meta);
 
-                                       // item.setCreatedBy(user);
+                                    // item.setCreatedBy(user);
 
-                                        //meta.save();
-                                        item.save();
+                                    //meta.save();
+                                    item.save();
 
-                                        upload(item);
+                                    upload(item);
 
-                                        if(!(database.getFileStatus(imageCollectionName).equalsIgnoreCase("not present"))) {
+                                    if (!(database.getFileStatus(imageCollectionName).equalsIgnoreCase("not present"))) {
 
-                                            database.updateFileStatus(imageCollectionName,"uploading");
-                                            //  FileId fileId = new FileId(fileNamePlusId, "uploaded");
+                                        database.updateFileStatus(imageCollectionName, "uploading");
+                                        //  FileId fileId = new FileId(fileNamePlusId, "uploaded");
 
-                                        }
-                                        else {
-                                            FileId fileId = new FileId(imageCollectionName, "uploading");
-                                            database.insertFile(fileId);
-
-                                        }
-                                     //   FileId fileId = new FileId(imageCollectionName,"uploading");
+                                    } else {
+                                        FileId fileId = new FileId(imageCollectionName, "uploading");
+                                        database.insertFile(fileId);
 
                                     }
-
+                                    //   FileId fileId = new FileId(imageCollectionName,"uploading");
 
                                 }
+
+
+                            }
 
 
 
@@ -235,16 +235,18 @@ public class UploadService extends IntentService {
                                         }
                                     }
                                 }*/
-                            }
                         }
                     }
+                }
 
-                }catch (Exception e) {
+            } catch (Exception e) {
 
                     /* Sending error message back to activity */
-                    bundle.putString(Intent.EXTRA_TEXT, e.toString());
-                    receiver.send(0, bundle);
-                }
+                bundle.putString(Intent.EXTRA_TEXT, e.toString());
+                receiver.send(0, bundle);
+            }
+
+        }
 
                 receiver.send(1, Bundle.EMPTY);
 

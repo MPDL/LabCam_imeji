@@ -183,6 +183,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        Log.v("Main activity", "started");
+
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -259,23 +262,25 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         /*
             set the folder path and folder names in shared preferences
          */
-        if (cur.moveToFirst()) {
-            String album;
-            String folderPath;
-            int albumLocation = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-            int path = cur.getColumnIndex(MediaStore.Images.Media.DATA);
+        if(cur != null) {
+            if (cur.moveToFirst()) {
+                String album;
+                String folderPath;
+                int albumLocation = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+                int path = cur.getColumnIndex(MediaStore.Images.Media.DATA);
 
-            do {
-                album = cur.getString(albumLocation);
-                folderPath = cur.getString(path);
-                File file = new File(folderPath);
-                String dir = file.getParent();
-                SharedPreferences.Editor ed = preferencesFiles.edit();
-                ed.putString(album, dir);
-                ed.commit();
-               // folders.add(album);
-                Log.i("ListingImages", " album=" + album);
-            } while (cur.moveToNext());
+                do {
+                    album = cur.getString(albumLocation);
+                    folderPath = cur.getString(path);
+                    File file = new File(folderPath);
+                    String dir = file.getParent();
+                    SharedPreferences.Editor ed = preferencesFiles.edit();
+                    ed.putString(album, dir);
+                    ed.commit();
+                    // folders.add(album);
+                    Log.i("ListingImages", " album=" + album);
+                } while (cur.moveToNext());
+            }
         }
 
 
