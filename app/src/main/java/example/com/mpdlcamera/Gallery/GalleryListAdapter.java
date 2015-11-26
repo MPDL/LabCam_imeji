@@ -209,16 +209,18 @@ public class GalleryListAdapter extends BaseAdapter {
 
             if (status.equalsIgnoreCase("On")) {
 
-                if (nPreferences.getString("UploadStatus", "").equalsIgnoreCase("true")) {
-                    message = "Uploaded";
-                  //  progressBar.setVisibility(View.INVISIBLE);
-                    upCount.setVisibility(View.GONE);
-
-                } else {
-                    message = "Uploading";
-                    upCount.setText(gallery.getCount()-uCount + "file(s) are remaining");
-                 //   progressBar.setVisibility(View.INVISIBLE);
-                }
+                message = "Activated";
+                upCount.setVisibility(View.INVISIBLE);
+//                if (nPreferences.getString("UploadStatus", "").equalsIgnoreCase("true")) {
+//                    message = "Uploaded";
+//                  //  progressBar.setVisibility(View.INVISIBLE);
+//                    upCount.setVisibility(View.GONE);
+//
+//                } else {
+//                    message = "Uploading";
+//                    upCount.setText(gallery.getCount()-uCount + "file(s) are remaining");
+//                 //   progressBar.setVisibility(View.INVISIBLE);
+//                }
             } else {
                 message = "Not Activated";
               //  progressBar.setVisibility(View.INVISIBLE);
