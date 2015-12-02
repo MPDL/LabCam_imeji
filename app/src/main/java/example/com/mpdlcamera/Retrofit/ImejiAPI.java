@@ -65,7 +65,7 @@ public interface ImejiAPI {
      *  For collections
     */
     //get all collections
-    @GET("/collections")
+    @GET(value = "/collections?size=30")
     void getCollections(Callback<List<ImejiFolder>> callback);
 
     //get all items by collection id

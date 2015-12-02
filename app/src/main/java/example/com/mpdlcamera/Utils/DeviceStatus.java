@@ -19,6 +19,7 @@ public class DeviceStatus {
     public static final String password = "";
     public static final String collectionID = "0L5yLxP_AphUMtIi";
     public static final String queryKeyword = "MPDLCam";
+ //   public static final String BASE_URL= "";
     public static final String BASE_URL = "https://dev-faces.mpdl.mpg.de/rest/";
 
     // Checks whether the device currently has a network connection
