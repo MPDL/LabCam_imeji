@@ -98,7 +98,12 @@ public class NewFileObserver extends ContentObserver {
 
             //Upload the files only when the settings is not "manual" so check for the other two options
             //  point:
-            do {
+                /**
+                 *  This "do...while" tries to check the internet connection when there is no internet,
+                 *  but  while (networkStatus == null) can not act as a listener"
+                 */
+
+                //TODO: add a WIFI listener
                 ConnectivityManager connectivityManager1 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo networkInfo1 = connectivityManager1.getActiveNetworkInfo();
                 if(networkInfo1 != null) {
@@ -143,14 +148,5 @@ public class NewFileObserver extends ContentObserver {
                     }
 
                 }
-            }
-            while (networkStatus == null);
-
-//            else if(networkStatus == null ) {
-//
-//                    break point;
-//            }
-
-
         }
 } }
