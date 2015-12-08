@@ -49,10 +49,12 @@ private Context context;
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         Cursor cursor = context.getContentResolver().query(uri, columns, null, null, MediaStore.Images.Media._ID + " DESC");
 
+        // no image in file system
         if (!cursor.moveToFirst()) {
             return -1;
         }
 
+        //ColumnIndex for image ID
         latestId = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media._ID));
         setMaxIdFromDatabase();
         int maxId = getMaxId();
@@ -86,7 +88,6 @@ private Context context;
 
             Uri image = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, latestId);
             Cursor cursor = context.getContentResolver().query(image,columns,null,null,null);
-
 
             if(cursor.moveToFirst()) {
 
@@ -138,8 +139,12 @@ private Context context;
      */
     private void setMaxIdFromDatabase()
     {
+
+        //
         String columns[] = new String[]{ MediaStore.Images.Media._ID, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.MINI_THUMB_MAGIC };
         Cursor cursor    = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, null, null, MediaStore.Images.Media._ID + " DESC");
+
+        //get latest image ID
         maxId            = cursor.moveToFirst() ? cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media._ID)) : -1;
     }
 

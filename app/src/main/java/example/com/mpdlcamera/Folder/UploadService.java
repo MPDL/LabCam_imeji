@@ -185,12 +185,12 @@ public class UploadService extends IntentService {
 
                     /* Sending error message back to activity */
                 bundle.putString(Intent.EXTRA_TEXT, e.toString());
-                receiver.send(0, bundle);
+//                receiver.send(0, bundle);
             }
 
         }
 
-                receiver.send(1, Bundle.EMPTY);
+//                receiver.send(1, Bundle.EMPTY);
 
 
 

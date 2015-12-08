@@ -86,6 +86,7 @@ public class NewFileObserver extends ContentObserver {
         LatestImage imageLatest = new LatestImage(context);
         int imageId = imageLatest.getId();
 
+        //file system is not empty
         if (imageId == -1) {
             return;
         }
@@ -98,12 +99,7 @@ public class NewFileObserver extends ContentObserver {
 
             //Upload the files only when the settings is not "manual" so check for the other two options
             //  point:
-                /**
-                 *  This "do...while" tries to check the internet connection when there is no internet,
-                 *  but  while (networkStatus == null) can not act as a listener"
-                 */
 
-                //TODO: add a WIFI listener
                 ConnectivityManager connectivityManager1 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
                 NetworkInfo networkInfo1 = connectivityManager1.getActiveNetworkInfo();
                 if(networkInfo1 != null) {
