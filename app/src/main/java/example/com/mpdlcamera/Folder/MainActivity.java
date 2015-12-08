@@ -42,6 +42,7 @@ import example.com.mpdlcamera.Gallery.GalleryListActivity;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Settings.SettingsActivity;
@@ -52,10 +53,11 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 /**
  * Created by kiran on 25.08.15.
  */
-public class MainActivity extends AppCompatActivity implements UploadResultReceiver.Receiver {
+public class MainActivity extends AppCompatActivity implements UploadResultReceiver.Receiver,NetChangeObserver {
 
     private View rootView;
     private final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -185,6 +187,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         Log.v("Main activity", "started");
 
+        // register NetStateObserver
+        NetWorkStateReceiver.registerNetStateObserver(this);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -378,6 +382,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        //deRegister NetStateObserver
+        NetWorkStateReceiver.unRegisterNetStateObserver(this);
+
         new Delete().
                 from(ImejiFolder.class)
                 .execute();
@@ -540,5 +548,15 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         }
     }
 
+    // monitor network when Connect
+    @Override
+    public void OnConnect() {
+        Toast.makeText(this, "network Connect...", Toast.LENGTH_LONG).show();
+    }
 
+    // monitor network when DisConnect
+    @Override
+    public void OnDisConnect() {
+        Toast.makeText(this, "network disconnect...", Toast.LENGTH_LONG).show();
+    }
 }
