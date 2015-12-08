@@ -13,12 +13,6 @@ import java.util.ArrayList;
 /**
  * NetWorkStateReceiver is a NetWork state receiver
  * Add the following configs in manifest:
- *              <receiver android:name="com.ice.android.common.net.NetWorkStateReceiver" >
- *                 <intent-filter>
- *                       <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
- *                 </intent-filter>
- *              </receiver>
- *
  *              <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
  *              <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
  *              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -41,19 +35,18 @@ public class NetWorkStateReceiver extends BroadcastReceiver {
          ConnectivityManager connectivityManager = ((ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE));
          NetworkInfo ni = connectivityManager.getActiveNetworkInfo();
 
-         //TODO: ConnectivityManager.EXTRA_NETWORK_INFO is aborted after API14, delete following line after testing
-//        NetworkInfo ni=(NetworkInfo) intent.getExtras().get(ConnectivityManager.EXTRA_NETWORK_INFO);
-
         if(ni!=null && ni.getState()== NetworkInfo.State.CONNECTED) {
             networkAvailable = true;
+            notifyObserver();
             Log.i(TAG,"Network "+ni.getTypeName()+" connected");
         }
      }
      if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)) {
          networkAvailable = false;
+         notifyObserver();
          Log.d(TAG, "no network connectivity");
      }
-        notifyObserver();
+
     }
 
     /**
