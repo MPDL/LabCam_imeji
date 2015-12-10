@@ -76,7 +76,7 @@ public class UploadService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if(isNetworkAvailable()) {
-            Log.d(TAG, "Service Started!");
+            Log.d(TAG, "UploadService Started!");
 
             user.setCompleteName("Kiran");
             user.save();
@@ -101,13 +101,6 @@ public class UploadService extends IntentService {
             final ResultReceiver receiver = intent.getParcelableExtra("receiver");
 
             if(cursor != null) {
-            int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-
-
-            int column_index_folder_name = cursor
-                    .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-
-            int column_index_file_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
 
             Bundle bundle = new Bundle();
 
@@ -182,7 +175,7 @@ public class UploadService extends IntentService {
                 }
 
             } catch (Exception e) {
-
+                Log.d(TAG, "exception in service!");
                     /* Sending error message back to activity */
                 bundle.putString(Intent.EXTRA_TEXT, e.toString());
 //                receiver.send(0, bundle);
@@ -192,7 +185,7 @@ public class UploadService extends IntentService {
 
 //                receiver.send(1, Bundle.EMPTY);
 
-
+            cursor.close();
 
             Log.d(TAG, "Service Stopping!");
             this.stopSelf(); //self destructing service.
@@ -239,6 +232,7 @@ public class UploadService extends IntentService {
         @Produce
         public void success(DataItem dataItem, Response response) {
 
+            System.out.println("~uploading success");
             nPrefs = getSharedPreferences("myPref", 0);
             String collectionId = mPrefs.getString("collectionID","");
             MySQLiteHelper db = new MySQLiteHelper(mContext);
@@ -283,6 +277,8 @@ public class UploadService extends IntentService {
 
         @Override
         public void failure(RetrofitError error) {
+
+            System.out.println("~uploading error");
 
             MySQLiteHelper db = new MySQLiteHelper(mContext);
             String fileName = typedFile.fileName();
