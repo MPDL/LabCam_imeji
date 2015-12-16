@@ -43,11 +43,6 @@ import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 import retrofit.mime.TypedFile;
 
-//import android.support.annotation.Nullable;
-
-/**
- * Created by kiran on 28.09.15.
- */
 public class UploadService extends IntentService {
 
     Context mContext = this;
@@ -71,15 +66,17 @@ public class UploadService extends IntentService {
     String json;
 
 
-
-    /*
-    Invoked independently by the activity.
-    When all the requests are handled, it kills itself.
+    /**
+     * used to offload tasks from an application's main thread.
+     * do uploading in the back
+     * Cursor: This interface provides random read-write access to the result set returned by a database query.
+     * @param intent
      */
+
     @Override
     protected void onHandleIntent(Intent intent) {
         if(isNetworkAvailable()) {
-            Log.d(TAG, "Service Started!");
+            Log.d(TAG, "UploadService Started!");
 
             user.setCompleteName("Kiran");
             user.save();
@@ -104,13 +101,6 @@ public class UploadService extends IntentService {
             final ResultReceiver receiver = intent.getParcelableExtra("receiver");
 
             if(cursor != null) {
-            int column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-
-
-            int column_index_folder_name = cursor
-                    .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-
-            int column_index_file_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
 
             Bundle bundle = new Bundle();
 
@@ -119,7 +109,11 @@ public class UploadService extends IntentService {
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
                 SharedPreferences preferencesFiles = getSharedPreferences("gallery", Context.MODE_PRIVATE);
                 SharedPreferences preferencesFolders = getSharedPreferences("folder", Context.MODE_PRIVATE);
+
+                // HashMap key is the folder name value is on off
                 HashMap<String, String> folderSyncMap = new HashMap<String, String>();
+
+                //get all values form local storage
                 folderSyncMap = (HashMap) preferencesFolders.getAll();
                 String status = preferences.getString("status", "");
 
@@ -147,6 +141,7 @@ public class UploadService extends IntentService {
                                 String imageCollectionName = imageName + collectionId;
                                 MySQLiteHelper database = new MySQLiteHelper(mContext);
 
+                                // search local database, if imageCollectionName is not there or upload failed
                                 String fileStatus = database.getFileStatus(imageCollectionName);
 
                                 if (fileStatus.equalsIgnoreCase("not present") || fileStatus.equalsIgnoreCase("failed"))
@@ -155,102 +150,42 @@ public class UploadService extends IntentService {
 
                                     item.setFilename(imageName);
 
-                                    //    meta.setTags(null);
-
-                                    //    meta.setAddress("blabla");
-
-                                    //    meta.setTitle(imageName);
-
-                                    //   meta.setCreator(user.getCompleteName());
-
                                     item.setCollectionId(collectionID);
 
                                     item.setLocalPath(imageFile.toString());
 
-                                    //   item.setMetadata(meta);
-
-                                    // item.setCreatedBy(user);
-
-                                    //meta.save();
                                     item.save();
 
                                     upload(item);
 
+                                    // case1: failed; case2: not present;
+
                                     if (!(database.getFileStatus(imageCollectionName).equalsIgnoreCase("not present"))) {
 
                                         database.updateFileStatus(imageCollectionName, "uploading");
-                                        //  FileId fileId = new FileId(fileNamePlusId, "uploaded");
 
                                     } else {
                                         FileId fileId = new FileId(imageCollectionName, "uploading");
                                         database.insertFile(fileId);
-
                                     }
-                                    //   FileId fileId = new FileId(imageCollectionName,"uploading");
-
                                 }
-
-
                             }
-
-
-
-    /*                            while (cursor.moveToNext()) {
-
-                                    if (folderName.equalsIgnoreCase(cursor.getString(column_index_folder_name))) {
-
-
-                                        String fileName = cursor.getString(column_index_file_name);
-                                        String path = cursor.getString(column_index_data);
-
-                                        MySQLiteHelper db = new MySQLiteHelper(mContext);
-
-                                        Boolean b = db.getFile(fileName);
-
-                                        if(!b)
-
-                                        {
-                                            item.setFilename(fileName);
-
-                                            meta.setTags(null);
-
-                                            meta.setAddress("blabla");
-
-                                            meta.setTitle(fileName);
-
-                                            meta.setCreator(user.getCompleteName());
-
-                                            item.setCollectionId(collectionID);
-
-                                            item.setLocalPath(path);
-
-                                            item.setMetadata(meta);
-
-                                            item.setCreatedBy(user);
-
-                                            meta.save();
-                                            item.save();
-
-                                            upload(item);
-                                        }
-                                    }
-                                }*/
                         }
                     }
                 }
 
             } catch (Exception e) {
-
+                Log.d(TAG, "exception in service!");
                     /* Sending error message back to activity */
                 bundle.putString(Intent.EXTRA_TEXT, e.toString());
-                receiver.send(0, bundle);
+//                receiver.send(0, bundle);
             }
 
         }
 
-                receiver.send(1, Bundle.EMPTY);
+//                receiver.send(1, Bundle.EMPTY);
 
-
+            cursor.close();
 
             Log.d(TAG, "Service Stopping!");
             this.stopSelf(); //self destructing service.
@@ -297,6 +232,7 @@ public class UploadService extends IntentService {
         @Produce
         public void success(DataItem dataItem, Response response) {
 
+            System.out.println("~uploading success");
             nPrefs = getSharedPreferences("myPref", 0);
             String collectionId = mPrefs.getString("collectionID","");
             MySQLiteHelper db = new MySQLiteHelper(mContext);
@@ -342,6 +278,8 @@ public class UploadService extends IntentService {
         @Override
         public void failure(RetrofitError error) {
 
+            System.out.println("~uploading error");
+
             MySQLiteHelper db = new MySQLiteHelper(mContext);
             String fileName = typedFile.fileName();
             String fileCollectionName = fileName + collectionID;
@@ -378,17 +316,7 @@ public class UploadService extends IntentService {
 
                     }
 
-                  //  FileId fileId = new FileId(fileCollectionName,"uploaded");
-                  //  db.insertFile(fileId);
-
-
-
-
-
-                    // Toast.makeText(mContext.getApplicationContext(), "", Toast.LENGTH_SHORT).show();
                 }
-               // else
-                    //Toast.makeText(mContext, "Upload failed", Toast.LENGTH_SHORT).show();
 
             }
 

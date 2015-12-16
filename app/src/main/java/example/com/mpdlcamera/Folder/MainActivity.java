@@ -42,6 +42,7 @@ import example.com.mpdlcamera.Gallery.GalleryListActivity;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Settings.SettingsActivity;
@@ -52,10 +53,11 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 /**
  * Created by kiran on 25.08.15.
  */
-public class MainActivity extends AppCompatActivity implements UploadResultReceiver.Receiver {
+public class MainActivity extends AppCompatActivity implements UploadResultReceiver.Receiver,NetChangeObserver {
 
     private View rootView;
     private final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -185,6 +187,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         Log.v("Main activity", "started");
 
+        // register NetStateObserver
+        NetWorkStateReceiver.registerNetStateObserver(this);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -336,10 +340,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         });
 
 
-        //TODO why start upload here?
-
                 /*
-                    The background service which uploads the files starts here
+                    file system
                  */
                 UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
                 mReceiver.setReceiver(this);
@@ -351,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 Handler handler = new Handler();
 
             /*
-                NewFile observer which looks for the new file added to the file system starts here
+                camera
              */
                 NewFileObserver newFileObserver = new NewFileObserver(handler,this);
                 getApplicationContext().getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,false, newFileObserver);
@@ -378,6 +380,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        //deRegister NetStateObserver
+        NetWorkStateReceiver.unRegisterNetStateObserver(this);
+
         new Delete().
                 from(ImejiFolder.class)
                 .execute();
@@ -475,61 +481,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 /* Hide progress & extract result from bundle */
                 setProgressBarIndeterminateVisibility(false);
 
-              //  String[] results = resultData.getStringArray("result");
-
-                /* Update ListView with result */
-                //ArrayAdapter arrayAdapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_2, results);
-                //listView.setAdapter(arrayAdapter);
-             //   Toast.makeText(this, "Files are synced", Toast.LENGTH_LONG).show();
-
-
                 mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
                 SharedPreferences.Editor e = mPrefs.edit();
                 e.putString("UploadStatus","true");
                 e.commit();
-//                Intent showLocalImageIntent = new Intent(activity, LocalGalleryActivity.class);
-//                startActivity(showLocalImageIntent);
-
-
-
- /*               if(mPrefs.contains("L_A_U")) {
-
-                    if(mPrefs.getBoolean("L_A_U", true)) {
-
-                        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-                        View popupView = inflater.inflate(R.layout.logout_confirm, null);
-                        final PopupWindow popupWindow = new PopupWindow(
-                                popupView,
-                                550,
-                                300);
-                        popupWindow.setFocusable(true);
-                        popupWindow.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                        popupWindow.setAnimationStyle(R.style.AnimationPopup);
-
-                        Button yes = (Button) popupView.findViewById(R.id.buttonYes);
-                        Button no = (Button) popupView.findViewById(R.id.buttonNo);
-                        popupWindow.showAtLocation(findViewById(R.id.navigation), Gravity.CENTER, 0, 0);
-
-                        yes.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                finish();
-                                Intent loginIntent = new Intent(activity, LoginActivity.class);
-                                startActivity(loginIntent);
-                            }
-                        });
-
-                        no.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                popupWindow.dismiss();
-                            }
-                        });
-
-                    }
-                }*/
 
                 break;
             case 2:
@@ -540,5 +496,22 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         }
     }
 
+    // monitor network when Connect
+    @Override
+    public void OnConnect() {
+        Toast.makeText(this, "network Connect...", Toast.LENGTH_LONG).show();
 
+        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
+        mReceiver.setReceiver(this);
+        Intent intent = new Intent(this, UploadService.class);
+        intent.putExtra("receiver", mReceiver);
+
+        this.startService(intent);
+    }
+
+    // monitor network when DisConnect
+    @Override
+    public void OnDisConnect() {
+        Toast.makeText(this, "network disconnect...", Toast.LENGTH_LONG).show();
+    }
 }
