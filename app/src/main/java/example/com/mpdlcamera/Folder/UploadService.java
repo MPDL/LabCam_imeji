@@ -176,6 +176,7 @@ public class UploadService extends IntentService {
 
             } catch (Exception e) {
                 Log.d(TAG, "exception in service!");
+                Log.d(TAG,e.getMessage());
                     /* Sending error message back to activity */
                 bundle.putString(Intent.EXTRA_TEXT, e.toString());
 //                receiver.send(0, bundle);
@@ -219,6 +220,10 @@ public class UploadService extends IntentService {
         Log.v(TAG, json);
 
         if(isNetworkAvailable()) {
+            //TODO: set serverURL without login
+            String BASE_URL = "https://dev-faces.mpdl.mpg.de/rest/";
+            RetrofitClient.setRestServer(BASE_URL);
+
             RetrofitClient.uploadItem(typedFile, json, callback, username, password);
         }
         else {

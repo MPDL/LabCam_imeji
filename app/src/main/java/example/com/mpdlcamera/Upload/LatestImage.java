@@ -87,8 +87,11 @@ private Context context;
         while (true) {
 
             Uri image = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, latestId);
+
+            //
             Cursor cursor = context.getContentResolver().query(image,columns,null,null,null);
 
+            //boolean moveToFirst
             if(cursor.moveToFirst()) {
 
 

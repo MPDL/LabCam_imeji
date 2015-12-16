@@ -185,6 +185,15 @@
         </receiver>
         <service android:name=".AutoRun.AutoRunService"/>
 
+        <receiver
+            android:name=".AutoRun.CameraEventReceiver"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="com.android.camera.NEW_PICTURE" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

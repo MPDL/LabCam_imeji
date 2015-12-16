@@ -63,6 +63,7 @@ public class LoginActivity extends AppCompatActivity {
             serverURL = DeviceStatus.BASE_URL;
         }
 
+        //it is called at login, what about without login?
         RetrofitClient.setRestServer(serverURL);
 
         serverURLView.setText(serverURL);

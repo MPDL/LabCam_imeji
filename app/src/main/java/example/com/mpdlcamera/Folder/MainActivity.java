@@ -251,13 +251,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         //editor.putString("status", "wifi");
         editor.commit();
 
+
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME,MediaStore.Images.Media.DATA};
         Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         preferencesFiles = getSharedPreferences("gallery", Context.MODE_PRIVATE);
-
-        for(int i = 0; i<albums.length ;i++){
-            Log.i("albums",  albums[i]);
-        }
 
         Cursor cur = getContentResolver().query(images, albums, null, null, null);
 
@@ -274,6 +271,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 int path = cur.getColumnIndex(MediaStore.Images.Media.DATA);
 
                 do {
+                    // here store filename and filepath
                     album = cur.getString(albumLocation);
                     folderPath = cur.getString(path);
                     File file = new File(folderPath);

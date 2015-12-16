@@ -182,6 +182,7 @@ public class LocalImageActivity extends AppCompatActivity {
 
         //final String CompleteCameraFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/" + title;
         File folder = new File(folderPath);
+        //listing all the files
         File[] folderFiles = folder.listFiles();
 
         Log.v("camera folder",folderPath);
@@ -190,6 +191,7 @@ public class LocalImageActivity extends AppCompatActivity {
             Log.v("file",imageFile.toURI().toString() );
 
             if(new ImageFileFilter(imageFile).accept(imageFile)) {
+                //filtering img files
                 dataPathList.add(imageFile.getAbsolutePath());
             }
         }

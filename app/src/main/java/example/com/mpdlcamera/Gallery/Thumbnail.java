@@ -46,7 +46,7 @@ public class Thumbnail {
 
             Uri image = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
-            Cursor cursor = context.getContentResolver().query(image,columns,null,null,null);
+            Cursor cursor = context.getContentResolver().query(image, columns, null, null, null);
 
 
             while (cursor.moveToNext()) {
@@ -82,9 +82,7 @@ public class Thumbnail {
 
 
                 }
-
             }
-            cursor.close();
         }
 
 
