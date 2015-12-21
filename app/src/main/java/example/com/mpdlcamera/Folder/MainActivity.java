@@ -42,6 +42,8 @@ import example.com.mpdlcamera.Gallery.GalleryListActivity;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.LocalModel.Image;
+import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
@@ -91,6 +93,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     CoordinatorLayout rootLayout;
 
+    //TESTING DB
+    private boolean isAdd = false;
 
 
     Callback<List<ImejiFolder>> callback = new Callback<List<ImejiFolder>>() {
@@ -186,6 +190,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         setContentView(R.layout.main);
 
         Log.v("Main activity", "started");
+
+        //init DB
+        initDB();
 
         // register NetStateObserver
         NetWorkStateReceiver.registerNetStateObserver(this);
@@ -511,5 +518,42 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     @Override
     public void OnDisConnect() {
         Toast.makeText(this, "network disconnect...", Toast.LENGTH_LONG).show();
+    }
+
+    //TODO: DELET TESTING CODE // FIXME: 12/17/15
+    private void initDB(){
+        if(isAdd){
+            Log.v("initDB","isAdded");
+        }else {
+
+            isAdd = true;
+            //init task
+            String now = "12/17/15";
+            String tomorrow = "12/18/15";
+            Task task1 = new Task();
+            task1.setTaskId("01");
+            task1.setUserName("Ina");
+            task1.setFinishTime(now);
+            task1.setStartTime(now);
+            task1.setUploadMode("AU");
+            task1.save();
+
+            //init image
+            Image einImage = new Image();
+            einImage.setImageId("001");
+            einImage.setImageName("eins");
+            einImage.setCreateTime(now);
+            einImage.setTask(task1);
+            einImage.save();
+
+            Image zwiImage = new Image();
+            zwiImage.setImageId("002");
+            zwiImage.setImageName("zwi");
+            zwiImage.setCreateTime(now);
+            zwiImage.setTask(task1);
+            zwiImage.save();
+
+
+        }
     }
 }

@@ -25,7 +25,6 @@ private Context context;
     MainActivity just;
 
     public int maxId;
-    private User user = new User();
 
     public LatestImage() {
 
@@ -78,8 +77,7 @@ private Context context;
 
         DataItem item = null;
         MetaData meta = new MetaData();
-        user.setCompleteName("Kiran");
-        user.save();
+
         String columns[] = new String[]{ MediaStore.Images.Media._ID, MediaStore.Images.Media.DATA, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.MIME_TYPE, MediaStore.Images.Media.BUCKET_DISPLAY_NAME, MediaStore.Images.Media.MINI_THUMB_MAGIC };
 
         SharedPreferences preferences = context.getSharedPreferences("folder", Context.MODE_PRIVATE);

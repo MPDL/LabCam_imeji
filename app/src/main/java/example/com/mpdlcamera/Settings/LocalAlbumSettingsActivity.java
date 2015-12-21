@@ -68,7 +68,6 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
     Context context = this;
     SharedPreferences preferencesFiles;
     SharedPreferences preferencesFolders;
-    private User user;
     String status;
     Boolean fStatus;
     ArrayList<String> imageFolders;
@@ -106,9 +105,6 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity  {
         //Generate listView from ArrayList
         displayListView();
 
-        user = new User();
-        user.setCompleteName("Kiran");
-        user.save();
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
 

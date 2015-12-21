@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.MetaData;
 import example.com.mpdlcamera.Model.User;
 import example.com.mpdlcamera.Otto.OttoSingleton;
@@ -54,13 +55,13 @@ public class UploadService extends IntentService {
     private SharedPreferences nPrefs;
     FileId fileId;
 
-
+    //Local database objects
+    private Image neuImage = new Image();
     private DataItem item = new DataItem();
     private MetaData meta = new MetaData();
 
     private String username;
     private String password;
-    private User user = new User();
     private String collectionID;
     public TypedFile typedFile;
     String json;
@@ -78,8 +79,6 @@ public class UploadService extends IntentService {
         if(isNetworkAvailable()) {
             Log.d(TAG, "UploadService Started!");
 
-            user.setCompleteName("Kiran");
-            user.save();
             ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
             String networkStatus = networkInfo.getTypeName();

@@ -18,7 +18,7 @@ import example.com.mpdlcamera.Upload.UploadResultReceiver;
 public class CameraEventReceiver extends BroadcastReceiver implements UploadResultReceiver.Receiver{
     @Override
     public void onReceive(Context context, Intent intent) {
-        Toast.makeText(context, "a new photo", Toast.LENGTH_LONG)
+        Toast.makeText(context, "fresh photo", Toast.LENGTH_LONG)
                 .show();
         UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
         mReceiver.setReceiver(this);

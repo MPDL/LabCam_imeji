@@ -28,6 +28,12 @@ import example.com.mpdlcamera.R;
 /**
  * Created by kiran on 06.10.15.
  */
+
+/**
+ * It is possible that different users using the same device
+ * SharedPreference is not enough for storing different personal settings
+ * We use a seting table here
+ */
 public class BackupSettingsActivity extends AppCompatActivity {
 
     Context context = this;
@@ -53,6 +59,10 @@ public class BackupSettingsActivity extends AppCompatActivity {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
+        //show options
+        /**
+         * TODO:
+         */
         textView = (TextView) findViewById(R.id.backup_item_list);
         if(preferences.contains("status")) {
             String option = preferences.getString("status", "");

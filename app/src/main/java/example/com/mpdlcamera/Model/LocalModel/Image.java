@@ -9,15 +9,15 @@ import com.google.gson.annotations.Expose;
  * Created by yingli on 12/14/15.
  */
 
-@Table(name = "Image")
+@Table(name = "Images")
 public class Image extends Model {
     @Expose
-    @Column(name = "ImageId")
-    private String ImageId;
+    @Column(name = "imageId")
+    private String imageId;
 
     @Expose
-    @Column(name = "ImageName")
-    private String ImageName;
+    @Column(name = "imageName")
+    private String imageName;
 
     @Expose
     @Column(name = "createTime")
@@ -42,8 +42,8 @@ public class Image extends Model {
     }
 
     public Image(String imageId, String imageName, String createTime, String geoLocation, String state, Task task) {
-        ImageId = imageId;
-        ImageName = imageName;
+        this.imageId = imageId;
+        this.imageName = imageName;
         this.createTime = createTime;
         this.geoLocation = geoLocation;
         this.state = state;
@@ -51,19 +51,19 @@ public class Image extends Model {
     }
 
     public String getImageId() {
-        return ImageId;
+        return imageId;
     }
 
     public void setImageId(String imageId) {
-        ImageId = imageId;
+        this.imageId = imageId;
     }
 
     public String getImageName() {
-        return ImageName;
+        return imageName;
     }
 
     public void setImageName(String imageName) {
-        ImageName = imageName;
+        this.imageName = imageName;
     }
 
     public String getCreateTime() {
