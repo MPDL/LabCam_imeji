@@ -15,7 +15,12 @@ import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -27,7 +32,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
@@ -39,7 +46,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import example.com.mpdlcamera.Gallery.GalleryListActivity;
+import example.com.mpdlcamera.ImejiFragment.ImejiFragment;
 import example.com.mpdlcamera.Items.ItemsActivity;
+import example.com.mpdlcamera.LocalFragment.LocalFragment;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.LocalModel.Image;
@@ -50,6 +59,8 @@ import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Settings.SettingsActivity;
 import example.com.mpdlcamera.Upload.NewFileObserver;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
+import example.com.mpdlcamera.UploadFragment.UploadFragment;
+import example.com.mpdlcamera.UserFragment.UserFragment;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -95,6 +106,25 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     //TESTING DB
     private boolean isAdd = false;
+
+
+
+    /**
+     * The {@link android.support.v4.view.PagerAdapter} that will provide
+     * fragments for each of the sections. We use a
+     * {@link FragmentPagerAdapter} derivative, which will keep every
+     * loaded fragment in memory. If this becomes too memory intensive, it
+     * may be best to switch to a
+     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+
+    /**
+     * The {@link ViewPager} that will host the section contents.
+     */
+
+    //new ui
+    TabLayout tabLayout;
+    ViewPager viewPager;
 
 
     Callback<List<ImejiFolder>> callback = new Callback<List<ImejiFolder>>() {
@@ -156,7 +186,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 } finally {
                     ActiveAndroid.endTransaction();
 
-                    adapter.notifyDataSetChanged();
+                    /**
+                     * TODO: temp disable
+                     */
+//                    adapter.notifyDataSetChanged();
 //                    adapter = new FolderListAdapter(activity, collectionListLocal);
 //                    listView.setAdapter(adapter);
 
@@ -187,8 +220,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-
+//        setContentView(R.layout.main);
+        setContentView(R.layout.activity_main);
         Log.v("Main activity", "started");
 
         //init DB
@@ -197,49 +230,55 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         // register NetStateObserver
         NetWorkStateReceiver.registerNetStateObserver(this);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        initInstances();
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        drawerToggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, R.string.hello_world, R.string.hello_world);
-        drawerLayout.setDrawerListener(drawerToggle);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayout);
-
-        rootView = getWindow().getDecorView().findViewById(android.R.id.content);
-
-
-
-        navigation = (NavigationView) findViewById(R.id.navigation);
-        navigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                switch (id) {
-                    case R.id.navItem1:
-                        Intent showLocalImageIntent = new Intent(activity, GalleryListActivity.class);
-                        startActivity(showLocalImageIntent);
-
-                        break;
-                    case R.id.navItem2:
-                        Intent showMainIntent = new Intent(activity, MainActivity.class);
-                        startActivity(showMainIntent);
-
-                        break;
-                    case R.id.navItem3:
-                        Intent showSettingIntent = new Intent(activity, SettingsActivity.class);
-                        startActivity(showSettingIntent);
-                        break;
-                    case R.id.navItem4:
-
-                        break;
-                }
-                return false;
-            }
-        });
+        /**
+         * DO NOT DELETE
+         * use tab layout instead
+         */
+//        toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+//
+//        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+//        drawerToggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, R.string.hello_world, R.string.hello_world);
+//        drawerLayout.setDrawerListener(drawerToggle);
+//
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+//
+//        rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayout);
+//
+//        rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+//
+//
+//
+//        navigation = (NavigationView) findViewById(R.id.navigation);
+//        navigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(MenuItem menuItem) {
+//                int id = menuItem.getItemId();
+//                switch (id) {
+//                    case R.id.navItem1:
+//                        Intent showLocalImageIntent = new Intent(activity, GalleryListActivity.class);
+//                        startActivity(showLocalImageIntent);
+//
+//                        break;
+//                    case R.id.navItem2:
+//                        Intent showMainIntent = new Intent(activity, MainActivity.class);
+//                        startActivity(showMainIntent);
+//
+//                        break;
+//                    case R.id.navItem3:
+//                        Intent showSettingIntent = new Intent(activity, SettingsActivity.class);
+//                        startActivity(showSettingIntent);
+//                        break;
+//                    case R.id.navItem4:
+//
+//                        break;
+//                }
+//                return false;
+//            }
+//        });
 
 
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -309,40 +348,33 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         Log.v(LOG_TAG, "size: " + collectionListLocal.size() + "");
 
 
-        adapter = new FolderListAdapter(activity, collectionListLocal);
-
-        //gridview = (GridView) findViewById(R.id.folder_gridView);
-        //registerForContextMenu(gridview);
-
-        listView = (ListView) findViewById(R.id.folder_listView);
-
-//        // use this setting to improve performance if you know that changes
-//        // in content do not change the layout size of the RecyclerView
-//        recyclerView.setHasFixedSize(true);
+        /**
+         * DO NOT DELETE
+         * hide listView for now
+         */
+//        adapter = new FolderListAdapter(activity, collectionListLocal);
 //
-//        // use a linear layout manager
-//        reLayoutManager = new LinearLayoutManager(this);
-//        recyclerView.setLayoutManager(reLayoutManager);
 //
-//        // specify an adapter (see also next example)
-//        reAdapter = new ReAdaptor(myDataset);
-
-        listView.setAdapter(adapter);
-
-
-
-        // Set OnItemClickListener so we can be notified on item clicks
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                ImejiFolder folder = (ImejiFolder) adapter.getItem(position);
-
-                Intent showItemsIntent = new Intent(activity, ItemsActivity.class);
-                showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
-                showItemsIntent.putExtra("folderTitle", folder.getTitle());
-                startActivity(showItemsIntent);
-            }
-        });
+//        listView = (ListView) findViewById(R.id.folder_listView);
+//
+//
+//
+//        listView.setAdapter(adapter);
+//
+//
+//
+//        // Set OnItemClickListener so we can be notified on item clicks
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+//                ImejiFolder folder = (ImejiFolder) adapter.getItem(position);
+//
+//                Intent showItemsIntent = new Intent(activity, ItemsActivity.class);
+//                showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
+//                showItemsIntent.putExtra("folderTitle", folder.getTitle());
+//                startActivity(showItemsIntent);
+//            }
+//        });
 
 
                 /*
@@ -398,14 +430,14 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     @Override
     public void onPostCreate(Bundle savedInstanceState) {
-        drawerToggle.syncState();
+//        drawerToggle.syncState();
         super.onPostCreate(savedInstanceState);
 
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-        drawerToggle.onConfigurationChanged(newConfig);
+//        drawerToggle.onConfigurationChanged(newConfig);
         super.onConfigurationChanged(newConfig);
 
     }
@@ -417,30 +449,35 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         return true;
     }
 
+    /**
+     * DO NOT DELETE
+     * navigation for drawerLayout, need it later
+     */
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            Intent showSettingIntent = new Intent(activity, SettingsActivity.class);
-            startActivity(showSettingIntent);
-
-            return true;
-        }
-        if (id == R.id.homeAsUp) {
-            drawerLayout.openDrawer(GravityCompat.START);
-            return true;
-        }
-
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//        int id = item.getItemId();
+//
+//        if (id == R.id.action_settings) {
+//            Intent showSettingIntent = new Intent(activity, SettingsActivity.class);
+//            startActivity(showSettingIntent);
+//
+//            return true;
+//        }
+//        if (id == R.id.homeAsUp) {
+//            drawerLayout.openDrawer(GravityCompat.START);
+//            return true;
+//        }
+//
+//        if (drawerToggle.onOptionsItemSelected(item)) {
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
     private void hidePDialog() {
         if (pDialog != null) {
@@ -556,4 +593,128 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         }
     }
+
+    /**
+     * init Fragments
+     */
+    private void initInstances() {
+        // Setup tabs
+        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(tabAdapter);
+
+
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.getTabAt(0).setCustomView(R.layout.tab_local);
+        tabLayout.getTabAt(1).setCustomView(R.layout.tab_imeji);
+        tabLayout.getTabAt(2).setCustomView(R.layout.tab_upload);
+        tabLayout.getTabAt(3).setCustomView(R.layout.tab_user);
+
+        //tab style change on page change
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            float scale = getResources().getDisplayMetrics().density;
+            int selectedIndex = -1;
+
+            // tab icon images
+            int[] unselectedTabResource = {
+                    R.drawable.user_inactive,
+                    R.drawable.user_inactive,
+                    R.drawable.user_inactive,
+                    R.drawable.user_inactive
+            };
+            int[] selectedTabResource = {
+                    R.drawable.user_active,
+                    R.drawable.user_active,
+                    R.drawable.user_active,
+                    R.drawable.user_active
+            };
+
+            //tab Icon and Text id in layout files
+            int[] backgroundIconId = {R.id.tabicon_local, R.id.tabicon_imeji, R.id.tabicon_upload, R.id.tabicon_user};
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+                //if the tab is not the selected one, set its text and icon style as inactive
+
+                if (0 != position && 0 != selectedIndex) {
+                    tabLayout.findViewById(backgroundIconId[0]).setBackgroundResource(unselectedTabResource[0]);
+                }
+                if (1 != position && 1 != selectedIndex) {
+                    tabLayout.findViewById(backgroundIconId[1]).setBackgroundResource(unselectedTabResource[1]);
+                }
+                if (2 != position && 2 != selectedIndex) {
+                    tabLayout.findViewById(backgroundIconId[2]).setBackgroundResource(unselectedTabResource[2]);
+                }
+                if (3 != position && 3 != selectedIndex) {
+                    tabLayout.findViewById(backgroundIconId[3]).setBackgroundResource(unselectedTabResource[3]);
+                }
+
+                //activate the selected tab icon and text
+                tabLayout.setBackgroundResource(R.color.primary);
+                //background icon
+                ImageView imageView = (ImageView) tabLayout.findViewById(backgroundIconId[position]);
+                imageView.setBackgroundResource(selectedTabResource[position]);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
+    /**
+     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * one of the sections/tabs/pages.
+     */
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+
+        @Override
+        public int getCount() {
+                return 4;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+
+            android.support.v4.app.Fragment fragment;
+
+            Log.v(LOG_TAG, position + "");
+            //try with exception
+
+            switch (position) {
+                case 0:
+                    fragment = new LocalFragment();
+                    return fragment;
+
+                case 1:
+                    fragment = new ImejiFragment();
+                    return fragment;
+                case 2:
+                    fragment = new UploadFragment();
+                    return fragment;
+                case 3:
+                    fragment = new UserFragment();
+                    return fragment;
+
+                default:
+                    return new LocalFragment();
+            }
+
+        }
+    }
+
 }
