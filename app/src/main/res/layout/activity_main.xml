@@ -28,15 +28,32 @@ w
                     android:id="@+id/tabLayout"
                     android:layout_width="0dp"
                     android:layout_weight="0.6"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="3px"/>
+                    android:layout_height="wrap_content" />
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="0dp"
                     android:layout_weight="0.4"
-                    android:layout_height="wrap_content">
+                    android:layout_height="fill_parent">
 
-                </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="16dp"
+                        android:id="@+id/camera_icon"
+                        android:src="@drawable/user_active"/>
+
+                    <ProgressBar
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_toLeftOf="@+id/camera_icon"
+                        android:layout_marginRight="20dp"
+                        android:id="@+id/progress_upload"
+                        android:layout_centerVertical="true"/>
+
+                </RelativeLayout>
 
             </LinearLayout>
 
