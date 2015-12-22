@@ -1,13 +1,33 @@
 package example.com.mpdlcamera.LocalFragment;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+
+import example.com.mpdlcamera.Gallery.ActivatedGalleryActivity;
+import example.com.mpdlcamera.Gallery.GalleryListAdapter;
+import example.com.mpdlcamera.Gallery.LocalImageActivity;
+import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.R;
 
 /**
@@ -19,14 +39,21 @@ import example.com.mpdlcamera.R;
  * create an instance of this fragment.
  */
 public class LocalFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+
+    //TODO: from kiran's galleryListActivity, remove lava later
+    Toolbar toolbar;
+    private View rootView;
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle drawerToggle;
+    CollapsingToolbarLayout collapsingToolbarLayout;
+    private NavigationView navigation;
+    GridView gridView;
+    SharedPreferences preferences;
+    private SharedPreferences mPrefs;
+
+
+    GalleryListAdapter adapter;
 
     private OnFragmentInteractionListener mListener;
 
@@ -42,8 +69,6 @@ public class LocalFragment extends Fragment {
     public static LocalFragment newInstance(String param1, String param2) {
         LocalFragment fragment = new LocalFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,17 +80,20 @@ public class LocalFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_local, container, false);
+        rootView = inflater.inflate(R.layout.fragment_local, container, false);
+        gridView = (GridView) rootView.findViewById(R.id.gallery_gridView);
+        // fill grid with LocalGallery
+        loadLocalGallery();
+
+        return rootView;
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -96,6 +124,84 @@ public class LocalFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
+    }
+
+    private void loadLocalGallery(){
+
+        String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
+        Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        preferences = getActivity().getSharedPreferences("folder", Context.MODE_PRIVATE);
+
+
+        final ArrayList<Gallery> folders = new ArrayList<Gallery>();
+        final ArrayList<String> folders1 = new ArrayList<String>();
+
+        Cursor cur = getActivity().getContentResolver().query(images, albums, null, null, null);
+
+        /*
+            Listing out all the image folders(Galleries) in the file system.
+         */
+        if (cur.moveToFirst()) {
+
+            int albumLocation = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+
+            do {
+                Gallery album = new Gallery();
+                album.setGalleryName(cur.getString(albumLocation));
+                String currentAlbum = cur.getString(albumLocation);
+                if(!folders1.contains(currentAlbum)) {
+                    folders.add(album);
+                    folders1.add(currentAlbum);
+                }
+
+                Log.i("ListingImages", " album=" + album);
+            } while (cur.moveToNext());
+        }
+
+        //try close cursor here
+        cur.close();
+
+        ArrayList<Gallery> imageFolders = new ArrayList<Gallery>();
+        imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
+
+
+        adapter = new GalleryListAdapter(getActivity(), imageFolders );
+
+        gridView.setAdapter(adapter);
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Gallery gallery = (Gallery) adapter.getItem(position);
+
+                String status = preferences.getString(gallery.getGalleryName(),"");
+
+                if(status.equalsIgnoreCase("On")) {
+
+                    /*
+                        Sending the galleryname and the gallerypath to the next activity(for the activated gallery)
+                     */
+                    Intent activatedGalleryIntent = new Intent(getActivity(), ActivatedGalleryActivity.class);
+                    activatedGalleryIntent.putExtra("galleryName", gallery.getGalleryName());
+                    activatedGalleryIntent.putExtra("galleryPath", gallery.getGalleryPath());
+
+                    startActivity(activatedGalleryIntent);
+
+                }
+                else {
+                    /*
+                        Sending the gallerytitle for the next activity(not activated gallery)
+                     */
+                    Intent galleryImagesIntent = new Intent(getActivity(), LocalImageActivity.class);
+                    galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
+
+                    startActivity(galleryImagesIntent);
+                }
+            }
+        });
+
+
     }
 
 }
