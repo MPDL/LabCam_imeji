@@ -31,7 +31,6 @@ import java.util.Map;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.MetaData;
-import example.com.mpdlcamera.Model.User;
 import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;

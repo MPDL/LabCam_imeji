@@ -11,7 +11,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import example.com.mpdlcamera.Folder.MainActivity;
-import example.com.mpdlcamera.Model.LocalModel.Configuration;
 import example.com.mpdlcamera.R;
 
 /**

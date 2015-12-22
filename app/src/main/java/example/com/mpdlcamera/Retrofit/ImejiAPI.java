@@ -2,8 +2,8 @@ package example.com.mpdlcamera.Retrofit;
 
 import java.util.List;
 
-import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.User;
 import retrofit.Callback;
 import retrofit.client.Response;

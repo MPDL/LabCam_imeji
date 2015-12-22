@@ -2,95 +2,55 @@ package example.com.mpdlcamera.Folder;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
-import com.activeandroid.query.Select;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import example.com.mpdlcamera.Gallery.GalleryListActivity;
 import example.com.mpdlcamera.ImejiFragment.ImejiFragment;
-import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.LocalFragment.LocalFragment;
-import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
+import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
-import example.com.mpdlcamera.Retrofit.RetrofitClient;
-import example.com.mpdlcamera.Settings.SettingsActivity;
 import example.com.mpdlcamera.Upload.NewFileObserver;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.UploadFragment.UploadFragment;
 import example.com.mpdlcamera.UserFragment.UserFragment;
-import example.com.mpdlcamera.Utils.DeviceStatus;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
-import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 /**
  * Created by kiran on 25.08.15.
  */
 public class MainActivity extends AppCompatActivity implements UploadResultReceiver.Receiver,NetChangeObserver {
 
-    private View rootView;
     private final String LOG_TAG = MainActivity.class.getSimpleName();
     private String username;
     private String password;
     private SharedPreferences mPrefs;
 
     private ProgressDialog pDialog;
-    private Activity activity = this;
-    //private FolderGridAdapter adapter;
-    //private GridView gridview;
-    private NavigationView navigation;
 
-    private FolderListAdapter adapter;
-    private ListView listView;
-
-    private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
-    private ImejiFolder currentCollectionLocal = new ImejiFolder();
-
-    SharedPreferences preferencesFiles;
 
     //TESTING DB
     private boolean isAdd = false;
@@ -115,94 +75,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     ViewPager viewPager;
 
 
-    Callback<List<ImejiFolder>> callback = new Callback<List<ImejiFolder>>() {
-        @Override
-        public void success(List<ImejiFolder> folderList, Response response) {
-            ActiveAndroid.beginTransaction();
-            try {
-                collectionListLocal.clear();
-                for(ImejiFolder folder : folderList){
-                    Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
-                    Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
-
-                    getFolderItems(folder.id);
-
-                    //TODO Here is a bug, collectionLocal will be random one collection
-                    //collectionLocal = folder;
-
-                    collectionListLocal.add(folder);
-                    //folder.save();
-                }
-                ActiveAndroid.setTransactionSuccessful();
-            } finally{
-                ActiveAndroid.endTransaction();
-            }
-
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-            Log.v(LOG_TAG, "get list failed");
-            Log.v(LOG_TAG, error.toString());
-            DeviceStatus.showSnackbar(rootView, "update data failed");
-        }
-    };
-
-    Callback<List<DataItem>> callbackItems = new Callback<List<DataItem>>() {
-        @Override
-        public void success(List<DataItem> dataList , Response response) {
-
-            if(dataList != null) {
-                ActiveAndroid.beginTransaction();
-                try {
-                    for (ImejiFolder folder : collectionListLocal) {
-
-                        if(dataList.size()>0) {
-                            DataItem coverItem = dataList.get(0);
-                            //check for each folder, if the current items belongs to the current folder
-                            if(coverItem.getCollectionId().equals(folder.id)){
-                                folder.setItems(dataList);
-
-                                folder.setCoverItemUrl(coverItem.getWebResolutionUrlUrl());
-                                folder.setImejiId(folder.id);
-                                folder.save();
-
-                            }
-                        }
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-                } finally {
-                    ActiveAndroid.endTransaction();
-
-                    /**
-                     * TODO: temp disable
-                     */
-//                    adapter.notifyDataSetChanged();
-//                    adapter = new FolderListAdapter(activity, collectionListLocal);
-//                    listView.setAdapter(adapter);
-
-
-                    if(pDialog != null) {
-                        pDialog.hide();
-                    }
-                }
-            }else{
-                DeviceStatus.showToast(activity, "no items");
-                Log.v(LOG_TAG, "no items");
-
-            }
-
-           Log.v(LOG_TAG, "get list OK");
-
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-            Log.v(LOG_TAG, "get list failed");
-            Log.v(LOG_TAG, error.toString());
-          //  DeviceStatus.showToast(activity, "update data failed");
-        }
-    };
 
 
     @Override
@@ -219,151 +91,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         NetWorkStateReceiver.registerNetStateObserver(this);
 
         initInstances();
-
-        /**
-         * DO NOT DELETE
-         * use tab layout instead
-         */
-//        toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-//
-//        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-//        drawerToggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, R.string.hello_world, R.string.hello_world);
-//        drawerLayout.setDrawerListener(drawerToggle);
-//
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
-//
-//        rootLayout = (CoordinatorLayout) findViewById(R.id.rootLayout);
-//
-//        rootView = getWindow().getDecorView().findViewById(android.R.id.content);
-//
-//
-//
-//        navigation = (NavigationView) findViewById(R.id.navigation);
-//        navigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-//            @Override
-//            public boolean onNavigationItemSelected(MenuItem menuItem) {
-//                int id = menuItem.getItemId();
-//                switch (id) {
-//                    case R.id.navItem1:
-//                        Intent showLocalImageIntent = new Intent(activity, GalleryListActivity.class);
-//                        startActivity(showLocalImageIntent);
-//
-//                        break;
-//                    case R.id.navItem2:
-//                        Intent showMainIntent = new Intent(activity, MainActivity.class);
-//                        startActivity(showMainIntent);
-//
-//                        break;
-//                    case R.id.navItem3:
-//                        Intent showSettingIntent = new Intent(activity, SettingsActivity.class);
-//                        startActivity(showSettingIntent);
-//                        break;
-//                    case R.id.navItem4:
-//
-//                        break;
-//                }
-//                return false;
-//            }
-//        });
-
-
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-
-        if(sharedPreferences.getString("status","").isEmpty()) {
-            SharedPreferences.Editor editorS = sharedPreferences.edit();
-            editorS.putString("status","wifi");
-            editorS.commit();
-
-        }
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-
-        editor.putString("UploadStatus", "false");
-        //editor.putString("status", "wifi");
-        editor.commit();
-
-
-        String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME,MediaStore.Images.Media.DATA};
-        Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        preferencesFiles = getSharedPreferences("gallery", Context.MODE_PRIVATE);
-
-        Cursor cur = getContentResolver().query(images, albums, null, null, null);
-
-       // final ArrayList<String> folders = new ArrayList<String>();
-
-        /*
-            set the folder path and folder names in shared preferences
-         */
-        if(cur != null) {
-            if (cur.moveToFirst()) {
-                String album;
-                String folderPath;
-                int albumLocation = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-                int path = cur.getColumnIndex(MediaStore.Images.Media.DATA);
-
-                do {
-                    // here store filename and filepath
-                    album = cur.getString(albumLocation);
-                    folderPath = cur.getString(path);
-                    File file = new File(folderPath);
-                    String dir = file.getParent();
-                    SharedPreferences.Editor ed = preferencesFiles.edit();
-                    ed.putString(album, dir);
-                    ed.commit();
-                    // folders.add(album);
-                    Log.i("ListingImages", " album=" + album);
-                } while (cur.moveToNext());
-            }
-        }
-
-
-
-
-
-
-
-        mPrefs = this.getSharedPreferences("myPref", 0);
-        username = mPrefs.getString("username", "");
-        password = mPrefs.getString("password", "");
-
-
-        collectionListLocal = new Select()
-                .from(ImejiFolder.class)
-                .execute();
-        Log.v(LOG_TAG, "size: " + collectionListLocal.size() + "");
-
-
-        /**
-         * DO NOT DELETE
-         * hide listView for now
-         */
-//        adapter = new FolderListAdapter(activity, collectionListLocal);
-//
-//
-//        listView = (ListView) findViewById(R.id.folder_listView);
-//
-//
-//
-//        listView.setAdapter(adapter);
-//
-//
-//
-//        // Set OnItemClickListener so we can be notified on item clicks
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-//                ImejiFolder folder = (ImejiFolder) adapter.getItem(position);
-//
-//                Intent showItemsIntent = new Intent(activity, ItemsActivity.class);
-//                showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
-//                showItemsIntent.putExtra("folderTitle", folder.getTitle());
-//                startActivity(showItemsIntent);
-//            }
-//        });
-
+        
 
                 /*
                     file system
@@ -388,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     @Override
     public void onStart() {
         super.onStart();
-        updateFolder();
     }
 
     @Override
@@ -437,36 +164,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         return true;
     }
 
-    /**
-     * DO NOT DELETE
-     * navigation for drawerLayout, need it later
-     */
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//
-
-//        int id = item.getItemId();
-//
-//        if (id == R.id.action_settings) {
-//            Intent showSettingIntent = new Intent(activity, SettingsActivity.class);
-//            startActivity(showSettingIntent);
-//
-//            return true;
-//        }
-//        if (id == R.id.homeAsUp) {
-//            drawerLayout.openDrawer(GravityCompat.START);
-//            return true;
-//        }
-//
-//        if (drawerToggle.onOptionsItemSelected(item)) {
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
     private void hidePDialog() {
         if (pDialog != null) {
             pDialog.dismiss();
@@ -474,17 +171,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         }
     }
 
-
-    private void updateFolder(){
-        pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Loading...");
-        pDialog.show();
-        RetrofitClient.getCollections(callback, username, password);
-    }
-
-    private void getFolderItems(String collectionId){
-        RetrofitClient.getCollectionItems(collectionId, callbackItems, username, password);
-    }
 
 
 

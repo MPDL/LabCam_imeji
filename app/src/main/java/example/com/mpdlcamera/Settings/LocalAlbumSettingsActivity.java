@@ -11,7 +11,6 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,9 +31,7 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.LocalGallery;
-import example.com.mpdlcamera.Model.User;
 import example.com.mpdlcamera.R;
-import example.com.mpdlcamera.Upload.CustomAdapter;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 
 
