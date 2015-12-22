@@ -86,23 +86,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     private FolderListAdapter adapter;
     private ListView listView;
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter reAdapter;
-    private RecyclerView.LayoutManager reLayoutManager;
 
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
     private ImejiFolder currentCollectionLocal = new ImejiFolder();
 
     SharedPreferences preferencesFiles;
-
-
-    Toolbar toolbar;
-    CollapsingToolbarLayout collapsingToolbarLayout;
-
-    DrawerLayout drawerLayout;
-    ActionBarDrawerToggle drawerToggle;
-
-    CoordinatorLayout rootLayout;
 
     //TESTING DB
     private boolean isAdd = false;

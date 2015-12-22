@@ -42,16 +42,10 @@ public class LocalFragment extends Fragment {
 
 
     //TODO: from kiran's galleryListActivity, remove lava later
-    Toolbar toolbar;
     private View rootView;
-    DrawerLayout drawerLayout;
-    ActionBarDrawerToggle drawerToggle;
-    CollapsingToolbarLayout collapsingToolbarLayout;
-    private NavigationView navigation;
+
     GridView gridView;
     SharedPreferences preferences;
-    private SharedPreferences mPrefs;
-
 
     GalleryListAdapter adapter;
 
@@ -126,6 +120,12 @@ public class LocalFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
+    /**
+     * Local Gallery Grid
+     * get folder name folder path
+     * set adapter for grid
+     * handle onclick
+     */
     private void loadLocalGallery(){
 
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
