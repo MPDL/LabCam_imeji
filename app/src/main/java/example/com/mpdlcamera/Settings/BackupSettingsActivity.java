@@ -60,9 +60,6 @@ public class BackupSettingsActivity extends AppCompatActivity {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         //show options
-        /**
-         * TODO:
-         */
         textView = (TextView) findViewById(R.id.backup_item_list);
         if(preferences.contains("status")) {
             String option = preferences.getString("status", "");

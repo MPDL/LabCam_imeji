@@ -11,6 +11,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import example.com.mpdlcamera.Folder.MainActivity;
+import example.com.mpdlcamera.Model.LocalModel.Configuration;
 import example.com.mpdlcamera.R;
 
 /**
@@ -28,6 +29,8 @@ public class BackUpOptionSettings extends AppCompatActivity {
         RadioButton radioOne = (RadioButton) findViewById(R.id.radioOne);
         RadioButton radioTwo = (RadioButton) findViewById(R.id.radioTwo);
         RadioButton radioThree = (RadioButton) findViewById(R.id.radioThree);
+
+        // place the radio button
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (preferences.contains("status")) {
 
@@ -57,8 +60,7 @@ public class BackUpOptionSettings extends AppCompatActivity {
 
         final RadioGroup radioOptionGroup = (RadioGroup) findViewById(R.id.radioNetwork);
 
-
-
+        //R.id.radioOne...
         int selectedId = radioOptionGroup.getCheckedRadioButtonId();
 
 
@@ -67,9 +69,12 @@ public class BackUpOptionSettings extends AppCompatActivity {
 
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("status", "wifi");
-
-
             editor.apply();
+
+            /**** wifi chosen ****/
+
+
+
         }
         if (selectedId == R.id.radioTwo) {
 

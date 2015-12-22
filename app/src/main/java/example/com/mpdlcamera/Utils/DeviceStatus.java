@@ -75,7 +75,9 @@ public class DeviceStatus {
         }
     }
 
-
+    public enum backupOption {
+        wifi, wifiCellular
+    }
 
 
 }

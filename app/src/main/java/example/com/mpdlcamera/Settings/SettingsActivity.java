@@ -13,10 +13,15 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
+
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import example.com.mpdlcamera.Model.LocalModel.Configuration;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
  * Created by Allen on 06.10s.15.
@@ -28,7 +33,8 @@ public class SettingsActivity extends AppCompatActivity {
     private final String LOG_TAG = SettingsActivity.class.getSimpleName();
     private View rootView;
     Toolbar toolbar;
-    String mOption;
+    String mOption; String networkOption = String.valueOf(DeviceStatus.backupOption.wifi);
+    //TODO: replace mOption with networkOption
     String localDevice;
     String remoteServer;
 
@@ -118,6 +124,8 @@ public class SettingsActivity extends AppCompatActivity {
             mOption = getString(R.string.wifi);
         }
 
+        //query database to get result
+
 
         SharedPreferences preferencesFolders = getSharedPreferences("folder", Context.MODE_PRIVATE);
         HashMap<String, String> folderSyncMap = new HashMap<String, String>();
@@ -152,6 +160,24 @@ public class SettingsActivity extends AppCompatActivity {
         list_item_local.setText(localDevice);
         list_item_server.setText(remoteServer);
     }
+
+    //save Configuration and create Task
+    private void saveSetting(){
+        /** new Configuration **/
+        Configuration configuration = new Configuration();
+        //setActivateTime
+        configuration.setActivateTime(System.currentTimeMillis());
+        //setBackupOption
+        configuration.setBackupOption(networkOption);
+    }
+
+    public static Configuration getConfiguration() {
+        return new Select()
+                .from(Configuration.class)
+                .orderBy("RANDOM()")
+                .executeSingle();
+    }
+
 }
 
 
