@@ -243,8 +243,8 @@ public class ImejiFragment extends Fragment {
             try {
                 collectionListLocal.clear();
                 for(ImejiFolder folder : folderList){
-                    Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
-                    Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
+//                    Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
+//                    Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
 
                     getFolderItems(folder.id);
 
@@ -263,9 +263,9 @@ public class ImejiFragment extends Fragment {
 
         @Override
         public void failure(RetrofitError error) {
-            Log.v(LOG_TAG, "get list failed");
+            Log.v(LOG_TAG, "get ImejiFolder failed");
             Log.v(LOG_TAG, error.toString());
-            DeviceStatus.showSnackbar(rootView, "update data failed");
+            DeviceStatus.showSnackbar(rootView, "get ImejiFolder failed");
         }
     };
 
@@ -310,13 +310,13 @@ public class ImejiFragment extends Fragment {
 
             }
 
-            Log.v(LOG_TAG, "get list OK");
+            Log.v(LOG_TAG, "get DataItem success");
 
         }
 
         @Override
         public void failure(RetrofitError error) {
-            Log.v(LOG_TAG, "get list failed");
+            Log.v(LOG_TAG, "get DataItem failed");
             Log.v(LOG_TAG, error.toString());
             //  DeviceStatus.showToast(activity, "update data failed");
         }

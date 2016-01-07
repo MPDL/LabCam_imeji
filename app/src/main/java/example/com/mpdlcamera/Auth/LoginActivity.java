@@ -5,22 +5,33 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.activeandroid.ActiveAndroid;
 
 import org.eclipse.jetty.util.MultiMap;
 import org.eclipse.jetty.util.UrlEncoded;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 import example.com.mpdlcamera.Folder.MainActivity;
+import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Utils.DeviceStatus;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -57,9 +68,9 @@ public class LoginActivity extends AppCompatActivity {
         mPrefs = this.getSharedPreferences("myPref", 0);
         usernameView.setText(mPrefs.getString("username", ""));
         passwordView.setText(mPrefs.getString("password", ""));
-        if(!mPrefs.getString("server", "").equals("")) {
+        if (!mPrefs.getString("server", "").equals("")) {
             serverURL = mPrefs.getString("server", "");
-        }else{
+        } else {
             serverURL = DeviceStatus.BASE_URL;
         }
 
@@ -109,9 +120,9 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferences.Editor ed = preferences.edit();
                     ed.putString("Camera", "On");
                     ed.commit();
-                    DeviceStatus.showSnackbar(rootView, "Login Successfully");
+//                    DeviceStatus.showSnackbar(rootView, "Login Successfully");
 
-                    accountLogin();
+                    RetrofitClient.getCollections(callback_login, username, password);
                 }
 
 
@@ -124,8 +135,6 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(activity, QRScannerActivity.class);
                 startActivityForResult(intent, INTENT_QR);
-
-
             }
         });
 
@@ -146,7 +155,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     String path = u.getPath();
                     String collectionId = null;
-                    if(path != null) {
+                    if (path != null) {
                         collectionId = path.substring(path.lastIndexOf("/") + 1);
                     }
 
@@ -181,9 +190,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-
     public void accountLogin() {
-        Intent intent = new Intent(this, MainActivity.class );
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
@@ -193,7 +201,7 @@ public class LoginActivity extends AppCompatActivity {
 
         String path = u.getPath();
         String collectionId = null;
-        if(path != null) {
+        if (path != null) {
             collectionId = path.substring(path.lastIndexOf("/") + 1);
         }
 
@@ -206,5 +214,28 @@ public class LoginActivity extends AppCompatActivity {
         System.out.println(values.getString("password"));
     }
 
+    /**
+     * callbacks
+     */
 
+    Callback<List<ImejiFolder>> callback_login = new Callback<List<ImejiFolder>>() {
+        @Override
+        public void success(List<ImejiFolder> folderList, Response response) {
+            Log.v(LOG_TAG, "Login success");
+            if(username!="" && username!=null){
+                Toast.makeText(activity,"Welcome "+username,Toast.LENGTH_SHORT).show();
+            }
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    accountLogin();
+                }
+            }, 1000);
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Toast.makeText(activity,"Wrong username or password",Toast.LENGTH_SHORT).show();
+        }
+    };
 }

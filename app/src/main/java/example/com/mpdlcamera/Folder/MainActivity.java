@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         NetWorkStateReceiver.registerNetStateObserver(this);
 
         initInstances();
-        
+
 
                 /*
                     file system
