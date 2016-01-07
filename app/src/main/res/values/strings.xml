@@ -22,8 +22,8 @@
     <string name="back_text">Upload in the background with wifi</string>
     <string name="manual">Upload Manually</string>
     <string name="backup_photos">Backup Photos</string>
-    <string name="lau">Logout After Uploading</string>
-    <string name="rpfd">Remove Photos From Device</string>
+    <string name="logout_after_upload">Logout after uploading</string>
+    <string name="remove_after_upload">Remove photos from device after uploading</string>
     <string name="rgl">Remove Geo Location</string>
     <string name="logout">All Files are Uploaded, Do you want to log out?</string>
     <string name="title_activity_local_album_settings">Local Album Settings</string>

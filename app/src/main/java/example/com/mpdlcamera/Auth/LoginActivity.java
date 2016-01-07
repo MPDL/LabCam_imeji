@@ -235,6 +235,8 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void failure(RetrofitError error) {
+            String errorInfo = error.getMessage();
+            Log.v("~~~", errorInfo);
             Toast.makeText(activity,"Wrong username or password",Toast.LENGTH_SHORT).show();
         }
     };
