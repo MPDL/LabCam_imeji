@@ -26,6 +26,7 @@ import java.util.List;
 
 import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.User;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -121,8 +122,7 @@ public class LoginActivity extends AppCompatActivity {
                     ed.putString("Camera", "On");
                     ed.commit();
 //                    DeviceStatus.showSnackbar(rootView, "Login Successfully");
-
-                    RetrofitClient.getCollections(callback_login, username, password);
+                    RetrofitClient.login(username,password,callback_login);
                 }
 
 
@@ -218,9 +218,9 @@ public class LoginActivity extends AppCompatActivity {
      * callbacks
      */
 
-    Callback<List<ImejiFolder>> callback_login = new Callback<List<ImejiFolder>>() {
+    Callback<User> callback_login = new Callback<User>() {
         @Override
-        public void success(List<ImejiFolder> folderList, Response response) {
+        public void success(User user, Response response) {
             Log.v(LOG_TAG, "Login success");
             if(username!="" && username!=null){
                 Toast.makeText(activity,"Welcome "+username,Toast.LENGTH_SHORT).show();
@@ -235,9 +235,7 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void failure(RetrofitError error) {
-            String errorInfo = error.getMessage();
-            Log.v("~~~", errorInfo);
-            Toast.makeText(activity,"Wrong username or password",Toast.LENGTH_SHORT).show();
+            Log.v("~~~","login failed" );
         }
     };
 }

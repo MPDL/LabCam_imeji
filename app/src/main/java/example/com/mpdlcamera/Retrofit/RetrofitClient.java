@@ -1,9 +1,15 @@
 package example.com.mpdlcamera.Retrofit;
 
+import com.google.gson.JsonObject;
+
+import org.json.JSONObject;
+
 import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
+import example.com.mpdlcamera.Model.User;
 import retrofit.Callback;
 import retrofit.client.Response;
 import retrofit.mime.TypedFile;
@@ -22,10 +28,10 @@ public class RetrofitClient {
         REST_SERVER = restServer;
     }
 
-    public static void login(String username, String password){
+    public static void login(String username, String password,Callback<User> callback){
         ImejiAPI imejiAPI = ServiceGenerator.
                 createService(ImejiAPI.class, REST_SERVER, username, password);
-        imejiAPI.basicLogin();
+        imejiAPI.basicLogin(callback);
     }
 
 
@@ -69,6 +75,14 @@ public class RetrofitClient {
         ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, username, password);
 
         imejiAPI.getCollections(callback);
+    }
+
+    public static void getCollectionMessage(Callback<JsonObject> callback,
+                                      String username,
+                                      String password) {
+        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, username, password);
+
+        imejiAPI.getCollectionMessage(callback);
     }
 
     public static void getCollectionItems(String collectionId,

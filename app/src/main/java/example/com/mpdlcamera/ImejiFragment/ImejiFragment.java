@@ -20,6 +20,13 @@ import android.widget.ListView;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,6 +36,7 @@ import example.com.mpdlcamera.Folder.FolderListAdapter;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -226,7 +234,8 @@ public class ImejiFragment extends Fragment {
         pDialog = new ProgressDialog(getActivity());
         pDialog.setMessage("Loading...");
         pDialog.show();
-        RetrofitClient.getCollections(callback, username, password);
+//        RetrofitClient.getCollections(callback, username, password);
+        RetrofitClient.getCollectionMessage(callback_collection,username,password);
     }
 
     private void getFolderItems(String collectionId){
@@ -236,38 +245,7 @@ public class ImejiFragment extends Fragment {
     /**
      * Callbacks
      */
-    Callback<List<ImejiFolder>> callback = new Callback<List<ImejiFolder>>() {
-        @Override
-        public void success(List<ImejiFolder> folderList, Response response) {
-            ActiveAndroid.beginTransaction();
-            try {
-                collectionListLocal.clear();
-                for(ImejiFolder folder : folderList){
-//                    Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
-//                    Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
 
-                    getFolderItems(folder.id);
-
-                    //TODO Here is a bug, collectionLocal will be random one collection
-                    //collectionLocal = folder;
-
-                    collectionListLocal.add(folder);
-                    //folder.save();
-                }
-                ActiveAndroid.setTransactionSuccessful();
-            } finally{
-                ActiveAndroid.endTransaction();
-            }
-
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-            Log.v(LOG_TAG, "get ImejiFolder failed");
-            Log.v(LOG_TAG, error.toString());
-            DeviceStatus.showSnackbar(rootView, "get ImejiFolder failed");
-        }
-    };
 
     Callback<List<DataItem>> callbackItems = new Callback<List<DataItem>>() {
         @Override
@@ -321,4 +299,52 @@ public class ImejiFragment extends Fragment {
             //  DeviceStatus.showToast(activity, "update data failed");
         }
     };
+
+    Callback<JsonObject> callback_collection = new Callback<JsonObject>() {
+        @Override
+        public void success(JsonObject jsonObject, Response response) {
+            Log.i("callback_collection","callback_collection success");
+            Log.i("callback_collection", jsonObject.toString());
+
+            JsonArray array;
+            List<ImejiFolder> folderList = new ArrayList<>();
+
+                array = jsonObject.getAsJsonArray("results");
+                Log.i("results", array.toString());
+                Gson gson = new Gson();
+                for(int i = 0 ; i < array.size() ; i++){
+                    ImejiFolder imejiFolder = gson.fromJson(array.get(i), ImejiFolder.class);
+                    folderList.add(imejiFolder);
+                }
+
+            ActiveAndroid.beginTransaction();
+            try {
+                collectionListLocal.clear();
+                for(ImejiFolder folder : folderList){
+//                    Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
+//                    Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
+
+                    getFolderItems(folder.id);
+
+                    //TODO Here is a bug, collectionLocal will be random one collection
+                    //collectionLocal = folder;
+
+                    collectionListLocal.add(folder);
+                    //folder.save();
+                }
+                ActiveAndroid.setTransactionSuccessful();
+            } finally{
+                ActiveAndroid.endTransaction();
+            }
+
+
+
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.i("callback_collection","callback_collection fails");
+        }
+    };
+
 }

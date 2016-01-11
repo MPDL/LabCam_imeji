@@ -1,9 +1,14 @@
 package example.com.mpdlcamera.Retrofit;
 
+import com.google.gson.JsonObject;
+
+import org.json.JSONObject;
+
 import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.Model.User;
 import retrofit.Callback;
 import retrofit.client.Response;
@@ -57,8 +62,13 @@ public interface ImejiAPI {
     List<User> getUserById(@Path("userId") String userId,
                            Callback<Response> callback);
 
+
+    /**
+     * login
+     * @param callback
+     */
     @POST("/login")
-    User basicLogin();
+    void basicLogin(Callback<User> callback);
 
 
     /*
@@ -67,6 +77,10 @@ public interface ImejiAPI {
     //get all collections
     @GET(value = "/collections?size=30")
     void getCollections(Callback<List<ImejiFolder>> callback);
+
+    @GET(value = "/collections?size=30")
+    void getCollectionMessage(Callback<JsonObject> callback);
+
 
     //get all items by collection id
     @GET("/collections/{id}/items?size=300")
