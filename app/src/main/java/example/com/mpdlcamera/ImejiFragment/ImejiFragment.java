@@ -24,10 +24,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +32,6 @@ import example.com.mpdlcamera.Folder.FolderListAdapter;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
-import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Utils.DeviceStatus;

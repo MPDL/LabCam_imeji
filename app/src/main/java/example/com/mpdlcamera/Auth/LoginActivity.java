@@ -15,17 +15,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.activeandroid.ActiveAndroid;
-
 import org.eclipse.jetty.util.MultiMap;
 import org.eclipse.jetty.util.UrlEncoded;
 
 import java.net.URL;
-import java.util.Collections;
-import java.util.List;
 
 import example.com.mpdlcamera.Folder.MainActivity;
-import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.User;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;

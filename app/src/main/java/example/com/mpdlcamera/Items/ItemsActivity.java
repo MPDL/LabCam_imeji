@@ -22,12 +22,9 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import example.com.mpdlcamera.Folder.FolderListAdapter;
 import example.com.mpdlcamera.Model.DataItem;
-import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
-import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
