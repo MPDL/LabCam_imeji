@@ -15,13 +15,19 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import com.activeandroid.ActiveAndroid;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import example.com.mpdlcamera.Folder.FolderListAdapter;
 import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -46,9 +52,20 @@ public class ItemsActivity extends AppCompatActivity {
 
     Toolbar toolbar;
 
-    Callback<List<DataItem>> callbackItems = new Callback<List<DataItem>>() {
+    Callback<JsonObject> callback_Items = new Callback<JsonObject>() {
         @Override
-        public void success(List<DataItem> dataList, Response response) {
+        public void success(JsonObject jsonObject, Response response) {
+            JsonArray array;
+            List<DataItem> dataList = new ArrayList<>();
+
+            array = jsonObject.getAsJsonArray("results");
+            Log.i("results", array.toString());
+            Gson gson = new Gson();
+            for(int i = 0 ; i < array.size() ; i++){
+                DataItem dataItem = gson.fromJson(array.get(i), DataItem.class);
+                dataList.add(dataItem);
+            }
+
             //load all data from imeji
             //adapter =  new CustomListAdapter(getActivity(), dataList);
             List<DataItem> dataListLocal = new ArrayList<DataItem>();
@@ -75,11 +92,10 @@ public class ItemsActivity extends AppCompatActivity {
 
         @Override
         public void failure(RetrofitError error) {
+            Log.v(LOG_TAG, "get DataItem failed");
             Log.v(LOG_TAG, error.toString());
         }
     };
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,7 +162,7 @@ public class ItemsActivity extends AppCompatActivity {
     }
 
     private void getFolderItems(String collectionId){
-        RetrofitClient.getCollectionItems(collectionId, callbackItems, username, password);
+        RetrofitClient.getCollectionItems(collectionId, callback_Items, username, password);
     }
 
 

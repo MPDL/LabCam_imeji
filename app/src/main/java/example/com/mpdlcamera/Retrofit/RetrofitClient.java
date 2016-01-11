@@ -86,7 +86,7 @@ public class RetrofitClient {
     }
 
     public static void getCollectionItems(String collectionId,
-                                      Callback<List<DataItem>> callback,
+                                      Callback<JsonObject> callback,
                                       String username,
                                       String password) {
         ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, username, password);

@@ -85,7 +85,7 @@ public interface ImejiAPI {
     //get all items by collection id
     @GET("/collections/{id}/items?size=300")
     void getCollectionItems(@Path("id") String collectionId,
-                            Callback<List<DataItem>> callback);
+                            Callback<JsonObject> callback);
 
 
 

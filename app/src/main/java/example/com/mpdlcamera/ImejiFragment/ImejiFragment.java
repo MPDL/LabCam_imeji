@@ -239,17 +239,26 @@ public class ImejiFragment extends Fragment {
     }
 
     private void getFolderItems(String collectionId){
-        RetrofitClient.getCollectionItems(collectionId, callbackItems, username, password);
+        RetrofitClient.getCollectionItems(collectionId, callback_Items, username, password);
     }
 
     /**
      * Callbacks
      */
 
-
-    Callback<List<DataItem>> callbackItems = new Callback<List<DataItem>>() {
+    Callback<JsonObject> callback_Items = new Callback<JsonObject>() {
         @Override
-        public void success(List<DataItem> dataList , Response response) {
+        public void success(JsonObject jsonObject, Response response) {
+            JsonArray array;
+            List<DataItem> dataList = new ArrayList<>();
+
+            array = jsonObject.getAsJsonArray("results");
+            Log.i("results", array.toString());
+            Gson gson = new Gson();
+            for(int i = 0 ; i < array.size() ; i++){
+                DataItem dataItem = gson.fromJson(array.get(i), DataItem.class);
+                dataList.add(dataItem);
+            }
 
             if(dataList != null) {
                 ActiveAndroid.beginTransaction();
@@ -296,7 +305,6 @@ public class ImejiFragment extends Fragment {
         public void failure(RetrofitError error) {
             Log.v(LOG_TAG, "get DataItem failed");
             Log.v(LOG_TAG, error.toString());
-            //  DeviceStatus.showToast(activity, "update data failed");
         }
     };
 
