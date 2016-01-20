@@ -2,6 +2,7 @@ package example.com.mpdlcamera.Settings;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.view.Display;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.UploadFragment.CollectionIdInterface;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
@@ -32,10 +34,14 @@ public class SettingsListAdapter extends BaseAdapter {
     int selectedPosition = -1;
     private SharedPreferences mPrefs;
 
+    private CollectionIdInterface ie;
 
-    public SettingsListAdapter(Activity activity, List<ImejiFolder> folderItems) {
+    //selected collection
+
+    public SettingsListAdapter(Activity activity, List<ImejiFolder> folderItems,CollectionIdInterface ie) {
         this.activity = activity;
         this.folderItems = folderItems;
+        this.ie = ie;
     }
 
     @Override
@@ -81,8 +87,8 @@ public class SettingsListAdapter extends BaseAdapter {
         TextView date = (TextView) convertView.findViewById(R.id.setting_item_date);
 
 
-        String collectionId= mPrefs.getString("collectionID", DeviceStatus.collectionID);
-        System.out.println("collectionId" + " "+collectionId);
+        final String collectionId= mPrefs.getString("collectionID", DeviceStatus.collectionID);
+        System.out.println("collectionId" + " " + collectionId);
 
         if(folderItems.size()>0) {
 
@@ -100,25 +106,31 @@ public class SettingsListAdapter extends BaseAdapter {
 
             // user
             if(collection.getContributors() != null) {
-                user.setText(collection.getContributors().get(0).getCompleteName());
+                user.setText(collection.getContributors().get(0).getPerson().getCompleteName());
             }
             // date
             date.setText(String.valueOf(collection.getModifiedDate()).split("\\+")[0]);
         }
 
-
-        System.out.println(LOG_TAG + " position " + position);
-        System.out.println(LOG_TAG + " selectedPosition " + selectedPosition);
-        System.out.println(LOG_TAG + " ## ");
-
-
         checkBox.setChecked(position == selectedPosition);
         checkBox.setTag(position);
+
+
+
+
+
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
                 selectedPosition = (Integer)view.getTag();
+
+//                ie.setCollectionId(folderItems.get(selectedPosition).id);
+
                 notifyDataSetChanged();
+
+                //collectionID and remoteServer
 
                 SharedPreferences.Editor editor = mPrefs.edit();
                 editor.putString("collectionID", folderItems.get(selectedPosition).id);
@@ -128,6 +140,8 @@ public class SettingsListAdapter extends BaseAdapter {
 //                System.out.println(preferences.getString("collectionID","default") + selectedPosition);
 
                 editor.apply();
+
+
             }
         });
 

@@ -5,10 +5,10 @@
 
     <ImageView
         android:id="@+id/tabicon_local"
-        android:layout_width="22.5dp"
-        android:layout_height="26dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_gravity="center"
-        android:background="@drawable/user_active"
+        android:background="@drawable/localfolder_active"
         android:adjustViewBounds="true"/>
 
 </LinearLayout>

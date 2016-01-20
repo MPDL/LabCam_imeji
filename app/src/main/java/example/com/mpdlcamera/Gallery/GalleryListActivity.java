@@ -115,8 +115,7 @@ public class GalleryListActivity extends AppCompatActivity implements UploadResu
         //try close cursor here
         cur.close();
 
-        ArrayList<Gallery> imageFolders = new ArrayList<Gallery>();
-        imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
+        ArrayList<Gallery> imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
 
 
         adapter = new GalleryListAdapter(activity, imageFolders );
@@ -154,20 +153,6 @@ public class GalleryListActivity extends AppCompatActivity implements UploadResu
                 }
             }
         });
-
-
-        /**
-         *  open a new upload service here? why
-         */
-
-        /*
-            The background service which uploads the files in the filesystem starts here
-         */
-        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
-        mReceiver.setReceiver(this);
-        Intent intent = new Intent(this, UploadService.class);
-        intent.putExtra("receiver", mReceiver);
-        this.startService(intent);
 
     }
 

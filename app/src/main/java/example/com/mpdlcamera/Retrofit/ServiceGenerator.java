@@ -77,4 +77,48 @@ public class ServiceGenerator {
 
         return adapter.create(serviceClass);
     }
+
+    public static <S> S createService(Class<S> serviceClass, String baseUrl,
+                                      String APIkey) {
+        RestAdapter.Builder builder = new RestAdapter.Builder();
+
+        Gson gson = new GsonBuilder()
+                .serializeNulls()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+
+        // set endpoint url and use OkHTTP as HTTP client
+        builder.setEndpoint(baseUrl)
+                .setConverter(new GsonConverter(gson))
+                .setClient(new OkClient(new OkHttpClient()));
+
+
+        final String key =  APIkey;
+        // execute only when user provide the username and password
+        if (key!=null) {
+            // concatenate username and password with colon for authentication
+
+            builder.setRequestInterceptor(new RequestInterceptor() {
+                @Override
+                public void intercept(RequestFacade request) {
+                    // create Base64 encodet string
+                    String string = "Bearer " + key;
+
+                    request.addHeader("Authorization", string);
+                    request.addHeader("Accept", "application/json");
+                }
+            });
+            // set log level
+            builder.setLogLevel(RestAdapter.LogLevel.FULL).setLog(new RestAdapter.Log() {
+                public void log(String msg) {
+                    Log.i("retrofit", msg);
+                }
+            });
+        }
+
+
+        RestAdapter adapter = builder.build();
+
+        return adapter.create(serviceClass);
+    }
 }

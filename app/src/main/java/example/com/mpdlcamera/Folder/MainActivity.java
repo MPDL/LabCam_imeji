@@ -4,9 +4,13 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,6 +23,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
+
+import java.io.File;
+import java.util.ArrayList;
 
 import example.com.mpdlcamera.ImejiFragment.ImejiFragment;
 import example.com.mpdlcamera.LocalFragment.LocalFragment;
@@ -79,7 +86,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         //init DB
         initDB();
-
+        //
+        getLocalCamFolder();
         // register NetStateObserver
         NetWorkStateReceiver.registerNetStateObserver(this);
 
@@ -165,7 +173,49 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     }
 
 
+    public void getLocalCamFolder(){
 
+       String path_DCIM = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
+       Log.i("DCIM path_DCIM:",path_DCIM);
+
+
+    }
+
+    public void getLocalFolders(){
+        String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME,MediaStore.Images.Media.DATA};
+        Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+        for(int i = 0; i<albums.length ;i++){
+            Log.i("albums",  albums[i]);
+        }
+        Log.i("Images",  images.toString());
+
+        final ArrayList<String> folders = new ArrayList<String>();
+
+        Cursor cur = getContentResolver().query(images, albums, null, null, null);
+
+        if (cur.moveToFirst()) {
+            String album;
+            String filePath;
+            int albumLocation = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
+            int path = cur.getColumnIndex(MediaStore.Images.Media.DATA);
+
+            do {
+                album = cur.getString(albumLocation);
+                Log.i("album",album);
+                filePath = cur.getString(path);
+                Log.i("filePath",filePath);
+                File file = new File(filePath);
+                String directory = file.getParent();
+                Log.i("filePath/directory", directory);
+//                SharedPreferences.Editor editor = preferencesFiles.edit();
+//                editor.putString(album, directory);
+//                editor.commit();
+                folders.add(album);
+                Log.i("ListingImages", " album=" + album);
+            } while (cur.moveToNext());
+        }
+    }
 
   /*  public class ResponseReceiver extends BroadcastReceiver {
 
@@ -232,13 +282,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
             isAdd = true;
             //init task
-            String now = "12/17/15";
-            String tomorrow = "12/18/15";
+
             Task task1 = new Task();
             task1.setTaskId("01");
             task1.setUserName("Ina");
-            task1.setFinishTime(now);
-            task1.setStartTime(now);
+
             task1.setUploadMode("AU");
             task1.save();
 
@@ -246,15 +294,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             Image einImage = new Image();
             einImage.setImageId("001");
             einImage.setImageName("eins");
-            einImage.setCreateTime(now);
-            einImage.setTask(task1);
+            einImage.setTaskId("1");
             einImage.save();
 
             Image zwiImage = new Image();
             zwiImage.setImageId("002");
             zwiImage.setImageName("zwi");
-            zwiImage.setCreateTime(now);
-            zwiImage.setTask(task1);
+            zwiImage.setTaskId("1");
             zwiImage.save();
 
 
@@ -277,7 +323,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         tabLayout.getTabAt(0).setCustomView(R.layout.tab_local);
         tabLayout.getTabAt(1).setCustomView(R.layout.tab_imeji);
         tabLayout.getTabAt(2).setCustomView(R.layout.tab_upload);
-        tabLayout.getTabAt(3).setCustomView(R.layout.tab_user);
 
         //tab style change on page change
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -286,20 +331,18 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
             // tab icon images
             int[] unselectedTabResource = {
-                    R.drawable.user_inactive,
-                    R.drawable.user_inactive,
-                    R.drawable.user_inactive,
-                    R.drawable.user_inactive
+                    R.drawable.localfolder_inactive,
+                    R.drawable.imeji_logo_inactive,
+                    R.drawable.settings_inactive,
             };
             int[] selectedTabResource = {
-                    R.drawable.user_active,
-                    R.drawable.user_active,
-                    R.drawable.user_active,
-                    R.drawable.user_active
+                    R.drawable.localfolder_active,
+                    R.drawable.imeji_logo_active,
+                    R.drawable.settings_active,
             };
 
             //tab Icon and Text id in layout files
-            int[] backgroundIconId = {R.id.tabicon_local, R.id.tabicon_imeji, R.id.tabicon_upload, R.id.tabicon_user};
+            int[] backgroundIconId = {R.id.tabicon_local, R.id.tabicon_imeji, R.id.tabicon_upload};
 
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -320,9 +363,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 if (2 != position && 2 != selectedIndex) {
                     tabLayout.findViewById(backgroundIconId[2]).setBackgroundResource(unselectedTabResource[2]);
                 }
-                if (3 != position && 3 != selectedIndex) {
-                    tabLayout.findViewById(backgroundIconId[3]).setBackgroundResource(unselectedTabResource[3]);
-                }
+
 
                 //activate the selected tab icon and text
                 tabLayout.setBackgroundResource(R.color.primary);
@@ -351,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         @Override
         public int getCount() {
-                return 4;
+                return 3;
         }
 
         @Override
@@ -372,9 +413,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     return fragment;
                 case 2:
                     fragment = new UploadFragment();
-                    return fragment;
-                case 3:
-                    fragment = new UserFragment();
                     return fragment;
 
                 default:

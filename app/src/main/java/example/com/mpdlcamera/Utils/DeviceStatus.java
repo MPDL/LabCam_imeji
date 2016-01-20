@@ -2,10 +2,12 @@ package example.com.mpdlcamera.Utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Toast;
@@ -77,6 +79,10 @@ public class DeviceStatus {
 
     public enum backupOption {
         wifi, wifiCellular
+    }
+
+    public enum state{
+        WAITING, STARTED, STOPPED, INTERRUPTED, FINISHED
     }
 
 

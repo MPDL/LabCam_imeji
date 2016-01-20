@@ -1,13 +1,19 @@
 package example.com.mpdlcamera.UploadFragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -20,12 +26,11 @@ import example.com.mpdlcamera.R;
 public class UploadFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    static final int PICK_COLLECTION_REQUEST = 1997;
+    private RadioGroup radioGroup;
+    private View rootview;
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
@@ -40,10 +45,6 @@ public class UploadFragment extends Fragment {
     // TODO: Rename and change types and number of parameters
     public static UploadFragment newInstance(String param1, String param2) {
         UploadFragment fragment = new UploadFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -54,17 +55,18 @@ public class UploadFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_upload, container, false);
+        rootview = inflater.inflate(R.layout.fragment_upload, container, false);
+        //init radioButton group
+        initRadioButtonGroup();
+
+        //choose collection
+        chooseCollection();
+        return rootview;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -95,4 +97,32 @@ public class UploadFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == PICK_COLLECTION_REQUEST) {
+//            // Make sure the request was successful
+//            if (resultCode == Activity.RESULT_OK)
+//                  data.getData();
+//                Log.i("RESULT_OK",data.getData().toString());
+////                TextView collectionNameTextView = (TextView) rootview.findViewById(R.id.collection_name);
+////                collectionNameTextView.setText(data.getDataString());}
+//            }
+//
+//    }
+
+    public void initRadioButtonGroup(){
+        radioGroup = (RadioGroup) rootview.findViewById(R.id.radio_group);
+        radioGroup.clearCheck();
+    }
+
+    public void chooseCollection(){
+        TextView chooseCollectionTextView = (TextView) rootview.findViewById(R.id.tv_choose_collection);
+        chooseCollectionTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent settingsIntent = new Intent(getActivity(), RemoteCollectionSettingsActivity.class);
+                startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
+            }
+        });
+    }
 }

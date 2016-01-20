@@ -2,29 +2,38 @@ package example.com.mpdlcamera.Settings;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
+import example.com.mpdlcamera.UploadFragment.CollectionIdInterface;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class RemoteCollectionSettingsActivity extends AppCompatActivity {
+public class RemoteCollectionSettingsActivity extends AppCompatActivity implements CollectionIdInterface{
     private String username;
     private String password;
     private SharedPreferences mPrefs;
@@ -39,11 +48,26 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
 
+    private String collectionID;
+    private CollectionIdInterface ie;
 
 
-    Callback<List<ImejiFolder>> callback = new Callback<List<ImejiFolder>>() {
+
+    Callback<JsonObject> callback = new Callback<JsonObject>() {
         @Override
-        public void success(List<ImejiFolder> folderList, Response response) {
+        public void success(JsonObject jsonObject, Response response) {
+            pDialog.hide();
+
+            JsonArray array;
+            List<ImejiFolder> folderList = new ArrayList<>();
+
+            array = jsonObject.getAsJsonArray("results");
+            Log.i("results", array.toString());
+            Gson gson = new Gson();
+            for(int i = 0 ; i < array.size() ; i++){
+                ImejiFolder imejiFolder = gson.fromJson(array.get(i), ImejiFolder.class);
+                folderList.add(imejiFolder);
+            }
             ActiveAndroid.beginTransaction();
             try {
                 collectionListLocal.clear();
@@ -59,19 +83,18 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity {
                 Log.v(LOG_TAG, "size: " + collectionListLocal.size() + "");
 
                 adapter.notifyDataSetChanged();
-                pDialog.hide();
             }
 
         }
 
         @Override
         public void failure(RetrofitError error) {
+            pDialog.hide();
             Log.v(LOG_TAG, "get list failed");
             Log.v(LOG_TAG, error.toString());
             DeviceStatus.showSnackbar(rootView, "update data failed");
         }
     };
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,22 +122,11 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity {
 
         listView = (ListView) findViewById(R.id.settings_remote_listView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        adapter = new SettingsListAdapter(activity, collectionListLocal);
+        adapter = new SettingsListAdapter(activity, collectionListLocal,ie);
         listView.setAdapter(adapter);
 
-
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-//                ImejiFolder folder = (ImejiFolder) adapter.getItem(position);
-//
-//                Intent showItemsIntent = new Intent(activity, ItemsActivity.class);
-//                showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
-//                startActivity(showItemsIntent);
-//            }
-//        });
-
-
+        //save collection folder
+        saveCollection();
     }
 
     @Override
@@ -154,7 +166,22 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity {
         pDialog = new ProgressDialog(this);
         pDialog.setMessage("Loading...");
         pDialog.show();
-        RetrofitClient.getCollections(callback, username, password);
+        RetrofitClient.getCollectionMessage(callback, username, password);
     }
 
+    private void saveCollection(){
+        Button saveButton = (Button) rootView.findViewById(R.id.save_collection);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Log.i("collectionID",collectionID);
+            }
+        });
+
+    }
+
+    @Override
+    public void setCollectionId(int Id) {
+        collectionID = collectionListLocal.get(Id).getImejiId();
+    }
 }

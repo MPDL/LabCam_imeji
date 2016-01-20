@@ -4,9 +4,9 @@
     android:layout_height="match_parent">
     <ImageView
         android:id="@+id/tabicon_imeji"
-        android:layout_width="22.5dp"
-        android:layout_height="26dp"
+        android:layout_width="32dp"
+        android:layout_height="30dp"
         android:layout_gravity="center"
-        android:background="@drawable/user_inactive"
+        android:background="@drawable/imeji_logo_inactive"
         android:adjustViewBounds="true"/>
 </LinearLayout>

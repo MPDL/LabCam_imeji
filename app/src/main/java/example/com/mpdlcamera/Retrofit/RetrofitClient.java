@@ -31,6 +31,11 @@ public class RetrofitClient {
         imejiAPI.basicLogin(callback);
     }
 
+    public static void apiLogin(String APIkey,Callback<User> callback){
+        ImejiAPI imejiAPI = ServiceGenerator.
+                createService(ImejiAPI.class, REST_SERVER,APIkey);
+        imejiAPI.basicLogin(callback);
+    }
 
     /*
     for items

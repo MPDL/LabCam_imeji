@@ -127,6 +127,7 @@ public class UploadService extends IntentService {
                             String folderName = (String) entry.getKey();
 
                             String directoryPath = preferencesFiles.getString(folderName, "");
+                            System.out.println("directoryPath"+directoryPath);
 
                             File folder = new File(directoryPath);
                             File[] folderFiles = folder.listFiles();

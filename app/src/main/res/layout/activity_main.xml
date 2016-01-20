@@ -14,7 +14,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-w
+
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -43,7 +43,7 @@ w
                         android:layout_centerVertical="true"
                         android:layout_marginRight="16dp"
                         android:id="@+id/camera_icon"
-                        android:src="@drawable/user_active"/>
+                        android:src="@drawable/camera"/>
 
                     <ProgressBar
                         android:layout_width="28dp"
@@ -51,6 +51,7 @@ w
                         android:layout_toLeftOf="@+id/camera_icon"
                         android:layout_marginRight="20dp"
                         android:id="@+id/progress_upload"
+                        android:visibility="gone"
                         android:layout_centerVertical="true"/>
 
                 </RelativeLayout>

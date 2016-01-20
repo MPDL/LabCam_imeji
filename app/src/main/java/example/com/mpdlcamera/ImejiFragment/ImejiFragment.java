@@ -280,11 +280,6 @@ public class ImejiFragment extends Fragment {
                     adapter.notifyDataSetChanged();
                     adapter = new FolderListAdapter(getActivity(), collectionListLocal);
                     listView.setAdapter(adapter);
-
-
-                    if(pDialog != null) {
-                        pDialog.hide();
-                    }
                 }
             }else{
                 DeviceStatus.showToast(getActivity(), "no items");
@@ -340,7 +335,9 @@ public class ImejiFragment extends Fragment {
                 ActiveAndroid.endTransaction();
             }
 
-
+            if(pDialog != null) {
+                pDialog.hide();
+            }
 
         }
 
