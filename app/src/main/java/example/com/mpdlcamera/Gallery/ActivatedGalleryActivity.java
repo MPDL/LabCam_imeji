@@ -348,7 +348,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
             String json ="{" + jsonPart1  +"}";
 
             Log.v(LOG_TAG, json);
-            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+//            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
             Log.v(LOG_TAG, "##upload:" + filePath);
 
         }

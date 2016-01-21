@@ -35,7 +35,7 @@ import retrofit.client.Response;
 
 public class RemoteCollectionSettingsActivity extends AppCompatActivity implements CollectionIdInterface{
     private String username;
-    private String password;
+    private String APIkey;
     private SharedPreferences mPrefs;
 
     private ProgressDialog pDialog;
@@ -111,7 +111,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
-        password = mPrefs.getString("password", "");
+        APIkey = mPrefs.getString("apiKey", "");
 
 
         collectionListLocal = new Select()
@@ -166,7 +166,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         pDialog = new ProgressDialog(this);
         pDialog.setMessage("Loading...");
         pDialog.show();
-        RetrofitClient.getCollectionMessage(callback, username, password);
+        RetrofitClient.getCollectionMessage(callback, APIkey);
     }
 
     private void saveCollection(){

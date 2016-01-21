@@ -61,7 +61,7 @@ public class LocalImageActivity extends AppCompatActivity {
     private final String LOG_TAG = LocalImageActivity.class.getSimpleName();
     private SharedPreferences mPrefs;
     private String username;
-    private String password;
+    private String apiKey;
     private TypedFile typedFile;
     private String json;
 
@@ -158,7 +158,7 @@ public class LocalImageActivity extends AppCompatActivity {
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
-        password = mPrefs.getString("password", "");
+        apiKey = mPrefs.getString("apiKey", "");
         dataCollectionId = mPrefs.getString("collectionID", DeviceStatus.collectionID);
 
         Intent intent = activity.getIntent();
@@ -386,7 +386,7 @@ public class LocalImageActivity extends AppCompatActivity {
                 json = "{" + jsonPart1 + "}";
 
                 Log.v(LOG_TAG, json);
-                RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
             }
         }
     }

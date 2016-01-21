@@ -60,7 +60,7 @@ public class UploadService extends IntentService {
     private MetaData meta = new MetaData();
 
     private String username;
-    private String password;
+    private String apiKey;
     private String collectionID;
     public TypedFile typedFile;
     String json;
@@ -84,7 +84,7 @@ public class UploadService extends IntentService {
 
             mPrefs = this.getSharedPreferences("myPref", 0);
             username = mPrefs.getString("username", "");
-            password = mPrefs.getString("password", "");
+            apiKey = mPrefs.getString("apiKey", "");
             if (mPrefs.contains("collectionID")) {
                 collectionID = mPrefs.getString("collectionID", "");
             } else
@@ -223,7 +223,7 @@ public class UploadService extends IntentService {
             String BASE_URL = "https://dev-faces.mpdl.mpg.de/rest/";
             RetrofitClient.setRestServer(BASE_URL);
 
-            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+            RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
         }
         else {
             //Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();

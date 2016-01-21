@@ -49,10 +49,9 @@ public class RetrofitClient {
     public static void uploadItem(TypedFile typedFile,
                                   String json,
                                   Callback<DataItem> callback,
-                                  String username,
-                                  String password) {
+                                  String APIkey) {
         ImejiAPI imejiAPI = ServiceGenerator.
-            createService(ImejiAPI.class, REST_SERVER, username, password);
+            createService(ImejiAPI.class, REST_SERVER, APIkey);
         imejiAPI.postItem(typedFile, json, callback);
     }
 
@@ -79,19 +78,21 @@ public class RetrofitClient {
         imejiAPI.getCollections(callback);
     }
 
+
+
     public static void getCollectionMessage(Callback<JsonObject> callback,
-                                      String username,
-                                      String password) {
-        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, username, password);
+                                            String APIkey) {
+        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
 
         imejiAPI.getCollectionMessage(callback);
     }
 
+
+
     public static void getCollectionItems(String collectionId,
                                       Callback<JsonObject> callback,
-                                      String username,
-                                      String password) {
-        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, username, password);
+                                      String APIkey) {
+        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
 
         // Fetch and print a list of the items to this library.
         imejiAPI.getCollectionItems(collectionId, callback);

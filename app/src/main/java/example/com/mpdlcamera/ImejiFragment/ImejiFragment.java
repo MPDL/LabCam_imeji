@@ -52,7 +52,7 @@ public class ImejiFragment extends Fragment {
     private View rootView;
     private final String LOG_TAG = "ImejiFragment";
     private String username;
-    private String password;
+    private String APIKey;
     private SharedPreferences mPrefs;
 
     private ProgressDialog pDialog;
@@ -216,7 +216,7 @@ public class ImejiFragment extends Fragment {
 
         mPrefs = getActivity().getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
-        password = mPrefs.getString("password", "");
+        APIKey = mPrefs.getString("apiKey", "");
 
 
         collectionListLocal = new Select()
@@ -230,11 +230,11 @@ public class ImejiFragment extends Fragment {
         pDialog.setMessage("Loading...");
         pDialog.show();
 //        RetrofitClient.getCollections(callback, username, password);
-        RetrofitClient.getCollectionMessage(callback_collection,username,password);
+        RetrofitClient.getCollectionMessage(callback_collection,APIKey);
     }
 
     private void getFolderItems(String collectionId){
-        RetrofitClient.getCollectionItems(collectionId, callback_Items, username, password);
+        RetrofitClient.getCollectionItems(collectionId, callback_Items, APIKey);
     }
 
     /**

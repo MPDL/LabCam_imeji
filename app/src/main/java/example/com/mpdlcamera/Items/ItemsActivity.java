@@ -44,7 +44,7 @@ public class ItemsActivity extends AppCompatActivity {
     private final String LOG_TAG = ItemsActivity.class.getSimpleName();
     SharedPreferences mPrefs;
     private String username;
-    private String password;
+    private String APIkey;
 
 
     Toolbar toolbar;
@@ -110,7 +110,7 @@ public class ItemsActivity extends AppCompatActivity {
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
-        password = mPrefs.getString("password", "");
+        APIkey = mPrefs.getString("apiKey", "");
 
         Intent intent = activity.getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {
@@ -159,7 +159,7 @@ public class ItemsActivity extends AppCompatActivity {
     }
 
     private void getFolderItems(String collectionId){
-        RetrofitClient.getCollectionItems(collectionId, callback_Items, username, password);
+        RetrofitClient.getCollectionItems(collectionId, callback_Items, APIkey);
     }
 
 

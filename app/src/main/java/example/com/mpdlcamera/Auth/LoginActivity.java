@@ -432,12 +432,12 @@ public class LoginActivity extends AppCompatActivity {
 
             String userCompleteName = "";
             userCompleteName = user.getPerson().getCompleteName();
-            Log.v("<<<", userCompleteName);
             if(userCompleteName!="" && userCompleteName!=null){
                 Toast.makeText(activity,"Welcome "+userCompleteName,Toast.LENGTH_SHORT).show();
                 mPrefs = getSharedPreferences("myPref", 0);
                 SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.putString("username",user.getPerson().getCompleteName()).apply();
+                    mEditor.putString("apiKey",user.getApiKey()).apply();
                 mEditor.commit();
 
                 if(collectionId!=null&&collectionId!=""){
@@ -446,12 +446,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
             accountLogin();
-//            Handler handler = new Handler();
-//            handler.postDelayed(new Runnable() {
-//                public void run() {
-//
-//                }
-//            }, 1000);
         }
 
         @Override

@@ -88,7 +88,7 @@ public class FileUploader {
         Log.v(TAG, json);
 
         if(isNetworkAvailable()) {
-            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+//            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
         }
         else {
             //Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
