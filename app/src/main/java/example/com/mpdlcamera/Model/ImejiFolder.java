@@ -7,6 +7,8 @@ import com.google.gson.annotations.Expose;
 
 import java.util.List;
 
+import example.com.mpdlcamera.Model.MessageModel.Person;
+
 /**
  * Created by allen on 27/08/15.
  */
@@ -35,7 +37,7 @@ public class ImejiFolder extends Model {
 
     @Expose
     //@Column(name = "contributors")
-    private List<User> contributors;
+    private List<Person> contributors;
 
     @Expose
     //@Column(name = "profile")
@@ -89,11 +91,11 @@ public class ImejiFolder extends Model {
         this.description = description;
     }
 
-    public List<User> getContributors() {
+    public List<Person> getContributors() {
         return contributors;
     }
 
-    public void setContributors(List<User> contributors) {
+    public void setContributors(List<Person> contributors) {
         this.contributors = contributors;
     }
 

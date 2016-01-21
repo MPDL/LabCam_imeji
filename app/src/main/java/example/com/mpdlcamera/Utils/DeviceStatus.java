@@ -12,6 +12,12 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
+
+import java.util.List;
+
+import example.com.mpdlcamera.Model.LocalModel.Task;
+
 /**
  * Created by allen on 09/04/15.
  */
@@ -85,5 +91,20 @@ public class DeviceStatus {
         WAITING, STARTED, STOPPED, INTERRUPTED, FINISHED
     }
 
+    //get latest task
+    public static Task getTask() {
+        return new Select()
+                .from(Task.class)
+                .orderBy("startDate DESC")
+                .executeSingle();
+    }
+
+    //get all tasks
+    public static List<Task> getTasks(){
+        return new Select()
+                .from(Task.class)
+                .orderBy("startDate DESC")
+                .execute();
+    }
 
 }

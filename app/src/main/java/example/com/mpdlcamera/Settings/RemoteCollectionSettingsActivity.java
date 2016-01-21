@@ -19,11 +19,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
@@ -38,8 +42,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     private String APIkey;
     private SharedPreferences mPrefs;
 
-    private ProgressDialog pDialog;
-
     private SettingsListAdapter adapter;
     private ListView listView;
     private Activity activity = this;
@@ -48,7 +50,10 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     private Toolbar toolbar;
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
 
-    private String collectionID;
+    private String collectionID = DeviceStatus.getTask().getCollectionId();
+    private String collectionName = DeviceStatus.getTask().getCollectionName();
+
+    private int selectedItem;
     private CollectionIdInterface ie;
 
 
@@ -56,7 +61,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     Callback<JsonObject> callback = new Callback<JsonObject>() {
         @Override
         public void success(JsonObject jsonObject, Response response) {
-            pDialog.hide();
 
             JsonArray array;
             List<ImejiFolder> folderList = new ArrayList<>();
@@ -89,7 +93,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
         @Override
         public void failure(RetrofitError error) {
-            pDialog.hide();
             Log.v(LOG_TAG, "get list failed");
             Log.v(LOG_TAG, error.toString());
             DeviceStatus.showSnackbar(rootView, "update data failed");
@@ -122,7 +125,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
         listView = (ListView) findViewById(R.id.settings_remote_listView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        adapter = new SettingsListAdapter(activity, collectionListLocal,ie);
+        adapter = new SettingsListAdapter(activity, collectionListLocal,this);
         listView.setAdapter(adapter);
 
         //save collection folder
@@ -144,28 +147,14 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     @Override
     public void onPause(){
         super.onPause();
-        hidePDialog();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        hidePDialog();
     }
-
-
-    private void hidePDialog() {
-        if (pDialog != null) {
-            pDialog.dismiss();
-            pDialog = null;
-        }
-    }
-
 
     private void updateFolder(){
-        pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Loading...");
-        pDialog.show();
         RetrofitClient.getCollectionMessage(callback, APIkey);
     }
 
@@ -174,14 +163,82 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Log.i("collectionID",collectionID);
+                // default collectionID
+
+                Log.i("~collectionID", collectionID);
+                createTask(collectionID);
+
+                Log.v("task.size",""+DeviceStatus.getTasks().size());
+                for(Task task:DeviceStatus.getTasks()){
+                    if(task.getTaskName()!=null){
+                    Log.v("~taskName",task.getTaskName());}
+                }
             }
         });
 
     }
 
+    private void createTask(String collectionID){
+        mPrefs = getSharedPreferences("myPref", 0);
+        String userName = mPrefs.getString("username", "");
+
+        Task latestTask = getTask();
+
+        if(latestTask==null){
+            Log.v("create Task","no task in database");
+            Task task = new Task();
+            String uniqueID = UUID.randomUUID().toString();
+            task.setTaskId(uniqueID);
+            task.setUploadMode("AU");
+            task.setCollectionId(collectionID);
+            task.setState(String.valueOf(DeviceStatus.state.WAITING));
+            task.setUserName(userName);
+
+            String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+            Long now = new Date().getTime();
+            task.setStartDate(String.valueOf(now));
+            task.setTaskName("AU to" + collectionName + currentDateTimeString);
+
+            task.save();
+
+        }else if(!latestTask.getCollectionId().equals(collectionID)) {
+            if(latestTask!=null){
+            Log.v("latestTask",latestTask.getCollectionId());}
+            else {
+                Log.v("latestTask","latest task is null");
+            }
+            Log.v("collectionID",collectionID);
+            Task task = new Task();
+            String uniqueID = UUID.randomUUID().toString();
+            task.setTaskId(uniqueID);
+            task.setUploadMode("AU");
+            task.setCollectionId(collectionID);
+            task.setState(String.valueOf(DeviceStatus.state.WAITING));
+            task.setUserName(userName);
+
+            String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+            Long now = new Date().getTime();
+            task.setStartDate(String.valueOf(now));
+            task.setTaskName("AU to" + collectionName + currentDateTimeString);
+
+            task.save();
+        }
+    }
+
+    //get latest task
+    // TODO: move away for reuse
+    public static Task getTask() {
+        return new Select()
+                .from(Task.class)
+                .orderBy("startDate DESC")
+                .executeSingle();
+    }
+
+
+
     @Override
     public void setCollectionId(int Id) {
         collectionID = collectionListLocal.get(Id).getImejiId();
+        collectionName = collectionListLocal.get(Id).getTitle();
     }
 }

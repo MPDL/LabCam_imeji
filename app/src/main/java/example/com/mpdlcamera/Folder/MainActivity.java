@@ -84,8 +84,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         setContentView(R.layout.activity_main);
         Log.v("Main activity", "started");
 
-        //init DB
-        initDB();
         //
         getLocalCamFolder();
         // register NetStateObserver
@@ -274,38 +272,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         Toast.makeText(this, "network disconnect...", Toast.LENGTH_LONG).show();
     }
 
-    //TODO: DELET TESTING CODE // FIXME: 12/17/15
-    private void initDB(){
-        if(isAdd){
-            Log.v("initDB","isAdded");
-        }else {
-
-            isAdd = true;
-            //init task
-
-            Task task1 = new Task();
-            task1.setTaskId("01");
-            task1.setUserName("Ina");
-
-            task1.setUploadMode("AU");
-            task1.save();
-
-            //init image
-            Image einImage = new Image();
-            einImage.setImageId("001");
-            einImage.setImageName("eins");
-            einImage.setTaskId("1");
-            einImage.save();
-
-            Image zwiImage = new Image();
-            zwiImage.setImageId("002");
-            zwiImage.setImageName("zwi");
-            zwiImage.setTaskId("1");
-            zwiImage.save();
-
-
-        }
-    }
 
     /**
      * init Fragments

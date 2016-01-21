@@ -70,6 +70,7 @@ public class LoginActivity extends AppCompatActivity {
     private String LOG_TAG = LoginActivity.class.getSimpleName();
 
     private String collectionId = null;
+    private String collectionName = "need to implement new api";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,8 +91,8 @@ public class LoginActivity extends AppCompatActivity {
 
 
         mPrefs = this.getSharedPreferences("myPref", 0);
-        usernameView.setText(mPrefs.getString("username", ""));
-        passwordView.setText(mPrefs.getString("password", ""));
+        usernameView.setText(mPrefs.getString("email", ""));
+        //TODO:store password?
         if (!mPrefs.getString("server", "").equals("")) {
             serverURL = mPrefs.getString("server", "");
         } else {
@@ -371,8 +372,7 @@ public class LoginActivity extends AppCompatActivity {
     private void createTask(){
         mPrefs = getSharedPreferences("myPref", 0);
         String userName = mPrefs.getString("username", "");
-
-        Task latestTask = getTask();
+        Task latestTask = DeviceStatus.getTask();
 
         if(latestTask==null){
             Log.v("create Task","no task in database");
@@ -388,11 +388,17 @@ public class LoginActivity extends AppCompatActivity {
             Long now = new Date().getTime();
             Log.v("now", now+"");
             task.setStartDate(String.valueOf(now));
-            task.setTaskName("AU to" + collectionId + currentDateTimeString);
+            task.setTaskName("AU to" + collectionName + currentDateTimeString);
 
             task.save();
 
-        }else if(latestTask.getCollectionId()!=collectionId) {
+        }else if(!latestTask.getCollectionId().equals(collectionId)) {
+            if(latestTask!=null){
+                Log.v("latestTask",latestTask.getCollectionId());}
+            else {
+                Log.v("latestTask","latest task is null");
+            }
+            Log.v("collectionID",collectionId);
             Task task = new Task();
             String uniqueID = UUID.randomUUID().toString();
             task.setTaskId(uniqueID);
@@ -405,20 +411,17 @@ public class LoginActivity extends AppCompatActivity {
             Long now = new Date().getTime();
             Log.v("now", now+"");
             task.setStartDate(String.valueOf(now));
-            task.setTaskName("AU to" + collectionId + currentDateTimeString);
+            task.setTaskName("AU to" + collectionName + currentDateTimeString);
 
             task.save();
         }
+
+        Log.v("task.size", "" + DeviceStatus.getTasks().size());
+        for(Task task:DeviceStatus.getTasks()){
+            if(task.getTaskName()!=null){
+                Log.v("~taskName",task.getTaskName());}
+        }
     }
-
-    //get latest task
-     public static Task getTask() {
-     return new Select()
-     .from(Task.class)
-     .orderBy("startDate DESC")
-     .executeSingle();
-     }
-
 
     /**
      * callbacks
@@ -437,11 +440,14 @@ public class LoginActivity extends AppCompatActivity {
                 mPrefs = getSharedPreferences("myPref", 0);
                 SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.putString("username",user.getPerson().getCompleteName()).apply();
+                    mEditor.putString("email",user.getEmail()).apply();
                     mEditor.putString("apiKey",user.getApiKey()).apply();
                 mEditor.commit();
 
+
                 if(collectionId!=null&&collectionId!=""){
                     //create a new task for new selected collection
+
                     createTask();
                 }
             }

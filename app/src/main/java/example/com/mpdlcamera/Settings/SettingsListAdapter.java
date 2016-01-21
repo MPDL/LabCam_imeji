@@ -19,6 +19,8 @@ import com.activeandroid.util.Log;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.MessageModel.Person;
+import example.com.mpdlcamera.Model.User;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.UploadFragment.CollectionIdInterface;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -34,6 +36,7 @@ public class SettingsListAdapter extends BaseAdapter {
     int selectedPosition = -1;
     private SharedPreferences mPrefs;
 
+    private String collectionId = DeviceStatus.getTask().getCollectionId();
     private CollectionIdInterface ie;
 
     //selected collection
@@ -73,8 +76,6 @@ public class SettingsListAdapter extends BaseAdapter {
         Point size = new Point();
         display.getSize(size);
 
-
-
         if (inflater == null)
             inflater = (LayoutInflater) activity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -86,9 +87,7 @@ public class SettingsListAdapter extends BaseAdapter {
         RadioButton checkBox = (RadioButton) convertView.findViewById(R.id.radio_button);
         TextView date = (TextView) convertView.findViewById(R.id.setting_item_date);
 
-
-        final String collectionId= mPrefs.getString("collectionID", DeviceStatus.collectionID);
-        System.out.println("collectionId" + " " + collectionId);
+        System.out.println("Adapter collectionId" + " " + collectionId);
 
         if(folderItems.size()>0) {
 
@@ -106,7 +105,7 @@ public class SettingsListAdapter extends BaseAdapter {
 
             // user
             if(collection.getContributors() != null) {
-                user.setText(collection.getContributors().get(0).getPerson().getCompleteName());
+                user.setText(collection.getContributors().get(0).getCompleteName());
             }
             // date
             date.setText(String.valueOf(collection.getModifiedDate()).split("\\+")[0]);
@@ -126,7 +125,9 @@ public class SettingsListAdapter extends BaseAdapter {
 
                 selectedPosition = (Integer)view.getTag();
 
-//                ie.setCollectionId(folderItems.get(selectedPosition).id);
+                ie.setCollectionId(selectedPosition);
+                //onclick place radioButton to selected position
+                collectionId = folderItems.get(selectedPosition).getImejiId();
 
                 notifyDataSetChanged();
 
