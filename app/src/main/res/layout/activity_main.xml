@@ -45,13 +45,28 @@
                         android:id="@+id/camera_icon"
                         android:src="@drawable/camera"/>
 
-                    <ProgressBar
+                    <!--shadow-->
+                    <ImageView
                         android:layout_width="28dp"
                         android:layout_height="28dp"
+                        android:id="@+id/progress_upload"
                         android:layout_toLeftOf="@+id/camera_icon"
                         android:layout_marginRight="20dp"
-                        android:id="@+id/progress_upload"
                         android:layout_centerVertical="true"/>
+
+                    <!--real progressbar-->
+                    <com.wang.avi.AVLoadingIndicatorView
+                        android:id="@+id/progress_AVL"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:visibility="visible"
+                        android:layout_toLeftOf="@+id/camera_icon"
+                        android:layout_marginRight="20dp"
+                        android:layout_centerVertical="true"
+                        app:indicator="BallSpinFadeLoader"
+                        app:indicator_color="@color/white"
+                    />
+
 
                 </RelativeLayout>
 

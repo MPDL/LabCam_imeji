@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -282,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         // Setup tabs
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         // TaskManager dialog
-        ProgressBar taskProgressBar = (ProgressBar) findViewById(R.id.progress_upload);
+        ImageView taskProgressBar = (ImageView) findViewById(R.id.progress_upload);
 
         taskProgressBar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -290,6 +291,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 TaskFragment taskFragment = new TaskFragment();
 
                 FragmentManager fragmentManager = getSupportFragmentManager();
+                taskFragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+
                 taskFragment.show(fragmentManager,"Task Manager");
             }
         });

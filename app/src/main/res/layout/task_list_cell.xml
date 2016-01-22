@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true"
+            android:text=""
+            android:textSize="8dp"
+            android:id="@+id/tv_task_name"/>
+
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/task_delete"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/cancel_red"/>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_toLeftOf="@id/task_delete"
+            android:layout_marginRight="10dp"
+            android:id="@+id/pause_play"
+            android:layout_centerVertical="true"
+            android:src="@drawable/pause_yellow"/>
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <ProgressBar
+            android:id="@+id/firstBar"
+            style="@style/CustomProgressBar"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10"
+            android:textSize="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_centerVertical="true"
+            android:id="@+id/totalItems"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/percent"
+            android:text="/"
+            android:layout_toLeftOf="@+id/totalItems"
+            android:textSize="15dp"
+            android:layout_centerVertical="true"
+            />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10"
+            android:textSize="15dp"
+            android:layout_toLeftOf="@id/percent"
+            android:layout_centerVertical="true"
+            android:id="@+id/finishedItems"/>
+
+
+
+
+
+    </RelativeLayout>
+
+
+</LinearLayout>
