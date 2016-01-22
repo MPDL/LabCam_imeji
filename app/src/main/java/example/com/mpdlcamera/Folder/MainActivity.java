@@ -19,7 +19,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
@@ -35,6 +37,7 @@ import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.TaskManager.TaskFragment;
 import example.com.mpdlcamera.Upload.NewFileObserver;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.UploadFragment.UploadFragment;
@@ -45,8 +48,7 @@ import example.com.mpdlcamera.UserFragment.UserFragment;
 public class MainActivity extends AppCompatActivity implements UploadResultReceiver.Receiver,NetChangeObserver {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
-    private String username;
-    private String password;
+
     private SharedPreferences mPrefs;
 
     private ProgressDialog pDialog;
@@ -279,6 +281,18 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private void initInstances() {
         // Setup tabs
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+        // TaskManager dialog
+        ProgressBar taskProgressBar = (ProgressBar) findViewById(R.id.progress_upload);
+
+        taskProgressBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TaskFragment taskFragment = new TaskFragment();
+
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                taskFragment.show(fragmentManager,"Task Manager");
+            }
+        });
 
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
@@ -343,6 +357,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
             }
         });
+
+
     }
 
     /**

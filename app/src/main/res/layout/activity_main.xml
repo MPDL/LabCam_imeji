@@ -51,7 +51,6 @@
                         android:layout_toLeftOf="@+id/camera_icon"
                         android:layout_marginRight="20dp"
                         android:id="@+id/progress_upload"
-                        android:visibility="gone"
                         android:layout_centerVertical="true"/>
 
                 </RelativeLayout>
