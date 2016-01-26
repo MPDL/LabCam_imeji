@@ -16,6 +16,7 @@ import com.activeandroid.query.Select;
 
 import java.util.List;
 
+import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 
 /**
@@ -91,7 +92,7 @@ public class DeviceStatus {
         WAITING, STARTED, STOPPED, INTERRUPTED, FINISHED
     }
 
-    //get latest task
+    //get latest task (sometimes its not right need to distinguish Au Mu)
     public static Task getTask() {
         return new Select()
                 .from(Task.class)
@@ -104,6 +105,15 @@ public class DeviceStatus {
         return new Select()
                 .from(Task.class)
                 .orderBy("startDate DESC")
+                .execute();
+    }
+
+    //get Image list of a Task
+    public static List<Image> getImagesByTaskId(String taskId){
+        return new Select()
+                .from(Image.class)
+                .where("taskId = ?",taskId)
+                .orderBy("createTime DESC")
                 .execute();
     }
 
