@@ -19,6 +19,7 @@ public class dbObserver extends ContentObserver {
 
     private Context mContext  ;
     private Handler mHandler ;   //update UI thread
+    private boolean selfChange;
 
 
     public dbObserver(Context context,Handler handler) {
@@ -27,13 +28,10 @@ public class dbObserver extends ContentObserver {
         mHandler = handler;
     }
 
-    @Override
-    public void onChange(boolean selfChange) {
-        this.onChange(selfChange, null);
-    }
 
     @Override
-    public void onChange(boolean selfChange, Uri uri) {
+    public void onChange(boolean selfChange) {
+        this.selfChange = selfChange;
         // do s.th.
         // depending on the handler you might be on the UI
         // thread, so be cautious!
@@ -41,7 +39,7 @@ public class dbObserver extends ContentObserver {
         Log.i(TAG, "the Tasks table has changed");
         Toast.makeText(mContext,"db changed",Toast.LENGTH_LONG).show();
 
-        Uri taskUri = Uri.parse("content://example.com.mpdlcamera/") ;
+        Uri taskUri = Uri.parse("content://example.com.mpdlcamera") ;
         Cursor c = mContext.getContentResolver().query(taskUri, null, null, null, null);
         String sb = "";
         if (c!=null){

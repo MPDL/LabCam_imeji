@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         // register NetStateObserver
         NetWorkStateReceiver.registerNetStateObserver(this);
 
-        Uri uri = Uri.parse("content://example.com.mpdlcamera/");
+        Uri uri = Uri.parse("content://example.com.mpdlcamera");
         ContentResolver resolver = this.getContentResolver();
         resolver.registerContentObserver(uri, true, new dbObserver(this,new Handler()));
 

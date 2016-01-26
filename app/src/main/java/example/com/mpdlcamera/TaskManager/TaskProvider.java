@@ -33,7 +33,7 @@ public class TaskProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
 
-        Uri taskUri = Uri.parse("content://example.com.mpdlcamera/") ;
+        Uri taskUri = Uri.parse("content://example.com.mpdlcamera") ;
         getContext().getContentResolver().notifyChange(taskUri, null);
         return taskUri;
     }

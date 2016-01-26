@@ -77,8 +77,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
-        List<Image> images = DeviceStatus.getImagesByTaskId(DeviceStatus.getTask().getTaskId());
-        Log.v("~~~",images.get(0).getImageName());
 
 
         //don't store local images

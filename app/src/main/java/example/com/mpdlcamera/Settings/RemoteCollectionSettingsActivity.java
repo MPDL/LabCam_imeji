@@ -53,8 +53,8 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     private Toolbar toolbar;
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
 
-    private String collectionID = DeviceStatus.getTask().getCollectionId();
-    private String collectionName = DeviceStatus.getTask().getCollectionName();
+    private String collectionID;
+    private String collectionName;
 
     private int selectedItem;
     private CollectionIdInterface ie;
