@@ -67,8 +67,7 @@ public class TaskManagerAdapter extends BaseAdapter {
         Task task = taskList.get(position);
         int currentNum = task.getFinishedItems();
         int maxNum = task.getTotalItems();
-        currentNum = 5;
-        maxNum = 12;
+
         if (currentNum == 0 || currentNum == maxNum) {
             //make the progress bar visible
             firstBar.setVisibility(View.VISIBLE);
@@ -83,6 +82,12 @@ public class TaskManagerAdapter extends BaseAdapter {
             currentNum = 0;
             firstBar.setVisibility(View.GONE);
         }
+
+        TextView totalNumTextView = (TextView) view.findViewById(R.id.totalItems);
+        totalNumTextView.setText(maxNum+"");
+
+        TextView finishedNumTextView = (TextView) view.findViewById(R.id.finishedItems);
+        finishedNumTextView.setText(currentNum+"");
 
         return view;
     }

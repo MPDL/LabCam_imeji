@@ -85,9 +85,16 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         photo.setTaskId(getTask().getTaskId());
         photo.save();
 
-        Log.v("taskid",getTask().getTaskId());
-        Log.v("taskId",getImage().getTaskId());
+        //get current Task id
 
+        Task task = Task.load(Task.class,getTask().getId());
+        task.setTotalItems(task.getTotalItems()+1);
+
+        task.save();
+
+        Log.v("taskid", getTask().getTaskId());
+        Log.v("taskId",getImage().getTaskId());
+        Log.v("taskNum",getTask().getTotalItems()+"");
 
         /**
         UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());

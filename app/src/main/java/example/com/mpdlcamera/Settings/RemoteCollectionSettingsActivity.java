@@ -2,8 +2,10 @@ package example.com.mpdlcamera.Settings;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -31,6 +33,7 @@ import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
+import example.com.mpdlcamera.TaskManager.TaskProvider;
 import example.com.mpdlcamera.UploadFragment.CollectionIdInterface;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
@@ -185,8 +188,12 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         Task latestTask = getTask();
 
         if(latestTask==null){
-            Log.v("create Task","no task in database");
+            Log.v("create Task", "no task in database");
             Task task = new Task();
+
+            TaskProvider taskProvider = new TaskProvider();
+            taskProvider.insert(Uri.parse("content://example.com.mpdlcamera/") ,new ContentValues());
+
             String uniqueID = UUID.randomUUID().toString();
             task.setTaskId(uniqueID);
             task.setUploadMode("AU");
@@ -209,6 +216,9 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             }
             Log.v("collectionID",collectionID);
             Task task = new Task();
+            task.setTotalItems(0);
+            task.setFinishedItems(0);
+
             String uniqueID = UUID.randomUUID().toString();
             task.setTaskId(uniqueID);
             task.setUploadMode("AU");

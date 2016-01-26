@@ -1,6 +1,7 @@
 package example.com.mpdlcamera.Folder;
 
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -30,6 +31,7 @@ import com.activeandroid.query.Delete;
 import java.io.File;
 import java.util.ArrayList;
 
+import example.com.mpdlcamera.AutoRun.dbObserver;
 import example.com.mpdlcamera.ImejiFragment.ImejiFragment;
 import example.com.mpdlcamera.LocalFragment.LocalFragment;
 import example.com.mpdlcamera.Model.ImejiFolder;
@@ -91,6 +93,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         getLocalCamFolder();
         // register NetStateObserver
         NetWorkStateReceiver.registerNetStateObserver(this);
+
+        Uri uri = Uri.parse("content://example.com.mpdlcamera/");
+        ContentResolver resolver = this.getContentResolver();
+        resolver.registerContentObserver(uri, true, new dbObserver(this,new Handler()));
 
         initInstances();
 
