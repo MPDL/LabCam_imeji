@@ -36,7 +36,7 @@ public class SettingsListAdapter extends BaseAdapter {
     int selectedPosition = -1;
     private SharedPreferences mPrefs;
 
-    private String collectionId = DeviceStatus.getTask().getCollectionId();
+    private String collectionId;
     private CollectionIdInterface ie;
 
     //selected collection
@@ -45,6 +45,14 @@ public class SettingsListAdapter extends BaseAdapter {
         this.activity = activity;
         this.folderItems = folderItems;
         this.ie = ie;
+        String lastCollectionId ="";
+        try{
+            lastCollectionId = DeviceStatus.getTask().getCollectionId();
+        }
+        catch(Exception e){
+        }
+        if(lastCollectionId!=null){
+            collectionId = lastCollectionId;}
     }
 
     @Override
@@ -70,6 +78,7 @@ public class SettingsListAdapter extends BaseAdapter {
         Log.v("getView");
         //final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
         mPrefs =  activity.getSharedPreferences("myPref", 0);
+
 
         WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();

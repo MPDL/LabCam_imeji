@@ -192,7 +192,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             Task task = new Task();
 
             TaskProvider taskProvider = new TaskProvider();
-            taskProvider.insert(Uri.parse("content://example.com.mpdlcamera/") ,new ContentValues());
+//            taskProvider.insert(Uri.parse("content://example.com.mpdlcamera/") ,new ContentValues());
 
             String uniqueID = UUID.randomUUID().toString();
             task.setTaskId(uniqueID);
