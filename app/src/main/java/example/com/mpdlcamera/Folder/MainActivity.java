@@ -104,11 +104,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 /*
                     file system
                  */
-                UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
-                mReceiver.setReceiver(this);
-                Intent intent = new Intent(this, UploadService.class);
-                intent.putExtra("receiver", mReceiver);
-                this.startService(intent);
+//                UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
+//                mReceiver.setReceiver(this);
+//                Intent intent = new Intent(this, UploadService.class);
+//                intent.putExtra("receiver", mReceiver);
+//                this.startService(intent);
 
 
                 Handler handler = new Handler();
@@ -116,8 +116,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             /*
                 camera
              */
-                NewFileObserver newFileObserver = new NewFileObserver(handler,this);
-                getApplicationContext().getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,false, newFileObserver);
+//                NewFileObserver newFileObserver = new NewFileObserver(handler,this);
+//                getApplicationContext().getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,false, newFileObserver);
 
     }
 

@@ -113,7 +113,7 @@ public class DeviceStatus {
         return new Select()
                 .from(Image.class)
                 .where("taskId = ?",taskId)
-                .orderBy("createTime DESC")
+                .orderBy("createTime ASC")
                 .execute();
     }
 

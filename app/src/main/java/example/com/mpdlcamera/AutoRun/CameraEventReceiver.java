@@ -21,6 +21,7 @@ import example.com.mpdlcamera.Folder.UploadService;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 import example.com.mpdlcamera.Utils.ImageFileFilter;
 
 
@@ -59,7 +60,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
 
         //state
-        String imageState = "init";  //"init" "uploading" "uploaded" "failed"
+        String imageState = String.valueOf(DeviceStatus.state.WAITING);
 
         //taskId
 
@@ -71,7 +72,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         Log.i("CameraEventReceiver", fileSize + "kb");
         Log.i("CameraEventReceiver", String.valueOf(createTime));
 
-
+        try{
 
         //store image in local database
         Image photo = new Image();
@@ -87,22 +88,26 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
 
         //get current Task id
 
-        Task task = Task.load(Task.class,getTask().getId());
-        task.setTotalItems(task.getTotalItems()+1);
 
-        task.save();
+            Task task = Task.load(Task.class, getTask().getId());
+            task.setTotalItems(task.getTotalItems() + 1);
 
-        Log.v("taskid", getTask().getTaskId());
-        Log.v("taskId",getImage().getTaskId());
-        Log.v("taskNum",getTask().getTotalItems()+"");
+            task.save();
 
-        /**
-        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
-        mReceiver.setReceiver(this);
-        Intent uploadIntent = new Intent(context, UploadService.class);
-        intent.putExtra("receiver", mReceiver);
-        context.startService(uploadIntent);
-         */
+            Log.v("taskid", getTask().getTaskId());
+            Log.v("taskId", getImage().getTaskId());
+            Log.v("taskNum", getTask().getTotalItems() + "");
+
+            UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
+            mReceiver.setReceiver(this);
+            Intent uploadIntent = new Intent(context, TaskUploadService.class);
+            intent.putExtra("receiver", mReceiver);
+            context.startService(uploadIntent);
+
+        }catch (Exception e){
+            Log.v("CameraEventReceiver","didn't set task");
+        }
+
     }
 
     @Override

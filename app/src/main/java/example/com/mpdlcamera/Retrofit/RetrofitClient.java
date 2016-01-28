@@ -87,6 +87,14 @@ public class RetrofitClient {
         imejiAPI.getCollectionMessage(callback);
     }
 
+    public static void getGrantCollectionMessage(Callback<JsonObject> callback,
+                                            String APIkey) {
+        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
+
+        String q = "grant=\"upload\"";
+        imejiAPI.getGrantedCollectionMessage(q,callback);
+    }
+
 
 
     public static void getCollectionItems(String collectionId,

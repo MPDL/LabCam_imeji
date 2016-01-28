@@ -15,6 +15,7 @@ import retrofit.http.Multipart;
 import retrofit.http.POST;
 import retrofit.http.Part;
 import retrofit.http.Path;
+import retrofit.http.Query;
 import retrofit.mime.TypedFile;
 
 /**
@@ -78,6 +79,8 @@ public interface ImejiAPI {
     @GET(value = "/collections?size=30")
     void getCollectionMessage(Callback<JsonObject> callback);
 
+    @GET(value = "/collections?size=30")
+    void getGrantedCollectionMessage(@Query("q") String q,Callback<JsonObject> callback);
 
     //get all items by collection id
     @GET("/collections/{id}/items?size=300")

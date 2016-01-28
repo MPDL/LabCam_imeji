@@ -184,6 +184,10 @@
             </intent-filter>
         </receiver>
         <service android:name=".AutoRun.AutoRunService"/>
+        <service android:name="example.com.mpdlcamera.AutoRun.TaskUploadService"
+            android:enabled="true">
+        </service>
+
 
         <receiver
             android:name=".AutoRun.CameraEventReceiver"

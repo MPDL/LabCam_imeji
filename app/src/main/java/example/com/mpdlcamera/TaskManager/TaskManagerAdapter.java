@@ -68,20 +68,22 @@ public class TaskManagerAdapter extends BaseAdapter {
         int currentNum = task.getFinishedItems();
         int maxNum = task.getTotalItems();
 
-        if (currentNum == 0 || currentNum == maxNum) {
-            //make the progress bar visible
-            firstBar.setVisibility(View.VISIBLE);
-            firstBar.setMax(maxNum);
-        }else if ( currentNum< firstBar.getMax() ) {
-            //Set first progress bar value
-            firstBar.setProgress(currentNum);
-            //Set the second progress bar value
-        }else {
-            firstBar.setProgress(0);
-            firstBar.setSecondaryProgress(0);
-            currentNum = 0;
-            firstBar.setVisibility(View.GONE);
-        }
+//        if (currentNum == 0 || currentNum == maxNum) {
+//            //make the progress bar visible
+//            firstBar.setVisibility(View.VISIBLE);
+//            firstBar.setMax(maxNum);
+//        }else if ( currentNum< firstBar.getMax() ) {
+//            //Set first progress bar value
+//            firstBar.setProgress(currentNum);
+//            //Set the second progress bar value
+//        }else {
+//            firstBar.setProgress(0);
+//            firstBar.setSecondaryProgress(0);
+//            currentNum = 0;
+//            firstBar.setVisibility(View.GONE);
+//        }
+        firstBar.setMax(maxNum);
+        firstBar.setProgress(currentNum);
 
         TextView totalNumTextView = (TextView) view.findViewById(R.id.totalItems);
         totalNumTextView.setText(maxNum+"");

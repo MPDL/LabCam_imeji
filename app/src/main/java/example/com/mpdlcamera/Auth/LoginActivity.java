@@ -386,6 +386,8 @@ public class LoginActivity extends AppCompatActivity {
             task.setCollectionId(collectionId);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
             task.setUserName(userName);
+            task.setTotalItems(0);
+            task.setFinishedItems(0);
 
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
@@ -409,6 +411,8 @@ public class LoginActivity extends AppCompatActivity {
             task.setCollectionId(collectionId);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
             task.setUserName(userName);
+            task.setTotalItems(0);
+            task.setFinishedItems(0);
 
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();

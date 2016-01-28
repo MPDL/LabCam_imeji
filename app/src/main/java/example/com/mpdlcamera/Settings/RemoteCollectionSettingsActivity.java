@@ -158,7 +158,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     }
 
     private void updateFolder(){
-        RetrofitClient.getCollectionMessage(callback, APIkey);
+        RetrofitClient.getGrantCollectionMessage(callback, APIkey);
     }
 
     private void saveCollection(){
@@ -187,6 +187,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
         Task latestTask = getTask();
 
+        //  create first task
         if(latestTask==null){
             Log.v("create Task", "no task in database");
             Task task = new Task();
@@ -200,6 +201,8 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             task.setCollectionId(collectionID);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
             task.setUserName(userName);
+            task.setTotalItems(0);
+            task.setFinishedItems(0);
 
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
