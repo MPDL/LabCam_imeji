@@ -16,6 +16,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.activeandroid.query.Select;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -23,9 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.SQLite.FileId;
 import example.com.mpdlcamera.SQLite.MySQLiteHelper;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
  *  Created by allen on 27/08/15.
@@ -112,64 +115,40 @@ public class LocalImageAdapter extends BaseAdapter {
 
         Button buttonCloud = (Button) grid.findViewById(R.id.cloud);
         Button buttonUploading = (Button) grid.findViewById(R.id.uploading);
-        String positionFile = (String) this.getItem(position);
+
+        String filePath = galleryItems.get(position);
         //buttonUploading.setVisibility(View.INVISIBLE);
+        File imageFile = new File(filePath);
 
-        File directory = new File(positionFile);
-        String file = directory.getName();
-        SharedPreferences preferences = activity.getSharedPreferences("myPref", 0);
-        String CollectionId = preferences.getString("collectionID","");
-        String fileCollectionName = file + CollectionId;
+        Image image = new Select().from(Image.class).where("imagePath = ?",filePath).executeSingle();
 
-        MySQLiteHelper db = new MySQLiteHelper(activity);
+        String fileStatus = "";
 
-        String fileStatus = db.getFileStatus(fileCollectionName);
-        //boolean b = true;
-
-        List<FileId> fileIds = db.getAllFiles();
-
-        String status = null;
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(activity);
-        if(pref.contains("status")) {
-            status = pref.getString("status","");
+        try{
+         fileStatus = image.getState();
+        }
+        catch (Exception e){
         }
 
-        if(isActiveFolder) {
             //not uploaded for active folder
-            if (fileStatus.equalsIgnoreCase("not present") || fileStatus.equalsIgnoreCase("failed")) {
-              //  if (status.equalsIgnoreCase("manual")) {
+            if (fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.INTERRUPTED)) ||
+                    fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED)) ||
+                    fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
                     buttonCloud.setVisibility(View.GONE);
                     buttonUploading.setVisibility(View.GONE);
-               // } else {
-                //    buttonCloud.setVisibility(View.GONE);
-                //    buttonUploading.setVisibility(View.GONE);
                 }
-             else if(fileStatus.equalsIgnoreCase("uploading")){ //uploading
+             else if(fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STARTED))){ //uploading
                 buttonCloud.setVisibility(View.GONE);
                 buttonUploading.setVisibility(View.VISIBLE);
             }
-              else {
+              else if(fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
 
                 buttonCloud.setVisibility(View.VISIBLE);
                 buttonUploading.setVisibility(View.GONE);
-        }
-
         }else {
-            //not uploaded for non-active folder
-            if (fileStatus.equalsIgnoreCase("not present") || fileStatus.equalsIgnoreCase("failed")) {
                 buttonCloud.setVisibility(View.GONE);
                 buttonUploading.setVisibility(View.GONE);
-            } else if(fileStatus.equalsIgnoreCase("uploading")){ //uploading
-                buttonCloud.setVisibility(View.GONE);
-                buttonUploading.setVisibility(View.VISIBLE);
             }
-            else {
-
-                buttonCloud.setVisibility(View.VISIBLE);
-                buttonUploading.setVisibility(View.GONE);
-            }
-
-        }
 
         grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light));
 
@@ -181,7 +160,7 @@ public class LocalImageAdapter extends BaseAdapter {
         ImageView imageView = (ImageView) grid.findViewById(R.id.image_view);
 
 
-        String filePath = galleryItems.get(position);
+
         Uri uri = Uri.fromFile(new File(filePath));
 
         Picasso.with(activity)

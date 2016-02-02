@@ -89,7 +89,8 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         //get current Task id
 
 
-            Task task = Task.load(Task.class, getTask().getId());
+            Task task = new Select().from(Task.class).where("uploadMode = ?","AU").orderBy("startDate DESC").executeSingle();
+
             task.setTotalItems(task.getTotalItems() + 1);
 
             task.save();

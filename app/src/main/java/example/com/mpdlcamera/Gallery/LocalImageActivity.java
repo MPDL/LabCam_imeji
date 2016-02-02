@@ -3,6 +3,7 @@ package example.com.mpdlcamera.Gallery;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -27,6 +28,7 @@ import com.dd.CircularProgressButton;
 import com.squareup.otto.Produce;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,6 +36,7 @@ import java.util.List;
 import java.util.UUID;
 
 import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.LocalUser;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Otto.OttoSingleton;
@@ -375,15 +378,34 @@ public class LocalImageActivity extends AppCompatActivity {
         mPrefs = activity.getSharedPreferences("myPref", 0);
         String username = mPrefs.getString("username", "");
         String email =  mPrefs.getString("email", "");
+        String currentTaskId = "";
 
         if(!DeviceStatus.is_newUser(email)) {
-            createTask(email,fileList.size());
-
-
+            currentTaskId = createTask(email,fileList);
         }else {
             Toast.makeText(activity,"please choose collection first",Toast.LENGTH_LONG).show();
         }
 
+
+        // TODO:Start uploading TASK (create a new function)
+        Task task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+        List<Image> imagesInTask = new Select().from(Image.class).where("taskId = ?", currentTaskId).orderBy("imageId ASC").execute();
+        String taskState = task.getState();
+        if(taskState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
+            Image image = imagesInTask.get(0);
+            String imageState = image.getState();
+            if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
+                // TODO:upload image
+            }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
+                // TODO:upload finish
+            }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STARTED))){
+                // TODO: already started, change to interupt?
+            }
+        }else if(taskState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
+            // TODO: task stopped
+        }else if(taskState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
+            // TODO:task finish
+        }
 
 
         String jsonPart1 = "\"collectionId\" : \"" +
@@ -407,13 +429,13 @@ public class LocalImageActivity extends AppCompatActivity {
                 json = "{" + jsonPart1 + "}";
 
                 Log.v(LOG_TAG, json);
-                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+//                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
             }
         }
     }
 
 
-    private void createTask(String email,int totalItems){
+    private String createTask(String email,List<String> fileList){
 
 
         LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
@@ -423,7 +445,7 @@ public class LocalImageActivity extends AppCompatActivity {
         Long now = new Date().getTime();
 
         Task task = new Task();
-        task.setTotalItems(totalItems);
+        task.setTotalItems(fileList.size());
         task.setFinishedItems(0);
         task.setTaskId(uniqueID);
         task.setUploadMode("MU");
@@ -432,8 +454,69 @@ public class LocalImageActivity extends AppCompatActivity {
         task.setUserName(username);
         task.setStartDate(String.valueOf(now));
         task.setTaskName(user.getCollectionName() + currentDateTimeString);
-
         task.save();
+        int num = addImages(fileList, task.getTaskId());
+        task.setTotalItems(num);
+        task.save();
+        Log.v(LOG_TAG,"setTotalItems:"+num);
+
+        return task.getTaskId();
+    }
+
+    private int addImages(List<String> fileList,String taskId){
+
+        int imageNum = 0;
+        for (String filePath: fileList) {
+            File file = new File(filePath);
+            File imageFile = file.getAbsoluteFile();
+            String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
+
+            //imageSize
+            String fileSize = String.valueOf(file.length() / 1024);
+
+
+            ExifInterface exif = null;
+            try {
+                exif = new ExifInterface(filePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            //createTime
+            String createTime = exif.getAttribute(ExifInterface.TAG_DATETIME);
+
+            //latitude
+            String latitude = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
+
+            //longitude
+            String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
+
+            //state
+            String imageState = String.valueOf(DeviceStatus.state.WAITING);
+
+
+
+            try {
+
+                //store image in local database
+                Image photo = new Image();
+                photo.setImageName(imageName);
+                photo.setImagePath(filePath);
+                photo.setLongitude(longitude);
+                photo.setLatitude(latitude);
+                photo.setCreateTime(createTime);
+                photo.setSize(fileSize);
+                photo.setState(imageState);
+                photo.setTaskId(taskId);
+                photo.save();
+                imageNum = imageNum + 1;
+
+            } catch (Exception e) {
+            }
+
+        }
+        return imageNum;
     }
     /*
         delete the selected files
