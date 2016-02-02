@@ -256,7 +256,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
             task.setStartDate(String.valueOf(now));
-            task.setTaskName("AU to" + collectionName + currentDateTimeString);
+            task.setTaskName(collectionName + currentDateTimeString);
 
             task.save();
         }

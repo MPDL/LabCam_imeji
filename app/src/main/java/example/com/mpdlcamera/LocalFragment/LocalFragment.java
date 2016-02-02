@@ -171,28 +171,32 @@ public class LocalFragment extends Fragment {
 
                 String status = preferences.getString(gallery.getGalleryName(),"");
 
-                if(status.equalsIgnoreCase("On")) {
-
-                    /*
-                        Sending the galleryname and the gallerypath to the next activity(for the activated gallery)
-                     */
-                    Intent activatedGalleryIntent = new Intent(getActivity(), ActivatedGalleryActivity.class);
-                    activatedGalleryIntent.putExtra("galleryName", gallery.getGalleryName());
-                    activatedGalleryIntent.putExtra("galleryPath", gallery.getGalleryPath());
-
-                    startActivity(activatedGalleryIntent);
-
-                }
-                else {
+                //// FIXME: 2/2/16 why need this if else?
+//                if(status.equalsIgnoreCase("On")) {
+//
+//                    /*
+//                        Sending the galleryname and the gallerypath to the next activity(for the activated gallery)
+//                     */
+//                    Intent activatedGalleryIntent = new Intent(getActivity(), ActivatedGalleryActivity.class);
+//                    activatedGalleryIntent.putExtra("galleryName", gallery.getGalleryName());
+//                    activatedGalleryIntent.putExtra("galleryPath", gallery.getGalleryPath());
+//
+//                    startActivity(activatedGalleryIntent);
+//
+//                }
+//                else {
                     /*
                         Sending the gallerytitle for the next activity(not activated gallery)
                      */
+                
+                
+                
                     Intent galleryImagesIntent = new Intent(getActivity(), LocalImageActivity.class);
                     galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
 
                     startActivity(galleryImagesIntent);
                 }
-            }
+//            }
         });
 
 

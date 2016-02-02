@@ -22,14 +22,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
 import com.dd.CircularProgressButton;
 import com.squareup.otto.Produce;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.Model.LocalModel.LocalUser;
+import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.R;
@@ -281,7 +287,7 @@ public class LocalImageActivity extends AppCompatActivity {
                         circularButton.setProgress(50); // set progress > 0 & < 100 to display indeterminate progress
 
                         if(selectedDataPathList != null) {
-                            upload(selectedDataPathList);
+                            uploadList(selectedDataPathList);
                         }
                         selectedDataPathList.clear();
                         adapter.clearSelection();
@@ -360,10 +366,25 @@ public class LocalImageActivity extends AppCompatActivity {
         /*
             upload the selected files
         */
-    private void upload(List<String> fileList) {
+    private void uploadList(List<String> fileList) {
         circularButton.setVisibility(View.VISIBLE);
         circularButton.setIndeterminateProgressMode(true); // turn on indeterminate progress
         circularButton.setProgress(50);
+
+
+        mPrefs = activity.getSharedPreferences("myPref", 0);
+        String username = mPrefs.getString("username", "");
+        String email =  mPrefs.getString("email", "");
+
+        if(!DeviceStatus.is_newUser(email)) {
+            createTask(email,fileList.size());
+
+
+        }else {
+            Toast.makeText(activity,"please choose collection first",Toast.LENGTH_LONG).show();
+        }
+
+
 
         String jsonPart1 = "\"collectionId\" : \"" +
                 dataCollectionId +
@@ -392,6 +413,28 @@ public class LocalImageActivity extends AppCompatActivity {
     }
 
 
+    private void createTask(String email,int totalItems){
+
+
+        LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
+        String collectionID = user.getCollectionId();
+        String uniqueID = UUID.randomUUID().toString();
+        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+        Long now = new Date().getTime();
+
+        Task task = new Task();
+        task.setTotalItems(totalItems);
+        task.setFinishedItems(0);
+        task.setTaskId(uniqueID);
+        task.setUploadMode("MU");
+        task.setCollectionId(collectionID);
+        task.setState(String.valueOf(DeviceStatus.state.WAITING));
+        task.setUserName(username);
+        task.setStartDate(String.valueOf(now));
+        task.setTaskName(user.getCollectionName() + currentDateTimeString);
+
+        task.save();
+    }
     /*
         delete the selected files
      */
