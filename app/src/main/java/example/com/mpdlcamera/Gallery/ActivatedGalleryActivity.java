@@ -336,6 +336,7 @@ public class ActivatedGalleryActivity extends AppCompatActivity implements Uploa
         mPrefs = activity.getSharedPreferences("myPref", 0);
         String username = mPrefs.getString("username", "");
         String password = mPrefs.getString("password", "");
+
         dataCollectionId = mPrefs.getString("collectionID", DeviceStatus.collectionID);
 
         String jsonPart1 = "\"collectionId\" : \"" +

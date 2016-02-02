@@ -2,6 +2,7 @@ package example.com.mpdlcamera.UploadFragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,8 +13,14 @@ import android.view.ViewGroup;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
+
+import java.util.List;
+
+import example.com.mpdlcamera.Model.LocalModel.LocalUser;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,11 +31,16 @@ import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
  * create an instance of this fragment.
  */
 public class UploadFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
+
+    private String TAG = UploadFragment.class.getSimpleName();
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     static final int PICK_COLLECTION_REQUEST = 1997;
     private RadioGroup radioGroup;
     private View rootview;
+
+    private String email;
+    private SharedPreferences mPrefs;
+
 
     // TODO: Rename and change types of parameters
 
@@ -55,6 +67,23 @@ public class UploadFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mPrefs = getActivity().getSharedPreferences("myPref", 0);
+        email = mPrefs.getString("email", "");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        TextView collectionNameTextView = (TextView) rootview.findViewById(R.id.collection_name);
+
+        if(!DeviceStatus.is_newUser(email)){
+            LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
+        collectionNameTextView.setText(user.getCollectionName());
+            List<LocalUser> userList = new Select().from(LocalUser.class).where("email = ?", email).execute();
+            Log.i(TAG,userList.size()+"");
+        }else {
+            collectionNameTextView.setText("unset");
+        }
     }
 
     @Override

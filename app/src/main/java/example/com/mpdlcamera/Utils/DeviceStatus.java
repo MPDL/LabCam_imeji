@@ -17,6 +17,7 @@ import com.activeandroid.query.Select;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.LocalModel.Image;
+import example.com.mpdlcamera.Model.LocalModel.LocalUser;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 
 /**
@@ -112,9 +113,18 @@ public class DeviceStatus {
     public static List<Image> getImagesByTaskId(String taskId){
         return new Select()
                 .from(Image.class)
-                .where("taskId = ?",taskId)
+                .where("taskId = ?", taskId)
                 .orderBy("createTime ASC")
                 .execute();
+    }
+
+    //check if it a is new user in local database
+    public static boolean is_newUser(String email) {
+        LocalUser foundBg = new Select()
+                .from(LocalUser.class)
+                .where("email = ?", email)
+                .executeSingle();
+        return (foundBg == null);
     }
 
 }

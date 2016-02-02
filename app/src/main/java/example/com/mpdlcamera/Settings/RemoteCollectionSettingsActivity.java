@@ -3,6 +3,7 @@ package example.com.mpdlcamera.Settings;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
@@ -29,6 +31,7 @@ import java.util.UUID;
 
 import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.LocalModel.LocalUser;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.R;
@@ -43,6 +46,7 @@ import retrofit.client.Response;
 public class RemoteCollectionSettingsActivity extends AppCompatActivity implements CollectionIdInterface{
     private String username;
     private String APIkey;
+    private String email;
     private SharedPreferences mPrefs;
 
     private SettingsListAdapter adapter;
@@ -53,9 +57,10 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     private Toolbar toolbar;
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
 
-    private String collectionID;
+    private String collectionID = "";
     private String collectionName;
 
+    private Context context =this;
     private int selectedItem;
     private CollectionIdInterface ie;
 
@@ -118,7 +123,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         APIkey = mPrefs.getString("apiKey", "");
-
+        email = mPrefs.getString("email", "");
 
         collectionListLocal = new Select()
                 .from(ImejiFolder.class)
@@ -166,16 +171,35 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // default collectionID
 
-                Log.i("~collectionID", collectionID);
-                createTask(collectionID);
+                //create task if collection is selected
+                if(!collectionID.equals("")&&!collectionID.equals(null)) {
+                    Log.i("~collectionID", collectionID);
+                    createTask(collectionID);
 
-                Log.v("task.size",""+DeviceStatus.getTasks().size());
-                for(Task task:DeviceStatus.getTasks()){
-                    if(task.getTaskName()!=null){
-                    Log.v("~taskName",task.getTaskName());}
+                    Log.v("task.size", "" + DeviceStatus.getTasks().size());
+                    for (Task task : DeviceStatus.getTasks()) {
+                        if (task.getTaskName() != null) {
+                            Log.v("~taskName", task.getTaskName());
+                        }
+                    }
+                    //TODO: set collection id for local user
+                    if (DeviceStatus.is_newUser(email)) {
+                        LocalUser user = new LocalUser(email, collectionID, collectionName);
+                        user.save();
+                        Toast.makeText(context, "user collectionID saved", Toast.LENGTH_LONG).show();
+                    } else {
+                        LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
+                        user.setCollectionId(collectionID);
+                        user.setCollectionName(collectionName);
+                        user.save();
+                        Toast.makeText(context, "user collectionID updated", Toast.LENGTH_LONG).show();
+                    }
+
+                }else {
+                    Toast.makeText(context, "collection setting not changed", Toast.LENGTH_LONG).show();
                 }
+                finish();
             }
         });
 

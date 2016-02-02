@@ -66,10 +66,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:layout_toRightOf="@id/tv_choose_collection"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
             android:id="@+id/collection_name"
             android:text=""
-            android:textSize="20dip"
+            android:textSize="15dp"
 
             />
 
