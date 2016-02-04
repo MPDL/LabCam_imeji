@@ -169,6 +169,10 @@
                  android:enabled="true">
         </service>
 
+        <service android:name=".AutoRun.ManualUploadService"
+            android:enabled="true">
+        </service>
+
         <receiver
             android:name="example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver"
             android:label="NetworkChangeReceiver" >

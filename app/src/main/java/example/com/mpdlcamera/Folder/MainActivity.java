@@ -40,8 +40,8 @@ import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
+
 import example.com.mpdlcamera.TaskManager.TaskFragment;
-import example.com.mpdlcamera.Upload.NewFileObserver;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.UploadFragment.UploadFragment;
 import example.com.mpdlcamera.UserFragment.UserFragment;
@@ -294,14 +294,16 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         taskProgressBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                TaskFragment taskFragment = new TaskFragment();
+                UploadFragment uploadFragment = new UploadFragment();
 
                 FragmentManager fragmentManager = getSupportFragmentManager();
-                taskFragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+                uploadFragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
 
-                taskFragment.show(fragmentManager,"Task Manager");
+                uploadFragment.show(fragmentManager,"Task Manager");
             }
         });
+
+
 
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
@@ -403,9 +405,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     fragment = new ImejiFragment();
                     return fragment;
                 case 2:
-                    fragment = new UploadFragment();
+                    fragment = new TaskFragment();
                     return fragment;
-
                 default:
                     return new LocalFragment();
             }
