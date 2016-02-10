@@ -202,6 +202,10 @@
             </intent-filter>
         </receiver>
 
+        <provider
+            android:authorities="com.activeandroid.content.ContentProvider"
+            android:name="com.activeandroid.content.ContentProvider"/>
+
     </application>
 
 </manifest>

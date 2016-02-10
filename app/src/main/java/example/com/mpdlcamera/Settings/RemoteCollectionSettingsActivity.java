@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -36,7 +37,6 @@ import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
-import example.com.mpdlcamera.TaskManager.TaskProvider;
 import example.com.mpdlcamera.UploadFragment.CollectionIdInterface;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
@@ -173,7 +173,13 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             public void onClick(View view) {
 
                 //create task if collection is selected
-                if(!collectionID.equals("")&&!collectionID.equals(null)) {
+                if (!collectionID.equals("") && !collectionID.equals(null)) {
+
+                    /**
+                     * delete all AU Task if finished
+                     * */
+                    deleteFinishedTasks();
+
                     Log.i("~collectionID", collectionID);
                     createTask(collectionID);
 
@@ -196,7 +202,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                         Toast.makeText(context, "user collectionID updated", Toast.LENGTH_LONG).show();
                     }
 
-                }else {
+                } else {
                     Toast.makeText(context, "collection setting not changed", Toast.LENGTH_LONG).show();
                 }
                 finish();
@@ -215,9 +221,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         if(latestTask==null){
             Log.v("create Task", "no task in database");
             Task task = new Task();
-
-            TaskProvider taskProvider = new TaskProvider();
-//            taskProvider.insert(Uri.parse("content://example.com.mpdlcamera/") ,new ContentValues());
 
             String uniqueID = UUID.randomUUID().toString();
             task.setTaskId(uniqueID);
@@ -271,11 +274,34 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                 .executeSingle();
     }
 
-
-
     @Override
     public void setCollectionId(int Id) {
         collectionID = collectionListLocal.get(Id).getImejiId();
         collectionName = collectionListLocal.get(Id).getTitle();
+    }
+
+    //delete finished tasks
+    public void deleteFinishedTasks(){
+
+        // get All au tasks first
+        List<Task> finishedTasks = new Select()
+                .from(Task.class)
+                .execute();
+        Log.v(LOG_TAG,finishedTasks.size()+"_all");
+
+        // remove unfinished tasks form list
+        for(Task task:finishedTasks){
+            if(task.getFinishedItems() == task.getTotalItems()){
+                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                task.save();
+            }
+        }
+
+        new Delete().from(Task.class).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
+
+        int num = (new Select()
+                .from(Task.class)
+                .execute()).size();
+        Log.v(LOG_TAG,num +"_finished");
     }
 }

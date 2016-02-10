@@ -1,6 +1,7 @@
 package example.com.mpdlcamera.AutoRun;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -9,8 +10,11 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.ResultReceiver;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -18,6 +22,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.otto.Produce;
@@ -36,6 +41,7 @@ import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.SQLite.FileId;
 import example.com.mpdlcamera.SQLite.MySQLiteHelper;
+import example.com.mpdlcamera.TaskManager.UpdateTaskInterface;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -53,18 +59,14 @@ public class TaskUploadService extends Service{
     private SharedPreferences mPrefs;
 
     // get last Task, may need to add a param to set task
-    Task mTask;
-    int next = 0;
-    int finishedNum;
+    private Task task;
+    private int finishedNum;
+    private String currentTaskId;
+    private String currentImageId;
+    private Handler handler = new Handler();
 
-    FileId fileId;
-
-    //Local database objects
-    private List<Image> images;
-
-    private Long imageId;
-    private DataItem item = new DataItem();
-    private MetaData meta = new MetaData();
+    // Images
+    List<Image> waitingImages = null;
 
     private String username;
     private String apiKey;
@@ -72,269 +74,126 @@ public class TaskUploadService extends Service{
     public TypedFile typedFile;
     String json;
 
+    //get context
+    private Context activity = this;
+
+    //flag
+    private boolean isBusy = true;
+    private static boolean isRunning = false;
+
+
+    //NotificationManager
+    private NotificationManager mNM;
+
+    /**
+     * Class for clients to access.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with
+     * IPC.
+     */
+    public class AutoUploadServiceBinder extends Binder {
+        public TaskUploadService  getService() {
+            return TaskUploadService.this;
+        }
+    }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
+
+    private final IBinder mBinder = new AutoUploadServiceBinder();
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.v(TAG, "TaskUploadService Destroy!");
+        isRunning = false;
     }
 
     @Override
     public void onCreate() {
+
         super.onCreate();
 
             if(isNetworkAvailable()) {
-                Log.v(TAG, "TaskUploadService Started!");
-                Toast.makeText(mContext, "TaskUploadService Started", Toast.LENGTH_SHORT).show();
+                Log.v(TAG, "TaskUploadService onCreate!");
                 ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-                String networkStatus = networkInfo.getTypeName();
 
+                // prepare auth for upload
                 mPrefs = this.getSharedPreferences("myPref", 0);
                 username = mPrefs.getString("username", "");
                 apiKey = mPrefs.getString("apiKey", "");
 
-                //set collectionID
+                //set task
                 try{
-                    mTask = DeviceStatus.getTask();
-                    Log.v("~~~","mTask get");
-                    finishedNum = mTask.getFinishedItems();
+                    task =  DeviceStatus.getAuTask();
+                    currentTaskId = task.getTaskId();
+                    Log.i(TAG, "currentTaskId" + currentTaskId);
+                    finishedNum = task.getFinishedItems();
                     Log.v("~~~","onCreate getFinishedItems: "+finishedNum);
                 }
                 catch (Exception e){
                     // no task or exception in query
-                    //TODO: handle exception
                     Log.v(TAG,"no task or exception in query");
                 }
-                if(mTask!=null) {
-                    collectionID = mTask.getCollectionId();
+                // set collectionId
+                if(task!=null) {
+                    collectionID = task.getCollectionId();
                     Log.v("~~~","collectionID set");
                 }else{
                     Log.v(TAG,"mTask is null, can't get collectionID");
                 }
-
-                //Images
-                try{
-                    images = DeviceStatus.getImagesByTaskId(DeviceStatus.getTask().getTaskId());
-                    Log.v("~~~","images get");}
-
-                catch (Exception e){
-                    //TODO: handle exception
-                    Log.v(TAG,"no image in this task");
-                }
-
-                if(images!=null){
-                    //get next Image in task
-//                    Image image = images.get(next);
-
-
-                    // image state is WAITING
-                    for (Image im: images) {
-                        if(im.getState().equals(String.valueOf(DeviceStatus.state.WAITING))){
-                            //upload
-                            upload(im);
-                            Log.v("~~~", " --first available--" + finishedNum);
-                            //set finished items num in local database
-                            Task task = Task.load(Task.class, mTask.getId());
-                            task.setFinishedItems(finishedNum);
-                            task.save();
-
-                            break;
-                        }else if(im.getState().equals(String.valueOf(DeviceStatus.state.FINISHED))){
-                            // next image exist in task (next = 0, size = 1)
-                            Log.v("~~~","current image FINISHED, move to next image");
-
-                            if ((finishedNum) < mTask.getTotalItems()) {
-                                finishedNum = finishedNum + 1;
-                                Log.v("~~~","go to next: "+next);
-                            }
-                        }else{
-                            Log.v("~~~","state error "+next);
-                        }
-
-                    }
-
-                }
-
-            }else {
-                //Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+                //start uploading
+                startUpload();
             }
+        isRunning = true;
     }
 
-    /*
-        uploads the dataitem
-         */
-    private void upload(Image image) {
-
-        //get collectionId
-        collectionID = mTask.getCollectionId();
-        //update current imageId
-        imageId = image.getId();
-        String jsonPart1 = "\"collectionId\" : \"" +
-                collectionID +
-                "\"";
-        Gson gson = new GsonBuilder()
-                .serializeNulls()
-                .excludeFieldsWithoutExposeAnnotation()
-                .create();
-        // item.getMetadata().setDeviceID("1");
-
-        typedFile = new TypedFile("multipart/form-data", new File(image.getImagePath()));
-
-        json = "{" + jsonPart1 + "}";
-        Log.v(TAG, json);
-
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
         if(isNetworkAvailable()) {
-            //TODO: set serverURL without login
-            String BASE_URL = "https://dev-faces.mpdl.mpg.de/rest/";
-            RetrofitClient.setRestServer(BASE_URL);
+            Log.v(TAG, "TaskUploadService onStartCommand!");
+            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-            RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+            // prepare auth for upload
+            mPrefs = this.getSharedPreferences("myPref", 0);
+            username = mPrefs.getString("username", "");
+            apiKey = mPrefs.getString("apiKey", "");
+
+            //set task
+            try{
+                task =  DeviceStatus.getAuTask();
+                currentTaskId = task.getTaskId();
+                Log.i(TAG, "currentTaskId" + currentTaskId);
+                finishedNum = task.getFinishedItems();
+                Log.v("~~~","onCreate getFinishedItems: "+finishedNum);
+            }
+            catch (Exception e){
+                // no task or exception in query
+                Log.v(TAG,"no task or exception in query");
+            }
+            // set collectionId
+            if(task!=null) {
+                collectionID = task.getCollectionId();
+                Log.v("~~~","collectionID set");
+            }else{
+                Log.v(TAG,"mTask is null, can't get collectionID");
+            }
+
+            if(isBusy) {
+            }
+            else {
+                //start uploading
+                startUpload();
+            }
         }
-        else {
-            //Toast.makeText(mContext, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
-        }
+        return super.onStartCommand(intent, flags, startId);
     }
 
-
-    Callback<DataItem> callback = new Callback<DataItem>() {
-        @Override
-        @Produce
-        public void success(DataItem dataItem, Response response) {
-
-            Log.v("~~~","callback success No."+ finishedNum);
-            Toast.makeText(mContext, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
-
-            //update mTask
-            mTask = DeviceStatus.getTask();
-            // change state
-            updateImageState();
-            Task task = Task.load(Task.class, mTask.getId());
-            task.setFinishedItems(task.getFinishedItems() + 1);
-            finishedNum = task.getFinishedItems()+1;
-            Log.i("~~~","get finishedNum"+ finishedNum+"="+"task.getFinishedItems()"+task.getFinishedItems()+"+1");
-            task.save();
-
-
-            //get Images again in case new image come in
-            try{
-                images = DeviceStatus.getImagesByTaskId(DeviceStatus.getTask().getTaskId());}
-            catch (Exception e){
-                //TODO: handle exception
-                Log.v(TAG,"no image in this task");
-            }
-
-            // images not null, continue
-            if(images!=null) {
-                // next image exist in task (next = 0, size = 1)
-
-                if ((finishedNum) < mTask.getTotalItems()) {
-                    //get next Image in task
-                    Image nextImage;
-                    nextImage = images.get(next);
-
-                    // image state is WAITING
-                    if (nextImage.getState().equals(String.valueOf(DeviceStatus.state.WAITING))) {
-                        //upload
-                        upload(nextImage);
-                    }
-                }else{
-                    // all uploaded
-                    next = next - 1;
-
-                    Log.i("~~~","all uploaded"+finishedNum+"/"+mTask.getTotalItems());
-                    //TODO: delete task?
-
-                }
-
-                //TODO: discuss rewrite or keep this function
-                mPrefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-
-                if (mPrefs.contains("RemovePhotosAfterUpload")) {
-
-                    if (mPrefs.getBoolean("RemovePhotosAfterUpload", true)) {
-
-                        File file = typedFile.file();
-                        Boolean deleted = file.delete();
-                        Log.v(TAG, "deleted:" + deleted);
-                        Toast.makeText(mContext, "Uploaded and deleted", Toast.LENGTH_SHORT).show();
-
-                    }
-
-                }
-            }
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-
-            System.out.println("~uploading image error");
-            Log.i("error", error.getMessage());
-
-
-            if(error.getMessage().equals("422 Unprocessable Entity")){
-                Log.i("error","catch 422 already uploaded");
-                // change it to finished? or
-                updateImageState();
-
-                //update mTask
-                mTask = DeviceStatus.getTask();
-
-                next = next +1;
-                if ((next) < mTask.getTotalItems()) {
-                    //get next Image in task
-                    Image nextImage;
-                    nextImage = images.get(next);
-
-                    // image state is WAITING
-                    if (nextImage.getState().equals(String.valueOf(DeviceStatus.state.WAITING))) {
-                        //upload
-                        upload(nextImage);
-                    }
-                }else{
-                    // all uploaded
-                    next = next - 1;
-                    Log.i("~~~","all uploaded");
-                    //TODO: delete task?
-
-                }
-            }
-            //Images
-            try{
-                images = DeviceStatus.getImagesByTaskId(DeviceStatus.getTask().getTaskId());}
-            catch (Exception e){
-                //TODO: handle exception
-                Log.v(TAG,"no image in this task");
-            }
-
-            if(images!=null){
-                //get next Image in task
-                Image image = images.get(next);
-
-                // image state is WAITING
-                if(image.getState().equals(String.valueOf(DeviceStatus.state.WAITING))){
-                    //upload
-                    upload(image);
-                }
-            }
-
-            //TODO: write error massage to log
-
-
-            Log.v(TAG, String.valueOf(error));
-
-        }
-    };
-
     /*
-        checks whether the network is available or not
-     */
+            checks whether the network is available or not
+         */
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -343,10 +202,228 @@ public class TaskUploadService extends Service{
     }
 
 
-    //update Image in db (not static)
-    private void updateImageState(){
-        Image image = Image.load(Image.class, imageId);
-        image.setState(String.valueOf(DeviceStatus.state.FINISHED));
-        image.save();
+    private void startUpload() {
+
+        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+        // get waitingImages number
+        try {
+            /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
+            waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
+        }catch (Exception e){}
+
+        //DELETE TESTING
+        Log.i(TAG,"waitingImages: "+ waitingImages.size());
+        Log.i(TAG, "totalImages: " + task.getTotalItems());
+
+        if (waitingImages!=null && waitingImages.size() > 0) {
+
+            //upload begin with the first in list
+
+            Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("createTime DESC").executeSingle();
+            String imageState = image.getState();
+            String filePath = image.getImagePath();
+            currentImageId = image.getImageId();
+            Log.e(TAG, currentImageId);
+
+
+            if (imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
+                // TODO:upload image
+                String jsonPart1 = "\"collectionId\" : \"" +
+                        collectionID +
+                        "\"";
+
+                typedFile = new TypedFile("multipart/form-data", new File(filePath));
+                json = "{" + jsonPart1 + "}";
+                Log.v(TAG, "start uploading: " + filePath);
+                image.setState(String.valueOf(DeviceStatus.state.STARTED));
+                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+
+            }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.INTERRUPTED))){
+            }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STARTED))){
+            }else {
+                Log.e(TAG,"illegal imageState:"+imageState);
+            }
+        }
     }
+    private void upload(Image image){
+
+        // load task?
+        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+        String taskState = task.getState();
+
+        //upload image
+        String imageState = image.getState();
+        String filePath = image.getImagePath();
+        currentImageId = image.getImageId();
+        Log.e(TAG, "upload" + currentImageId);
+
+        if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
+            // TODO:upload image
+            String jsonPart1 = "\"collectionId\" : \"" +
+                    collectionID +
+                    "\"";
+
+            typedFile = new TypedFile("multipart/form-data", new File(filePath));
+            json = "{" + jsonPart1 + "}";
+            Log.v(TAG, "start uploading: "+filePath);
+            image.setState(String.valueOf(DeviceStatus.state.STARTED));
+            RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+        }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
+            // TODO:upload finish
+        }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STARTED))){
+            // TODO: already started?
+        }
+    }
+
+
+
+
+    /*******/
+    public static boolean isRunning()
+    {
+        return isRunning;
+    }
+
+
+
+    //callback
+    Callback<DataItem> callback = new Callback<DataItem>() {
+        @Override
+        @Produce
+        public void success(DataItem dataItem, Response response) {
+
+            handler.post(new Runnable() {
+                public void run() {
+                    Toast.makeText(activity, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
+
+            Log.e(TAG,currentImageId);
+            Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
+            currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
+            currentImage.save();
+
+            //TODO: ReWrite "remove after upload" function later
+            mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
+
+            /*
+                Delete the file if the setting "Remove the photos after upload" is On
+             */
+            if(mPrefs.contains("RemovePhotosAfterUpload")) {
+                if(mPrefs.getBoolean("RemovePhotosAfterUpload",true)) {
+
+                    File file = typedFile.file();
+                    Boolean deleted = file.delete();
+                    Log.v(TAG, "deleted:" +deleted);
+                }
+            }
+            //TODO: remove picture
+//            adapter.notifyDataSetChanged();
+
+
+
+            /** move on to next **/
+            int finishedNum = task.getFinishedItems();
+            int totalNum = task.getTotalItems();
+            finishedNum = finishedNum +1;
+            task.setFinishedItems(finishedNum);
+            task.save();
+
+            Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
+            if(totalNum>finishedNum){
+                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
+                if(image!=null){
+                upload(image);
+                }
+            }else {
+                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                isBusy = false;
+                Log.i(TAG, "task finished");
+            }
+
+
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+
+
+            Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
+            currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
+            currentImage.setLog(error.getKind().name());
+
+
+            if (error == null || error.getResponse() == null) {
+                OttoSingleton.getInstance().post(new UploadEvent(null));
+                if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
+
+
+                    handler=new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        public void run() {
+                            Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                else {
+
+                    handler=new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        public void run() {
+                            Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            } else {
+                OttoSingleton.getInstance().post(
+                        new UploadEvent(error.getResponse().getStatus()));
+                String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
+                if (jsonBody.contains("already exists")) {
+
+                    handler=new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        public void run() {
+                            Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    currentImage.setLog(error.getKind().name() +" already exists");
+
+                }
+                else {
+
+                    handler=new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        public void run() {
+                            Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+            // save state changes
+            currentImage.save();
+            Log.v(TAG, String.valueOf(error));
+
+            //TODO: continue upload
+
+            /** move on to next **/
+            int finishedNum = task.getFinishedItems();
+            int totalNum = task.getTotalItems();
+            Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
+            if(totalNum>finishedNum){
+                // continue anyway
+                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
+                if(image!=null){
+                upload(image);
+                }
+            }else {
+                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                isBusy = false;
+                Log.i(TAG,"task finished");
+            }
+
+        }
+    };
+
 }

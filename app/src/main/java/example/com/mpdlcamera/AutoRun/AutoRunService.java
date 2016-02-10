@@ -38,11 +38,12 @@ public class AutoRunService extends Service implements UploadResultReceiver.Rece
     @Override
     public void OnConnect() {
         Toast.makeText(this, "AutoRunService detect network Connect...", Toast.LENGTH_LONG).show();
-        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
-        mReceiver.setReceiver(this);
-        Intent intent = new Intent(this, UploadService.class);
-        intent.putExtra("receiver", mReceiver);
-        this.startService(intent);
+        // FIXME: 2/10/16 unknow bug in UploadService
+//        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
+//        mReceiver.setReceiver(this);
+//        Intent intent = new Intent(this, UploadService.class);
+//        intent.putExtra("receiver", mReceiver);
+//        this.startService(intent);
     }
 
     @Override

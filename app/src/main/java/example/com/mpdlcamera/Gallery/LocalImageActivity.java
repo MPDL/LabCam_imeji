@@ -1,11 +1,16 @@
 package example.com.mpdlcamera.Gallery;
 
 import android.app.Activity;
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +40,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import example.com.mpdlcamera.AutoRun.ManualUploadService;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.LocalUser;
@@ -65,14 +71,12 @@ public class LocalImageActivity extends AppCompatActivity {
 //    public  ImagesGridAdapter adapter;
     private GridView gridView;
     private View rootView;
-    private String dataCollectionId;
     private Activity activity = this;
     private final String LOG_TAG = LocalImageActivity.class.getSimpleName();
     private SharedPreferences mPrefs;
     private String username;
-    private String apiKey;
-    private TypedFile typedFile;
-    private String json;
+
+
 
     private Toolbar toolbar;
     private String folderPath;
@@ -80,76 +84,11 @@ public class LocalImageActivity extends AppCompatActivity {
 
     private CircularProgressButton circularButton;
 
-
-    Callback<DataItem> callback = new Callback<DataItem>() {
-        @Override
-        @Produce
-        public void success(DataItem dataItem, Response response) {
-
-            Toast.makeText(activity, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
-            Log.v(LOG_TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
-
-            MySQLiteHelper db = new MySQLiteHelper(activity);
-            String fileNamePlusId = dataItem.getFilename() + dataCollectionId;
-            FileId fileId = new FileId(fileNamePlusId,"uploaded");
-            db.insertFile(fileId);
+    //Bind Manual uploading service
+    private Service myService;
+    private boolean bound;
 
 
-            mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
-
-            /*
-                Delete the file if the setting "Remove the photos after upload" is On
-             */
-            if(mPrefs.contains("RemovePhotosAfterUpload")) {
-                if(mPrefs.getBoolean("RemovePhotosAfterUpload",true)) {
-
-                    File file = typedFile.file();
-                    Boolean deleted = file.delete();
-                    Log.v(LOG_TAG, "deleted:" +deleted);
-                }
-            }
-            adapter.notifyDataSetChanged();
-
-            circularButton.setProgress(100);
-
-        }
-
-
-        @Override
-        public void failure(RetrofitError error) {
-
-            MySQLiteHelper db = new MySQLiteHelper(activity);
-            String fileNamePlusId = typedFile.fileName() + dataCollectionId;
-            FileId fileId = new FileId(fileNamePlusId,"failed");
-            db.insertFile(fileId);
-
-            if (error == null || error.getResponse() == null) {
-                OttoSingleton.getInstance().post(new UploadEvent(null));
-                if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
-                    Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                OttoSingleton.getInstance().post(
-                        new UploadEvent(error.getResponse().getStatus()));
-                String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
-                if (jsonBody.contains("already exists")) {
-                    Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
-                    //FileId newFileId = new FileId(fileNamePlusId,"")
-                    db.updateFileStatus(fileNamePlusId,"uploaded");
-                }
-                else {
-                    Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
-                }
-            }
-            circularButton.setProgress(-1);
-
-            Log.v(LOG_TAG, String.valueOf(error));
-
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,8 +106,6 @@ public class LocalImageActivity extends AppCompatActivity {
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
-        apiKey = mPrefs.getString("apiKey", "");
-        dataCollectionId = mPrefs.getString("collectionID", DeviceStatus.collectionID);
 
         Intent intent = activity.getIntent();
         if (intent != null) {
@@ -386,52 +323,9 @@ public class LocalImageActivity extends AppCompatActivity {
             Toast.makeText(activity,"please choose collection first",Toast.LENGTH_LONG).show();
         }
 
-
-        // TODO:Start uploading TASK (create a new function)
-        Task task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
-        List<Image> imagesInTask = new Select().from(Image.class).where("taskId = ?", currentTaskId).orderBy("imageId ASC").execute();
-        String taskState = task.getState();
-        if(taskState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
-            Image image = imagesInTask.get(0);
-            String imageState = image.getState();
-            if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
-                // TODO:upload image
-            }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
-                // TODO:upload finish
-            }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STARTED))){
-                // TODO: already started, change to interupt?
-            }
-        }else if(taskState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
-            // TODO: task stopped
-        }else if(taskState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
-            // TODO:task finish
-        }
-
-
-        String jsonPart1 = "\"collectionId\" : \"" +
-                dataCollectionId +
-                "\"";
-
-        for (String filePath : fileList) {
-            File file = new File(filePath);
-            File imageFile = file.getAbsoluteFile();
-            String fileName = imageFile.getName();
-            String filePlusId = fileName + dataCollectionId;
-            MySQLiteHelper db = new MySQLiteHelper(activity);
-            FileId fileId = new FileId(filePlusId,"uploaded");
-            String status = db.getFileStatus(filePlusId);
-            if(status.equalsIgnoreCase("not present") || status.equalsIgnoreCase("failed")) {
-                db.insertFile(fileId);
-
-
-                typedFile = new TypedFile("multipart/form-data", new File(filePath));
-
-                json = "{" + jsonPart1 + "}";
-
-                Log.v(LOG_TAG, json);
-//                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
-            }
-        }
+        Intent manualUploadServiceIntent = new Intent(this,ManualUploadService.class);
+        manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
+        startService(manualUploadServiceIntent);
     }
 
 
@@ -499,8 +393,10 @@ public class LocalImageActivity extends AppCompatActivity {
 
             try {
 
+                String imageId = UUID.randomUUID().toString();
                 //store image in local database
                 Image photo = new Image();
+                photo.setImageId(imageId);
                 photo.setImageName(imageName);
                 photo.setImagePath(filePath);
                 photo.setLongitude(longitude);
@@ -532,6 +428,18 @@ public class LocalImageActivity extends AppCompatActivity {
         }
     }
 
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
 
+        public void onServiceConnected( ComponentName className, IBinder service ) {
 
+            myService = ( (ManualUploadService.ServiceBinder) service ).getService();
+            bound = true;
+        }
+
+        public void onServiceDisconnected( ComponentName className ) {
+
+            myService = null;
+            bound = false;
+        }
+    };
 }

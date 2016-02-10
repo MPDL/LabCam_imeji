@@ -6,6 +6,7 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.Model.User;
 import retrofit.Callback;
 import retrofit.client.Response;
@@ -70,10 +71,9 @@ public class RetrofitClient {
     /*
         for collection
      */
-    public static void getCollections(Callback<List<ImejiFolder>> callback,
-                                String username,
-                                String password) {
-        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, username, password);
+    public static void getCollections(Callback<CollectionMessage> callback,
+                                      String APIkey) {
+        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
 
         imejiAPI.getCollections(callback);
     }

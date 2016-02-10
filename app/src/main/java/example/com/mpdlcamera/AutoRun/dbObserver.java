@@ -38,16 +38,15 @@ public class dbObserver extends ContentObserver {
 
         Log.i(TAG, "the Tasks table has changed");
         Toast.makeText(mContext,"db changed",Toast.LENGTH_LONG).show();
+//
+//        Uri taskUri = Uri.parse("content://example.com.mpdlcamera/tasks") ;
+//        Cursor c = mContext.getContentResolver().query(taskUri, null, null, null, null);
+//        String sb = "";
+//        if (c!=null){
+//             sb = "bla";
+//        }
 
-        Uri taskUri = Uri.parse("content://example.com.mpdlcamera") ;
-        Cursor c = mContext.getContentResolver().query(taskUri, null, null, null, null);
-        String sb = "";
-        if (c!=null){
-             sb = "bla";
-        }
-        c.close();
-
-        mHandler.obtainMessage(2, sb.toString()).sendToTarget();
+        mHandler.sendEmptyMessage(1234);
 
     }
 }

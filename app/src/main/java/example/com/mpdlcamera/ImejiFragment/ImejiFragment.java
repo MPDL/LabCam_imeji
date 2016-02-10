@@ -32,6 +32,7 @@ import example.com.mpdlcamera.Folder.FolderListAdapter;
 import example.com.mpdlcamera.Items.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -230,7 +231,7 @@ public class ImejiFragment extends Fragment {
         pDialog.setMessage("Loading...");
         pDialog.show();
 //        RetrofitClient.getCollections(callback, username, password);
-        RetrofitClient.getCollectionMessage(callback_collection,APIKey);
+        RetrofitClient.getCollections(callback_collection,APIKey);
     }
 
     private void getFolderItems(String collectionId){
@@ -298,29 +299,19 @@ public class ImejiFragment extends Fragment {
         }
     };
 
-    Callback<JsonObject> callback_collection = new Callback<JsonObject>() {
+    Callback<CollectionMessage> callback_collection = new Callback<CollectionMessage>() {
         @Override
-        public void success(JsonObject jsonObject, Response response) {
+        public void success(CollectionMessage collectionMessage, Response response) {
             Log.i("callback_collection","callback_collection success");
-            Log.i("callback_collection", jsonObject.toString());
 
-            JsonArray array;
             List<ImejiFolder> folderList = new ArrayList<>();
-
-                array = jsonObject.getAsJsonArray("results");
-                Log.i("results", array.toString());
-                Gson gson = new Gson();
-                for(int i = 0 ; i < array.size() ; i++){
-                    ImejiFolder imejiFolder = gson.fromJson(array.get(i), ImejiFolder.class);
-                    folderList.add(imejiFolder);
-                }
+            folderList = collectionMessage.getResults();
 
             ActiveAndroid.beginTransaction();
             try {
                 collectionListLocal.clear();
                 for(ImejiFolder folder : folderList){
-//                    Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
-//                    Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
+                    Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
 
                     getFolderItems(folder.id);
 
@@ -338,12 +329,12 @@ public class ImejiFragment extends Fragment {
             if(pDialog != null) {
                 pDialog.hide();
             }
-
         }
 
         @Override
         public void failure(RetrofitError error) {
             Log.i("callback_collection","callback_collection fails");
+
         }
     };
 

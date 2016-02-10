@@ -95,6 +95,7 @@ public class LoginActivity extends AppCompatActivity {
         mPrefs = this.getSharedPreferences("myPref", 0);
         usernameView.setText(mPrefs.getString("email", ""));
         //TODO:store password?
+
         if (!mPrefs.getString("server", "").equals("")) {
             serverURL = mPrefs.getString("server", "");
         } else {
@@ -116,7 +117,10 @@ public class LoginActivity extends AppCompatActivity {
                 username = usernameView.getText().toString();
                 password = passwordView.getText().toString();
                 serverURL = serverURLView.getText().toString();
+                RetrofitClient.setRestServer(serverURL);
 
+
+                Log.v(LOG_TAG,serverURL);
                 usernameView.setError(null);
                 passwordView.setError(null);
 
@@ -465,7 +469,8 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void failure(RetrofitError error) {
             Log.v("~~~","login failed" );
-            Log.v("~~~",error.getMessage());
+            try{
+            Log.v("~~~", error.getMessage());}catch (Exception e){}
         }
     };
 }

@@ -1,17 +1,30 @@
 package example.com.mpdlcamera.TaskManager;
 
+import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.List;
 
+import example.com.mpdlcamera.AutoRun.TaskUploadService;
+import example.com.mpdlcamera.AutoRun.dbObserver;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -22,6 +35,28 @@ import example.com.mpdlcamera.Utils.DeviceStatus;
 public class TaskFragment extends Fragment{
 
     private List<Task> taskList;
+    private ListView taskManagerListView;
+
+    //
+    private TaskUploadService mBoundService;
+    boolean mIsBound;
+
+    private TaskManagerAdapter taskManagerAdapter;
+
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if(msg.what==1234){
+                Log.v("~~~", "1234~~~");
+                    taskList = DeviceStatus.getTasks();
+                    if(taskList!=null){
+                        taskManagerAdapter.notifyDataSetChanged();
+                    }
+            }
+        }
+    };
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -29,9 +64,10 @@ public class TaskFragment extends Fragment{
 
         View view = inflater.inflate(R.layout.fragment_task, container,false);
         //taskManager listview
-        ListView taskManagerListView = (ListView) view.findViewById(R.id.listView_task);
+        taskManagerListView = (ListView) view.findViewById(R.id.listView_task);
         taskList = DeviceStatus.getTasks();
-        TaskManagerAdapter taskManagerAdapter = new TaskManagerAdapter(this.getActivity(),taskList);
+        taskManagerAdapter = new TaskManagerAdapter(this.getActivity(),taskList);
+        taskManagerAdapter.notifyDataSetChanged();
         taskManagerListView.setAdapter(taskManagerAdapter);
         return view;
     }
@@ -50,9 +86,18 @@ public class TaskFragment extends Fragment{
         // Required empty public constructor
     }
 
+
+//    MyObserver observer;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Uri uri = Uri.parse("content://example.com.mpdlcamera/tasks");
+        ContentResolver resolver = getActivity().getContentResolver();
+        resolver.registerContentObserver(uri, true, new dbObserver(getActivity(), mHandler));
+
+//        doBindService();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -66,6 +111,12 @@ public class TaskFragment extends Fragment{
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+//        doUnbindService();
     }
 
     /**
@@ -82,4 +133,43 @@ public class TaskFragment extends Fragment{
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
+
+//    private ServiceConnection mConnection = new ServiceConnection() {
+//        public void onServiceConnected(ComponentName className, IBinder service) {
+//            // This is called when the connection with the service has been
+//            // established, giving us the service object we can use to
+//            // interact with the service.  Because we have bound to a explicit
+//            // service that we know is running in our own process, we can
+//            // cast its IBinder to a concrete class and directly access it.
+//            mBoundService = ((TaskUploadService.AutoUploadServiceBinder) service).getService();
+//
+//        }
+//
+//        public void onServiceDisconnected(ComponentName className) {
+//            // This is called when the connection with the service has been
+//            // unexpectedly disconnected -- that is, its process crashed.
+//            // Because it is running in our same process, we should never
+//            // see this happen.
+//            mBoundService = null;
+//        }
+//    };
+//
+//
+//    void doBindService() {
+//        // Establish a connection with the service.  We use an explicit
+//        // class name because we want a specific service implementation that
+//        // we know will be running in our own process (and thus won't be
+//        // supporting component replacement by other applications).
+//        getActivity().bindService(new Intent(getActivity(), TaskUploadService.class), mConnection, Context.BIND_AUTO_CREATE);
+//
+//        mIsBound = true;
+//    }
+//
+//    void doUnbindService() {
+//        if (mIsBound) {
+//            // Detach our existing connection.
+//            getActivity().unbindService(mConnection);
+//            mIsBound = false;
+//        }
+//    }
 }

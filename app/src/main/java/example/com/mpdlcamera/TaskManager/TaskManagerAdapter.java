@@ -8,13 +8,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.activeandroid.query.Delete;
 
 import org.w3c.dom.Text;
 
 import java.util.List;
 
+import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
 
@@ -64,32 +68,35 @@ public class TaskManagerAdapter extends BaseAdapter {
         taskNameTextView.setText(taskList.get(position).getTaskName());
 
         ProgressBar firstBar = (ProgressBar) view.findViewById(R.id.firstBar);
-        Task task = taskList.get(position);
+
+        //get task
+        final Task task = taskList.get(position);
         int currentNum = task.getFinishedItems();
         int maxNum = task.getTotalItems();
 
-//        if (currentNum == 0 || currentNum == maxNum) {
-//            //make the progress bar visible
-//            firstBar.setVisibility(View.VISIBLE);
-//            firstBar.setMax(maxNum);
-//        }else if ( currentNum< firstBar.getMax() ) {
-//            //Set first progress bar value
-//            firstBar.setProgress(currentNum);
-//            //Set the second progress bar value
-//        }else {
-//            firstBar.setProgress(0);
-//            firstBar.setSecondaryProgress(0);
-//            currentNum = 0;
-//            firstBar.setVisibility(View.GONE);
-//        }
         firstBar.setMax(maxNum);
         firstBar.setProgress(currentNum);
 
+        //totalNumTextView
         TextView totalNumTextView = (TextView) view.findViewById(R.id.totalItems);
         totalNumTextView.setText(maxNum+"");
 
+        //finishedNumTextView
         TextView finishedNumTextView = (TextView) view.findViewById(R.id.finishedItems);
         finishedNumTextView.setText(currentNum+"");
+
+        //DeleteTask
+        ImageView deleteTaskImageView = (ImageView) view.findViewById(R.id.task_delete);
+        deleteTaskImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String currentTaskId = task.getTaskId();
+                new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
+                //TODO: delete from data list
+                  /** if it is a Au, what to do? */
+            }
+        });
+
 
         return view;
     }

@@ -1,6 +1,7 @@
 package example.com.mpdlcamera.Model.MessageModel;
 
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -13,18 +14,23 @@ import example.com.mpdlcamera.Model.ImejiFolder;
  */
 public class CollectionMessage {
 
+    @Expose
     @SerializedName("totalNumberOfResults")
     private int totalNumberOfResults;
 
+    @Expose
     @SerializedName("numberOfResults")
     private int numberOfResults;
 
+    @Expose
     @SerializedName("offset")
     private int offset;
 
+    @Expose
     @SerializedName("size")
     private int size;
 
+    @Expose
     @SerializedName("results")
     private List<ImejiFolder> results = new ArrayList<>();
 

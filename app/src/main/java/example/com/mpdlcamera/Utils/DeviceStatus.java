@@ -101,6 +101,15 @@ public class DeviceStatus {
                 .executeSingle();
     }
 
+    public static Task getAuTask() {
+        String mode = "AU";
+        return new Select()
+                .from(Task.class)
+                .where("uploadMode = ?", mode)
+                .orderBy("startDate DESC")
+                .executeSingle();
+    }
+
     //get all tasks
     public static List<Task> getTasks(){
         return new Select()

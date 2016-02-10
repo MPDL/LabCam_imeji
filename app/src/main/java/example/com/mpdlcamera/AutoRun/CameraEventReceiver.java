@@ -16,6 +16,7 @@ import com.activeandroid.query.Select;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.UUID;
 
 import example.com.mpdlcamera.Folder.UploadService;
 import example.com.mpdlcamera.Model.LocalModel.Image;
@@ -73,9 +74,11 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         Log.i("CameraEventReceiver", String.valueOf(createTime));
 
         try{
-
         //store image in local database
+
+        String imageId = UUID.randomUUID().toString();
         Image photo = new Image();
+        photo.setImageId(imageId);
         photo.setImageName(imageName);
         photo.setImagePath(imagePath);
         photo.setLongitude(longitude);

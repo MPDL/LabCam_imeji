@@ -4,12 +4,14 @@ import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.UriMatcher;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
@@ -45,6 +47,8 @@ import example.com.mpdlcamera.TaskManager.TaskFragment;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.UploadFragment.UploadFragment;
 import example.com.mpdlcamera.UserFragment.UserFragment;
+import example.com.mpdlcamera.Utils.DeviceStatus;
+
 /**
  * Created by kiran on 25.08.15.
  */
@@ -60,6 +64,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     //TESTING DB
     private boolean isAdd = false;
 
+    //uri register
+    private static UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+    private static final int TASK_CODE = 2016;
+
+    static {
+        matcher.addURI("example.com.mpdlcamera", "tasks", TASK_CODE);
+    }
 
 
     /**
@@ -94,13 +105,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         // register NetStateObserver
         NetWorkStateReceiver.registerNetStateObserver(this);
 
-        Uri uri = Uri.parse("content://example.com.mpdlcamera");
-        ContentResolver resolver = this.getContentResolver();
-        resolver.registerContentObserver(uri, true, new dbObserver(this,new Handler()));
 
         initInstances();
-
-
                 /*
                     file system
                  */
@@ -267,12 +273,12 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     public void OnConnect() {
         Toast.makeText(this, "network Connect...", Toast.LENGTH_LONG).show();
 
-        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
-        mReceiver.setReceiver(this);
-        Intent intent = new Intent(this, UploadService.class);
-        intent.putExtra("receiver", mReceiver);
-
-        this.startService(intent);
+//        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
+//        mReceiver.setReceiver(this);
+//        Intent intent = new Intent(this, UploadService.class);
+//        intent.putExtra("receiver", mReceiver);
+//
+//        this.startService(intent);
     }
 
     // monitor network when DisConnect
