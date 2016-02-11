@@ -1,16 +1,14 @@
-package example.com.mpdlcamera.UploadFragment;
+package example.com.mpdlcamera.UploadActivity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -31,13 +29,14 @@ import example.com.mpdlcamera.Utils.DeviceStatus;
  * Use the {@link UploadFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class UploadFragment extends DialogFragment {
+public class UploadFragment extends Activity {
 
     private String TAG = UploadFragment.class.getSimpleName();
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     static final int PICK_COLLECTION_REQUEST = 1997;
     private RadioGroup radioGroup;
-    private View rootview;
+
+    private Context context = this;
 
     private String email;
     private SharedPreferences mPrefs;
@@ -67,15 +66,24 @@ public class UploadFragment extends DialogFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
+
         super.onCreate(savedInstanceState);
-        mPrefs = getActivity().getSharedPreferences("myPref", 0);
+        mPrefs = this.getSharedPreferences("myPref", 0);
         email = mPrefs.getString("email", "");
+
+        setContentView(R.layout.fragment_upload);
+        //init radioButton group
+        initRadioButtonGroup();
+
+        //choose collection
+        chooseCollection();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        TextView collectionNameTextView = (TextView) rootview.findViewById(R.id.collection_name);
+        TextView collectionNameTextView = (TextView) findViewById(R.id.collection_name);
 
         if(!DeviceStatus.is_newUser(email)){
             LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
@@ -87,18 +95,6 @@ public class UploadFragment extends DialogFragment {
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        rootview = inflater.inflate(R.layout.fragment_upload, container, false);
-        //init radioButton group
-        initRadioButtonGroup();
-
-        //choose collection
-        chooseCollection();
-        return rootview;
-    }
-
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -106,11 +102,6 @@ public class UploadFragment extends DialogFragment {
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
 
     /**
      * This interface must be implemented by activities that contain this
@@ -141,16 +132,16 @@ public class UploadFragment extends DialogFragment {
 //    }
 
     public void initRadioButtonGroup(){
-        radioGroup = (RadioGroup) rootview.findViewById(R.id.radio_group);
+        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
         radioGroup.clearCheck();
     }
 
     public void chooseCollection(){
-        TextView chooseCollectionTextView = (TextView) rootview.findViewById(R.id.tv_choose_collection);
+        TextView chooseCollectionTextView = (TextView) findViewById(R.id.tv_choose_collection);
         chooseCollectionTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent settingsIntent = new Intent(getActivity(), RemoteCollectionSettingsActivity.class);
+                Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
                 startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
             }
         });

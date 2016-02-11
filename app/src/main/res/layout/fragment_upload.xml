@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="example.com.mpdlcamera.UploadFragment.UploadFragment">
+    tools:context="example.com.mpdlcamera.UploadActivity.UploadFragment">
 
     <LinearLayout
         android:orientation="vertical"

@@ -79,11 +79,6 @@ public class TaskUploadService extends Service{
 
     //flag
     private boolean isBusy = true;
-    private static boolean isRunning = false;
-
-
-    //NotificationManager
-    private NotificationManager mNM;
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -108,7 +103,6 @@ public class TaskUploadService extends Service{
     public void onDestroy() {
         super.onDestroy();
         Log.v(TAG, "TaskUploadService Destroy!");
-        isRunning = false;
     }
 
     @Override
@@ -118,7 +112,7 @@ public class TaskUploadService extends Service{
 
             if(isNetworkAvailable()) {
                 Log.v(TAG, "TaskUploadService onCreate!");
-                ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
 
                 // prepare auth for upload
                 mPrefs = this.getSharedPreferences("myPref", 0);
@@ -144,17 +138,18 @@ public class TaskUploadService extends Service{
                 }else{
                     Log.v(TAG,"mTask is null, can't get collectionID");
                 }
-                //start uploading
-                startUpload();
+                // auto task is WAITING
+                if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
+                    //start uploading
+                    startUpload();
+                }
             }
-        isRunning = true;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(isNetworkAvailable()) {
             Log.v(TAG, "TaskUploadService onStartCommand!");
-            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
             // prepare auth for upload
             mPrefs = this.getSharedPreferences("myPref", 0);
@@ -181,12 +176,12 @@ public class TaskUploadService extends Service{
                 Log.v(TAG,"mTask is null, can't get collectionID");
             }
 
-            if(isBusy) {
-            }
-            else {
+            // auto task is WAITING
+            if(!isBusy && task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
                 //start uploading
                 startUpload();
             }
+
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -251,40 +246,33 @@ public class TaskUploadService extends Service{
         task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
         String taskState = task.getState();
 
-        //upload image
-        String imageState = image.getState();
-        String filePath = image.getImagePath();
-        currentImageId = image.getImageId();
-        Log.e(TAG, "upload" + currentImageId);
+        // if the taskState is waiting, continue, so when it is stop do nothing
+        if(taskState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
 
-        if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
-            // TODO:upload image
-            String jsonPart1 = "\"collectionId\" : \"" +
-                    collectionID +
-                    "\"";
+            //upload image
+            String imageState = image.getState();
+            String filePath = image.getImagePath();
+            currentImageId = image.getImageId();
+            Log.e(TAG, "upload" + currentImageId);
 
-            typedFile = new TypedFile("multipart/form-data", new File(filePath));
-            json = "{" + jsonPart1 + "}";
-            Log.v(TAG, "start uploading: "+filePath);
-            image.setState(String.valueOf(DeviceStatus.state.STARTED));
-            RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
-        }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
-            // TODO:upload finish
-        }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STARTED))){
-            // TODO: already started?
+            if (imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
+                // TODO:upload image
+                String jsonPart1 = "\"collectionId\" : \"" +
+                        collectionID +
+                        "\"";
+
+                typedFile = new TypedFile("multipart/form-data", new File(filePath));
+                json = "{" + jsonPart1 + "}";
+                Log.v(TAG, "start uploading: " + filePath);
+                image.setState(String.valueOf(DeviceStatus.state.STARTED));
+                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+            } else if (imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))) {
+                // TODO:upload finish
+            } else if (imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STARTED))) {
+                // TODO: already started?
+            }
         }
     }
-
-
-
-
-    /*******/
-    public static boolean isRunning()
-    {
-        return isRunning;
-    }
-
-
 
     //callback
     Callback<DataItem> callback = new Callback<DataItem>() {

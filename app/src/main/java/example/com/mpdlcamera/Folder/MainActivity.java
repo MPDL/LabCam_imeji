@@ -1,7 +1,7 @@
 package example.com.mpdlcamera.Folder;
 
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.UriMatcher;
@@ -11,11 +11,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -25,7 +23,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
@@ -33,21 +30,16 @@ import com.activeandroid.query.Delete;
 import java.io.File;
 import java.util.ArrayList;
 
-import example.com.mpdlcamera.AutoRun.dbObserver;
 import example.com.mpdlcamera.ImejiFragment.ImejiFragment;
 import example.com.mpdlcamera.LocalFragment.LocalFragment;
 import example.com.mpdlcamera.Model.ImejiFolder;
-import example.com.mpdlcamera.Model.LocalModel.Image;
-import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
 
 import example.com.mpdlcamera.TaskManager.TaskFragment;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
-import example.com.mpdlcamera.UploadFragment.UploadFragment;
-import example.com.mpdlcamera.UserFragment.UserFragment;
-import example.com.mpdlcamera.Utils.DeviceStatus;
+import example.com.mpdlcamera.UploadActivity.UploadFragment;
 
 /**
  * Created by kiran on 25.08.15.
@@ -90,7 +82,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     TabLayout tabLayout;
     ViewPager viewPager;
 
-
+    //activity
+    private Context context = this;
 
 
     @Override
@@ -300,12 +293,14 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         taskProgressBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UploadFragment uploadFragment = new UploadFragment();
-
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                uploadFragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
-
-                uploadFragment.show(fragmentManager,"Task Manager");
+//                UploadFragment uploadFragment = new UploadFragment();
+//
+//                FragmentManager fragmentManager = getSupportFragmentManager();
+//                uploadFragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+//
+//                uploadFragment.show(fragmentManager,"Task Manager");
+                Intent intent = new Intent(context,UploadFragment.class);
+                startActivity(intent);
             }
         });
 

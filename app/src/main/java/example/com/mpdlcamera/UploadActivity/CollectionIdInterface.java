@@ -1,4 +1,4 @@
-package example.com.mpdlcamera.UploadFragment;
+package example.com.mpdlcamera.UploadActivity;
 
 /**
  * Created by yingli on 1/19/16.

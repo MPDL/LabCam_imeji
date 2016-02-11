@@ -2,7 +2,6 @@ package example.com.mpdlcamera.Settings;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.view.Display;
@@ -19,10 +18,8 @@ import com.activeandroid.util.Log;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.ImejiFolder;
-import example.com.mpdlcamera.Model.MessageModel.Person;
-import example.com.mpdlcamera.Model.User;
 import example.com.mpdlcamera.R;
-import example.com.mpdlcamera.UploadFragment.CollectionIdInterface;
+import example.com.mpdlcamera.UploadActivity.CollectionIdInterface;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
