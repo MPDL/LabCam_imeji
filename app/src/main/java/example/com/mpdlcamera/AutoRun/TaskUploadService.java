@@ -41,7 +41,6 @@ import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.SQLite.FileId;
 import example.com.mpdlcamera.SQLite.MySQLiteHelper;
-import example.com.mpdlcamera.TaskManager.UpdateTaskInterface;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;

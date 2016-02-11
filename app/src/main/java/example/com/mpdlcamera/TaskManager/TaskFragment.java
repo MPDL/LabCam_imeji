@@ -32,7 +32,7 @@ import example.com.mpdlcamera.Utils.DeviceStatus;
 /**
  * Created by yingli on 1/22/16.
  */
-public class TaskFragment extends Fragment{
+public class TaskFragment extends Fragment implements RemoveTaskInterface{
 
     private List<Task> taskList;
     private ListView taskManagerListView;
@@ -66,7 +66,7 @@ public class TaskFragment extends Fragment{
         //taskManager listview
         taskManagerListView = (ListView) view.findViewById(R.id.listView_task);
         taskList = DeviceStatus.getTasks();
-        taskManagerAdapter = new TaskManagerAdapter(this.getActivity(),taskList);
+        taskManagerAdapter = new TaskManagerAdapter(this.getActivity(),taskList,this);
         taskManagerAdapter.notifyDataSetChanged();
         taskManagerListView.setAdapter(taskManagerAdapter);
         return view;
@@ -117,6 +117,18 @@ public class TaskFragment extends Fragment{
     public void onDestroy() {
         super.onDestroy();
 //        doUnbindService();
+    }
+
+
+
+    @Override
+    public void remove(int postion) {
+        try{
+        taskList.remove(postion);
+        taskManagerAdapter.notifyDataSetChanged();
+        } catch (Exception e){
+            //press too fast
+        }
     }
 
     /**

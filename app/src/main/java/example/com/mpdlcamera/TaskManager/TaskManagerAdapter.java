@@ -2,25 +2,33 @@ package example.com.mpdlcamera.TaskManager;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.SystemClock;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
 
 import org.w3c.dom.Text;
 
 import java.util.List;
 
+import example.com.mpdlcamera.AutoRun.TaskUploadService;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
  * Created by yingli on 1/22/16.
@@ -32,12 +40,15 @@ public class TaskManagerAdapter extends BaseAdapter {
     private Activity activity;
     private List<Task> taskList;
 
+    private RemoveTaskInterface removeTaskInterface;
+
     public TaskManagerAdapter() {
     }
 
-    public TaskManagerAdapter(Activity activity, List<Task> taskList) {
+    public TaskManagerAdapter(Activity activity, List<Task> taskList, RemoveTaskInterface removeTaskInterface) {
         this.activity = activity;
         this.taskList = taskList;
+        this.removeTaskInterface = removeTaskInterface;
     }
 
     @Override
@@ -56,7 +67,7 @@ public class TaskManagerAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View view, ViewGroup viewGroup) {
+    public View getView(final int position, View view, ViewGroup viewGroup) {
 
 
         if (inflater == null)
@@ -83,22 +94,68 @@ public class TaskManagerAdapter extends BaseAdapter {
 
         //finishedNumTextView
         TextView finishedNumTextView = (TextView) view.findViewById(R.id.finishedItems);
-        finishedNumTextView.setText(currentNum+"");
+        finishedNumTextView.setText(currentNum + "");
 
         //DeleteTask
         ImageView deleteTaskImageView = (ImageView) view.findViewById(R.id.task_delete);
         deleteTaskImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String currentTaskId = task.getTaskId();
-                new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
-                //TODO: delete from data list
-                  /** if it is a Au, what to do? */
+                new AlertDialog.Builder(activity)
+                        .setTitle("Delete entry")
+                        .setMessage("Are you sure you want to delete this entry?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with delete
+                                deleteTask(task,position);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+
             }
         });
 
+        //pause/play Task
+        CheckBox isPausedCheckBox = (CheckBox) view.findViewById(R.id.checkBox_is_paused);
+        isPausedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(compoundButton.isChecked()){
+                    // is paused (play button)
+                    String currentTaskId = task.getTaskId();
+                    try {
+                        Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+                        currentTask.setState(String.valueOf(DeviceStatus.state.WAITING));
+                        if(currentTask.getUploadMode().equalsIgnoreCase("AU")){
+                            // start AU TaskUploadService
+                            Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+                            activity.startService(uploadIntent);
+                        }else{
+
+                        }
+                    }catch (Exception e){}
+
+                }else if(!compoundButton.isChecked()){
+                    // pause button
+
+                }
+            }
+        });
 
         return view;
     }
 
+    private void deleteTask(Task task,int position){
+        String currentTaskId = task.getTaskId();
+        new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
+        //TODO: delete from data list
+        removeTaskInterface.remove(position);
+        /** if it is a Au, what to do? */
+    }
 }
