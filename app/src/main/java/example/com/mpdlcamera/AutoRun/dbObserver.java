@@ -37,7 +37,7 @@ public class dbObserver extends ContentObserver {
         // thread, so be cautious!
 
         Log.i(TAG, "the Tasks table has changed");
-        Toast.makeText(mContext,"db changed",Toast.LENGTH_LONG).show();
+//        Toast.makeText(mContext,"db changed",Toast.LENGTH_LONG).show();
 //
 //        Uri taskUri = Uri.parse("content://example.com.mpdlcamera/tasks") ;
 //        Cursor c = mContext.getContentResolver().query(taskUri, null, null, null, null);

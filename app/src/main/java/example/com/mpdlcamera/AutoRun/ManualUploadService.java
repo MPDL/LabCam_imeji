@@ -86,25 +86,29 @@ public class ManualUploadService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Service onStartComman");
 
-        // prepare taskId
-        currentTaskId = intent.getStringExtra("currentTaskId");
-        Log.i(TAG,"currentTaskId"+currentTaskId);
-        //prepare apiKey
-        mPrefs = activity.getSharedPreferences("myPref", 0);
-        apiKey = mPrefs.getString("apiKey", "");
-        String email = mPrefs.getString("email", "");
-        //prepare collectionId
-        LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
-        collectionID = user.getCollectionId();
+            // prepare taskId
+            currentTaskId = intent.getStringExtra("currentTaskId");
+            Log.i(TAG, "currentTaskId" + currentTaskId);
+            //prepare apiKey
+            mPrefs = activity.getSharedPreferences("myPref", 0);
+            apiKey = mPrefs.getString("apiKey", "");
+            String email = mPrefs.getString("email", "");
+            //prepare collectionId
+            LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
+            collectionID = user.getCollectionId();
 
+        if(!taskIsStopped()) {
+            Log.v(TAG,"not stopped");
+            Log.v(TAG,task.getState());
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                startUpload();
-            }
-        }).start();
-
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.i(TAG,"Thread --> startUpload()");
+                    startUpload();
+                }
+            }).start();
+        }
         return Service.START_STICKY;
     }
 
@@ -123,25 +127,16 @@ public class ManualUploadService extends Service {
 
     private void startUpload() {
 
-        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
-        try {
+        if(!taskIsStopped()){
+
             /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
-            waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
-            finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
-            for(Image i:finishedImages){
-               try{
-                   waitingImages.remove(i);
-               }catch (Exception e){}
-            }
-        }catch (Exception e){}
+            waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
+            finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
         //DELETE TESTING
         Log.i(TAG,"waitingImages: "+ waitingImages.size());
         Log.i(TAG,"finishedImages: "+ finishedImages.size());
-        Log.i(TAG,"totalImages: "+task.getTotalItems());
-        if(waitingImages.size()+finishedImages.size() == task.getTotalItems()){
-            task.setFinishedItems(finishedImages.size());
-        }
+        Log.i(TAG, "totalImages: " + task.getTotalItems());
 
         if (waitingImages!=null && waitingImages.size() > 0) {
 
@@ -163,29 +158,27 @@ public class ManualUploadService extends Service {
                     typedFile = new TypedFile("multipart/form-data", new File(filePath));
                     json = "{" + jsonPart1 + "}";
                     Log.v(TAG, "start uploading: " + filePath);
-                    image.setState(String.valueOf(DeviceStatus.state.STARTED));
+//                    image.setState(String.valueOf(DeviceStatus.state.STARTED));
                     RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
 
-            }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.INTERRUPTED))){
-            }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STARTED))){
-                }else {
+            }else {
                     Log.e(TAG,"illegal imageState:"+imageState);
                 }
+            }
         }
     }
+
     private void upload(Image image){
 
-        // load task?
-        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
-        String taskState = task.getState();
+        if(!taskIsStopped()){
 
-        //upload image
+            //upload image
             String imageState = image.getState();
             String filePath = image.getImagePath();
             currentImageId = image.getImageId();
-            Log.e(TAG,"upload"+currentImageId);
+            Log.e(TAG, "upload" + currentImageId);
 
-        if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
+            if (imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
                 // TODO:upload image
                 String jsonPart1 = "\"collectionId\" : \"" +
                         collectionID +
@@ -193,14 +186,11 @@ public class ManualUploadService extends Service {
 
                 typedFile = new TypedFile("multipart/form-data", new File(filePath));
                 json = "{" + jsonPart1 + "}";
-                Log.v(TAG, "start uploading: "+filePath);
-                image.setState(String.valueOf(DeviceStatus.state.STARTED));
+                Log.v(TAG, "start uploading: " + filePath);
+//                image.setState(String.valueOf(DeviceStatus.state.STARTED));
                 RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
-            }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
-                // TODO:upload finish
-            }else if(imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STARTED))){
-                // TODO: already started?
             }
+        }
     }
 
 
@@ -209,6 +199,7 @@ public class ManualUploadService extends Service {
         @Produce
         public void success(DataItem dataItem, Response response) {
 
+            if(!taskIsStopped()){
             handler=new Handler(Looper.getMainLooper());
             handler.post(new Runnable() {
                 public void run() {
@@ -251,17 +242,20 @@ public class ManualUploadService extends Service {
             Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
             if(totalNum>finishedNum){
                 Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
+                if(image!=null){
                 upload(image);
+                }
             }else {
 //                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
                 Log.i(TAG,"task finished");
+            }
             }
         }
 
         @Override
         public void failure(RetrofitError error) {
 
-
+            if(!taskIsStopped()){
             Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
             currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
             currentImage.setLog(error.getKind().name());
@@ -327,12 +321,27 @@ public class ManualUploadService extends Service {
             if(totalNum>finishedNum){
                 // continue anyway
                 Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
+                if(image!=null){
                 upload(image);
+                }
             }else {
 //                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
                 Log.i(TAG,"task finished");
             }
-
+            }
         }
     };
+
+    private boolean taskIsStopped (){
+        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+
+        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
+            Log.v(TAG,"taskIsStopped");
+            return true;
+        }else{
+            Log.v(TAG,"task is not stopped");
+            return false;
+        }
+
+    }
 }

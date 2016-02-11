@@ -49,10 +49,12 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
             super.handleMessage(msg);
             if(msg.what==1234){
                 Log.v("~~~", "1234~~~");
+                try {
                     taskList = DeviceStatus.getTasks();
                     if(taskList!=null){
                         taskManagerAdapter.notifyDataSetChanged();
-                    }
+                }
+                    }catch (Exception e){}
             }
         }
     };

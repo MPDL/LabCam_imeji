@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import org.w3c.dom.Text;
 
 import java.util.List;
 
+import example.com.mpdlcamera.AutoRun.ManualUploadService;
 import example.com.mpdlcamera.AutoRun.TaskUploadService;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
@@ -35,6 +37,7 @@ import example.com.mpdlcamera.Utils.DeviceStatus;
  */
 public class TaskManagerAdapter extends BaseAdapter {
 
+    private static String TAG = TaskManagerAdapter.class.getSimpleName();
     private LayoutInflater inflater;
 
     private Activity activity;
@@ -126,23 +129,45 @@ public class TaskManagerAdapter extends BaseAdapter {
         isPausedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(compoundButton.isChecked()){
-                    // is paused (play button)
-                    String currentTaskId = task.getTaskId();
+                String currentTaskId = task.getTaskId();
+                if(!compoundButton.isChecked()){
+                    // pause clicked
                     try {
                         Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
                         currentTask.setState(String.valueOf(DeviceStatus.state.WAITING));
+                        currentTask.save();
+                        Log.v(TAG, "setState: WAITING" );
+                        if(currentTask.getUploadMode().equalsIgnoreCase("AU")){
+                            // start AU TaskUploadService
+                            Log.v(TAG,"start TaskUploadService");
+                            Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+                            activity.startService(uploadIntent);
+                        }else{
+                            // start ManualUploadService
+                            Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
+                            manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
+                            activity.startService(manualUploadServiceIntent);
+                        }
+                    }catch (Exception e){}
+
+                }else if(compoundButton.isChecked()){
+                    // pause button
+                    try {
+                        Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+                        currentTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
+                        currentTask.save();
+                        Log.v(TAG, "setState: STOPPED");
                         if(currentTask.getUploadMode().equalsIgnoreCase("AU")){
                             // start AU TaskUploadService
                             Intent uploadIntent = new Intent(activity, TaskUploadService.class);
                             activity.startService(uploadIntent);
                         }else{
-
+                            // start ManualUploadService
+                            Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
+                            manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
+                            activity.startService(manualUploadServiceIntent);
                         }
                     }catch (Exception e){}
-
-                }else if(!compoundButton.isChecked()){
-                    // pause button
 
                 }
             }
@@ -154,8 +179,10 @@ public class TaskManagerAdapter extends BaseAdapter {
     private void deleteTask(Task task,int position){
         String currentTaskId = task.getTaskId();
         new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
+        Log.v(TAG,"task delete clicked");
         //TODO: delete from data list
         removeTaskInterface.remove(position);
         /** if it is a Au, what to do? */
     }
 }
+

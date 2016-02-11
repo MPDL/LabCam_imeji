@@ -7,7 +7,14 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import com.activeandroid.query.Select;
+
 import java.util.ArrayList;
+import java.util.List;
+
+import example.com.mpdlcamera.AutoRun.ManualUploadService;
+import example.com.mpdlcamera.AutoRun.TaskUploadService;
+import example.com.mpdlcamera.Model.LocalModel.Task;
 
 
 /**
@@ -38,7 +45,30 @@ public class NetWorkStateReceiver extends BroadcastReceiver {
         if(ni!=null && ni.getState()== NetworkInfo.State.CONNECTED) {
             networkAvailable = true;
             notifyObserver();
-            Log.i(TAG,"Network "+ni.getTypeName()+" connected");
+            try {
+
+                Task autoTask = new Select().from(Task.class).where("uploadMode = ?", "AU").executeSingle();
+
+                List<Task> ManualTaskList = new Select().from(Task.class).where("uploadMode = ?", "MU").execute();
+                //activate upload services
+                if (autoTask.getUploadMode().equalsIgnoreCase("AU")) {
+                    // start AU TaskUploadService
+                    Intent uploadIntent = new Intent(context, TaskUploadService.class);
+                    context.startService(uploadIntent);
+                }
+
+                for (Task task : ManualTaskList) {
+                    // start
+                    String currentTaskId = task.getTaskId();
+                    Intent manualUploadServiceIntent = new Intent(context, ManualUploadService.class);
+                    manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
+                    context.startService(manualUploadServiceIntent);
+                }
+            }catch (Exception e){
+                Log.v(TAG,"Exception in activate upload services");
+            }
+
+            Log.i(TAG, "Network " + ni.getTypeName() + " connected");
         }
      }
      if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)) {
