@@ -66,6 +66,7 @@ public class TaskUploadService extends Service{
 
     // Images
     List<Image> waitingImages = null;
+    List<Image>  finishedImages = null;
 
     private String username;
     private String apiKey;
@@ -77,6 +78,7 @@ public class TaskUploadService extends Service{
     private Context activity = this;
 
     //flag
+    //set false in success and failure callback
     private boolean isBusy = true;
 
     /**
@@ -140,7 +142,7 @@ public class TaskUploadService extends Service{
                 // auto task is WAITING
                 if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
                     //start uploading
-                    startUpload();
+                    startUpload(false);
                 }
             }
     }
@@ -180,9 +182,9 @@ public class TaskUploadService extends Service{
                 Log.v(TAG,"isBysy"+isBusy);
                 Log.v(TAG,task.getState());
                 // auto task is WAITING
-                if (!isBusy && task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
+                if (task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
                     //start uploading
-                    startUpload();
+                    startUpload(isBusy);
                 }
             }
         }
@@ -212,19 +214,23 @@ public class TaskUploadService extends Service{
         }
     }
 
-    private void startUpload() {
+    private void startUpload(boolean isBusy) {
         Log.v(TAG, "startUpload()");
 
-        if(!taskIsStopped()) {
+        if(!taskIsStopped()&&!isBusy) {
             try {
                 /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
                 waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
+                finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
             } catch (Exception e) {
             }
 
             //DELETE TESTING
             Log.i(TAG, "waitingImages: " + waitingImages.size());
+            Log.i(TAG, "finishedImages "+finishedImages.size());
             Log.i(TAG, "totalImages: " + task.getTotalItems());
+            task.setFinishedItems(finishedImages.size());
+            task.save();
 
             if (waitingImages != null && waitingImages.size() > 0) {
 
@@ -256,6 +262,18 @@ public class TaskUploadService extends Service{
         }
     }
     private void upload(Image image){
+
+        try {
+            /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
+            finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+        } catch (Exception e) {
+        }
+
+        //DELETE TESTING
+        Log.i(TAG, "finishedImages "+finishedImages.size());
+        Log.i(TAG, "totalImages: " + task.getTotalItems());
+        task.setFinishedItems(finishedImages.size());
+        task.save();
 
 
             if(!taskIsStopped()){
@@ -319,17 +337,34 @@ public class TaskUploadService extends Service{
 
 
                 /** move on to next **/
-                int finishedNum = task.getFinishedItems();
-                int totalNum = task.getTotalItems();
-                finishedNum = finishedNum + 1;
-                task.setFinishedItems(finishedNum);
+
+                try {
+                    /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
+                    finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+                } catch (Exception e) {
+                }
+
+                //DELETE TESTING
+                Log.i(TAG, "finishedImages "+finishedImages.size());
+                Log.i(TAG, "totalImages: " + task.getTotalItems());
+                task.setFinishedItems(finishedImages.size());
                 task.save();
+
+                int finishedNum = finishedImages.size();
+                int totalNum = task.getTotalItems();
 
                 Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
                 if (totalNum > finishedNum) {
                     Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
                     if (image != null) {
                         upload(image);
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+                                // Actions to do after 3 seconds
+                                isBusy = false;
+                            }
+                        }, 3000);
                     }
                 } else {
                     task.setState(String.valueOf(DeviceStatus.state.FINISHED));
@@ -345,6 +380,7 @@ public class TaskUploadService extends Service{
 
             if (!taskIsStopped()) {
                 Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
+                //TODO:what to do with interrupted
                 currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
                 currentImage.setLog(error.getKind().name());
 
@@ -382,6 +418,8 @@ public class TaskUploadService extends Service{
                             }
                         });
                         currentImage.setLog(error.getKind().name() + " already exists");
+                        currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                        currentImage.save();
 
                     } else {
 

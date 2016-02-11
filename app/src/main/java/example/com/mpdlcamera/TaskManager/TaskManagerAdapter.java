@@ -141,6 +141,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                             // start AU TaskUploadService
                             Log.v(TAG,"start TaskUploadService");
                             Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+                            uploadIntent.putExtra("isBusy",false);
                             activity.startService(uploadIntent);
                         }else{
                             // start ManualUploadService
@@ -160,6 +161,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                         if(currentTask.getUploadMode().equalsIgnoreCase("AU")){
                             // start AU TaskUploadService
                             Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+                            uploadIntent.putExtra("isBusy",false);
                             activity.startService(uploadIntent);
                         }else{
                             // start ManualUploadService

@@ -257,6 +257,7 @@ public class ManualUploadService extends Service {
 
             if(!taskIsStopped()){
             Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
+            //change state not saved here
             currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
             currentImage.setLog(error.getKind().name());
 
