@@ -181,7 +181,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                      * */
                     deleteFinishedTasks();
 
-                    /**create Task**/
+                        /**create Task**/
                     createTask(collectionID);
 
                     Log.v("task.size", "" + DeviceStatus.getTasks().size());

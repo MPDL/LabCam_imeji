@@ -31,6 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                android:checked="true"
                 android:layout_marginRight="16dp"/>
         </RelativeLayout>
         <!--divider-->
@@ -149,6 +150,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/radioButton_wifi"
+            android:checked="true"
             android:layout_marginRight="30dp"/>
 
         <RadioButton

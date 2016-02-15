@@ -51,6 +51,7 @@ import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.SQLite.FileId;
 import example.com.mpdlcamera.SQLite.MySQLiteHelper;
+import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import example.com.mpdlcamera.Utils.ImageFileFilter;
 import retrofit.Callback;
@@ -322,6 +323,10 @@ public class LocalImageActivity extends AppCompatActivity {
         }else {
             Toast.makeText(activity,"please choose collection first",Toast.LENGTH_LONG).show();
         }
+
+        // go to RemoteCollectionSettings
+//        Intent remoteCollectionSettingIntent = new Intent(this, RemoteCollectionSettingsActivity.class);
+//        remoteCollectionSettingIntent.putExtra("Manual",)
 
         Intent manualUploadServiceIntent = new Intent(this,ManualUploadService.class);
         manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
