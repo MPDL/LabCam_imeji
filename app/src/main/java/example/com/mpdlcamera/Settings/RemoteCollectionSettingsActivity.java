@@ -124,10 +124,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         APIkey = mPrefs.getString("apiKey", "");
         email = mPrefs.getString("email", "");
 
-        collectionListLocal = new Select()
-                .from(ImejiFolder.class)
-                .execute();
-        Log.v(LOG_TAG, "size: " + collectionListLocal.size() + "");
 
 
         listView = (ListView) findViewById(R.id.settings_remote_listView);

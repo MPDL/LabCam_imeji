@@ -23,23 +23,30 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import example.com.mpdlcamera.ImejiFragment.ImejiFragment;
 import example.com.mpdlcamera.LocalFragment.LocalFragment;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.LocalModel.LocalUser;
 import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
 
+import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
 import example.com.mpdlcamera.TaskManager.TaskFragment;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.UploadActivity.UploadFragment;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
  * Created by kiran on 25.08.15.
@@ -48,10 +55,16 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private SharedPreferences mPrefs;
-
     private ProgressDialog pDialog;
 
+    //drawer
+    private String TAG = "drawer";
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    static final int PICK_COLLECTION_REQUEST = 1997;
+    private RadioGroup radioGroup;
+
+    private String email;
+    private SharedPreferences mPrefs;
 
     //TESTING DB
     private boolean isAdd = false;
@@ -118,6 +131,16 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 //                NewFileObserver newFileObserver = new NewFileObserver(handler,this);
 //                getApplicationContext().getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,false, newFileObserver);
 
+        //create drawer view
+        mPrefs = this.getSharedPreferences("myPref", 0);
+        email = mPrefs.getString("email", "");
+
+        //init radioButton group
+        initRadioButtonGroup();
+
+        //choose collection
+        chooseCollection();
+
     }
 
     @Override
@@ -128,6 +151,18 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     @Override
     public void onResume(){
         super.onResume();
+
+        //set selected collection name
+        TextView collectionNameTextView = (TextView) findViewById(R.id.collection_name);
+
+        if(!DeviceStatus.is_newUser(email)){
+            LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
+            collectionNameTextView.setText(user.getCollectionName());
+            List<LocalUser> userList = new Select().from(LocalUser.class).where("email = ?", email).execute();
+            Log.i(TAG,userList.size()+"");
+        }else {
+            collectionNameTextView.setText("unset");
+        }
     }
 
     @Override
@@ -287,25 +322,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private void initInstances() {
         // Setup tabs
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        // TaskManager dialog
-        ImageView taskProgressBar = (ImageView) findViewById(R.id.progress_upload);
-
-        taskProgressBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                UploadFragment uploadFragment = new UploadFragment();
-//
-//                FragmentManager fragmentManager = getSupportFragmentManager();
-//                uploadFragment.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
-//
-//                uploadFragment.show(fragmentManager,"Task Manager");
-                Intent intent = new Intent(context,UploadFragment.class);
-                startActivity(intent);
-            }
-        });
-
-
-
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(tabAdapter);
@@ -356,9 +372,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     tabLayout.findViewById(backgroundIconId[2]).setBackgroundResource(unselectedTabResource[2]);
                 }
 
-
-                //activate the selected tab icon and text
-                tabLayout.setBackgroundResource(R.color.primary);
                 //background icon
                 ImageView imageView = (ImageView) tabLayout.findViewById(backgroundIconId[position]);
                 imageView.setBackgroundResource(selectedTabResource[position]);
@@ -413,6 +426,23 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             }
 
         }
+    }
+
+    //drawer layout(settings)
+    public void initRadioButtonGroup(){
+        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
+//        radioGroup.clearCheck();
+    }
+
+    public void chooseCollection(){
+        TextView chooseCollectionTextView = (TextView) findViewById(R.id.tv_choose_collection);
+        chooseCollectionTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
+                startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
+            }
+        });
     }
 
 }

@@ -302,9 +302,16 @@ public class LocalImageActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public static RemoteListDialogFragment newInstance(String taskId)
+    {
+        RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("taskId", taskId);
+        remoteListDialogFragment.setArguments(args);
+        return remoteListDialogFragment;
+    }
 
-
-        /*
+    /*
             upload the selected files
         */
     private void uploadList(List<String> fileList) {
@@ -318,27 +325,23 @@ public class LocalImageActivity extends AppCompatActivity {
         String email =  mPrefs.getString("email", "");
         String currentTaskId = "";
 
-        if(!DeviceStatus.is_newUser(email)) {
-            currentTaskId = createTask(email,fileList);
-        }else {
-            Toast.makeText(activity,"please choose collection first",Toast.LENGTH_LONG).show();
-        }
+
+        currentTaskId = createTask(fileList);
 
         // go to RemoteCollectionSettings
 //        Intent remoteCollectionSettingIntent = new Intent(this, RemoteCollectionSettingsActivity.class);
 //        remoteCollectionSettingIntent.putExtra("Manual",)
 
-        Intent manualUploadServiceIntent = new Intent(this,ManualUploadService.class);
-        manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
-        startService(manualUploadServiceIntent);
+        newInstance(currentTaskId).show(getFragmentManager(), "remoteListDialog");
+//
+//        Intent manualUploadServiceIntent = new Intent(this,ManualUploadService.class);
+//        manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
+//        startService(manualUploadServiceIntent);
     }
 
 
-    private String createTask(String email,List<String> fileList){
+    private String createTask(List<String> fileList){
 
-
-        LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
-        String collectionID = user.getCollectionId();
         String uniqueID = UUID.randomUUID().toString();
         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
         Long now = new Date().getTime();
@@ -348,11 +351,9 @@ public class LocalImageActivity extends AppCompatActivity {
         task.setFinishedItems(0);
         task.setTaskId(uniqueID);
         task.setUploadMode("MU");
-        task.setCollectionId(collectionID);
         task.setState(String.valueOf(DeviceStatus.state.WAITING));
         task.setUserName(username);
         task.setStartDate(String.valueOf(now));
-        task.setTaskName(user.getCollectionName() + currentDateTimeString);
         task.save();
         int num = addImages(fileList, task.getTaskId());
         task.setTotalItems(num);

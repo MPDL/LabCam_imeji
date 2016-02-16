@@ -133,7 +133,7 @@ public class UploadFragment extends Activity {
 
     public void initRadioButtonGroup(){
         radioGroup = (RadioGroup) findViewById(R.id.radio_group);
-        radioGroup.clearCheck();
+//        radioGroup.clearCheck();
     }
 
     public void chooseCollection(){

@@ -86,16 +86,20 @@ public class ManualUploadService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Service onStartComman");
 
-            // prepare taskId
-            currentTaskId = intent.getStringExtra("currentTaskId");
-            Log.i(TAG, "currentTaskId" + currentTaskId);
-            //prepare apiKey
+        // prepare taskId
+        currentTaskId = intent.getStringExtra("currentTaskId");
+        Log.i(TAG, "currentTaskId" + currentTaskId);
+
+        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+        //prepare collectionId
+        collectionID =task.getCollectionId();
+
+        //prepare apiKey
             mPrefs = activity.getSharedPreferences("myPref", 0);
             apiKey = mPrefs.getString("apiKey", "");
             String email = mPrefs.getString("email", "");
-            //prepare collectionId
-            LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
-            collectionID = user.getCollectionId();
+
+
 
         if(!taskIsStopped()) {
             Log.v(TAG,"not stopped");

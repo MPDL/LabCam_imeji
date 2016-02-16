@@ -101,29 +101,36 @@ public class TaskManagerAdapter extends BaseAdapter {
 
         //DeleteTask
         ImageView deleteTaskImageView = (ImageView) view.findViewById(R.id.task_delete);
-        deleteTaskImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new AlertDialog.Builder(activity)
-                        .setTitle("Delete entry")
-                        .setMessage("Are you sure you want to delete this entry?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // continue with delete
-                                deleteTask(task,position);
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
 
-            }
-        });
+        if(task.getUploadMode().equalsIgnoreCase("AU")){
+            deleteTaskImageView.setVisibility(View.INVISIBLE);
+            deleteTaskImageView.setFocusable(false);
+        }else {
+            deleteTaskImageView.setVisibility(View.VISIBLE);
+            deleteTaskImageView.setFocusable(true);
+            deleteTaskImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    new AlertDialog.Builder(activity)
+                            .setTitle("Delete entry")
+                            .setMessage("Are you sure you want to delete this entry?")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // continue with delete
+                                    deleteTask(task, position);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // do nothing
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
 
+                }
+            });
+        }
         //pause/play Task
         CheckBox isPausedCheckBox = (CheckBox) view.findViewById(R.id.checkBox_is_paused);
         isPausedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
