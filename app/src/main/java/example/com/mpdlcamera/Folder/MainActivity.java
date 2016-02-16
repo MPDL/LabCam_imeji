@@ -1,5 +1,6 @@
 package example.com.mpdlcamera.Folder;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,10 @@ import android.content.SharedPreferences;
 import android.content.UriMatcher;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,12 +23,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -36,13 +43,22 @@ import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import example.com.mpdlcamera.ImejiFragment.ImejiFragment;
 import example.com.mpdlcamera.LocalFragment.LocalFragment;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.LocalUser;
+import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
@@ -50,6 +66,7 @@ import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
 import example.com.mpdlcamera.Settings.SettingsActivity;
 import example.com.mpdlcamera.TaskManager.TaskFragment;
+import example.com.mpdlcamera.Upload.NewFileObserver;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.UploadActivity.UploadFragment;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -118,8 +135,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         setContentView(R.layout.activity_main);
         Log.v("Main activity", "started");
 
-
-
         getLocalCamFolder();
         // register NetStateObserver
         NetWorkStateReceiver.registerNetStateObserver(this);
@@ -133,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         drawerToggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, R.string.hello_world, R.string.hello_world);
         drawerLayout.setDrawerListener(drawerToggle);
-        
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -225,11 +240,21 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     }
 
+    private static final int REQUEST_CODE = 1;
+    private Bitmap bitmap;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+
+        //open camera
+        ImageView cameraImageView = (ImageView) findViewById(R.id.camera_icon);
+        cameraImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dispatchTakePictureIntent();
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -404,15 +429,15 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
                 if (0 != position && 0 != selectedIndex) {
                     TextView iconText0 = (TextView) tabLayout.findViewById(backgroundIconId[0]);
-                    iconText0.setTextColor(getResources().getColor(R.color.white));
+                    iconText0.setTextColor(getResources().getColor(R.color.tabUnselect));
                 }
                 if (1 != position && 1 != selectedIndex) {
                     TextView iconText1 = (TextView) tabLayout.findViewById(backgroundIconId[1]);
-                    iconText1.setTextColor(getResources().getColor(R.color.white));
+                    iconText1.setTextColor(getResources().getColor(R.color.tabUnselect));
                 }
                 if (2 != position && 2 != selectedIndex) {
                     TextView iconText2 = (TextView) tabLayout.findViewById(backgroundIconId[2]);
-                    iconText2.setTextColor(getResources().getColor(R.color.white));
+                    iconText2.setTextColor(getResources().getColor(R.color.tabUnselect));
                 }
 
                 //background icon
@@ -487,5 +512,50 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             }
         });
     }
+
+
+    //camera
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String imageFileName = "JPEG_" + timeStamp + "_";
+
+            MediaStore.Images.Media.insertImage(getContentResolver(), imageBitmap, imageFileName , null);
+
+
+        }
+    }
+
+
+
+    //get latest task
+    public static Task getTask() {
+        return new Select()
+                .from(Task.class)
+                .orderBy("startDate DESC")
+                .executeSingle();
+    }
+
+    //get latest image
+    public static Image getImage() {
+        return new Select()
+                .from(Image.class)
+                .orderBy("createTime DESC")
+                .executeSingle();
+    }
+
 
 }

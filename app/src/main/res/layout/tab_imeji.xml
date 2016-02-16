@@ -18,6 +18,7 @@
         android:text="IMEJI"
         android:textStyle="bold"
         android:textSize="18dp"
+        android:textColor="@color/tabUnselect"
         android:adjustViewBounds="true"
         />
 </LinearLayout>

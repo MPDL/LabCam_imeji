@@ -25,6 +25,7 @@
     <color name="red">#FF3B00</color>
     <color name="red_press">#990000</color>
 
+    <color name="tabUnselect">#999999</color>
     <color name="bottomBackground">#fffafafa</color>
     <color name="bottomBorder">#ffbdbdbd</color>
     <color name="bottomTextNormal">#ffb2b2b2</color>
