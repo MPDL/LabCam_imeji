@@ -17,15 +17,20 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
@@ -43,6 +48,7 @@ import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
 
 import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
+import example.com.mpdlcamera.Settings.SettingsActivity;
 import example.com.mpdlcamera.TaskManager.TaskFragment;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.UploadActivity.UploadFragment;
@@ -59,6 +65,12 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     //drawer
     private String TAG = "drawer";
+    android.support.v7.widget.Toolbar toolbar;
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle drawerToggle;
+
+
+
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     static final int PICK_COLLECTION_REQUEST = 1997;
     private RadioGroup radioGroup;
@@ -106,10 +118,24 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         setContentView(R.layout.activity_main);
         Log.v("Main activity", "started");
 
-        //
+
+
         getLocalCamFolder();
         // register NetStateObserver
         NetWorkStateReceiver.registerNetStateObserver(this);
+
+
+        //init drawer toggle
+
+
+        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        drawerToggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, R.string.hello_world, R.string.hello_world);
+        drawerLayout.setDrawerListener(drawerToggle);
+        
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
         initInstances();
@@ -187,14 +213,14 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     @Override
     public void onPostCreate(Bundle savedInstanceState) {
-//        drawerToggle.syncState();
+        drawerToggle.syncState();
         super.onPostCreate(savedInstanceState);
 
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-//        drawerToggle.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
         super.onConfigurationChanged(newConfig);
 
     }
@@ -204,6 +230,31 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         // Inflate the menu; this adds items to the action bar if it is present.
         //getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+//        if (id == R.id.action_settings) {
+//            Intent showSettingIntent = new Intent(activity, SettingsActivity.class);
+//            startActivity(showSettingIntent);
+//
+//            return true;
+//        }
+
+        if (id == R.id.homeAsUp) {
+            drawerLayout.openDrawer(GravityCompat.START);
+            return true;
+        }
+
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void hidePDialog() {
@@ -337,17 +388,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             float scale = getResources().getDisplayMetrics().density;
             int selectedIndex = -1;
 
-            // tab icon images
-            int[] unselectedTabResource = {
-                    R.drawable.localfolder_inactive,
-                    R.drawable.imeji_logo_inactive,
-                    R.drawable.settings_inactive,
-            };
-            int[] selectedTabResource = {
-                    R.drawable.localfolder_active,
-                    R.drawable.imeji_logo_active,
-                    R.drawable.settings_active,
-            };
 
             //tab Icon and Text id in layout files
             int[] backgroundIconId = {R.id.tabicon_local, R.id.tabicon_imeji, R.id.tabicon_upload};
@@ -363,18 +403,21 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 //if the tab is not the selected one, set its text and icon style as inactive
 
                 if (0 != position && 0 != selectedIndex) {
-                    tabLayout.findViewById(backgroundIconId[0]).setBackgroundResource(unselectedTabResource[0]);
+                    TextView iconText0 = (TextView) tabLayout.findViewById(backgroundIconId[0]);
+                    iconText0.setTextColor(getResources().getColor(R.color.white));
                 }
                 if (1 != position && 1 != selectedIndex) {
-                    tabLayout.findViewById(backgroundIconId[1]).setBackgroundResource(unselectedTabResource[1]);
+                    TextView iconText1 = (TextView) tabLayout.findViewById(backgroundIconId[1]);
+                    iconText1.setTextColor(getResources().getColor(R.color.white));
                 }
                 if (2 != position && 2 != selectedIndex) {
-                    tabLayout.findViewById(backgroundIconId[2]).setBackgroundResource(unselectedTabResource[2]);
+                    TextView iconText2 = (TextView) tabLayout.findViewById(backgroundIconId[2]);
+                    iconText2.setTextColor(getResources().getColor(R.color.white));
                 }
 
                 //background icon
-                ImageView imageView = (ImageView) tabLayout.findViewById(backgroundIconId[position]);
-                imageView.setBackgroundResource(selectedTabResource[position]);
+                TextView iconText = (TextView) tabLayout.findViewById(backgroundIconId[position]);
+                iconText.setTextColor(getResources().getColor(R.color.primary));
             }
 
             @Override
