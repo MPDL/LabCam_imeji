@@ -1,101 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/layout_task_info"
         android:layout_margin="8dp">
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text=""
+        android:textSize="16dp"
+            android:textColor="@color/black"
+        android:id="@+id/tv_task_name"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_centerVertical="true"
+            android:layout_below="@id/tv_task_name"
             android:text=""
-            android:textSize="8dp"
-            android:id="@+id/tv_task_name"/>
-
-
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:id="@+id/task_delete"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/cancel_red"/>
-
-
-        <CheckBox
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_toLeftOf="@id/task_delete"
-            android:layout_marginRight="10dp"
-            android:background="@xml/checkbox_pause_play"
-            android:id="@+id/checkBox_is_paused"
-            android:layout_centerVertical="true"
-            android:button="@null"
-            />
-
-        <!--<ImageView-->
-            <!--android:layout_width="20dp"-->
-            <!--android:layout_height="20dp"-->
-            <!--android:layout_toLeftOf="@id/task_delete"-->
-            <!--android:layout_marginRight="10dp"-->
-            <!--android:id="@+id/im_pause_play"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:src="@drawable/pause_yellow"/>-->
-
+            android:textSize="15dp"
+            android:textColor="@color/tabUnselect"
+            android:id="@+id/tv_task_collection"/>
 
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout_task_info">
 
         <ProgressBar
             android:id="@+id/firstBar"
             style="@style/CustomProgressBar"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp" />
+            android:layout_margin="10dp" />
 
-
+        <!--percent-->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
             android:textSize="15dp"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
+            android:layout_toRightOf="@id/firstBar"
+            android:layout_marginLeft="8dp"
             android:layout_centerVertical="true"
-            android:id="@+id/totalItems"/>
+            android:id="@+id/tv_percent"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/percent"
-            android:text="/"
-            android:layout_toLeftOf="@+id/totalItems"
+            android:text="%"
+            android:layout_toRightOf="@+id/tv_percent"
             android:textSize="15dp"
             android:layout_centerVertical="true"
             />
 
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textSize="15dp"
-            android:layout_toLeftOf="@id/percent"
-            android:layout_centerVertical="true"
-            android:id="@+id/finishedItems"/>
-
-
-
-
-
     </RelativeLayout>
 
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/task_delete"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/cancel_red"/>
 
-</LinearLayout>
+
+    <CheckBox
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_toLeftOf="@id/task_delete"
+        android:layout_marginRight="16dp"
+        android:background="@xml/checkbox_pause_play"
+        android:id="@+id/checkBox_is_paused"
+        android:layout_centerVertical="true"
+        android:button="@null"
+        />
+</RelativeLayout>

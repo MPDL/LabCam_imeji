@@ -70,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
     private String LOG_TAG = LoginActivity.class.getSimpleName();
 
     private String collectionId = null;
-    private String collectionName = "need to implement new api";
+    private String collectionName = "for auto upload, please set a collection";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -397,7 +397,7 @@ public class LoginActivity extends AppCompatActivity {
             Long now = new Date().getTime();
             Log.v("now", now+"");
             task.setStartDate(String.valueOf(now));
-            task.setTaskName("AU to" + collectionName + currentDateTimeString);
+            task.setCollectionName(collectionName);
 
             task.save();
 
@@ -422,7 +422,7 @@ public class LoginActivity extends AppCompatActivity {
             Long now = new Date().getTime();
             Log.v("now", now+"");
             task.setStartDate(String.valueOf(now));
-            task.setTaskName("AU to" + collectionName + currentDateTimeString);
+            task.setCollectionName(collectionName);
 
             task.save();
         }

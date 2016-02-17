@@ -78,8 +78,19 @@ public class TaskManagerAdapter extends BaseAdapter {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (view == null)
             view = inflater.inflate(R.layout.task_list_cell, null);
+
+        // set task info according to mode
         TextView taskNameTextView = (TextView) view.findViewById(R.id.tv_task_name);
-        taskNameTextView.setText(taskList.get(position).getTaskName());
+        if(taskList.get(position).getUploadMode().equalsIgnoreCase("AU")){
+            // AU
+            taskNameTextView.setText("Captured Fotos upload to");
+        }else {
+            // MU
+            taskNameTextView.setText(taskList.get(position).getTotalItems()+" selected Fotos upload to");
+        }
+        // set collection name
+        TextView taskCollectionTextView = (TextView) view.findViewById(R.id.tv_task_collection);
+        taskCollectionTextView.setText(taskList.get(position).getCollectionName());
 
         ProgressBar firstBar = (ProgressBar) view.findViewById(R.id.firstBar);
 
@@ -91,13 +102,15 @@ public class TaskManagerAdapter extends BaseAdapter {
         firstBar.setMax(maxNum);
         firstBar.setProgress(currentNum);
 
-        //totalNumTextView
-        TextView totalNumTextView = (TextView) view.findViewById(R.id.totalItems);
-        totalNumTextView.setText(maxNum+"");
-
-        //finishedNumTextView
-        TextView finishedNumTextView = (TextView) view.findViewById(R.id.finishedItems);
-        finishedNumTextView.setText(currentNum + "");
+        //percent
+        TextView percentTextView = (TextView) view.findViewById(R.id.tv_percent);
+        int percent;
+        if(maxNum!=0){
+            percent = (currentNum * 100) / maxNum;}
+        else {
+            percent = 0;
+        }
+        percentTextView.setText(percent + "");
 
         //DeleteTask
         ImageView deleteTaskImageView = (ImageView) view.findViewById(R.id.task_delete);

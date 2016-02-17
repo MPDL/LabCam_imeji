@@ -222,6 +222,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             task.setTaskId(uniqueID);
             task.setUploadMode("AU");
             task.setCollectionId(collectionID);
+            task.setCollectionName(collectionName);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
             task.setUserName(username);
             task.setTotalItems(0);
@@ -230,7 +231,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 //            String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
             task.setStartDate(String.valueOf(now));
-            task.setTaskName("Auto upload to" + collectionName);
 
             task.save();
 
@@ -327,7 +327,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
                         Long now = new Date().getTime();
                         task.setStartDate(String.valueOf(now));
-                        task.setTaskName("Auto upload to " + collectionName);
+                        task.setCollectionName(collectionName);
 
                         task.save();
 

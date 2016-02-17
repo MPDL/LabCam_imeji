@@ -293,30 +293,6 @@
         android:background="#80808080" >
     </LinearLayout>
 
-
-    <!--change account-->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:text="@string/change_account"
-        android:id="@+id/tv_change_accout"
-        android:textSize="16dp"
-        android:textColor="@color/black" />
-
-    <!--divider-->
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:background="#80808080" >
-    </LinearLayout>
-
-
     <!--logout-->
     <TextView
         android:layout_width="wrap_content"

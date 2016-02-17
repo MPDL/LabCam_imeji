@@ -62,6 +62,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
     private Activity activity;
 
     private String collectionId;
+    private String collectionName;
     private List<ImejiFolder> collectionList = new ArrayList<ImejiFolder>();
 
     //taskId
@@ -90,7 +91,8 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                                 if(collectionId!=null){
                                 Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
                                 currentTask.setCollectionId(collectionId);
-                                currentTask.setTaskName("Manual  "+collectionId);
+                                currentTask.setTaskName("Manual  " + collectionId);
+                                currentTask.setCollectionName(collectionName);
                                     currentTask.save();
 
                                 Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
@@ -123,6 +125,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
     @Override
     public void setCollectionId(int Id) {
         collectionId = collectionList.get(Id).getImejiId();
+        collectionName = collectionList.get(Id).getTitle();
     }
 
 
@@ -147,6 +150,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                 collectionList.clear();
                 for(ImejiFolder folder : folderList){
                     folder.setImejiId(folder.id);
+                    folder.setTitle(folder.getTitle());
                     collectionList.add(folder);
                 }
                 ActiveAndroid.setTransactionSuccessful();
