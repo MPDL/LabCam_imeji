@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private RadioGroup radioGroup;
 
     private String email;
+    private String username;
     private SharedPreferences mPrefs;
 
     //TESTING DB
@@ -175,12 +176,14 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         //create drawer view
         mPrefs = this.getSharedPreferences("myPref", 0);
         email = mPrefs.getString("email", "");
+        username =  mPrefs.getString("username", "");
 
         //init radioButton group
         initRadioButtonGroup();
 
         //choose collection
         chooseCollection();
+        setUserInfoText();
 
     }
 
@@ -502,7 +505,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 //        radioGroup.clearCheck();
     }
 
-    public void chooseCollection(){
+    //choose collection
+    private void chooseCollection(){
         TextView chooseCollectionTextView = (TextView) findViewById(R.id.tv_choose_collection);
         chooseCollectionTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -513,6 +517,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         });
     }
 
+    //set user info textView(name email)
+    private void setUserInfoText(){
+        TextView nameTextView = (TextView) findViewById(R.id.tv_username);
+        TextView emailTextView = (TextView) findViewById(R.id.tv_user_email);
+        nameTextView.setText(username);
+        emailTextView.setText(email);
+    }
 
     //camera
     static final int REQUEST_IMAGE_CAPTURE = 1;

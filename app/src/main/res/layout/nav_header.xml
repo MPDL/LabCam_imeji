@@ -15,7 +15,41 @@
         android:gravity="left"
         android:id="@+id/netOption">
 
-        <!--Upload Settings-->
+        <!--name-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_username"
+            android:textColor="@color/black"
+            android:text=""
+            android:textSize="20dp"
+            android:layout_marginLeft="10dp"/>
+
+        <!--email-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_user_email"
+            android:textColor="@color/black"
+            android:text=""
+            android:textSize="16dp"
+            android:layout_marginLeft="10dp"/>
+
+
+        <!--divider-->
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="#80808080" >
+        </LinearLayout>
+
+
+        <!--auto upload-->
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">
@@ -24,24 +58,28 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/textView"
                 android:text="@string/auto_upload"
-                android:textSize="20dip"
-                android:paddingTop="10dp"
+                android:textColor="@color/tabUnselect"
+                android:textSize="15dp"
                 android:paddingLeft="10dp"/>
 
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
             <Switch
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:checked="true"
-                android:layout_marginRight="16dp"/>
+                android:layout_marginRight="10dp" />
+            </RelativeLayout>
         </RelativeLayout>
         <!--divider-->
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:background="#80808080" >
         </LinearLayout>
 
@@ -58,51 +96,131 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:text="@string/choose_collection"
             android:id="@+id/tv_choose_collection"
-            android:textSize="20dip"
+            android:textSize="16dp"
             android:textColor="@color/black" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:layout_alignParentRight="true"
             android:layout_marginRight="10dp"
             android:id="@+id/collection_name"
             android:text=""
-            android:textSize="15dp"
+            android:textSize="16dp"
 
             />
 
     </RelativeLayout>
 
-    <Switch
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/ocr"
         android:id="@+id/ocr"
-        android:textSize="20dip"
+        android:layout_marginBottom="16dp"
+        android:textSize="16dp"
 
-        android:layout_below="@+id/lau"
+
+        android:textColor="@color/black"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:paddingBottom="10dp"
         android:paddingTop="10dp"
         android:paddingLeft="10dp"/>
+
+    <!--privacy setting-->
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/privacy_setting"
+            android:textColor="@color/tabUnselect"
+            android:textSize="15dp"
+            android:paddingLeft="10dp"/>
+
+    </RelativeLayout>
+
+    <!--divider-->
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:layout_below="@id/ocr"
-        android:layout_marginTop="20dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:background="#80808080" >
     </LinearLayout>
+
+    <!--logout after uploading-->
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/logout_after_upload"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:paddingLeft="10dp"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:checked="false"
+                android:layout_marginRight="10dp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <!--remove photos-->
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/remove_after_upload"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:paddingLeft="10dp"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:checked="false"
+                android:layout_marginRight="10dp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <!--upload option-->
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/upload_options"
+            android:textColor="@color/tabUnselect"
+            android:textSize="15dp"
+            android:paddingLeft="10dp"/>
+
+    </RelativeLayout>
 
     <!--divider-->
 
@@ -123,10 +241,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="10dp"
             android:text="@string/option_wifi"
             android:id="@+id/tv_option_wifi"
-            android:textSize="20dip"
+            android:textSize="16dp"
             android:textColor="@color/black" />
 
         <TextView
@@ -137,7 +255,7 @@
             android:layout_below="@id/tv_option_wifi"
             android:text="@string/option_cellular"
             android:id="@+id/tv_option_cellular"
-            android:textSize="20dip"
+            android:textSize="16dp"
             android:textColor="@color/black" />
 
         <RadioGroup
@@ -145,7 +263,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/radio_group"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="2dp"
             android:orientation="vertical">
             <RadioButton
                 android:layout_width="wrap_content"
@@ -164,5 +282,61 @@
 
     </RelativeLayout>
 
+    <!--divider-->
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#80808080" >
+    </LinearLayout>
+
+
+    <!--change account-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/change_account"
+        android:id="@+id/tv_change_accout"
+        android:textSize="16dp"
+        android:textColor="@color/black" />
+
+    <!--divider-->
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#80808080" >
+    </LinearLayout>
+
+
+    <!--logout-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Logout"
+        android:id="@+id/tv_logout"
+        android:textSize="16dp"
+        android:textColor="@color/black" />
+
+    <!--divider-->
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="#80808080" >
+    </LinearLayout>
 
 </LinearLayout>
