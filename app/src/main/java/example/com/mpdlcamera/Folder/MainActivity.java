@@ -2,6 +2,7 @@ package example.com.mpdlcamera.Folder;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -529,26 +530,35 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }
+//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+//            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+//        }
+        Intent mIntent = new Intent();
+
+        ComponentName comp = new ComponentName("com.android.camera","com.android.camera.Camera");
+
+        mIntent.setComponent(comp);
+
+        mIntent.setAction("android.intent.action.VIEW");
+
+        startActivity(mIntent);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String imageFileName = "JPEG_" + timeStamp + "_";
-
-            MediaStore.Images.Media.insertImage(getContentResolver(), imageBitmap, imageFileName , null);
-
-
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+//            Bundle extras = data.getExtras();
+//            Bitmap imageBitmap = (Bitmap) extras.get("data");
+//
+//            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+//            String imageFileName = "JPEG_" + timeStamp + "_";
+//
+//            MediaStore.Images.Media.insertImage(getContentResolver(), imageBitmap, imageFileName , null);
+//
+//
+//        }
+//    }
 
 
 
