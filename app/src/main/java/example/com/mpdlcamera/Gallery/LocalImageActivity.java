@@ -76,6 +76,7 @@ public class LocalImageActivity extends AppCompatActivity {
     private final String LOG_TAG = LocalImageActivity.class.getSimpleName();
     private SharedPreferences mPrefs;
     private String username;
+    private String userId;
 
 
 
@@ -107,6 +108,7 @@ public class LocalImageActivity extends AppCompatActivity {
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
+        userId = mPrefs.getString("userId","");
 
         Intent intent = activity.getIntent();
         if (intent != null) {
@@ -353,6 +355,7 @@ public class LocalImageActivity extends AppCompatActivity {
         task.setUploadMode("MU");
         task.setState(String.valueOf(DeviceStatus.state.WAITING));
         task.setUserName(username);
+        task.setUserId(userId);
         task.setStartDate(String.valueOf(now));
         task.save();
         int num = addImages(fileList, task.getTaskId());

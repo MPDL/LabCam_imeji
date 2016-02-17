@@ -92,7 +92,7 @@ public class RetrofitClient {
         ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
 
         String q = "grant=\"upload\"";
-        imejiAPI.getGrantedCollectionMessage(q,callback);
+        imejiAPI.getGrantedCollectionMessage(q, callback);
     }
 
 
@@ -106,7 +106,14 @@ public class RetrofitClient {
         imejiAPI.getCollectionItems(collectionId, callback);
     }
 
+    //getCollectionById
+    public static void getCollectionById(String collectionId,
+                                          Callback<ImejiFolder> callback,
+                                          String APIkey) {
+        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
 
-
+        // Fetch and print a list of the items to this library.
+        imejiAPI.getCollectionById(collectionId, callback);
+    }
 
 }

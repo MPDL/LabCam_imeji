@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import example.com.mpdlcamera.Folder.MainActivity;
+import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.LocalAlbum;
 import example.com.mpdlcamera.Model.LocalModel.Task;
@@ -200,9 +201,9 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (path != null) {
                         collectionId = path.substring(path.lastIndexOf("/") + 1);
-                        Log.v("collectionId", collectionId);
                     }
 
+                    //get collection
 
                     Log.i("QRAPIkey1",mPrefs.getString("APIkey",""));
                     mPrefs = getSharedPreferences("myPref", 0);
@@ -376,10 +377,14 @@ public class LoginActivity extends AppCompatActivity {
         System.out.println(values.getString("password"));
     }
 
+
+    // createTask only when with QRcode
     private void createTask(){
         mPrefs = getSharedPreferences("myPref", 0);
         String userName = mPrefs.getString("username", "");
-        Task latestTask = DeviceStatus.getTask();
+        String userId = mPrefs.getString("userId", "");
+
+        Task latestTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
 
         if(latestTask==null){
             Log.v("create Task","no task in database");
@@ -388,8 +393,10 @@ public class LoginActivity extends AppCompatActivity {
             task.setTaskId(uniqueID);
             task.setUploadMode("AU");
             task.setCollectionId(collectionId);
+            task.setCollectionName(collectionName);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
             task.setUserName(userName);
+            task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
 
@@ -415,6 +422,7 @@ public class LoginActivity extends AppCompatActivity {
             task.setCollectionId(collectionId);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
             task.setUserName(userName);
+            task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
 
@@ -427,11 +435,8 @@ public class LoginActivity extends AppCompatActivity {
             task.save();
         }
 
-        Log.v("task.size", "" + DeviceStatus.getTasks().size());
-        for(Task task:DeviceStatus.getTasks()){
-            if(task.getTaskName()!=null){
-                Log.v("~taskName",task.getTaskName());}
-        }
+        // login
+        accountLogin();
     }
 
     /**
@@ -451,19 +456,16 @@ public class LoginActivity extends AppCompatActivity {
                 mPrefs = getSharedPreferences("myPref", 0);
                 SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.putString("username",user.getPerson().getCompleteName()).apply();
+                    mEditor.putString("userId",user.getPerson().getId()).apply();
                     mEditor.putString("email",user.getEmail()).apply();
                     mEditor.putString("apiKey",user.getApiKey()).apply();
                 mEditor.commit();
-                Log.i("loginApi", mPrefs.getString("APIkey", ""));
-
-
                 if(collectionId!=null&&collectionId!=""){
+                     RetrofitClient.getCollectionById(collectionId, callback_collection, user.getApiKey());
                     //create a new task for new selected collection
-
-                    createTask();
-                }
+                }else { accountLogin();}
             }
-            accountLogin();
+
         }
 
         @Override
@@ -471,6 +473,20 @@ public class LoginActivity extends AppCompatActivity {
             Log.v("~~~","login failed" );
             try{
             Log.v("~~~", error.getMessage());}catch (Exception e){}
+        }
+    };
+
+    Callback<ImejiFolder> callback_collection = new Callback<ImejiFolder>() {
+        @Override
+        public void success(ImejiFolder imejiFolder, Response response) {
+            Log.v(LOG_TAG,"success");
+            collectionName = imejiFolder.getTitle();
+            createTask();
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.v(LOG_TAG,"faulure");
         }
     };
 }

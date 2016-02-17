@@ -15,6 +15,8 @@ public class Person {
 
     private int position;
 
+    @Expose
+    @Column(name="userId")
     private String id;
 
     @Expose

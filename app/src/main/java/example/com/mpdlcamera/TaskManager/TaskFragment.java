@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -41,33 +42,24 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
     private TaskUploadService mBoundService;
     boolean mIsBound;
 
+    //user info
+    private String userId;
+    private SharedPreferences mPrefs;
+
     private TaskManagerAdapter taskManagerAdapter;
 
-    private Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            if(msg.what==1234){
-                Log.v("~~~", "1234~~~");
-                try {
-                    taskList = DeviceStatus.getTasks();
-                    if(taskList!=null){
-                        taskManagerAdapter.notifyDataSetChanged();
-                }
-                    }catch (Exception e){}
-            }
-        }
-    };
+
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        mPrefs = getActivity().getSharedPreferences("myPref", 0);
+        userId =  mPrefs.getString("userId", "");
 
         View view = inflater.inflate(R.layout.fragment_task, container,false);
         //taskManager listview
         taskManagerListView = (ListView) view.findViewById(R.id.listView_task);
-        taskList = DeviceStatus.getTasks();
+        taskList = DeviceStatus.getUserTasks(userId);
         taskManagerAdapter = new TaskManagerAdapter(this.getActivity(),taskList,this);
         taskManagerAdapter.notifyDataSetChanged();
         taskManagerListView.setAdapter(taskManagerAdapter);
@@ -94,9 +86,28 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Uri uri = Uri.parse("content://example.com.mpdlcamera/tasks");
         ContentResolver resolver = getActivity().getContentResolver();
+
+        mPrefs = getActivity().getSharedPreferences("myPref", 0);
+        userId =  mPrefs.getString("userId", "");
+        Handler mHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+
+                if(msg.what==1234){
+                    Log.v("~~~", "1234~~~");
+                    try {
+                        taskList = DeviceStatus.getUserTasks(userId);
+                        if(taskList!=null){
+                            taskManagerAdapter.notifyDataSetChanged();
+                        }
+                    }catch (Exception e){}
+                }
+            }
+        };
+
         resolver.registerContentObserver(uri, true, new dbObserver(getActivity(), mHandler));
 
 //        doBindService();

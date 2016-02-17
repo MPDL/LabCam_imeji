@@ -41,6 +41,7 @@ import retrofit.client.Response;
 
 public class RemoteCollectionSettingsActivity extends AppCompatActivity implements CollectionIdInterface{
     private String username;
+    private String userId;
     private String APIkey;
     private String email;
     private SharedPreferences mPrefs;
@@ -121,6 +122,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
+        userId = mPrefs.getString("userId","");
         APIkey = mPrefs.getString("apiKey", "");
         email = mPrefs.getString("email", "");
 
@@ -175,13 +177,12 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                     /**
                      * delete all AU Task if finished
                      * */
-                    deleteFinishedTasks();
+                    DeviceStatus.deleteFinishedTasks();
 
-                        /**create Task**/
+                    /**create Task**/
                     createTask(collectionID);
 
-                    Log.v("task.size", "" + DeviceStatus.getTasks().size());
-                    for (Task task : DeviceStatus.getTasks()) {
+                    for (Task task : DeviceStatus.getUserTasks(userId)) {
                         if (task.getTaskName() != null) {
                             Log.v("~taskName", task.getTaskName());
                         }
@@ -211,7 +212,11 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     private void createTask(String collectionID){
 
         // get AU task
-        latestTask = getAUTask();
+        latestTask = new Select()
+                .from(Task.class)
+                .where("uploadMode = ?","AU")
+                .orderBy("startDate DESC")
+                .executeSingle();
 
         //  create first task
         if(latestTask==null){
@@ -225,6 +230,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             task.setCollectionName(collectionName);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
             task.setUserName(username);
+            task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
 
@@ -244,7 +250,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                       // stop latestTask, change mode/name, save
                       latestTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
                       latestTask.setUploadMode("MU");
-                      latestTask.setTaskName("Manual upload to" + collectionName);
+                      latestTask.setCollectionName(collectionName);
                       latestTask.save();
 
                       // Num of photo
@@ -256,16 +262,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         }
     }
 
-    //get latest task
-    // TODO: move away for reuse
-    public static Task getAUTask() {
-        String mode = "AU";
-        return new Select()
-                .from(Task.class)
-                .where("uploadMode = ?",mode)
-                .orderBy("startDate DESC")
-                .executeSingle();
-    }
 
     @Override
     public void setCollectionId(int Id) {
@@ -273,30 +269,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         collectionName = collectionListLocal.get(Id).getTitle();
     }
 
-    //delete finished tasks
-    public void deleteFinishedTasks(){
-
-        // get All au tasks first
-        List<Task> finishedTasks = new Select()
-                .from(Task.class)
-                .execute();
-        Log.v(LOG_TAG,finishedTasks.size()+"_all");
-
-        // remove unfinished tasks form list
-        for(Task task:finishedTasks){
-            if(task.getFinishedItems() == task.getTotalItems()){
-                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                task.save();
-            }
-        }
-
-        new Delete().from(Task.class).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
-
-        int num = (new Select()
-                .from(Task.class)
-                .execute()).size();
-        Log.v(LOG_TAG,num +"_finished");
-    }
 
     //checkbox dialog
     private void dialog(int num){
@@ -324,6 +296,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                         task.setCollectionId(collectionID);
                         task.setState(String.valueOf(DeviceStatus.state.WAITING));
                         task.setUserName(username);
+                        task.setUserId(userId);
 
                         Long now = new Date().getTime();
                         task.setStartDate(String.valueOf(now));

@@ -9,9 +9,11 @@ import android.net.NetworkInfo;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import java.util.List;
@@ -25,6 +27,7 @@ import example.com.mpdlcamera.Model.LocalModel.Task;
  */
 public class DeviceStatus {
 
+    private static final String LOG_TAG = DeviceStatus.class.getSimpleName();
     public static final String username = "";
     public static final String password = "";
     public static final String collectionID = "0L5yLxP_AphUMtIi";
@@ -110,11 +113,14 @@ public class DeviceStatus {
                 .executeSingle();
     }
 
-    //get all tasks
     public static List<Task> getTasks(){
+        return null;
+    }
+    //get user tasks
+    public static List<Task> getUserTasks(String userId){
         return new Select()
                 .from(Task.class)
-                .orderBy("startDate DESC")
+                .where("userId = ?",userId)
                 .execute();
     }
 
@@ -134,6 +140,34 @@ public class DeviceStatus {
                 .where("email = ?", email)
                 .executeSingle();
         return (foundBg == null);
+    }
+
+
+    //delete tasks
+
+    //delete finished tasks
+    public static void deleteFinishedTasks(){
+
+        // get All au tasks first
+        List<Task> finishedTasks = new Select()
+                .from(Task.class)
+                .execute();
+        Log.v(LOG_TAG, finishedTasks.size() + "_all");
+
+        // remove unfinished tasks form list
+        for(Task task:finishedTasks){
+            if(task.getFinishedItems() == task.getTotalItems()){
+                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                task.save();
+            }
+        }
+
+        new Delete().from(Task.class).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
+
+        int num = (new Select()
+                .from(Task.class)
+                .execute()).size();
+        Log.v(LOG_TAG,num +"_finished");
     }
 
 }

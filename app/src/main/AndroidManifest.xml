@@ -17,6 +17,8 @@
     <!-- device boot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <uses-feature android:name = "android.hardware.camera" android:required="false"/>
+
     <application
         android:name="com.activeandroid.app.Application"
         android:allowBackup="true"

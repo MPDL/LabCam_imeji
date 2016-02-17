@@ -88,6 +88,9 @@ public interface ImejiAPI {
     void getCollectionItems(@Path("id") String collectionId,
                             Callback<JsonObject> callback);
 
-
+    //get collection by id
+    @GET("/collections/{id}")
+    void getCollectionById (@Path("id") String collectionId,
+                            Callback<ImejiFolder> callback);
 
 }

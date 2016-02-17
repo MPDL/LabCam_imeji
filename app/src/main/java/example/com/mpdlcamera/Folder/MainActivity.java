@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.UriMatcher;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     private String email;
     private String username;
+    private String userId;
     private SharedPreferences mPrefs;
 
     //TESTING DB
@@ -178,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         mPrefs = this.getSharedPreferences("myPref", 0);
         email = mPrefs.getString("email", "");
         username =  mPrefs.getString("username", "");
+        userId = mPrefs.getString("userId","");
 
         //init radioButton group
         initRadioButtonGroup();
@@ -200,14 +203,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         //set selected collection name
         TextView collectionNameTextView = (TextView) findViewById(R.id.collection_name);
 
-        if(!DeviceStatus.is_newUser(email)){
-            LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
-            collectionNameTextView.setText(user.getCollectionName());
-            List<LocalUser> userList = new Select().from(LocalUser.class).where("email = ?", email).execute();
-            Log.i(TAG,userList.size()+"");
-        }else {
-            collectionNameTextView.setText("unset");
-        }
+//            LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
+            Task lastAUTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
+            if(lastAUTask!= null){
+            collectionNameTextView.setText(lastAUTask.getCollectionName());}
+            else{
+                collectionNameTextView.setText("unset");
+            }
     }
 
     @Override
@@ -516,6 +518,15 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
             }
         });
+
+        TextView choosedCollectionTextView = (TextView) findViewById(R.id.collection_name);
+        choosedCollectionTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
+                startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
+            }
+        });
     }
 
     //set user info textView(name email)
@@ -534,15 +545,28 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 //        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 //            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 //        }
-        Intent mIntent = new Intent();
+        PackageManager packman = getPackageManager();
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        String pack = intent.resolveActivity(packman).getPackageName();
+        String cls = intent.resolveActivity(packman).getClassName();
 
-        ComponentName comp = new ComponentName("com.android.camera","com.android.camera.Camera");
+        Log.e("~~~", pack);
+        Log.e("~~~", cls);
 
-        mIntent.setComponent(comp);
+        if(pack.equalsIgnoreCase("com.sec.android.app.camera")){
+            Toast.makeText(context,"this device not support open camerea here",Toast.LENGTH_SHORT).show();
+        }else {
+            Intent mIntent = new Intent();
 
-        mIntent.setAction("android.intent.action.VIEW");
+            ComponentName comp = new ComponentName(pack,cls);
 
-        startActivity(mIntent);
+            mIntent.setComponent(comp);
+
+            mIntent.setAction("android.intent.action.VIEW");
+
+            startActivity(mIntent);
+        }
+
     }
 
 //    @Override
