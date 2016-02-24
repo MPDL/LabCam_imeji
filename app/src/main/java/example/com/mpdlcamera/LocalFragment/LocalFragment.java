@@ -4,14 +4,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,75 +25,73 @@ import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.Switch;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
+import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.UUID;
 
-import example.com.mpdlcamera.Gallery.ActivatedGalleryActivity;
+import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Gallery.GalleryListAdapter;
 import example.com.mpdlcamera.Gallery.LocalImageActivity;
+import example.com.mpdlcamera.Gallery.RemoteListDialogFragment;
 import example.com.mpdlcamera.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
 import example.com.mpdlcamera.Gallery.SectionedGridView.SimpleAdapter;
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.Model.LocalModel.Image;
+import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * {@link LocalFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link LocalFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
-public class LocalFragment extends Fragment {
+public class LocalFragment extends Fragment implements android.support.v7.view.ActionMode.Callback{
 
-
+    private static final String LOG_TAG = LocalFragment.class.getSimpleName();
+    private android.support.v7.view.ActionMode actionMode;
+    public Set<Integer> positionSet = new HashSet<>();
     //TODO: from kiran's galleryListActivity, remove lava later
     private View rootView;
+    android.support.v7.app.ActionBar actionBar;
 
     GridView gridView;
     RecyclerView recyclerView;
     SharedPreferences preferences;
 
     GalleryListAdapter adapter;
+    SectionedGridRecyclerViewAdapter mSectionedAdapter;
+    SimpleAdapter simpleAdapter;
+
+    android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
 
     //adapter data
     final ArrayList<Gallery> folders = new ArrayList<Gallery>();
     final ArrayList<String> folders1 = new ArrayList<String>();
 
-    TreeMap<Long, String> imageList =
-            new TreeMap<Long, String>();
+    TreeMap<Long, String> imageList = new TreeMap<Long, String>();
+    TreeMap<String,String> imageTree = new TreeMap<String,String>();
+    List<String> sortedImageNameList;
 
-    TreeMap<String,String> imageTree =
-            new TreeMap<String,String>();
+
+    //user info
+    private SharedPreferences mPrefs;
+    private String username;
+    private String userId;
 
     private OnFragmentInteractionListener mListener;
-
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment LocalFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static LocalFragment newInstance(String param1, String param2) {
-        LocalFragment fragment = new LocalFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     public LocalFragment() {
         // Required empty public constructor
@@ -97,9 +101,9 @@ public class LocalFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
-
+        mPrefs = getActivity().getSharedPreferences("myPref", 0);
+        username = mPrefs.getString("username", "");
+        userId = mPrefs.getString("userId","");
 
     }
 
@@ -110,6 +114,8 @@ public class LocalFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_local, container, false);
         // folder gridView
         gridView = (GridView) rootView.findViewById(R.id.gallery_gridView);
+
+        actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
         // timeline recycleView
         recyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_recycleView);
@@ -125,7 +131,26 @@ public class LocalFragment extends Fragment {
         //set header recycleView adapter
         loadTimeLinePicture();
 
+        simpleAdapter.setOnItemClickListener(new SimpleAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (actionMode != null) {
+                    // 如果当前处于多选状态，则进入多选状态的逻辑
+                    // 维护当前已选的position
+                    addOrRemove(position);
+                } else {
+                    // 如果不是多选状态，则进入点击事件的业务逻辑
+                    // maybe show picture
+                }
+            }
 
+            @Override
+            public void onItemLongClick(View view, int position) {
+                if (actionMode == null) {
+                    actionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(ActionModeCallback);
+                }
+            }
+        });
 
 
 
@@ -161,6 +186,77 @@ public class LocalFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
+        if (actionMode == null) {
+            actionMode = mode;
+            actionBar.hide();
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.contextual_menu_local, menu);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean onPrepareActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_upload_local:
+
+                Log.v(LOG_TAG, "upload");
+
+                Log.v(LOG_TAG, " "+positionSet.size());
+                List uploadPathList = new ArrayList();
+                for(Integer i:positionSet){
+                    uploadPathList.add(sortedImageNameList.get(i));
+                }
+
+                if(uploadPathList != null) {
+                    uploadList(uploadPathList);
+                }
+                uploadPathList.clear();
+                mode.finish();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
+        actionMode = null;
+        positionSet.clear();
+        actionBar.show();
+//        simpleAdapter.notifyDataSetChanged();
+//        mSectionedAdapter.notifyDataSetChanged();
+    }
+
+    private void addOrRemove(int position) {
+        if (positionSet.contains(position)) {
+            // 如果包含，则撤销选择
+            positionSet.remove(position);
+        } else {
+            // 如果不包含，则添加
+            positionSet.add(position);
+        }
+        if (positionSet.size() == 0) {
+            // 如果没有选中任何的item，则退出多选模式
+            actionMode.finish();
+        } else {
+            // 设置ActionMode标题
+            actionMode.setTitle(positionSet.size() + " selected");
+            // 更新列表界面，否则无法显示已选的item
+//            simpleAdapter.notifyDataSetChanged();
+//            mSectionedAdapter.notifyDataSetChanged();
+        }
     }
 
     /**
@@ -200,7 +296,7 @@ public class LocalFragment extends Fragment {
 
                 Gallery gallery = (Gallery) adapter.getItem(position);
 
-                String status = preferences.getString(gallery.getGalleryName(),"");
+                String status = preferences.getString(gallery.getGalleryName(), "");
 
                 //// FIXME: 2/2/16 why need this if else?
 //                if(status.equalsIgnoreCase("On")) {
@@ -219,14 +315,13 @@ public class LocalFragment extends Fragment {
                     /*
                         Sending the gallerytitle for the next activity(not activated gallery)
                      */
-                
-                
-                
-                    Intent galleryImagesIntent = new Intent(getActivity(), LocalImageActivity.class);
-                    galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
 
-                    startActivity(galleryImagesIntent);
-                }
+
+                Intent galleryImagesIntent = new Intent(getActivity(), LocalImageActivity.class);
+                galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
+
+                startActivity(galleryImagesIntent);
+            }
 //            }
         });
 
@@ -288,7 +383,8 @@ public class LocalFragment extends Fragment {
     private void loadTimeLinePicture(){
         // Your RecyclerView.Adapter
         // sortedImageNameList is imagePath list
-        List<String> sortedImageNameList = new ArrayList<>();
+        ArrayList<String> ImageNameList = new ArrayList<>();
+        sortedImageNameList = new ArrayList<>();
         // sectionMap key is the date, value is the picture number
         List<String> dateAseList = new ArrayList<String>();
         List<String> dateList = new ArrayList<String>();
@@ -299,15 +395,21 @@ public class LocalFragment extends Fragment {
             SimpleDateFormat dt = new SimpleDateFormat(" dd.MM.yyyy");
             String dateStr = dt.format(d);
             dateAseList.add(dateStr);
-            sortedImageNameList.add(entry.getValue());
+            ImageNameList.add(entry.getValue());
+            Log.v(LOG_TAG,dateStr+" -> "+entry.getValue());
         }
 
 
+        // treeMap order is ASE, need DSE, so reverse
         for(int i=dateAseList.size()-1;i>=0;i--){
                 dateList.add(dateAseList.get(i));
         }
 
-        SimpleAdapter simpleAdapter = new SimpleAdapter(getActivity(),sortedImageNameList);
+        for(int i=ImageNameList.size()-1;i>=0;i--){
+            sortedImageNameList.add(ImageNameList.get(i));
+        }
+
+         simpleAdapter = new SimpleAdapter(getActivity(),sortedImageNameList);
 
         //This is the code to provide a sectioned grid
         List<SectionedGridRecyclerViewAdapter.Section> sections =
@@ -333,11 +435,122 @@ public class LocalFragment extends Fragment {
 
         //Add your adapter to the sectionAdapter
         SectionedGridRecyclerViewAdapter.Section[] dummy = new SectionedGridRecyclerViewAdapter.Section[sections.size()];
-        SectionedGridRecyclerViewAdapter mSectionedAdapter = new
+        mSectionedAdapter = new
                 SectionedGridRecyclerViewAdapter(getActivity(),R.layout.header_grid_section,R.id.section_text,recyclerView,simpleAdapter);
         mSectionedAdapter.setSections(sections.toArray(dummy));
 
         //Apply this adapter to the RecyclerView
         recyclerView.setAdapter(mSectionedAdapter);
+    }
+
+
+    /**upload methods**/
+     /*
+            upload the selected files
+        */
+    private void uploadList(List<String> fileList) {
+        String currentTaskId = createTask(fileList);
+
+        // go to RemoteCollectionSettings
+//        Intent remoteCollectionSettingIntent = new Intent(this, RemoteCollectionSettingsActivity.class);
+//        remoteCollectionSettingIntent.putExtra("Manual",)
+
+        newInstance(currentTaskId).show(getActivity().getFragmentManager(), "remoteListDialog");
+//
+//        Intent manualUploadServiceIntent = new Intent(this,ManualUploadService.class);
+//        manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
+//        startService(manualUploadServiceIntent);
+    }
+
+    public static RemoteListDialogFragment newInstance(String taskId)
+    {
+        RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("taskId", taskId);
+        remoteListDialogFragment.setArguments(args);
+        return remoteListDialogFragment;
+    }
+
+    private String createTask(List<String> fileList){
+
+        String uniqueID = UUID.randomUUID().toString();
+        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+        Long now = new Date().getTime();
+
+        Task task = new Task();
+        task.setTotalItems(fileList.size());
+        task.setFinishedItems(0);
+        task.setTaskId(uniqueID);
+        task.setUploadMode("MU");
+        task.setState(String.valueOf(DeviceStatus.state.WAITING));
+        task.setUserName(username);
+        task.setUserId(userId);
+        task.setStartDate(String.valueOf(now));
+        task.save();
+        int num = addImages(fileList, task.getTaskId());
+        task.setTotalItems(num);
+        task.save();
+        Log.v(LOG_TAG,"MU task"+task.getTaskId() );
+        Log.v(LOG_TAG, "setTotalItems:" + num);
+
+        return task.getTaskId();
+    }
+
+    private int addImages(List<String> fileList,String taskId){
+
+        int imageNum = 0;
+        for (String filePath: fileList) {
+            File file = new File(filePath);
+            File imageFile = file.getAbsoluteFile();
+            String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
+
+            //imageSize
+            String fileSize = String.valueOf(file.length() / 1024);
+
+
+            ExifInterface exif = null;
+            try {
+                exif = new ExifInterface(filePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            //createTime
+            String createTime = exif.getAttribute(ExifInterface.TAG_DATETIME);
+
+            //latitude
+            String latitude = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
+
+            //longitude
+            String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
+
+            //state
+            String imageState = String.valueOf(DeviceStatus.state.WAITING);
+
+
+
+            try {
+
+                String imageId = UUID.randomUUID().toString();
+                //store image in local database
+                Image photo = new Image();
+                photo.setImageId(imageId);
+                photo.setImageName(imageName);
+                photo.setImagePath(filePath);
+                photo.setLongitude(longitude);
+                photo.setLatitude(latitude);
+                photo.setCreateTime(createTime);
+                photo.setSize(fileSize);
+                photo.setState(imageState);
+                photo.setTaskId(taskId);
+                photo.save();
+                imageNum = imageNum + 1;
+
+            } catch (Exception e) {
+            }
+
+        }
+        return imageNum;
     }
 }

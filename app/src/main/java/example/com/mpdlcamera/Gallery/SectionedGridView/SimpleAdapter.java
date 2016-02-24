@@ -2,6 +2,7 @@ package example.com.mpdlcamera.Gallery.SectionedGridView;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +26,15 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
 
     private final Context mContext;
     private final List<String> mItems;
-    private int mCurrentItemId = 0;
+
+    private LayoutInflater inflater;
+
+
+    private OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
 
     public static class SimpleViewHolder extends RecyclerView.ViewHolder {
         public final ImageView imageView;
@@ -39,6 +48,7 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     public SimpleAdapter(Context context,List<String> galleryItems) {
         mContext = context;
         mItems = galleryItems;
+        inflater = LayoutInflater.from(context);
     }
 
     public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -56,12 +66,28 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
                 .resize(235,235)
                 .centerCrop()
                 .into(holder.imageView);
+
+
+        if (onItemClickListener!=null){
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onItemClickListener.onItemClick(v,position);
+                }
+            });
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    onItemClickListener.onItemLongClick(v,position);
+                    return false;
+                }
+            });
+        }
     }
 
-    public void addItem(int position) {
-//        final int id = mCurrentItemId++;
-        mItems.add(position, "");
-        notifyItemInserted(position);
+    public void remove(String str){
+        mItems.remove(str);
+        notifyDataSetChanged();
     }
 
     public void removeItem(int position) {
@@ -69,8 +95,18 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
         notifyItemRemoved(position);
     }
 
+    public String getItem(int pos){
+        return mItems.get(pos);
+    }
+
     @Override
     public int getItemCount() {
         return mItems.size();
+    }
+
+
+    public interface OnItemClickListener{
+        void onItemClick(View view, int position);
+        void onItemLongClick(View view,int position);
     }
 }

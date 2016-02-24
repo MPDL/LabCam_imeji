@@ -175,111 +175,111 @@ public class LocalImageActivity extends AppCompatActivity {
 
             }
 
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                // TODO Auto-generated method stub
-                selectedCount = 0;
+      @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        // TODO Auto-generated method stub
+        selectedCount = 0;
 
-                toolbar.setVisibility(View.GONE);
+        toolbar.setVisibility(View.GONE);
 
-                //adapter.getCheckBox().setVisibility(View.VISIBLE);
+        //adapter.getCheckBox().setVisibility(View.VISIBLE);
 
-                MenuInflater inflater = getMenuInflater();
-                inflater.inflate(R.menu.contextual_menu_local, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.contextual_menu_local, menu);
 //                menu.add(Menu.NONE, R.id.item_delete_local, Menu.NONE, "Delete");
 //                menu.add(Menu.NONE, R.id.item_upload_local, Menu.NONE, "Upload");
 
-                return true;
-            }
+        return true;
+    }
 
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                // TODO Auto-generated method stub
-                int id = item.getItemId();
-                Log.v(LOG_TAG, ""+ id);
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        // TODO Auto-generated method stub
+        int id = item.getItemId();
+        Log.v(LOG_TAG, ""+ id);
 
-                switch (item.getItemId()) {
-                    case R.id.item_delete_local:
-                        selectedCount = 0;
-                        Log.v(LOG_TAG,"##delete");
-                        if(selectedDataPathList != null) {
-                            delete(selectedDataPathList);
-                            for(String str: selectedDataPathList){
-                                dataPathList.remove(str);
-                            }
-                            adapter.notifyDataSetChanged();
+        switch (item.getItemId()) {
+//            case R.id.item_delete_local:
+//                selectedCount = 0;
+//                Log.v(LOG_TAG,"##delete");
+//                if(selectedDataPathList != null) {
+//                    delete(selectedDataPathList);
+//                    for(String str: selectedDataPathList){
+//                        dataPathList.remove(str);
+//                    }
+//                    adapter.notifyDataSetChanged();
+//
+//                }
+//                selectedDataPathList.clear();
+//                adapter.clearSelection();
+//
+//                mode.finish();
+//                break;
 
-                        }
-                        selectedDataPathList.clear();
-                        adapter.clearSelection();
-
-                        mode.finish();
-                        break;
-
-                    case R.id.item_upload_local:
+            case R.id.item_upload_local:
 //                        nr = 0;
 //                        adapter.clearSelection();
-                        Log.v(LOG_TAG,"upload");
+                Log.v(LOG_TAG,"upload");
 
-                        Log.v(LOG_TAG, " "+selectedDataPathList.size());
+                Log.v(LOG_TAG, " "+selectedDataPathList.size());
 
-                        Log.v(LOG_TAG, selectedDataPathList.get(0));
+                Log.v(LOG_TAG, selectedDataPathList.get(0));
 
-                        circularButton.setVisibility(View.VISIBLE);
-                        circularButton.setIndeterminateProgressMode(true); // turn on indeterminate progress
-                        circularButton.setProgress(50); // set progress > 0 & < 100 to display indeterminate progress
+                circularButton.setVisibility(View.VISIBLE);
+                circularButton.setIndeterminateProgressMode(true); // turn on indeterminate progress
+                circularButton.setProgress(50); // set progress > 0 & < 100 to display indeterminate progress
 
-                        if(selectedDataPathList != null) {
-                            uploadList(selectedDataPathList);
-                        }
-                        selectedDataPathList.clear();
-                        adapter.clearSelection();
-
-                        mode.finish();
-                        break;
-
+                if(selectedDataPathList != null) {
+                    uploadList(selectedDataPathList);
                 }
+                selectedDataPathList.clear();
+                adapter.clearSelection();
 
-                return false;
-            }
+                mode.finish();
+                break;
 
-            @Override
-            public void onItemCheckedStateChanged(ActionMode mode,
-                                                  int position,
-                                                  long id,
-                                                  boolean checked) {
-                if (checked) {
-                    selectedCount++;
-                    adapter.setNewSelection(position, checked);
-                    selectedDataPathList.add(dataPathList.get(position));
-                    //adapter.getCheckBox().setChecked(true);
+        }
 
-                } else {
-                    selectedCount--;
-                    adapter.removeSelection(position);
-                    selectedDataPathList.remove(dataPathList.get(position));
-                    //adapter.getCheckBox().setChecked(false);
+        return false;
+    }
 
-                }
-                mode.setTitle(selectedCount + " selected");
+    @Override
+    public void onItemCheckedStateChanged(ActionMode mode,
+                                          int position,
+                                          long id,
+                                          boolean checked) {
+        if (checked) {
+            selectedCount++;
+            adapter.setNewSelection(position, checked);
+            selectedDataPathList.add(dataPathList.get(position));
+            //adapter.getCheckBox().setChecked(true);
 
-            }
-        });
+        } else {
+            selectedCount--;
+            adapter.removeSelection(position);
+            selectedDataPathList.remove(dataPathList.get(position));
+            //adapter.getCheckBox().setChecked(false);
+
+        }
+        mode.setTitle(selectedCount + " selected");
+
+    }
+});
 
         gridView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
 
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
-            @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-                                           int position, long arg3) {
-                gridView.setItemChecked(position, !adapter.isPositionChecked(position));
-                return false;
-            }
+@Override
+public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
+        int position, long arg3) {
+        gridView.setItemChecked(position, !adapter.isPositionChecked(position));
+        return false;
+        }
         });
 
-    }
+        }
 
 
     @Override
@@ -323,8 +323,6 @@ public class LocalImageActivity extends AppCompatActivity {
 
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
-        String username = mPrefs.getString("username", "");
-        String email =  mPrefs.getString("email", "");
         String currentTaskId = "";
 
 
@@ -436,19 +434,4 @@ public class LocalImageActivity extends AppCompatActivity {
 
         }
     }
-
-    private final ServiceConnection serviceConnection = new ServiceConnection() {
-
-        public void onServiceConnected( ComponentName className, IBinder service ) {
-
-            myService = ( (ManualUploadService.ServiceBinder) service ).getService();
-            bound = true;
-        }
-
-        public void onServiceDisconnected( ComponentName className ) {
-
-            myService = null;
-            bound = false;
-        }
-    };
 }

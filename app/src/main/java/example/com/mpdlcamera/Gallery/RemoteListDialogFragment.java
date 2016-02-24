@@ -95,6 +95,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                                 currentTask.setCollectionName(collectionName);
                                     currentTask.save();
 
+                                Log.v(LOG_TAG,currentTask.getTaskId());
                                 Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
                                 manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
                                 activity.startService(manualUploadServiceIntent);

@@ -132,8 +132,6 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
 //        doUnbindService();
     }
 
-
-
     @Override
     public void remove(int postion) {
         try{
