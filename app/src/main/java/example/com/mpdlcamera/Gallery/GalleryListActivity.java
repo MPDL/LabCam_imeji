@@ -55,7 +55,6 @@ public class GalleryListActivity extends AppCompatActivity implements UploadResu
     private Activity activity = this;
 
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

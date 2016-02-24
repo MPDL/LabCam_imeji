@@ -1,20 +1,40 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="example.com.mpdlcamera.LocalFragment.LocalFragment">
 
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:id="@+id/switch_mode"/>
+
     <!-- TODO: Update blank fragment layout -->
+
+
     <GridView
         android:id="@+id/gallery_gridView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/switch_mode"
         android:numColumns="2"
         android:verticalSpacing="0dp"
         android:horizontalSpacing="0dp"
         android:gravity="center"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:stretchMode="columnWidth"/>
+        android:stretchMode="columnWidth"
+        android:visibility="gone"/>
 
-</FrameLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/gallery_recycleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/switch_mode"
+        android:visibility="visible"
+        />
+
+
+</RelativeLayout>
