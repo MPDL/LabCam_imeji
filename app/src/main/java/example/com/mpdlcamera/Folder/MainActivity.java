@@ -3,6 +3,7 @@ package example.com.mpdlcamera.Folder;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.UriMatcher;
@@ -24,6 +25,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -39,7 +41,11 @@ import com.activeandroid.query.Select;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
+import example.com.mpdlcamera.Auth.LoginActivity;
 import example.com.mpdlcamera.ImejiFragment.ImejiFragment;
 import example.com.mpdlcamera.LocalFragment.LocalFragment;
 import example.com.mpdlcamera.Model.ImejiFolder;
@@ -51,6 +57,7 @@ import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
 import example.com.mpdlcamera.TaskManager.TaskFragment;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
  * Created by kiran on 25.08.15.
@@ -167,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         //choose collection
         chooseCollection();
         setUserInfoText();
+        setLogout();
 
     }
 
@@ -506,6 +514,91 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             }
         });
     }
+    //logout
+    static Task autoTask;
+    static List<Task> manualTasks;
+    private void setLogout(){
+        TextView logoutTextView = (TextView) findViewById(R.id.tv_logout);
+        logoutTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                List<Task> taskList = DeviceStatus.getUserTasks(userId);
+                boolean isFinished = true;
+
+                for(Task task:taskList){
+
+                   if(task.getFinishedItems()<task.getTotalItems()){
+                       isFinished = false;
+
+                       if(task.getUploadMode().equalsIgnoreCase("AU")){
+                           autoTask = task;
+                       }else if(task.getUploadMode().equalsIgnoreCase("MU")){
+                            manualTasks.add(task);
+                       }
+                   }
+                }
+                if(!isFinished){
+                    new AlertDialog.Builder(context)
+                            .setTitle("Logout")
+                            .setMessage("There are still pictures waiting for uploading,are you sure you want to logout?")
+                            .setPositiveButton("LOGOUT", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // LOGOUT
+
+                                    //for auto task
+                                    if(autoTask!=null) {
+                                        autoTask.setUploadMode("MU");
+                                        autoTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
+                                        autoTask.save();
+
+                                        //create auto task (default)
+                                        Task task = new Task();
+
+                                        String uniqueID = UUID.randomUUID().toString();
+                                        task.setTaskId(uniqueID);
+                                        task.setUploadMode("AU");
+                                        task.setCollectionId(autoTask.getCollectionId());
+                                        task.setCollectionName(autoTask.getCollectionName());
+                                        task.setState(String.valueOf(DeviceStatus.state.WAITING));
+                                        task.setUserName(username);
+                                        task.setUserId(userId);
+                                        task.setTotalItems(0);
+                                        task.setFinishedItems(0);
+
+                                        Long now = new Date().getTime();
+                                        task.setStartDate(String.valueOf(now));
+
+                                        task.save();
+                                    }
+                                    // for manual task
+                                    if(manualTasks.size()>0){
+                                        for(Task task:manualTasks){
+                                            task.setState(String.valueOf(DeviceStatus.state.STOPPED));
+                                            task.save();
+                                        }
+                                    }
+
+                                    Intent logoutIntent = new Intent(context, LoginActivity.class);
+                                    startActivity(logoutIntent);
+                                }
+                            })
+                            .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // do
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                }else {
+                //go to login (delete sharedPreference at login )
+                Intent logoutIntent = new Intent(context, LoginActivity.class);
+                startActivity(logoutIntent);
+                }
+            }
+        });
+
+    }
 
     //set user info textView(name email)
     private void setUserInfoText(){
@@ -514,6 +607,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         nameTextView.setText(username);
         emailTextView.setText(email);
     }
+
 
     //camera
     static final int REQUEST_IMAGE_CAPTURE = 1;

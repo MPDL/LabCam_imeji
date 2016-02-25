@@ -249,10 +249,6 @@ public class ManualUploadService extends Service {
             /** move on to next **/
             int finishedNum = task.getFinishedItems();
             int totalNum = task.getTotalItems();
-            finishedNum = finishedNum +1;
-            task.setFinishedItems(finishedNum);
-            task.save();
-            Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
             if(totalNum>finishedNum){
                 Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
                 if(image!=null){
@@ -346,8 +342,6 @@ public class ManualUploadService extends Service {
             /** move on to next **/
             int finishedNum = task.getFinishedItems();
             int totalNum = task.getTotalItems();
-            task.setFinishedItems(finishedNum + 1);
-            Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
             if(totalNum>finishedNum){
                 // continue anyway
                 Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();

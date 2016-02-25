@@ -262,9 +262,9 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
         final AlertDialog alertDialog =
                 new AlertDialog.Builder(context)
-                .setTitle("Delete entry")
-                .setMessage("There are some Fotos waiting for uploading, Upload them to the ")
-                .setPositiveButton(oldCollectionName, new DialogInterface.OnClickListener() {
+                        .setTitle("Delete entry")
+                        .setMessage("There are some Fotos waiting for uploading, Upload them to the ")
+                        .setPositiveButton(oldCollectionName, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // yes continue latestTask
                         String taskId = latestTask.getTaskId();
