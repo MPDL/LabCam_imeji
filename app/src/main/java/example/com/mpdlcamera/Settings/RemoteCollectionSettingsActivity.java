@@ -200,7 +200,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                 .orderBy("startDate DESC")
                 .executeSingle();
 
-        //  create first task
+        //   case 1: create first task
         if(latestTask==null){
             Log.v("create Task", "no task in database");
             Task task = new Task();
@@ -222,8 +222,10 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
             task.save();
 
+            finish();
+
         }else if(!latestTask.getCollectionId().equals(collectionID)) {
-            // create second Auto task
+            // already have auto task
             if(latestTask!=null){
             Log.v("latestTask", latestTask.getCollectionId());
                 // make sure task is not finished
@@ -241,6 +243,9 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                       dialog(oldCollectionName);
                   }
             }
+        }else {
+           // save task
+            finish();
         }
     }
 
@@ -263,6 +268,12 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                     public void onClick(DialogInterface dialog, int which) {
                         // yes continue latestTask
                         String taskId = latestTask.getTaskId();
+
+
+                        // change state of old task
+                        latestTask.setState(String.valueOf(DeviceStatus.state.WAITING));
+                        latestTask.save();
+
                         Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
                         manualUploadServiceIntent.putExtra("currentTaskId", taskId);
                         startService(manualUploadServiceIntent);
@@ -290,10 +301,13 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                         //start auto upload service
                         Intent uploadIntent = new Intent(activity, TaskUploadService.class);
                         activity.startService(uploadIntent);
+
+                        finish();
                     }
                 })
                 .setNegativeButton(collectionName, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+
 
                         // change totalNum of old task
                         latestTask.setTotalItems(latestTask.getFinishedItems());
@@ -357,6 +371,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                         Intent uploadIntent = new Intent(activity, TaskUploadService.class);
                         startService(uploadIntent);
 
+                        finish();
 
                     }
                 })
