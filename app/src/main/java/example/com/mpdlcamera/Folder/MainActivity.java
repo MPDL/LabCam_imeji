@@ -119,6 +119,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     //activity
     private Context context = this;
 
+    //
+    private boolean isTaskFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,6 +128,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 //        setContentView(R.layout.main);
         setContentView(R.layout.activity_main);
         Log.v("Main activity", "started");
+
+        Bundle args = this.getIntent().getExtras();
+        isTaskFragment= args.getBoolean("isTaskFragment", false);
 
         getLocalCamFolder();
         // register NetStateObserver
@@ -397,10 +402,21 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         viewPager.setAdapter(tabAdapter);
 
 
+        if(isTaskFragment){
+        viewPager.setCurrentItem(2);
+        }
+
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setCustomView(R.layout.tab_local);
         tabLayout.getTabAt(1).setCustomView(R.layout.tab_imeji);
         tabLayout.getTabAt(2).setCustomView(R.layout.tab_upload);
+
+        if(isTaskFragment){
+            TextView taskTextView = (TextView)tabLayout.findViewById(R.id.tabicon_upload);
+            taskTextView.setTextColor(getResources().getColor(R.color.primary));
+            TextView fotoTextView = (TextView)tabLayout.findViewById(R.id.tabicon_local);
+            fotoTextView.setTextColor(getResources().getColor(R.color.tabUnselect));
+        }
 
         //tab style change on page change
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

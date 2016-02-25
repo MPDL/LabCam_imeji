@@ -2,12 +2,14 @@ package example.com.mpdlcamera.Auth;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -32,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -348,10 +351,55 @@ public class LoginActivity extends AppCompatActivity {
                 .execute();
     }
      */
+    boolean isTaskFragment = false;
 
-    public void accountLogin() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+    public void accountLogin(String userId) {
+
+
+        List<Task> taskList = DeviceStatus.getUserTasks(userId);
+        boolean isFinished = true;
+        for(Task task:taskList){
+
+            if(task.getFinishedItems()<task.getTotalItems()){
+                isFinished = false;
+            }
+        }
+            if(!isFinished) {
+
+                new AlertDialog.Builder(this)
+                        .setTitle("Welcome")
+                        .setMessage("There are some uploading tasks not be compeleted last time, you can restart them in your Task Manager")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with delete
+                                isTaskFragment = true;
+
+                                Intent intent = new Intent(activity, MainActivity.class);
+                                intent.putExtra("isTaskFragment",isTaskFragment);
+                                startActivity(intent);
+                                // login out of stack
+                                finish();
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                                Intent intent = new Intent(activity, MainActivity.class);
+                                intent.putExtra("isTaskFragment",isTaskFragment);
+                                startActivity(intent);
+                                // login out of stack
+                                finish();
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }else if(isFinished){
+                Intent intent = new Intent(activity, MainActivity.class);
+                intent.putExtra("isTaskFragment",isTaskFragment);
+                startActivity(intent);
+                // login out of stack
+                finish();
+            }
     }
 
 
@@ -431,8 +479,8 @@ public class LoginActivity extends AppCompatActivity {
             task.save();
         }
 
-        // login
-        accountLogin();
+        // QR login
+        accountLogin(userId);
     }
 
     /**
@@ -459,7 +507,7 @@ public class LoginActivity extends AppCompatActivity {
                 if(collectionId!=null&&collectionId!=""){
                      RetrofitClient.getCollectionById(collectionId, callback_collection, user.getApiKey());
                     //create a new task for new selected collection
-                }else { accountLogin();}
+                }else { accountLogin(user.getPerson().getId());}
             }
 
         }
