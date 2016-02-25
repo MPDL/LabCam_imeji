@@ -315,64 +315,68 @@ public class TaskUploadService extends Service{
 
                 Log.e(TAG, currentImageId);
                 Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
-                currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                currentImage.save();
+                if (currentImage == null) {
+                    Log.v(TAG, currentImageId + "is not in database, task might be resumed");
+                    // task is deleted/resumed so break and left callback
+                } else {
+                    currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                    currentImage.save();
 
-                //TODO: ReWrite "remove after upload" function later
-                mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
+                    //TODO: ReWrite "remove after upload" function later
+                    mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
             /*
                 Delete the file if the setting "Remove the photos after upload" is On
              */
-                if (mPrefs.contains("RemovePhotosAfterUpload")) {
-                    if (mPrefs.getBoolean("RemovePhotosAfterUpload", true)) {
+                    if (mPrefs.contains("RemovePhotosAfterUpload")) {
+                        if (mPrefs.getBoolean("RemovePhotosAfterUpload", true)) {
 
-                        File file = typedFile.file();
-                        Boolean deleted = file.delete();
-                        Log.v(TAG, "deleted:" + deleted);
+                            File file = typedFile.file();
+                            Boolean deleted = file.delete();
+                            Log.v(TAG, "deleted:" + deleted);
+                        }
                     }
-                }
-                //TODO: remove picture
+                    //TODO: remove picture
 //            adapter.notifyDataSetChanged();
 
 
-                /** move on to next **/
+                    /** move on to next **/
 
-                try {
-                    /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
-                    finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
-                } catch (Exception e) {
-                }
-
-                //DELETE TESTING
-                Log.i(TAG, "finishedImages "+finishedImages.size());
-                Log.i(TAG, "totalImages: " + task.getTotalItems());
-                task.setFinishedItems(finishedImages.size());
-                task.save();
-
-                int finishedNum = finishedImages.size();
-                int totalNum = task.getTotalItems();
-
-                Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
-                if (totalNum > finishedNum) {
-                    Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
-                    if (image != null) {
-                        upload(image);
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            public void run() {
-                                // Actions to do after 3 seconds
-                                isBusy = false;
-                            }
-                        }, 3000);
+                    try {
+                        /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
+                        finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+                    } catch (Exception e) {
                     }
-                } else {
-                    task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                    isBusy = false;
-                    Log.i(TAG, "task finished");
+
+                    //DELETE TESTING
+                    Log.i(TAG, "finishedImages " + finishedImages.size());
+                    Log.i(TAG, "totalImages: " + task.getTotalItems());
+                    task.setFinishedItems(finishedImages.size());
+                    task.save();
+
+                    int finishedNum = finishedImages.size();
+                    int totalNum = task.getTotalItems();
+
+                    Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
+                    if (totalNum > finishedNum) {
+                        Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
+                        if (image != null) {
+                            upload(image);
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                public void run() {
+                                    // Actions to do after 3 seconds
+                                    isBusy = false;
+                                }
+                            }, 3000);
+                        }
+                    } else {
+                        task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                        isBusy = false;
+                        Log.i(TAG, "task finished");
+                    }
                 }
             }
-
         }
 
         @Override
@@ -456,5 +460,6 @@ public class TaskUploadService extends Service{
             }
         }
     };
+
 
 }

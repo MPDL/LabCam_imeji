@@ -32,6 +32,7 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/layout_progress"
         android:layout_below="@id/layout_task_info">
 
         <ProgressBar
@@ -64,13 +65,18 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_stop_delete"
+        android:layout_centerVertical="true"
+        >
     <ImageView
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:id="@+id/task_delete"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
-        android:layout_centerVertical="true"
         android:src="@drawable/cancel_red"/>
 
 
@@ -81,7 +87,19 @@
         android:layout_marginRight="16dp"
         android:background="@xml/checkbox_pause_play"
         android:id="@+id/checkBox_is_paused"
-        android:layout_centerVertical="true"
         android:button="@null"
+        />
+    </RelativeLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_clear"
+        android:visibility="gone"
+        android:layout_marginRight="16dp"
+        android:text="CLEAR"
+        android:textSize="15dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
         />
 </RelativeLayout>

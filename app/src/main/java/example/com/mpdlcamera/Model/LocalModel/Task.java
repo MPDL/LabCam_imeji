@@ -214,4 +214,5 @@ public class Task extends Model{
     public void setLogs(String logs) {
         this.logs = logs;
     }
+
 }

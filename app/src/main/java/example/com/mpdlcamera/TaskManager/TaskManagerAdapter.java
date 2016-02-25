@@ -12,10 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.activeandroid.query.Delete;
@@ -24,6 +26,7 @@ import com.activeandroid.query.Select;
 import org.w3c.dom.Text;
 
 import java.util.List;
+import java.util.TreeMap;
 
 import example.com.mpdlcamera.AutoRun.ManualUploadService;
 import example.com.mpdlcamera.AutoRun.TaskUploadService;
@@ -44,6 +47,13 @@ public class TaskManagerAdapter extends BaseAdapter {
     private List<Task> taskList;
 
     private RemoveTaskInterface removeTaskInterface;
+
+    static final int  AU_WAITING = 1001;
+    static final int AU_UPLOADING = 1002;
+    static final int AU_FINISH = 1003;
+
+    static final int MU_UPLOADING = 2002;
+    static final int MU_FINISH = 2003;
 
     public TaskManagerAdapter() {
     }
@@ -92,6 +102,7 @@ public class TaskManagerAdapter extends BaseAdapter {
         TextView taskCollectionTextView = (TextView) view.findViewById(R.id.tv_task_collection);
         taskCollectionTextView.setText(taskList.get(position).getCollectionName());
 
+        //ProgressBar
         ProgressBar firstBar = (ProgressBar) view.findViewById(R.id.firstBar);
 
         //get task
@@ -112,25 +123,117 @@ public class TaskManagerAdapter extends BaseAdapter {
         }
         percentTextView.setText(percent + "");
 
+
+        /**
+         * layout changes in different phrases
+         */
+        int phrase = -1;
+
+        if(task.getUploadMode().equalsIgnoreCase("AU")){
+            if(maxNum == 0){
+                phrase = AU_WAITING;
+            }else if(currentNum == maxNum){
+                phrase = AU_FINISH;
+            }else {
+                phrase = AU_UPLOADING;
+            }
+
+        }else {
+            if(currentNum == maxNum){
+                phrase = MU_FINISH;
+            }else {
+                phrase = MU_UPLOADING;
+            }
+        }
+
+        RelativeLayout progressLayout = (RelativeLayout) view.findViewById(R.id.layout_progress);
+        RelativeLayout toolButtonLayout = (RelativeLayout) view.findViewById(R.id.layout_stop_delete);
+        Button clearButton = (Button) view.findViewById(R.id.btn_clear);
+
+
+        switch (phrase){
+            case AU_WAITING:
+                progressLayout.setVisibility(View.GONE);
+                toolButtonLayout.setVisibility(View.GONE);
+                clearButton.setVisibility(View.GONE);
+
+                break;
+            case AU_UPLOADING:
+                progressLayout.setVisibility(View.VISIBLE);
+                toolButtonLayout.setVisibility(View.VISIBLE);
+                clearButton.setVisibility(View.GONE);
+
+                break;
+            case AU_FINISH:
+                progressLayout.setVisibility(View.GONE);
+                toolButtonLayout.setVisibility(View.GONE);
+                clearButton.setVisibility(View.GONE);
+
+                break;
+            case MU_UPLOADING:
+                progressLayout.setVisibility(View.VISIBLE);
+                toolButtonLayout.setVisibility(View.VISIBLE);
+                clearButton.setVisibility(View.GONE);
+
+                break;
+            case MU_FINISH:
+                progressLayout.setVisibility(View.GONE);
+                toolButtonLayout.setVisibility(View.GONE);
+                clearButton.setVisibility(View.VISIBLE);
+                clearButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        deleteTask(task, position);
+                    }
+                });
+
+                break;
+        }
+
+        if(maxNum == 0||currentNum == maxNum){
+            //hide both
+
+            //show clear for MU
+            if(task.getUploadMode().equalsIgnoreCase("AU")){
+                //AU
+
+            } else {
+                //MU
+                //show clear hide stop/delete
+
+            }
+
+        }
+
         //DeleteTask
         ImageView deleteTaskImageView = (ImageView) view.findViewById(R.id.task_delete);
 
-        if(task.getUploadMode().equalsIgnoreCase("AU")){
-            deleteTaskImageView.setVisibility(View.INVISIBLE);
-            deleteTaskImageView.setFocusable(false);
-        }else {
-            deleteTaskImageView.setVisibility(View.VISIBLE);
-            deleteTaskImageView.setFocusable(true);
+
             deleteTaskImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     new AlertDialog.Builder(activity)
-                            .setTitle("Delete entry")
-                            .setMessage("Are you sure you want to delete this entry?")
+                            .setTitle("abort uploading")
+                            .setMessage("Are you sure you want to give up this uploading process?")
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    // continue with delete
-                                    deleteTask(task, position);
+
+                                    if(task.getUploadMode().equalsIgnoreCase("AU")){
+                                        //abort uploading, but keep the task
+                                        //stop the service
+                                        Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+                                        activity.stopService(uploadIntent);
+
+                                        //delete all image with this taskId
+                                        new Delete().from(Image.class).where("taskId = ?", task.getTaskId()).execute();
+
+                                        //resume task
+                                        resumeTask(task);
+                                    }else {
+                                        // continue with delete
+                                        deleteTask(task, position);
+                                    }
+
                                 }
                             })
                             .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -143,7 +246,9 @@ public class TaskManagerAdapter extends BaseAdapter {
 
                 }
             });
-        }
+
+
+
         //pause/play Task
         CheckBox isPausedCheckBox = (CheckBox) view.findViewById(R.id.checkBox_is_paused);
         isPausedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -201,10 +306,19 @@ public class TaskManagerAdapter extends BaseAdapter {
     private void deleteTask(Task task,int position){
         String currentTaskId = task.getTaskId();
         new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
-        Log.v(TAG,"task delete clicked");
+        Log.v(TAG, "task delete clicked");
         //TODO: delete from data list
         removeTaskInterface.remove(position);
+        taskList.remove(task);
+        notifyDataSetChanged();
         /** if it is a Au, what to do? */
+    }
+
+    private void resumeTask(Task task){
+        task.setFinishedItems(0);
+        task.setTotalItems(0);
+        task.setLogs("");
+        task.save();
     }
 }
 
