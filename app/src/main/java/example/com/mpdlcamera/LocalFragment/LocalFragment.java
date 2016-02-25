@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,7 +39,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Gallery.GalleryListAdapter;
 import example.com.mpdlcamera.Gallery.LocalImageActivity;
 import example.com.mpdlcamera.Gallery.RemoteListDialogFragment;

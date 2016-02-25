@@ -1,6 +1,5 @@
 package example.com.mpdlcamera.Folder;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,9 +10,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,53 +21,36 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import example.com.mpdlcamera.ImejiFragment.ImejiFragment;
 import example.com.mpdlcamera.LocalFragment.LocalFragment;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.LocalModel.Image;
-import example.com.mpdlcamera.Model.LocalModel.LocalUser;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
-
 import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
-import example.com.mpdlcamera.Settings.SettingsActivity;
 import example.com.mpdlcamera.TaskManager.TaskFragment;
-import example.com.mpdlcamera.Upload.NewFileObserver;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
-import example.com.mpdlcamera.UploadActivity.UploadFragment;
-import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
  * Created by kiran on 25.08.15.
@@ -203,7 +182,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         //set selected collection name
         TextView collectionNameTextView = (TextView) findViewById(R.id.collection_name);
 
-//            LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
             Task lastAUTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
             if(lastAUTask!= null){
             collectionNameTextView.setText(lastAUTask.getCollectionName());}

@@ -28,8 +28,9 @@ import java.util.List;
 import java.util.UUID;
 
 import example.com.mpdlcamera.AutoRun.ManualUploadService;
+import example.com.mpdlcamera.AutoRun.TaskUploadService;
 import example.com.mpdlcamera.Model.ImejiFolder;
-import example.com.mpdlcamera.Model.LocalModel.LocalUser;
+import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
@@ -182,28 +183,9 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                     /**create Task**/
                     createTask(collectionID);
 
-                    for (Task task : DeviceStatus.getUserTasks(userId)) {
-                        if (task.getTaskName() != null) {
-                            Log.v("~taskName", task.getTaskName());
-                        }
-                    }
-                    //TODO: set collection id for local user
-                    if (DeviceStatus.is_newUser(email)) {
-                        LocalUser user = new LocalUser(email, collectionID, collectionName);
-                        user.save();
-                        Toast.makeText(context, "user collectionID saved", Toast.LENGTH_LONG).show();
-                    } else {
-                        LocalUser user = new Select().from(LocalUser.class).where("email = ?", email).executeSingle();
-                        user.setCollectionId(collectionID);
-                        user.setCollectionName(collectionName);
-                        user.save();
-                        Toast.makeText(context, "user collectionID updated", Toast.LENGTH_LONG).show();
-                    }
-
                 } else {
                     Toast.makeText(context, "collection setting not changed", Toast.LENGTH_LONG).show();
                 }
-                finish();
             }
         });
 
@@ -244,19 +226,19 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             // create second Auto task
             if(latestTask!=null){
             Log.v("latestTask", latestTask.getCollectionId());
-                // make sure task is not finished (finished tasks already deleted anyway)
+                // make sure task is not finished
                   if(latestTask.getTotalItems()>latestTask.getFinishedItems())
                   {
+                      String oldCollectionName = latestTask.getCollectionName();
                       // stop latestTask, change mode/name, save
                       latestTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
                       latestTask.setUploadMode("MU");
-                      latestTask.setCollectionName(collectionName);
                       latestTask.save();
 
                       // Num of photo
-                      int photoNum = latestTask.getTotalItems() - latestTask.getFinishedItems();
+//                      int photoNum = latestTask.getTotalItems() - latestTask.getFinishedItems();
                       // show dialog
-                      dialog(photoNum);
+                      dialog(oldCollectionName);
                   }
             }
         }
@@ -271,12 +253,13 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
 
     //checkbox dialog
-    private void dialog(int num){
+    private void dialog(String oldCollectionName){
 
-        new AlertDialog.Builder(context)
+        final AlertDialog alertDialog =
+                new AlertDialog.Builder(context)
                 .setTitle("Delete entry")
-                .setMessage("There are "+num+"photos not uploaded yes, please select")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                .setMessage("There are some Fotos waiting for uploading, Upload them to the ")
+                .setPositiveButton(oldCollectionName, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // yes continue latestTask
                         String taskId = latestTask.getTaskId();
@@ -304,16 +287,95 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
                         task.save();
 
-                        //task
+                        //start auto upload service
+                        Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+                        activity.startService(uploadIntent);
                     }
                 })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                .setNegativeButton(collectionName, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // no move picture to new repository
+
+                        // change totalNum of old task
+                        latestTask.setTotalItems(latestTask.getFinishedItems());
+                        latestTask.setState(String.valueOf(DeviceStatus.state.WAITING));
+                        latestTask.save();
+
+                        // stop/delete old upload process
+                        Intent oldUploadIntent = new Intent(activity, TaskUploadService.class);
+                        stopService(oldUploadIntent);
+
+                        // move picture to new repository
+                        // get remain Images
+                       List<Image> remainImages = new Select().from(Image.class)
+                               .where("taskId = ?", latestTask.getTaskId())
+                               .where("state = ?", String.valueOf(DeviceStatus.state.WAITING))
+                               .execute();
+
+                        //uniqueID as new AU taskId
+                        String uniqueID = UUID.randomUUID().toString();
+
+                        //set remainImage taskId
+                        ActiveAndroid.beginTransaction();
+                        try {
+                            for (Image image:remainImages) {
+
+                                image.setTaskId(uniqueID);
+                                image.save();
+                            }
+                            ActiveAndroid.setTransactionSuccessful();
+                        }
+                        finally {
+                            ActiveAndroid.endTransaction();
+                        }
+
+                        //delete old taskImage
+                        new Delete().from(Image.class)
+                                .where("taskId = ?", latestTask.getTaskId())
+                                .where("state = ?", String.valueOf(DeviceStatus.state.FINISHED))
+                                .execute();
+
+                        //create new task
+                        Log.v("collectionID",collectionID);
+                        Task task = new Task();
+                        task.setTotalItems(remainImages.size());
+                        task.setFinishedItems(0);
+
+                        task.setTaskId(uniqueID);
+                        task.setUploadMode("AU");
+                        task.setCollectionId(collectionID);
+                        task.setState(String.valueOf(DeviceStatus.state.WAITING));
+                        task.setUserName(username);
+                        task.setUserId(userId);
+
+                        Long now = new Date().getTime();
+                        task.setStartDate(String.valueOf(now));
+                        task.setCollectionName(collectionName);
+
+                        task.save();
+
+                        //start service
+                        Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+                        startService(uploadIntent);
+
 
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+
+        // not dismiss by wrong click
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener(){
+
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button b = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                b.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        alertDialog.dismiss();
+                    }
+                });
+            }
+        } );
     }
 }

@@ -1,13 +1,9 @@
 package example.com.mpdlcamera.AutoRun;
 
 import android.content.Context;
-import android.database.ContentObservable;
 import android.database.ContentObserver;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Created by yingli on 1/26/16.

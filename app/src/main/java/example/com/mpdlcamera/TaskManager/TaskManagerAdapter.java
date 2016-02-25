@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,10 +21,7 @@ import android.widget.TextView;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
-import java.util.TreeMap;
 
 import example.com.mpdlcamera.AutoRun.ManualUploadService;
 import example.com.mpdlcamera.AutoRun.TaskUploadService;
@@ -266,7 +261,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                             // start AU TaskUploadService
                             Log.v(TAG,"start TaskUploadService");
                             Intent uploadIntent = new Intent(activity, TaskUploadService.class);
-                            uploadIntent.putExtra("isBusy",false);
+//                            uploadIntent.putExtra("isBusy",false);
                             activity.startService(uploadIntent);
                         }else{
                             // start ManualUploadService
@@ -286,7 +281,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                         if(currentTask.getUploadMode().equalsIgnoreCase("AU")){
                             // start AU TaskUploadService
                             Intent uploadIntent = new Intent(activity, TaskUploadService.class);
-                            uploadIntent.putExtra("isBusy",false);
+//                            uploadIntent.putExtra("isBusy",false);
                             activity.startService(uploadIntent);
                         }else{
                             // start ManualUploadService

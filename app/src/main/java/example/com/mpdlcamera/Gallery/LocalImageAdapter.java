@@ -2,10 +2,8 @@ package example.com.mpdlcamera.Gallery;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -26,8 +24,6 @@ import java.util.Set;
 
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.R;
-import example.com.mpdlcamera.SQLite.FileId;
-import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**

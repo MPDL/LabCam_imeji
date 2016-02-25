@@ -1,26 +1,17 @@
 package example.com.mpdlcamera.TaskManager;
 
-import android.content.ComponentName;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -35,6 +26,7 @@ import example.com.mpdlcamera.Utils.DeviceStatus;
  */
 public class TaskFragment extends Fragment implements RemoveTaskInterface{
 
+    private static final String LOG_TAG = TaskFragment.class.getSimpleName();
     private List<Task> taskList;
     private ListView taskManagerListView;
 
@@ -60,6 +52,13 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
         //taskManager listview
         taskManagerListView = (ListView) view.findViewById(R.id.listView_task);
         taskList = DeviceStatus.getUserTasks(userId);
+        for(Task task:taskList){
+            Log.v(LOG_TAG,"mode: "+task.getUploadMode());
+            Log.v(LOG_TAG,"collection: "+task.getCollectionName());
+            Log.v(LOG_TAG,"total:: "+task.getTotalItems());
+            Log.v(LOG_TAG,"finished: "+task.getFinishedItems());
+        }
+
         taskManagerAdapter = new TaskManagerAdapter(this.getActivity(),taskList,this);
         taskManagerAdapter.notifyDataSetChanged();
         taskManagerListView.setAdapter(taskManagerAdapter);
@@ -110,7 +109,6 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
 
         resolver.registerContentObserver(uri, true, new dbObserver(getActivity(), mHandler));
 
-//        doBindService();
     }
 
     // TODO: Rename method, update argument and hook method into UI event

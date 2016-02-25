@@ -8,8 +8,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import example.com.mpdlcamera.Model.Gallery;
-
 /**
  * Created by yingli on 2/23/16.
  */

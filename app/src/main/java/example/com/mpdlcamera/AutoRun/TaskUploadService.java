@@ -1,46 +1,32 @@
 package example.com.mpdlcamera.AutoRun;
 
-import android.app.IntentService;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.ResultReceiver;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.squareup.otto.Produce;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
-import example.com.mpdlcamera.Model.MetaData;
 import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
-import example.com.mpdlcamera.SQLite.FileId;
-import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -440,6 +426,18 @@ public class TaskUploadService extends Service{
                 Log.v(TAG, String.valueOf(error));
 
                 //TODO: continue upload
+
+                try {
+                    /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
+                    finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+                } catch (Exception e) {
+                }
+
+                //DELETE TESTING
+                Log.i(TAG, "finishedImages " + finishedImages.size());
+                Log.i(TAG, "totalImages: " + task.getTotalItems());
+                task.setFinishedItems(finishedImages.size());
+                task.save();
 
                 /** move on to next **/
                 int finishedNum = task.getFinishedItems();

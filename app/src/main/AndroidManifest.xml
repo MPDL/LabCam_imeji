@@ -193,8 +193,6 @@
             android:name="com.activeandroid.content.ContentProvider"
             android:authorities="com.activeandroid.content.ContentProvider" />
 
-        <activity android:name=".UploadActivity.UploadFragment" >
-        </activity>
     </application>
 
 </manifest>

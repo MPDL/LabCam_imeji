@@ -2,16 +2,11 @@ package example.com.mpdlcamera.Gallery;
 
 import android.app.Activity;
 import android.app.Service;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,11 +21,8 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.activeandroid.query.Select;
 import com.dd.CircularProgressButton;
-import com.squareup.otto.Produce;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,25 +32,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import example.com.mpdlcamera.AutoRun.ManualUploadService;
-import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.LocalModel.Image;
-import example.com.mpdlcamera.Model.LocalModel.LocalUser;
 import example.com.mpdlcamera.Model.LocalModel.Task;
-import example.com.mpdlcamera.Otto.OttoSingleton;
-import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.R;
-import example.com.mpdlcamera.Retrofit.RetrofitClient;
-import example.com.mpdlcamera.SQLite.FileId;
-import example.com.mpdlcamera.SQLite.MySQLiteHelper;
-import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import example.com.mpdlcamera.Utils.ImageFileFilter;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
-import retrofit.mime.TypedFile;
 
 /**
  * Created by allen on 03/09/15.

@@ -10,20 +10,16 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.UUID;
 
-import example.com.mpdlcamera.Folder.UploadService;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.Utils.DeviceStatus;
-import example.com.mpdlcamera.Utils.ImageFileFilter;
 
 
 /**

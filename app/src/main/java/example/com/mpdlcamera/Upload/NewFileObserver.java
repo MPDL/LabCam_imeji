@@ -2,33 +2,18 @@ package example.com.mpdlcamera.Upload;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
-import android.database.Cursor;
-import android.media.ExifInterface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.activeandroid.query.Select;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import example.com.mpdlcamera.AutoRun.TaskUploadService;
 import example.com.mpdlcamera.Folder.MainActivity;
-import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
-import example.com.mpdlcamera.SQLite.FileId;
 import example.com.mpdlcamera.SQLite.MySQLiteHelper;
-import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
  * Created by kiran on 29.09.15.

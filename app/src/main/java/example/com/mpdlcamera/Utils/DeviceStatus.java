@@ -2,12 +2,10 @@ package example.com.mpdlcamera.Utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.database.Cursor;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +17,6 @@ import com.activeandroid.query.Select;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.LocalModel.Image;
-import example.com.mpdlcamera.Model.LocalModel.LocalUser;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 
 /**
@@ -131,15 +128,6 @@ public class DeviceStatus {
                 .where("taskId = ?", taskId)
                 .orderBy("createTime ASC")
                 .execute();
-    }
-
-    //check if it a is new user in local database
-    public static boolean is_newUser(String email) {
-        LocalUser foundBg = new Select()
-                .from(LocalUser.class)
-                .where("email = ?", email)
-                .executeSingle();
-        return (foundBg == null);
     }
 
 

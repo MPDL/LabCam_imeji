@@ -2,18 +2,15 @@ package example.com.mpdlcamera.Gallery.SectionedGridView;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import example.com.mpdlcamera.R;

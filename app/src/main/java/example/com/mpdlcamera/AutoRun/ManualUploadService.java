@@ -1,6 +1,5 @@
 package example.com.mpdlcamera.AutoRun;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +21,6 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.LocalModel.Image;
-import example.com.mpdlcamera.Model.LocalModel.LocalUser;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
@@ -235,7 +233,18 @@ public class ManualUploadService extends Service {
             //TODO: remove picture
 //            adapter.notifyDataSetChanged();
 
+                try {
+                    /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
+                    finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+                } catch (Exception e) {
+                }
 
+                //DELETE TESTING
+                Log.i(TAG, "finishedImages " + finishedImages.size());
+                Log.i(TAG, "totalImages: " + task.getTotalItems());
+
+            task.setFinishedItems(finishedImages.size());
+            task.save();
 
             /** move on to next **/
             int finishedNum = task.getFinishedItems();
@@ -299,7 +308,9 @@ public class ManualUploadService extends Service {
                             Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
                         }
                     });
-                    currentImage.setLog(error.getKind().name() +" already exists");
+                    currentImage.setLog(error.getKind().name() + " already exists");
+                    currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                    currentImage.save();
 
                 }
                 else {
@@ -317,6 +328,20 @@ public class ManualUploadService extends Service {
             Log.v(TAG, String.valueOf(error));
 
             //TODO: continue upload
+
+
+                try {
+                    /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
+                    finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+                } catch (Exception e) {
+                }
+
+                //DELETE TESTING
+                Log.i(TAG, "finishedImages " + finishedImages.size());
+                Log.i(TAG, "totalImages: " + task.getTotalItems());
+
+            task.setFinishedItems(finishedImages.size());
+            task.save();
 
             /** move on to next **/
             int finishedNum = task.getFinishedItems();

@@ -3,11 +3,9 @@ package example.com.mpdlcamera.AutoRun;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.widget.Toast;
 
-import example.com.mpdlcamera.Folder.UploadService;
 import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;

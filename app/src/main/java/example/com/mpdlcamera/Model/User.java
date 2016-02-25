@@ -5,10 +5,6 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.google.gson.annotations.Expose;
 
-import java.sql.Blob;
-import java.util.ArrayList;
-import java.util.List;
-
 import example.com.mpdlcamera.Model.MessageModel.Person;
 
 /**

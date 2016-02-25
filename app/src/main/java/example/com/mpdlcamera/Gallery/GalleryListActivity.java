@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -26,7 +25,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
-import example.com.mpdlcamera.Folder.UploadService;
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
