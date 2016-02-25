@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle drawerToggle;
 
+    private List<Task> manualTasks = new ArrayList<>();
+
 
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -516,7 +518,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     }
     //logout
     static Task autoTask;
-    static List<Task> manualTasks;
     private void setLogout(){
         TextView logoutTextView = (TextView) findViewById(R.id.tv_logout);
         logoutTextView.setOnClickListener(new View.OnClickListener() {

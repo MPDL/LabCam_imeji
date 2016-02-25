@@ -359,13 +359,20 @@ public class ManualUploadService extends Service {
     private boolean taskIsStopped (){
         task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
 
-        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
-            Log.v(TAG,"taskIsStopped");
-            return true;
-        }else{
-            Log.v(TAG,"task is not stopped");
+        try{
+            if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
+                Log.v(TAG,"taskIsStopped");
+                return true;
+            }else{
+                Log.v(TAG,"task is not stopped");
+                return false;
+            }}catch (Exception e){
+            Log.e(TAG,"taskIsStopped exception");
+            Log.e(TAG,e.getMessage());
+
             return false;
         }
+
 
     }
 }
