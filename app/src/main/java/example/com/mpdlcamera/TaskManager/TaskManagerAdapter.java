@@ -246,6 +246,13 @@ public class TaskManagerAdapter extends BaseAdapter {
 
         //pause/play Task
         CheckBox isPausedCheckBox = (CheckBox) view.findViewById(R.id.checkBox_is_paused);
+        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
+            isPausedCheckBox.setChecked(false);
+        }else {
+            //true is play button, means state now is paused
+            isPausedCheckBox.setChecked(true);
+        }
+
         isPausedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -261,10 +268,10 @@ public class TaskManagerAdapter extends BaseAdapter {
                             // start AU TaskUploadService
                             Log.v(TAG,"start TaskUploadService");
                             Intent uploadIntent = new Intent(activity, TaskUploadService.class);
-//                            uploadIntent.putExtra("isBusy",false);
                             activity.startService(uploadIntent);
                         }else{
                             // start ManualUploadService
+                            Log.v(TAG,"start manualUploadService");
                             Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
                             manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
                             activity.startService(manualUploadServiceIntent);

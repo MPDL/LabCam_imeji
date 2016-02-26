@@ -85,9 +85,13 @@ public class ManualUploadService extends Service {
         Log.i(TAG, "Service onStartComman");
 
         // prepare taskId
-        currentTaskId = intent.getStringExtra("currentTaskId");
-        Log.i(TAG, "currentTaskId" + currentTaskId);
-
+        try {
+            currentTaskId = intent.getStringExtra("currentTaskId");
+            Log.i(TAG, "get currentTaskId" + currentTaskId);
+        }catch (Exception e){
+//            Log.i(TAG, e.getMessage());
+              Log.i(TAG, "e~~~");
+        }
         task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
         //prepare collectionId
         collectionID =task.getCollectionId();
@@ -134,6 +138,7 @@ public class ManualUploadService extends Service {
             /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
             waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
             finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+
 
         //DELETE TESTING
         Log.i(TAG,"waitingImages: "+ waitingImages.size());
@@ -267,8 +272,11 @@ public class ManualUploadService extends Service {
             if(!taskIsStopped()){
             Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
             //change state not saved here
-            currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
-            currentImage.setLog(error.getKind().name());
+
+//                    currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
+//                    currentImage.setLog(error.getKind().name());
+//                    Log.e(TAG, error.getKind().name());
+
 
 
             if (error == null || error.getResponse() == null) {
@@ -279,7 +287,7 @@ public class ManualUploadService extends Service {
                     handler=new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         public void run() {
-                            Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -301,7 +309,7 @@ public class ManualUploadService extends Service {
                     handler=new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         public void run() {
-                            Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
                         }
                     });
                     currentImage.setLog(error.getKind().name() + " already exists");

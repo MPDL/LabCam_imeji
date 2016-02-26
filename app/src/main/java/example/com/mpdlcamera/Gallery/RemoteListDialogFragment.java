@@ -72,7 +72,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
 
         // builder
         AlertDialog.Builder b=  new  AlertDialog.Builder(getActivity())
-                .setTitle("Enter Players")
+                .setTitle("Choose collection")
                 .setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {

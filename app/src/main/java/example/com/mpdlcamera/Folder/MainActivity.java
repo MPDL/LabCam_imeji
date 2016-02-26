@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private Context context = this;
 
     //
-    private boolean isTaskFragment;
+    private boolean isTaskFragment = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,8 +129,12 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         setContentView(R.layout.activity_main);
         Log.v("Main activity", "started");
 
+        try{
         Bundle args = this.getIntent().getExtras();
-        isTaskFragment= args.getBoolean("isTaskFragment", false);
+        isTaskFragment= args.getBoolean("isTaskFragment", false);}
+        catch (Exception e){
+            Log.v(LOG_TAG,e.getMessage());
+        }
 
         getLocalCamFolder();
         // register NetStateObserver

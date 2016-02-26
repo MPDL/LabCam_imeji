@@ -378,19 +378,22 @@ public class TaskUploadService extends Service{
             if (!taskIsStopped()) {
                 Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
                 //TODO:what to do with interrupted
-                currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
-                currentImage.setLog(error.getKind().name());
+
+//
+//                    currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
+//                    currentImage.setLog(error.getKind().name());
+//                    Log.e(TAG, error.getKind().name());
 
 
                 if (error == null || error.getResponse() == null) {
                     OttoSingleton.getInstance().post(new UploadEvent(null));
                     if (error.getKind().name().equalsIgnoreCase("NETWORK")) {
 
-
+                // NETWORK disconnect situation don't need to change image state
                         handler = new Handler(Looper.getMainLooper());
                         handler.post(new Runnable() {
                             public void run() {
-                                Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
                             }
                         });
                     } else {
@@ -411,7 +414,7 @@ public class TaskUploadService extends Service{
                         handler = new Handler(Looper.getMainLooper());
                         handler.post(new Runnable() {
                             public void run() {
-                                Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
                             }
                         });
                         currentImage.setLog(error.getKind().name() + " already exists");

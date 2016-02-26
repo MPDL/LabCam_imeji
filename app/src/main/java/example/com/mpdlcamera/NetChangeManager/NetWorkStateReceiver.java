@@ -61,6 +61,7 @@ public class NetWorkStateReceiver extends BroadcastReceiver {
                     // start
                     String currentTaskId = task.getTaskId();
                     Intent manualUploadServiceIntent = new Intent(context, ManualUploadService.class);
+                    Log.v(TAG,"currentTaskId: "+currentTaskId);
                     manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
                     context.startService(manualUploadServiceIntent);
                 }
