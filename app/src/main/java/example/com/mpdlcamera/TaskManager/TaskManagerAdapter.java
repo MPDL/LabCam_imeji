@@ -50,6 +50,10 @@ public class TaskManagerAdapter extends BaseAdapter {
     static final int MU_UPLOADING = 2002;
     static final int MU_FINISH = 2003;
 
+    // interrupt (collectionID not exist)
+    static final int AU_INTERRUPT = 3001;
+    static final int MU_INTERRUPT = 3002;
+
     public TaskManagerAdapter() {
     }
 
@@ -124,6 +128,7 @@ public class TaskManagerAdapter extends BaseAdapter {
          */
         int phrase = -1;
 
+
         if(task.getUploadMode().equalsIgnoreCase("AU")){
             if(maxNum == 0){
                 phrase = AU_WAITING;
@@ -140,10 +145,21 @@ public class TaskManagerAdapter extends BaseAdapter {
                 phrase = MU_UPLOADING;
             }
         }
+//
+        //collection error
+        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.INTERRUPTED))){
+            if(task.getUploadMode().equalsIgnoreCase("AU")){
+            phrase = AU_INTERRUPT;
+            }else {
+                phrase = MU_INTERRUPT;
+            }
+        }
 
         RelativeLayout progressLayout = (RelativeLayout) view.findViewById(R.id.layout_progress);
         RelativeLayout toolButtonLayout = (RelativeLayout) view.findViewById(R.id.layout_stop_delete);
+        RelativeLayout errorLayout = (RelativeLayout) view.findViewById(R.id.layout_error);
         Button clearButton = (Button) view.findViewById(R.id.btn_clear);
+
 
 
         switch (phrase){
@@ -151,24 +167,32 @@ public class TaskManagerAdapter extends BaseAdapter {
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.GONE);
                 clearButton.setVisibility(View.GONE);
+                errorLayout.setVisibility(View.GONE);
+                Log.v(TAG,"AU_WAITING");
 
                 break;
             case AU_UPLOADING:
                 progressLayout.setVisibility(View.VISIBLE);
                 toolButtonLayout.setVisibility(View.VISIBLE);
                 clearButton.setVisibility(View.GONE);
+                errorLayout.setVisibility(View.GONE);
+                Log.v(TAG, "AU_UPLOADING");
 
                 break;
             case AU_FINISH:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.GONE);
                 clearButton.setVisibility(View.GONE);
+                errorLayout.setVisibility(View.GONE);
+                Log.v(TAG, "AU_FINISH");
 
                 break;
             case MU_UPLOADING:
                 progressLayout.setVisibility(View.VISIBLE);
                 toolButtonLayout.setVisibility(View.VISIBLE);
                 clearButton.setVisibility(View.GONE);
+                errorLayout.setVisibility(View.GONE);
+                Log.v(TAG, "MU_UPLOADING");
 
                 break;
             case MU_FINISH:
@@ -181,8 +205,28 @@ public class TaskManagerAdapter extends BaseAdapter {
                         deleteTask(task, position);
                     }
                 });
+                errorLayout.setVisibility(View.GONE);
+                Log.v(TAG, "MU_FINISH");
+                break;
+
+            case AU_INTERRUPT:
+                progressLayout.setVisibility(View.GONE);
+                toolButtonLayout.setVisibility(View.GONE);
+                clearButton.setVisibility(View.VISIBLE);
+                errorLayout.setVisibility(View.VISIBLE);
+                //error
+
+                Log.v(TAG, "AU_INTERRUPT");
 
                 break;
+            case MU_INTERRUPT:
+                progressLayout.setVisibility(View.GONE);
+                toolButtonLayout.setVisibility(View.GONE);
+                clearButton.setVisibility(View.VISIBLE);
+                errorLayout.setVisibility(View.VISIBLE);
+                Log.v(TAG, "MU_INTERRUPT");
+                break;
+
         }
 
         if(maxNum == 0||currentNum == maxNum){

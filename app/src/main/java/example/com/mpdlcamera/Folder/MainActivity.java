@@ -392,6 +392,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     @Override
     public void OnDisConnect() {
         Toast.makeText(this, "network disconnect...", Toast.LENGTH_LONG).show();
+
     }
 
 

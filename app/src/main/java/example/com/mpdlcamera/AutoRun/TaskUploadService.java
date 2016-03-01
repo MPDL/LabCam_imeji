@@ -41,7 +41,7 @@ public class TaskUploadService extends Service{
 
     Context mContext = this;
     private static String TAG = TaskUploadService.class.getSimpleName();
-    private SharedPreferences mPrefs;
+
 
     // get last Task, may need to add a param to set task
     private Task task;
@@ -54,7 +54,9 @@ public class TaskUploadService extends Service{
     List<Image> waitingImages = null;
     List<Image>  finishedImages = null;
 
+    private SharedPreferences mPrefs;
     private String username;
+    private String userId;
     private String apiKey;
     private String collectionID;
     public TypedFile typedFile;
@@ -105,10 +107,11 @@ public class TaskUploadService extends Service{
                 mPrefs = this.getSharedPreferences("myPref", 0);
                 username = mPrefs.getString("username", "");
                 apiKey = mPrefs.getString("apiKey", "");
+                userId = mPrefs.getString("userId", "");
 
                 //set task
                 try{
-                    task =  DeviceStatus.getAuTask();
+                    task =  DeviceStatus.getAuTask(userId);
                     currentTaskId = task.getTaskId();
                     Log.i(TAG, "currentTaskId" + currentTaskId);
                     finishedNum = task.getFinishedItems();
@@ -145,7 +148,7 @@ public class TaskUploadService extends Service{
 
             //set task
             try{
-                task =  DeviceStatus.getAuTask();
+                task =  DeviceStatus.getAuTask(userId);
                 currentTaskId = task.getTaskId();
                 Log.i(TAG, "currentTaskId: " + currentTaskId);
                 finishedNum = task.getFinishedItems();
@@ -374,8 +377,19 @@ public class TaskUploadService extends Service{
 
         @Override
         public void failure(RetrofitError error) {
+            boolean isInterrupted = false;
 
-            if (!taskIsStopped()) {
+            Log.e(TAG,error.getResponse().getStatus()+"");
+
+            if(error.getResponse().getStatus() == 403 || error.getResponse().getStatus() == 422 ) {
+                task.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
+                task.save();
+                Log.e(TAG,task.getState());
+                isInterrupted = true;
+            }
+
+
+            if (!taskIsStopped()&&!isInterrupted) {
                 Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
                 //TODO:what to do with interrupted
 

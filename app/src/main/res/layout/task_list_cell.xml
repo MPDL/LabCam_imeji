@@ -66,6 +66,22 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_error"
+        android:layout_below="@id/layout_task_info">
+
+        <TextView
+            android:id="@+id/tv_error"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="choosen collection not exist"
+            android:textColor="@color/red"
+            android:layout_margin="10dp" />
+
+        </RelativeLayout>
+
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/layout_stop_delete"

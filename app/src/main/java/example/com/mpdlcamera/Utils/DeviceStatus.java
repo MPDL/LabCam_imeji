@@ -101,11 +101,13 @@ public class DeviceStatus {
                 .executeSingle();
     }
 
-    public static Task getAuTask() {
+    //TODO: need to pass user as param
+    public static Task getAuTask(String userId) {
         String mode = "AU";
         return new Select()
                 .from(Task.class)
                 .where("uploadMode = ?", mode)
+                .where("userId = ?",userId)
                 .orderBy("startDate DESC")
                 .executeSingle();
     }

@@ -45,6 +45,9 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
     private String email;
     private SharedPreferences mPrefs;
 
+    //interface
+    private CollectionIdInterface ie = this;
+
 
     private SettingsListAdapter adapter;
     private ListView listView;
@@ -84,7 +87,8 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                                 currentTask.setCollectionName(collectionName);
                                     currentTask.save();
 
-                                Log.v(LOG_TAG,currentTask.getTaskId());
+                                Log.e(LOG_TAG,currentTask.getTaskId());
+                                Log.e(LOG_TAG,currentTask.getCollectionName());
                                 Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
                                 manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
                                 activity.startService(manualUploadServiceIntent);
@@ -140,8 +144,16 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                 collectionList.clear();
                 for(ImejiFolder folder : folderList){
                     folder.setImejiId(folder.id);
-                    folder.setTitle(folder.getTitle());
+
                     collectionList.add(folder);
+
+                    ImejiFolder imejiFolder = new ImejiFolder();
+                    imejiFolder.setTitle(folder.getTitle());
+                    imejiFolder.setImejiId(folder.id);
+                    imejiFolder.setContributors(folder.getContributors());
+                    imejiFolder.setCoverItemUrl(folder.getCoverItemUrl());
+                    imejiFolder.setModifiedDate(folder.getModifiedDate());
+                    imejiFolder.save();
                 }
                 ActiveAndroid.setTransactionSuccessful();
             } finally{
@@ -156,6 +168,22 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
         public void failure(RetrofitError error) {
             Log.v(LOG_TAG, "get list failed");
             Log.v(LOG_TAG, error.toString());
+
+            try {
+                collectionList.clear();
+                collectionList = new Select().from(ImejiFolder.class).execute();
+                Log.v(LOG_TAG, collectionList.size() + "");
+
+            }catch (Exception e){
+                Log.v(LOG_TAG,e.getMessage());
+            }
+//            Log.v(LOG_TAG,collectionList.get(0).getTitle());
+//            Log.v(LOG_TAG, collectionList.get(0).getModifiedDate());
+
+
+//            adapter.notifyDataSetChanged();
+            adapter = new SettingsListAdapter(activity, collectionList,ie);
+            listView.setAdapter(adapter);
         }
     };
 

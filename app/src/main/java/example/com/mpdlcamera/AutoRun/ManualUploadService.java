@@ -269,7 +269,15 @@ public class ManualUploadService extends Service {
         @Override
         public void failure(RetrofitError error) {
 
-            if(!taskIsStopped()){
+            boolean isInterrupted = false;
+            if(error.getResponse().getStatus() == 403 || error.getResponse().getStatus() == 422 ) {
+                task.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
+                task.save();
+                Log.e(TAG, task.getState());
+                isInterrupted = true;
+            }
+
+            if (!taskIsStopped()&&!isInterrupted) {
             Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
             //change state not saved here
 
@@ -277,6 +285,7 @@ public class ManualUploadService extends Service {
 //                    currentImage.setLog(error.getKind().name());
 //                    Log.e(TAG, error.getKind().name());
 
+            //
 
 
             if (error == null || error.getResponse() == null) {
@@ -290,8 +299,7 @@ public class ManualUploadService extends Service {
 //                            Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
                         }
                     });
-                }
-                else {
+                }else {
 
                     handler=new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {

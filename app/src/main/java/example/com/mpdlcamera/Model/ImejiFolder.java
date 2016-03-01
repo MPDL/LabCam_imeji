@@ -19,6 +19,7 @@ public class ImejiFolder extends Model {
     //@Column(name = "ImejiId")
     public String id;
 
+    //very very confusing here, ImejiId = folder.id
     @Column(name = "ImejiId")
     private String ImejiId;
 
@@ -44,7 +45,7 @@ public class ImejiFolder extends Model {
     private ImejiProfile profile;
 
 
-    @Column(name = "items")
+//    @Column(name = "items")
     private List<DataItem> items;
 
     @Column(name = "coverItemUrl")

@@ -70,6 +70,13 @@ public class NetWorkStateReceiver extends BroadcastReceiver {
             }
 
             Log.i(TAG, "Network " + ni.getTypeName() + " connected");
+        }else {
+            // stop service
+            Intent uploadIntent = new Intent(context, TaskUploadService.class);
+            context.stopService(uploadIntent);
+            Intent manualUploadServiceIntent = new Intent(context, ManualUploadService.class);
+            context.stopService(manualUploadServiceIntent);
+
         }
      }
      if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)) {

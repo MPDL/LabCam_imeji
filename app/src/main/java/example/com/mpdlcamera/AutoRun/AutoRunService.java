@@ -35,7 +35,7 @@ public class AutoRunService extends Service implements UploadResultReceiver.Rece
 
     @Override
     public void OnConnect() {
-        Toast.makeText(this, "AutoRunService detect network Connect...", Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, "AutoRunService detect network Connect...", Toast.LENGTH_LONG).show();
         // FIXME: 2/10/16 unknow bug in UploadService
 //        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
 //        mReceiver.setReceiver(this);
@@ -46,7 +46,7 @@ public class AutoRunService extends Service implements UploadResultReceiver.Rece
 
     @Override
     public void OnDisConnect() {
-        Toast.makeText(this, "AutoRunService detect network disconnect...", Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, "AutoRunService detect network disconnect...", Toast.LENGTH_LONG).show();
     }
 
     @Override

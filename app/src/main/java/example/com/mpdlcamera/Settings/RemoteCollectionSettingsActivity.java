@@ -60,7 +60,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
     private Context context =this;
     private int selectedItem;
-    private CollectionIdInterface ie;
+    private CollectionIdInterface ie = this;
 
     //latestTask
     Task latestTask;
@@ -81,6 +81,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                 ImejiFolder imejiFolder = gson.fromJson(array.get(i), ImejiFolder.class);
                 folderList.add(imejiFolder);
             }
+            new Delete().from(ImejiFolder.class).execute();
             ActiveAndroid.beginTransaction();
             try {
                 collectionListLocal.clear();
@@ -89,6 +90,13 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                     Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
                     folder.setImejiId(folder.id);
                     collectionListLocal.add(folder);
+
+                    ImejiFolder imejiFolder = new ImejiFolder();
+                    imejiFolder.setTitle(folder.getTitle());
+                    imejiFolder.setImejiId(folder.id);
+                    imejiFolder.setCoverItemUrl(folder.getCoverItemUrl());
+                    imejiFolder.setModifiedDate(folder.getModifiedDate());
+                    imejiFolder.save();
                 }
                 ActiveAndroid.setTransactionSuccessful();
             } finally{
@@ -105,6 +113,22 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             Log.v(LOG_TAG, "get list failed");
             Log.v(LOG_TAG, error.toString());
             DeviceStatus.showSnackbar(rootView, "update data failed");
+
+            try {
+                collectionListLocal.clear();
+                collectionListLocal = new Select().from(ImejiFolder.class).execute();
+                Log.v(LOG_TAG,collectionListLocal.size()+"");
+
+            }catch (Exception e){
+                Log.v(LOG_TAG,e.getMessage());
+            }
+//            Log.v(LOG_TAG,collectionListLocal.get(0).getTitle());
+//            Log.v(LOG_TAG, collectionListLocal.get(0).getModifiedDate());
+
+
+//
+            adapter = new SettingsListAdapter(activity, collectionListLocal,ie);
+            listView.setAdapter(adapter);
         }
     };
 
