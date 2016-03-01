@@ -40,6 +40,7 @@ public class ManualUploadService extends Service {
     private static final String TAG = ManualUploadService.class.getSimpleName();
 
     List<Image> waitingImages = null;
+    List<Image> interruptedImages = null;
     List<Image> finishedImages = null;
 
     //  position in waitingImage list
@@ -101,8 +102,6 @@ public class ManualUploadService extends Service {
             apiKey = mPrefs.getString("apiKey", "");
             String email = mPrefs.getString("email", "");
 
-
-
         if(!taskIsStopped()) {
             Log.v(TAG,"not stopped");
             Log.v(TAG,task.getState());
@@ -135,19 +134,19 @@ public class ManualUploadService extends Service {
 
         if(!taskIsStopped()){
 
-            /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
+            /** WAITING, FINISHED **/
             waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
             finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
 
         //DELETE TESTING
-        Log.i(TAG,"waitingImages: "+ waitingImages.size());
-        Log.i(TAG,"finishedImages: "+ finishedImages.size());
-        Log.i(TAG, "totalImages: " + task.getTotalItems());
+            Log.i(TAG, "waitingImages: "+ waitingImages.size());
+            Log.i(TAG, "finishedImages: " + finishedImages.size());
+            Log.i(TAG, "totalImages: " + task.getTotalItems());
+
 
         if (waitingImages!=null && waitingImages.size() > 0) {
 
-                //upload begin with the first in list
 
                 Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
                 String imageState = image.getState();
@@ -165,7 +164,6 @@ public class ManualUploadService extends Service {
                     typedFile = new TypedFile("multipart/form-data", new File(filePath));
                     json = "{" + jsonPart1 + "}";
                     Log.v(TAG, "start uploading: " + filePath);
-//                    image.setState(String.valueOf(DeviceStatus.state.STARTED));
                     RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
 
             }else {
@@ -194,7 +192,6 @@ public class ManualUploadService extends Service {
                 typedFile = new TypedFile("multipart/form-data", new File(filePath));
                 json = "{" + jsonPart1 + "}";
                 Log.v(TAG, "start uploading: " + filePath);
-//                image.setState(String.valueOf(DeviceStatus.state.STARTED));
                 RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
             }
         }
@@ -239,7 +236,7 @@ public class ManualUploadService extends Service {
 //            adapter.notifyDataSetChanged();
 
                 try {
-                    /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
+                    /** WAITING, FINISHED **/
                     finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
                 } catch (Exception e) {
                 }
@@ -260,7 +257,7 @@ public class ManualUploadService extends Service {
                 upload(image);
                 }
             }else {
-//                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
                 Log.i(TAG,"task finished");
             }
             }
@@ -269,15 +266,17 @@ public class ManualUploadService extends Service {
         @Override
         public void failure(RetrofitError error) {
 
-            boolean isInterrupted = false;
-            if(error.getResponse().getStatus() == 403 || error.getResponse().getStatus() == 422 ) {
-                task.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
-                task.save();
-                Log.e(TAG, task.getState());
-                isInterrupted = true;
-            }
+            // set Task "INTERRUPTED" while 403||422
+//            if(error.getResponse().getStatus() == 403 || error.getResponse().getStatus() == 422 ) {
+//                task.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
+//                task.save();
+//                Log.e(TAG, "task: " + task.getTaskId());
+//                Log.e(TAG, task.getState());
+//                Log.e(TAG, error.getResponse().getStatus()+"");
+//                return;
+//            }
 
-            if (!taskIsStopped()&&!isInterrupted) {
+            if (!taskIsStopped()) {
             Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
             //change state not saved here
 
@@ -365,7 +364,6 @@ public class ManualUploadService extends Service {
                 upload(image);
                 }
             }else {
-//                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
                 Log.i(TAG,"task finished");
             }
             }

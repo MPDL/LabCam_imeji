@@ -75,10 +75,19 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mPrefs = getSharedPreferences("myPref", 0);
+        String Key = mPrefs.getString("apiKey", "");
+
+        if(Key.equalsIgnoreCase("")){
         setContentView(R.layout.login);
-
-
-
+        }else {
+            serverURL = mPrefs.getString("server", "");
+            RetrofitClient.setRestServer(serverURL);
+            Intent intent = new Intent(activity, MainActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
         //don't store local images
 //        getLocalFolders();
 
@@ -92,7 +101,7 @@ public class LoginActivity extends AppCompatActivity {
         //error = (TextView) findViewById(R.id.tv_error);
 
 
-        mPrefs = this.getSharedPreferences("myPref", 0);
+//        mPrefs = this.getSharedPreferences("myPref", 0);
         usernameView.setText(mPrefs.getString("email", ""));
         //TODO:store password?
 

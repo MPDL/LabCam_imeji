@@ -31,8 +31,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +52,7 @@ import example.com.mpdlcamera.ImejiFragment.ImejiFragment;
 import example.com.mpdlcamera.LocalFragment.LocalFragment;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.LocalModel.Image;
+import example.com.mpdlcamera.Model.LocalModel.Settings;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
@@ -185,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         //choose collection
         chooseCollection();
         setUserInfoText();
+        setAutoUpload();
         setLogout();
 
     }
@@ -537,6 +541,39 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             }
         });
     }
+
+    //auto upload switch
+    private void setAutoUpload(){
+        Switch autoUploadSwitch = (Switch) findViewById(R.id.switch_auto_upload);
+        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+        if(settings!=null){
+            autoUploadSwitch.setChecked(settings.isAutoUpload());
+        }
+        autoUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+
+                //init settings
+                if (settings == null) {
+                    settings = new Settings();
+                }
+
+                if (compoundButton.isChecked()) {
+                    Log.e(TAG, "userId" + userId);
+                    settings.setUserId(userId);
+                    settings.setIsAutoUpload(true);
+                    settings.save();
+                } else {
+                    Log.e(TAG, "userId" + userId);
+                    settings.setUserId(userId);
+                    settings.setIsAutoUpload(false);
+                    settings.save();
+                }
+            }
+        });
+    }
+
     //logout
     static Task autoTask;
     private void setLogout(){
@@ -613,7 +650,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .show();
                 }else {
-                //go to login (delete sharedPreference at login )
+                //delete sharedPreference(move to logout callback after backend implementation)
+                SharedPreferences.Editor mEditor = mPrefs.edit();
+                    mEditor.remove("apiKey").commit();
+                    mEditor.remove("userId").commit();
+//                    mEditor.remove("email").commit();
+                    mEditor.remove("username").commit();
+
                 Intent logoutIntent = new Intent(context, LoginActivity.class);
                 startActivity(logoutIntent);
                 }

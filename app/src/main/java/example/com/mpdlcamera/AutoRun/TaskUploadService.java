@@ -377,19 +377,18 @@ public class TaskUploadService extends Service{
 
         @Override
         public void failure(RetrofitError error) {
-            boolean isInterrupted = false;
 
             Log.e(TAG,error.getResponse().getStatus()+"");
 
-            if(error.getResponse().getStatus() == 403 || error.getResponse().getStatus() == 422 ) {
-                task.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
-                task.save();
-                Log.e(TAG,task.getState());
-                isInterrupted = true;
-            }
+//            if(error.getResponse().getStatus() == 403 || error.getResponse().getStatus() == 422 ) {
+//                task.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
+//                task.save();
+//                Log.e(TAG,task.getState());
+//                isInterrupted = true;
+//            }
 
 
-            if (!taskIsStopped()&&!isInterrupted) {
+            if (!taskIsStopped()) {
                 Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
                 //TODO:what to do with interrupted
 
