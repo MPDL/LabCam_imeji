@@ -378,8 +378,6 @@ public class TaskUploadService extends Service{
         @Override
         public void failure(RetrofitError error) {
 
-            Log.e(TAG,error.getResponse().getStatus()+"");
-
 //            if(error.getResponse().getStatus() == 403 || error.getResponse().getStatus() == 422 ) {
 //                task.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
 //                task.save();

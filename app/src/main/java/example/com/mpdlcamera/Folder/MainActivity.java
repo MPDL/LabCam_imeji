@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         Bundle args = this.getIntent().getExtras();
         isTaskFragment= args.getBoolean("isTaskFragment", false);}
         catch (Exception e){
-            Log.v(LOG_TAG,e.getMessage());
+//            Log.v(LOG_TAG,e.getMessage());
         }
 
         getLocalCamFolder();
