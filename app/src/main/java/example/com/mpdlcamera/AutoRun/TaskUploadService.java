@@ -65,10 +65,6 @@ public class TaskUploadService extends Service{
     //get context
     private Context activity = this;
 
-    //flag
-    //set false in success and failure callback
-    private boolean isBusy = true;
-
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with
@@ -99,7 +95,7 @@ public class TaskUploadService extends Service{
 
         super.onCreate();
 
-            if(isNetworkAvailable()) {
+
                 Log.v(TAG, "TaskUploadService onCreate!");
 
 
@@ -129,16 +125,14 @@ public class TaskUploadService extends Service{
                     Log.v(TAG,"mTask is null, can't get collectionID");
                 }
                 // auto task is WAITING
-                if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
-                    //start uploading
-                    startUpload(false);
-                }
+
+                    startUpload();
+
             }
-    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(isNetworkAvailable()) {
+
             Log.v(TAG, "onStartCommand!");
 
             // prepare auth for upload
@@ -168,28 +162,16 @@ public class TaskUploadService extends Service{
 
             if(!taskIsStopped()) {
                 Log.v(TAG,"not stopped");
-                Log.v(TAG,"isBysy"+isBusy);
                 Log.v(TAG,task.getState());
                 // auto task is WAITING
                 if (task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
                     //start uploading
-                    startUpload(isBusy);
+                    startUpload();
                 }
             }
-        }
+
         return super.onStartCommand(intent, flags, startId);
     }
-
-    /*
-            checks whether the network is available or not
-         */
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
 
     private boolean taskIsStopped (){
         task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
@@ -210,10 +192,10 @@ public class TaskUploadService extends Service{
 
     }
 
-    private void startUpload(boolean isBusy) {
+    private void startUpload() {
         Log.v(TAG, "startUpload()");
 
-        if(!taskIsStopped()&&!isBusy) {
+        if(!taskIsStopped()) {
             try {
                 /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
                 waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
@@ -339,7 +321,6 @@ public class TaskUploadService extends Service{
                     /** move on to next **/
 
                     try {
-                        /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
                         finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
                     } catch (Exception e) {
                     }
@@ -362,13 +343,11 @@ public class TaskUploadService extends Service{
                             handler.postDelayed(new Runnable() {
                                 public void run() {
                                     // Actions to do after 3 seconds
-                                    isBusy = false;
                                 }
                             }, 3000);
                         }
                     } else {
                         task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                        isBusy = false;
                         Log.i(TAG, "task finished");
                     }
                 }
@@ -449,7 +428,6 @@ public class TaskUploadService extends Service{
                 //TODO: continue upload
 
                 try {
-                    /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
                     finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
                 } catch (Exception e) {
                 }
@@ -472,7 +450,6 @@ public class TaskUploadService extends Service{
                     }
                 } else {
                     task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                    isBusy = false;
                     Log.i(TAG, "task finished");
                 }
 
