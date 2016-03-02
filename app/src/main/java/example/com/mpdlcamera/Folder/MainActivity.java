@@ -136,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         Bundle args = this.getIntent().getExtras();
         isTaskFragment= args.getBoolean("isTaskFragment", false);}
         catch (Exception e){
-            Log.v(LOG_TAG,e.getMessage());
         }
 
         getLocalCamFolder();
@@ -637,7 +636,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                                             task.save();
                                         }
                                     }
-
+                                    //delete sharedPreference(move to logout callback after backend implementation)
+                                    SharedPreferences.Editor mEditor = mPrefs.edit();
+                                    mEditor.remove("apiKey").commit();
+                                    mEditor.remove("userId").commit();
+                                    mEditor.remove("username").commit();
                                     Intent logoutIntent = new Intent(context, LoginActivity.class);
                                     startActivity(logoutIntent);
                                 }
@@ -650,15 +653,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .show();
                 }else {
-                //delete sharedPreference(move to logout callback after backend implementation)
-                SharedPreferences.Editor mEditor = mPrefs.edit();
+                    //delete sharedPreference(move to logout callback after backend implementation)
+                    SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.remove("apiKey").commit();
                     mEditor.remove("userId").commit();
-//                    mEditor.remove("email").commit();
                     mEditor.remove("username").commit();
-
-                Intent logoutIntent = new Intent(context, LoginActivity.class);
-                startActivity(logoutIntent);
+                    Intent logoutIntent = new Intent(context, LoginActivity.class);
+                    startActivity(logoutIntent);
                 }
             }
         });
