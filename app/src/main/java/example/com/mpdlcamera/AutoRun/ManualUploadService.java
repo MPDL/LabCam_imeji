@@ -17,7 +17,6 @@ import com.activeandroid.query.Select;
 import com.squareup.otto.Produce;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
@@ -41,17 +40,16 @@ public class ManualUploadService extends Service {
     private static final String TAG = ManualUploadService.class.getSimpleName();
 
     List<Image> waitingImages = null;
+    List<Image> interruptedImages = null;
     List<Image> finishedImages = null;
 
     //  position in waitingImage list
 
     String currentImageId;
     Task task;
-    String collectionID;
 
     // pass currentTaskId to service
     private String currentTaskId;
-    private List<String> currentTaskList = new ArrayList<>();
 
     // SharedPreferences
     private SharedPreferences mPrefs;
@@ -60,7 +58,7 @@ public class ManualUploadService extends Service {
     //
     private TypedFile typedFile;
     private String json;
-//    private String collectionID;
+    private String collectionID;
     private Context activity = this;
 
     // handler for toast
@@ -87,11 +85,6 @@ public class ManualUploadService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Service onStartComman");
 
-        //prepare apiKey
-        mPrefs = activity.getSharedPreferences("myPref", 0);
-        apiKey = mPrefs.getString("apiKey", "");
-        String email = mPrefs.getString("email", "");
-
         // prepare taskId
         try {
             currentTaskId = intent.getStringExtra("currentTaskId");
@@ -100,22 +93,27 @@ public class ManualUploadService extends Service {
 //            Log.i(TAG, e.getMessage());
               Log.i(TAG, "e~~~");
         }
-        /** add taskId to currentTask list **/
-        currentTaskList.add(currentTaskId);
+        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+        //prepare collectionId
+        collectionID =task.getCollectionId();
 
-        for(final String taskId:currentTaskList) {
-                    Task task = new Select().from(Task.class).where("taskId = ?", taskId).executeSingle();
-                    //prepare collectionId
-                    String collectionID = task.getCollectionId();
-                    Log.e(TAG,collectionID);
+        //prepare apiKey
+            mPrefs = activity.getSharedPreferences("myPref", 0);
+            apiKey = mPrefs.getString("apiKey", "");
+            String email = mPrefs.getString("email", "");
 
-                    if (!taskIsStopped()) {
-                        Log.v(TAG, "not stopped");
-                        Log.v(TAG, task.getState());
-                        Log.i(TAG, "Thread --> startUpload()");
-                        startUpload(taskId, collectionID);
-                    }
+        if(!taskIsStopped()) {
+            Log.v(TAG,"not stopped");
+            Log.v(TAG,task.getState());
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.i(TAG,"Thread --> startUpload()");
+                    startUpload();
                 }
+            }).start();
+        }
         return Service.START_STICKY;
     }
 
@@ -132,17 +130,25 @@ public class ManualUploadService extends Service {
     }
 
 
-    private void startUpload(String taskId, String collectionID) {
+    private void startUpload() {
 
         if(!taskIsStopped()){
 
             /** WAITING, FINISHED **/
-            waitingImages = new Select().from(Image.class).where("taskId = ?", taskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
+            waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
+            finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+
+
+        //DELETE TESTING
+            Log.i(TAG, "waitingImages: "+ waitingImages.size());
+            Log.i(TAG, "finishedImages: " + finishedImages.size());
+            Log.i(TAG, "totalImages: " + task.getTotalItems());
+
 
         if (waitingImages!=null && waitingImages.size() > 0) {
 
-                //TODO: fix error here
-                Image image = new Select().from(Image.class).where("taskId = ?", taskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
+
+                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
                 String imageState = image.getState();
                 String filePath = image.getImagePath();
                 currentImageId = image.getImageId();
@@ -170,8 +176,6 @@ public class ManualUploadService extends Service {
     private void upload(Image image){
 
         if(!taskIsStopped()){
-
-            //get collectionID
 
             //upload image
             String imageState = image.getState();
@@ -378,6 +382,8 @@ public class ManualUploadService extends Service {
                 return false;
             }}catch (Exception e){
             Log.e(TAG,"taskIsStopped exception");
+            Log.e(TAG,e.getMessage());
+
             return false;
         }
 
