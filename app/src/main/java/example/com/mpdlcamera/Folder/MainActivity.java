@@ -48,6 +48,8 @@ import java.util.List;
 import java.util.UUID;
 
 import example.com.mpdlcamera.Auth.LoginActivity;
+import example.com.mpdlcamera.AutoRun.ManualUploadService;
+import example.com.mpdlcamera.AutoRun.TaskUploadService;
 import example.com.mpdlcamera.ImejiFragment.ImejiFragment;
 import example.com.mpdlcamera.LocalFragment.LocalFragment;
 import example.com.mpdlcamera.Model.ImejiFolder;
@@ -638,6 +640,20 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                                         }
                                     }
 
+
+                                    // stop old upload process
+                                    Intent AUIntent = new Intent(context, TaskUploadService.class);
+                                    stopService(AUIntent);
+
+                                    Intent MUIntent = new Intent(context, ManualUploadService.class);
+                                    stopService(MUIntent);
+
+                                    //delete sharedPreference(move to logout callback after backend implementation)
+                                    SharedPreferences.Editor mEditor = mPrefs.edit();
+                                    mEditor.remove("apiKey").commit();
+                                    mEditor.remove("userId").commit();
+                                    mEditor.remove("username").commit();
+
                                     Intent logoutIntent = new Intent(context, LoginActivity.class);
                                     startActivity(logoutIntent);
                                 }
@@ -650,11 +666,18 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .show();
                 }else {
+
+                    // stop old upload process
+                    Intent AUIntent = new Intent(context, TaskUploadService.class);
+                    stopService(AUIntent);
+
+                    Intent MUIntent = new Intent(context, ManualUploadService.class);
+                    stopService(MUIntent);
+
                 //delete sharedPreference(move to logout callback after backend implementation)
                 SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.remove("apiKey").commit();
                     mEditor.remove("userId").commit();
-//                    mEditor.remove("email").commit();
                     mEditor.remove("username").commit();
 
                 Intent logoutIntent = new Intent(context, LoginActivity.class);
