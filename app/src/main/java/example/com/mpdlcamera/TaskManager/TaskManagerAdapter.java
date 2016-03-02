@@ -290,12 +290,6 @@ public class TaskManagerAdapter extends BaseAdapter {
 
         //pause/play Task
         CheckBox isPausedCheckBox = (CheckBox) view.findViewById(R.id.checkBox_is_paused);
-        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
-            isPausedCheckBox.setChecked(false);
-        }else {
-            //true is play button, means state now is paused
-            isPausedCheckBox.setChecked(true);
-        }
 
         isPausedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -308,6 +302,14 @@ public class TaskManagerAdapter extends BaseAdapter {
                         currentTask.setState(String.valueOf(DeviceStatus.state.WAITING));
                         currentTask.save();
                         Log.v(TAG, "setState: WAITING" );
+
+                        if(currentTask.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
+                            compoundButton.setChecked(false);
+                        }else {
+                            //true is play button, means state now is paused
+                            compoundButton.setChecked(true);
+                        }
+
                         if(currentTask.getUploadMode().equalsIgnoreCase("AU")){
                             // start AU TaskUploadService
                             Log.v(TAG,"start TaskUploadService");
@@ -329,6 +331,14 @@ public class TaskManagerAdapter extends BaseAdapter {
                         currentTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
                         currentTask.save();
                         Log.v(TAG, "setState: STOPPED");
+
+                        if(currentTask.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
+                            compoundButton.setChecked(false);
+                        }else {
+                            //true is play button, means state now is paused
+                            compoundButton.setChecked(true);
+                        }
+
                         if(currentTask.getUploadMode().equalsIgnoreCase("AU")){
                             // start AU TaskUploadService
                             Intent uploadIntent = new Intent(activity, TaskUploadService.class);
