@@ -81,17 +81,17 @@ public class FolderListAdapter extends BaseAdapter {
             // getting item data for the row
             ImejiFolder collection = folderItems.get(position);
             Log.v(LOG_TAG, collection.getTitle());
-
-            if (collection.getItems() != null) {
-                if (collection.getItems().size() > 0) {
-                    DataItem m = collection.getItems().get(0);
-                    Log.v(LOG_TAG, m.getWebResolutionUrlUrl());
+//
+//            if (collection.getItems() != null) {
+//                if (collection.getItems().size() > 0) {
+//                    DataItem m = collection.getItems().get(0);
+//                    Log.e(LOG_TAG, m.getWebResolutionUrlUrl());
 
                     Picasso.with(activity)
-                            .load(m.getWebResolutionUrlUrl())
+                            .load(collection.getCoverItemUrl())
                             .into(imageView);
-                }
-            }
+//                }
+//            }
             title.setText(collection.getTitle());
 
             //title

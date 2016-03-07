@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -107,8 +108,12 @@ public class ImejiFragment extends Fragment {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_imeji, container, false);
 
+        mPrefs = getActivity().getSharedPreferences("myPref", 0);
+        username = mPrefs.getString("username", "");
+        APIKey = mPrefs.getString("apiKey", "");
 
-        loadImejiFolder();
+
+//        loadImejiFolder();
         adapter = new FolderListAdapter(getActivity(), collectionListLocal);
         listView = (ListView) rootView.findViewById(R.id.folder_listView);
         listView.setAdapter(adapter);
@@ -260,16 +265,15 @@ public class ImejiFragment extends Fragment {
                 ActiveAndroid.beginTransaction();
                 try {
                     for (ImejiFolder folder : collectionListLocal) {
-
                         if(dataList.size()>0) {
                             DataItem coverItem = dataList.get(0);
                             //check for each folder, if the current items belongs to the current folder
                             if(coverItem.getCollectionId().equals(folder.id)){
 //                                folder.setItems(dataList);
 //
-//                                folder.setCoverItemUrl(coverItem.getWebResolutionUrlUrl());
-//                                folder.setImejiId(folder.id);
-//                                folder.save();
+                                folder.setCoverItemUrl(coverItem.getWebResolutionUrlUrl());
+                                folder.setImejiId(folder.id);
+                                folder.save();
 
                             }
                         }
