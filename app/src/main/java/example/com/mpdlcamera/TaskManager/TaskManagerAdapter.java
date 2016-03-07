@@ -21,7 +21,9 @@ import android.widget.TextView;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import example.com.mpdlcamera.AutoRun.ManualUploadService;
 import example.com.mpdlcamera.AutoRun.TaskUploadService;
@@ -257,7 +259,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
 
-                                    if(task.getUploadMode().equalsIgnoreCase("AU")){
+                                    if (task.getUploadMode().equalsIgnoreCase("AU")) {
                                         //abort uploading, but keep the task
                                         //stop the service
                                         Intent uploadIntent = new Intent(activity, TaskUploadService.class);
@@ -265,10 +267,37 @@ public class TaskManagerAdapter extends BaseAdapter {
 
                                         //delete all image with this taskId
                                         new Delete().from(Image.class).where("taskId = ?", task.getTaskId()).execute();
+                                        String collectionID = task.getCollectionId();
+                                        String collectionName = task.getCollectionName();
+                                        String username = task.getUserName();
+                                        String userId = task.getUserId();
+                                        task.delete();
 
-                                        //resume task
-                                        resumeTask(task);
-                                    }else {
+                                        taskList.remove(task);
+
+
+                                        //resume task(create task)
+
+                                        Task newTask = new Task();
+
+                                        String uniqueID = UUID.randomUUID().toString();
+                                        newTask.setTaskId(uniqueID);
+                                        newTask.setUploadMode("AU");
+                                        newTask.setCollectionId(collectionID);
+                                        newTask.setCollectionName(collectionName);
+                                        newTask.setState(String.valueOf(DeviceStatus.state.WAITING));
+                                        newTask.setUserName(username);
+                                        newTask.setUserId(userId);
+                                        newTask.setTotalItems(0);
+                                        newTask.setFinishedItems(0);
+                                        Long now = new Date().getTime();
+                                        newTask.setStartDate(String.valueOf(now));
+                                        newTask.save();
+                                        taskList.add(newTask);
+
+                                        notifyDataSetChanged();
+
+                                    } else {
                                         // continue with delete
                                         deleteTask(task, position);
                                     }
@@ -289,42 +318,43 @@ public class TaskManagerAdapter extends BaseAdapter {
 
 
         //pause/play Task
-        CheckBox isPausedCheckBox = (CheckBox) view.findViewById(R.id.checkBox_is_paused);
+        final CheckBox isPausedCheckBox = (CheckBox) view.findViewById(R.id.checkBox_is_paused);
 
-        isPausedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        isPausedCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            public void onClick(View view) {
                 String currentTaskId = task.getTaskId();
-                if(!compoundButton.isChecked()){
+                if (!isPausedCheckBox.isChecked()) {
                     // pause clicked
                     try {
                         Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
                         currentTask.setState(String.valueOf(DeviceStatus.state.WAITING));
                         currentTask.save();
-                        Log.v(TAG, "setState: WAITING" );
+                        Log.v(TAG, "setState: WAITING");
 
-                        if(currentTask.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
-                            compoundButton.setChecked(false);
-                        }else {
+                        if (currentTask.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
+                            isPausedCheckBox.setChecked(false);
+                        } else {
                             //true is play button, means state now is paused
-                            compoundButton.setChecked(true);
+                            isPausedCheckBox.setChecked(true);
                         }
 
-                        if(currentTask.getUploadMode().equalsIgnoreCase("AU")){
+                        if (currentTask.getUploadMode().equalsIgnoreCase("AU")) {
                             // start AU TaskUploadService
-                            Log.v(TAG,"start TaskUploadService");
+                            Log.v(TAG, "start TaskUploadService");
                             Intent uploadIntent = new Intent(activity, TaskUploadService.class);
                             activity.startService(uploadIntent);
-                        }else{
+                        } else {
                             // start ManualUploadService
-                            Log.v(TAG,"start manualUploadService");
-                            Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
+                            Log.v(TAG, "start manualUploadService");
+                            Intent manualUploadServiceIntent = new Intent(activity, ManualUploadService.class);
                             manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
                             activity.startService(manualUploadServiceIntent);
                         }
-                    }catch (Exception e){}
+                    } catch (Exception e) {
+                    }
 
-                }else if(compoundButton.isChecked()){
+                } else if (isPausedCheckBox.isChecked()) {
                     // pause button
                     try {
                         Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
@@ -332,29 +362,38 @@ public class TaskManagerAdapter extends BaseAdapter {
                         currentTask.save();
                         Log.v(TAG, "setState: STOPPED");
 
-                        if(currentTask.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
-                            compoundButton.setChecked(false);
-                        }else {
+                        if (currentTask.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
+                            isPausedCheckBox.setChecked(false);
+                        } else {
                             //true is play button, means state now is paused
-                            compoundButton.setChecked(true);
+                            isPausedCheckBox.setChecked(true);
                         }
 
-                        if(currentTask.getUploadMode().equalsIgnoreCase("AU")){
+                        if (currentTask.getUploadMode().equalsIgnoreCase("AU")) {
                             // start AU TaskUploadService
                             Intent uploadIntent = new Intent(activity, TaskUploadService.class);
 //                            uploadIntent.putExtra("isBusy",false);
                             activity.startService(uploadIntent);
-                        }else{
+                        } else {
                             // start ManualUploadService
-                            Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
+                            Intent manualUploadServiceIntent = new Intent(activity, ManualUploadService.class);
                             manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
                             activity.startService(manualUploadServiceIntent);
                         }
-                    }catch (Exception e){}
+                    } catch (Exception e) {
+                    }
 
                 }
             }
         });
+
+        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
+            isPausedCheckBox.setChecked(false);
+        }else {
+            //true is play button, means state now is paused
+            isPausedCheckBox.setChecked(true);
+        }
+
 
         return view;
     }
@@ -370,11 +409,5 @@ public class TaskManagerAdapter extends BaseAdapter {
         /** if it is a Au, what to do? */
     }
 
-    private void resumeTask(Task task){
-        task.setFinishedItems(0);
-        task.setTotalItems(0);
-        task.setLogs("");
-        task.save();
-    }
 }
 

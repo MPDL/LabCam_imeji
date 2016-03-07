@@ -57,6 +57,7 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
             Log.v(LOG_TAG,"collection: "+task.getCollectionName());
             Log.v(LOG_TAG,"total:: "+task.getTotalItems());
             Log.v(LOG_TAG,"finished: "+task.getFinishedItems());
+            Log.v(LOG_TAG,"CollectionId: "+task.getCollectionId());
             Log.v(LOG_TAG,"State: "+task.getState());
         }
 

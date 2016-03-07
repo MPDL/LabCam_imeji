@@ -406,9 +406,11 @@ public class TaskUploadService extends Service{
 //                                Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
                             }
                         });
+                        
+                        try{
                         currentImage.setLog(error.getKind().name() + " already exists");
                         currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                        currentImage.save();
+                        currentImage.save();}catch (Exception e){}
 
                     } else {
 

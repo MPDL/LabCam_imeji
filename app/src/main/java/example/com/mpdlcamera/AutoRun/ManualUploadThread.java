@@ -198,7 +198,6 @@ public class ManualUploadThread extends Thread {
 
                 //DELETE TESTING
                 Log.i(TAG, "finishedImages " + finishedImages.size());
-                Log.i(TAG, "totalImages: " + task.getTotalItems());
 
                 task.setFinishedItems(finishedImages.size());
                 task.save();
@@ -304,7 +303,6 @@ public class ManualUploadThread extends Thread {
 
                 //DELETE TESTING
                 Log.i(TAG, "finishedImages " + finishedImages.size());
-                Log.i(TAG, "totalImages: " + task.getTotalItems());
 
                 task.setFinishedItems(finishedImages.size());
                 task.save();
