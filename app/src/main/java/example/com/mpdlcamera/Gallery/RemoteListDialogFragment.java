@@ -11,7 +11,9 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
@@ -19,9 +21,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import example.com.mpdlcamera.Auth.QRScannerActivity;
 import example.com.mpdlcamera.AutoRun.ManualUploadService;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.LocalModel.Task;
@@ -29,6 +36,7 @@ import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Settings.SettingsListAdapter;
 import example.com.mpdlcamera.UploadActivity.CollectionIdInterface;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -39,6 +47,8 @@ import retrofit.client.Response;
 public class RemoteListDialogFragment extends DialogFragment implements CollectionIdInterface {
 
     private static final String LOG_TAG = RemoteListDialogFragment.class.getSimpleName();
+    private static final int INTENT_QR = 1001;
+
     //user
     private String username;
     private String APIkey;
@@ -73,26 +83,24 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
         APIkey = mPrefs.getString("apiKey", "");
         email = mPrefs.getString("email", "");
 
+        /** scan QR **/
+        Button qrCodeImageView = (Button) view.findViewById(R.id.btn_qr_scan);
+        qrCodeImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(activity, QRScannerActivity.class);
+                startActivityForResult(intent, INTENT_QR);
+            }
+        });
+
         // builder
         AlertDialog.Builder b=  new  AlertDialog.Builder(getActivity())
                 .setTitle("Choose collection")
                 .setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                // set collectionId and save
-                                if(collectionId!=null){
-                                Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
-                                currentTask.setCollectionId(collectionId);
-                                currentTask.setTaskName("Manual  " + collectionId);
-                                currentTask.setCollectionName(collectionName);
-                                    currentTask.save();
 
-                                Log.e(LOG_TAG,currentTask.getTaskId());
-                                Log.e(LOG_TAG,currentTask.getCollectionName());
-                                Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
-                                manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
-                                activity.startService(manualUploadServiceIntent);
-                                }
+                                setMUCollection();
                             }
                         }
                 )
@@ -114,6 +122,36 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
 
         b.setView(view);
         return b.create();
+    }
+
+    private void setMUCollection(){
+        // set collectionId and save
+        if(collectionId!=null){
+            getCollectionNameById(collectionId);
+
+            Task manualTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+            manualTask.setCollectionId(collectionId);
+            manualTask.setTaskName("Manual  " + collectionId);
+            manualTask.setCollectionName(collectionName);
+            manualTask.save();
+
+            Log.e(LOG_TAG,manualTask.getTaskId());
+            Log.e(LOG_TAG,manualTask.getCollectionName());
+            Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
+            manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
+            activity.startService(manualUploadServiceIntent);
+        }
+    }
+
+    private void getCollectionNameById(String collectionID){
+        //get collection Name form Id
+        for (ImejiFolder imejiFolder:collectionList){
+            if (imejiFolder.getImejiId().equalsIgnoreCase(collectionID) ){
+                collectionName = imejiFolder.getTitle();
+                Log.v(LOG_TAG,"getCollectionName:"+collectionName);
+                return;
+            }
+        }
     }
 
     @Override
@@ -187,4 +225,58 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
         }
     };
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == INTENT_QR) {
+
+            if (resultCode == Activity.RESULT_OK) {
+                Bundle bundle = data.getExtras();
+                String QRText = bundle.getString("QRText");
+                Log.v(LOG_TAG, QRText);
+                String APIkey = "";
+                String url = "";
+                try {
+                    JSONObject jsonObject = new JSONObject(QRText);
+                    APIkey = jsonObject.getString("key");
+                    Log.v("APIkey",APIkey);
+                    url = jsonObject.getString("col");
+                    Log.v("col",url);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                try {
+
+                    URL u = new URL(url);
+
+                    String path = u.getPath();
+
+                    if (path != null) {
+                        String qrCollectionId = path.substring(path.lastIndexOf("/") + 1);
+                        /** set choose **/
+                        //create task if collection is selected
+                        if (!qrCollectionId.equals("") && !qrCollectionId.equals(null)) {
+                            Log.i("~qrCollectionId", qrCollectionId);
+                            collectionId = qrCollectionId;
+                            //set and save
+                            setMUCollection();
+                            getDialog().dismiss();
+
+                        } else {
+                            Toast.makeText(getActivity(), "collection setting not changed", Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // User cancelled the photo picking
+            }
+        }
+    }
 }

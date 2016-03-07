@@ -344,7 +344,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                              * delete all AU Task if finished
                              * */
                             DeviceStatus.deleteFinishedTasks();
-
+                            collectionID = qrCollectionId;
                             /**create Task**/
                             createTask(qrCollectionId);
 
@@ -374,6 +374,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     //checkbox dialog
     private void dialog(String oldCollectionName){
 
+        getCollectionNameById(collectionID);
         final String[] arrayCollection = new String[] { oldCollectionName, collectionName };
 
         final AlertDialog alertDialog =
