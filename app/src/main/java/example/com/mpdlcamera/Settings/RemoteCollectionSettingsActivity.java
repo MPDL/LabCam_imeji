@@ -284,121 +284,121 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     //checkbox dialog
     private void dialog(String oldCollectionName){
 
+        final String[] arrayCollection = new String[] { oldCollectionName, collectionName };
+
         final AlertDialog alertDialog =
                 new AlertDialog.Builder(context)
-                        .setTitle("Delete entry")
-                        .setMessage("There are some Fotos waiting for uploading, Upload them to the ")
-                        .setPositiveButton(oldCollectionName, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // yes continue latestTask
-                        String taskId = latestTask.getTaskId();
+                        .setTitle("There are some photos waiting for uploading, Upload them to the ")
+                        .setSingleChoiceItems(arrayCollection, 0, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                if(i ==0){
+                                    //oldCollectionName selected
+                                    // yes continue latestTask
+                                    String taskId = latestTask.getTaskId();
 
 
-                        // change state of old task
-                        latestTask.setState(String.valueOf(DeviceStatus.state.WAITING));
-                        latestTask.save();
+                                    // change state of old task
+                                    latestTask.setState(String.valueOf(DeviceStatus.state.WAITING));
+                                    latestTask.save();
 
-                        Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
-                        manualUploadServiceIntent.putExtra("currentTaskId", taskId);
-                        startService(manualUploadServiceIntent);
+                                    Intent manualUploadServiceIntent = new Intent(activity, ManualUploadService.class);
+                                    manualUploadServiceIntent.putExtra("currentTaskId", taskId);
+                                    startService(manualUploadServiceIntent);
 
-                        //create new task
-                        Log.v("collectionID",collectionID);
-                        Task task = new Task();
-                        task.setTotalItems(0);
-                        task.setFinishedItems(0);
+                                    //create new task
+                                    Log.v("collectionID", collectionID);
+                                    Task task = new Task();
+                                    task.setTotalItems(0);
+                                    task.setFinishedItems(0);
 
-                        String uniqueID = UUID.randomUUID().toString();
-                        task.setTaskId(uniqueID);
-                        task.setUploadMode("AU");
-                        task.setCollectionId(collectionID);
-                        task.setState(String.valueOf(DeviceStatus.state.WAITING));
-                        task.setUserName(username);
-                        task.setUserId(userId);
+                                    String uniqueID = UUID.randomUUID().toString();
+                                    task.setTaskId(uniqueID);
+                                    task.setUploadMode("AU");
+                                    task.setCollectionId(collectionID);
+                                    task.setState(String.valueOf(DeviceStatus.state.WAITING));
+                                    task.setUserName(username);
+                                    task.setUserId(userId);
 
-                        Long now = new Date().getTime();
-                        task.setStartDate(String.valueOf(now));
-                        task.setCollectionName(collectionName);
+                                    Long now = new Date().getTime();
+                                    task.setStartDate(String.valueOf(now));
+                                    task.setCollectionName(collectionName);
 
-                        task.save();
+                                    task.save();
 
-                        //start auto upload service
-                        Intent uploadIntent = new Intent(activity, TaskUploadService.class);
-                        activity.startService(uploadIntent);
+                                    //start auto upload service
+                                    Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+                                    activity.startService(uploadIntent);
 
-                        finish();
-                    }
-                })
-                .setNegativeButton(collectionName, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
+                                    finish();
+                                }else if(i == 1){
+                                    // new collection selected
+                                    // change totalNum of old task
+                                    latestTask.setTotalItems(latestTask.getFinishedItems());
+                                    latestTask.setState(String.valueOf(DeviceStatus.state.WAITING));
+                                    latestTask.save();
 
+                                    // stop/delete old upload process
+                                    Intent oldUploadIntent = new Intent(activity, TaskUploadService.class);
+                                    stopService(oldUploadIntent);
 
-                        // change totalNum of old task
-                        latestTask.setTotalItems(latestTask.getFinishedItems());
-                        latestTask.setState(String.valueOf(DeviceStatus.state.WAITING));
-                        latestTask.save();
+                                    // move picture to new repository
+                                    // get remain Images
+                                    List<Image> remainImages = new Select().from(Image.class)
+                                            .where("taskId = ?", latestTask.getTaskId())
+                                            .where("state = ?", String.valueOf(DeviceStatus.state.WAITING))
+                                            .execute();
 
-                        // stop/delete old upload process
-                        Intent oldUploadIntent = new Intent(activity, TaskUploadService.class);
-                        stopService(oldUploadIntent);
+                                    //uniqueID as new AU taskId
+                                    String uniqueID = UUID.randomUUID().toString();
 
-                        // move picture to new repository
-                        // get remain Images
-                       List<Image> remainImages = new Select().from(Image.class)
-                               .where("taskId = ?", latestTask.getTaskId())
-                               .where("state = ?", String.valueOf(DeviceStatus.state.WAITING))
-                               .execute();
+                                    //set remainImage taskId
+                                    ActiveAndroid.beginTransaction();
+                                    try {
+                                        for (Image image:remainImages) {
 
-                        //uniqueID as new AU taskId
-                        String uniqueID = UUID.randomUUID().toString();
+                                            image.setTaskId(uniqueID);
+                                            image.save();
+                                        }
+                                        ActiveAndroid.setTransactionSuccessful();
+                                    }
+                                    finally {
+                                        ActiveAndroid.endTransaction();
+                                    }
 
-                        //set remainImage taskId
-                        ActiveAndroid.beginTransaction();
-                        try {
-                            for (Image image:remainImages) {
+                                    //delete old taskImage
+                                    new Delete().from(Image.class)
+                                            .where("taskId = ?", latestTask.getTaskId())
+                                            .where("state = ?", String.valueOf(DeviceStatus.state.FINISHED))
+                                            .execute();
 
-                                image.setTaskId(uniqueID);
-                                image.save();
+                                    //create new task
+                                    Log.v("collectionID",collectionID);
+                                    Task task = new Task();
+                                    task.setTotalItems(remainImages.size());
+                                    task.setFinishedItems(0);
+
+                                    task.setTaskId(uniqueID);
+                                    task.setUploadMode("AU");
+                                    task.setCollectionId(collectionID);
+                                    task.setState(String.valueOf(DeviceStatus.state.WAITING));
+                                    task.setUserName(username);
+                                    task.setUserId(userId);
+
+                                    Long now = new Date().getTime();
+                                    task.setStartDate(String.valueOf(now));
+                                    task.setCollectionName(collectionName);
+
+                                    task.save();
+
+                                    //start service
+                                    Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+                                    startService(uploadIntent);
+
+                                    finish();
+                                }
                             }
-                            ActiveAndroid.setTransactionSuccessful();
-                        }
-                        finally {
-                            ActiveAndroid.endTransaction();
-                        }
-
-                        //delete old taskImage
-                        new Delete().from(Image.class)
-                                .where("taskId = ?", latestTask.getTaskId())
-                                .where("state = ?", String.valueOf(DeviceStatus.state.FINISHED))
-                                .execute();
-
-                        //create new task
-                        Log.v("collectionID",collectionID);
-                        Task task = new Task();
-                        task.setTotalItems(remainImages.size());
-                        task.setFinishedItems(0);
-
-                        task.setTaskId(uniqueID);
-                        task.setUploadMode("AU");
-                        task.setCollectionId(collectionID);
-                        task.setState(String.valueOf(DeviceStatus.state.WAITING));
-                        task.setUserName(username);
-                        task.setUserId(userId);
-
-                        Long now = new Date().getTime();
-                        task.setStartDate(String.valueOf(now));
-                        task.setCollectionName(collectionName);
-
-                        task.save();
-
-                        //start service
-                        Intent uploadIntent = new Intent(activity, TaskUploadService.class);
-                        startService(uploadIntent);
-
-                        finish();
-
-                    }
-                })
+                        })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
 

@@ -185,7 +185,6 @@ public class TaskUploadService extends Service{
             return false;
         }}catch (Exception e){
             Log.e(TAG,"taskIsStopped exception");
-            Log.e(TAG,e.getMessage());
 
             return false;
         }
@@ -429,30 +428,27 @@ public class TaskUploadService extends Service{
 
                 try {
                     finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+                    Log.e(TAG, "finishedImages " + finishedImages.size());
+                    task.setFinishedItems(finishedImages.size());
+                    task.save();
+
+
+                    /** move on to next **/
+                    int finishedNum = task.getFinishedItems();
+                    int totalNum = task.getTotalItems();
+                    Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
+                    if (totalNum > finishedNum) {
+                        // continue anyway
+                        Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
+                        if (image != null) {
+                            upload(image);
+                        }
+                    } else {
+                        task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                        Log.i(TAG, "task finished");
+                    }
                 } catch (Exception e) {
                 }
-
-                //DELETE TESTING
-                Log.i(TAG, "finishedImages " + finishedImages.size());
-                Log.i(TAG, "totalImages: " + task.getTotalItems());
-                task.setFinishedItems(finishedImages.size());
-                task.save();
-
-                /** move on to next **/
-                int finishedNum = task.getFinishedItems();
-                int totalNum = task.getTotalItems();
-                Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
-                if (totalNum > finishedNum) {
-                    // continue anyway
-                    Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
-                    if (image != null) {
-                        upload(image);
-                    }
-                } else {
-                    task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                    Log.i(TAG, "task finished");
-                }
-
             }
         }
     };
