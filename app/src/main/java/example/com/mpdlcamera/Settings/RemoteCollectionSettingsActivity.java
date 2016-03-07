@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -22,11 +24,17 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import example.com.mpdlcamera.Auth.QRScannerActivity;
 import example.com.mpdlcamera.AutoRun.ManualUploadService;
 import example.com.mpdlcamera.AutoRun.TaskUploadService;
 import example.com.mpdlcamera.Model.ImejiFolder;
@@ -41,6 +49,11 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 public class RemoteCollectionSettingsActivity extends AppCompatActivity implements CollectionIdInterface{
+
+    private final String LOG_TAG = RemoteCollectionSettingsActivity.class.getSimpleName();
+    private static final int INTENT_QR = 1001;
+
+    //user info
     private String username;
     private String userId;
     private String APIkey;
@@ -50,7 +63,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     private SettingsListAdapter adapter;
     private ListView listView;
     private Activity activity = this;
-    private final String LOG_TAG = RemoteCollectionSettingsActivity.class.getSimpleName();
     private View rootView;
     private Toolbar toolbar;
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
@@ -90,7 +102,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                     Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
                     folder.setImejiId(folder.id);
                     collectionListLocal.add(folder);
-
                     ImejiFolder imejiFolder = new ImejiFolder();
                     imejiFolder.setTitle(folder.getTitle());
                     imejiFolder.setImejiId(folder.id);
@@ -151,7 +162,15 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         APIkey = mPrefs.getString("apiKey", "");
         email = mPrefs.getString("email", "");
 
-
+        /** scan QR **/
+        Button qrCodeImageView = (Button) findViewById(R.id.im_qr_scan);
+        qrCodeImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(activity, QRScannerActivity.class);
+                startActivityForResult(intent, INTENT_QR);
+            }
+        });
 
         listView = (ListView) findViewById(R.id.settings_remote_listView);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -229,6 +248,8 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             Log.v("create Task", "no task in database");
             Task task = new Task();
 
+            getCollectionNameById(collectionID);
+
             String uniqueID = UUID.randomUUID().toString();
             task.setTaskId(uniqueID);
             task.setUploadMode("AU");
@@ -245,7 +266,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             task.setStartDate(String.valueOf(now));
 
             task.save();
-
+            Log.v(LOG_TAG,"finish");
             finish();
 
         }else if(!latestTask.getCollectionId().equals(collectionID)) {
@@ -272,7 +293,76 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             finish();
         }
     }
+    private void getCollectionNameById(String collectionID){
+        //get collection Name form Id
+        for (ImejiFolder imejiFolder:collectionListLocal){
+            if (imejiFolder.getImejiId().equalsIgnoreCase(collectionID) ){
+                collectionName = imejiFolder.getTitle();
+                Log.v(LOG_TAG,"getCollectionName:"+collectionName);
+                return;
+            }
+        }
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == INTENT_QR) {
+
+            if (resultCode == Activity.RESULT_OK) {
+                Bundle bundle = data.getExtras();
+                String QRText = bundle.getString("QRText");
+                Log.v(LOG_TAG, QRText);
+                String APIkey = "";
+                String url = "";
+                try {
+                    JSONObject jsonObject = new JSONObject(QRText);
+                    APIkey = jsonObject.getString("key");
+                    Log.v("APIkey",APIkey);
+                    url = jsonObject.getString("col");
+                    Log.v("col",url);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                try {
+
+                    URL u = new URL(url);
+
+                    String path = u.getPath();
+
+                    if (path != null) {
+                       String qrCollectionId = path.substring(path.lastIndexOf("/") + 1);
+                        /** set choose **/
+                        //create task if collection is selected
+                        if (!qrCollectionId.equals("") && !qrCollectionId.equals(null)) {
+                            Log.i("~qrCollectionId", qrCollectionId);
+
+
+                            /**
+                             * delete all AU Task if finished
+                             * */
+                            DeviceStatus.deleteFinishedTasks();
+
+                            /**create Task**/
+                            createTask(qrCollectionId);
+
+                        } else {
+                            Toast.makeText(context, "collection setting not changed", Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // User cancelled the photo picking
+            }
+        }
+    }
 
     @Override
     public void setCollectionId(int Id) {

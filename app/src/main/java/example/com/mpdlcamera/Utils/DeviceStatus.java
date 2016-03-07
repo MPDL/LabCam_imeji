@@ -141,6 +141,7 @@ public class DeviceStatus {
         // get All au tasks first
         List<Task> finishedTasks = new Select()
                 .from(Task.class)
+                .where("uploadMode = ?","AU")
                 .execute();
         Log.v(LOG_TAG, finishedTasks.size() + "_all");
 

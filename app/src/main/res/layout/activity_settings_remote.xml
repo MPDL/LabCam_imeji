@@ -32,7 +32,7 @@
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
 
-    <ImageView
+    <Button
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginTop="10dp"
@@ -40,7 +40,7 @@
         android:layout_marginLeft="10dp"
         android:id="@+id/im_qr_scan"
         android:layout_below="@id/toolbar"
-        android:src="@drawable/qr_scan"/>
+        android:background="@drawable/qr_scan"/>
     
         <ListView
             android:layout_width="match_parent"
