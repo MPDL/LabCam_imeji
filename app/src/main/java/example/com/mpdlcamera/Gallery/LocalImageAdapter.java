@@ -112,6 +112,8 @@ public class LocalImageAdapter extends BaseAdapter {
         Button buttonCloud = (Button) grid.findViewById(R.id.cloud);
         Button buttonUploading = (Button) grid.findViewById(R.id.uploading);
 
+        ImageView checkMark = (ImageView) grid.findViewById(R.id.gallery_grid_check_mark);
+
         String filePath = galleryItems.get(position);
         //buttonUploading.setVisibility(View.INVISIBLE);
         File imageFile = new File(filePath);
@@ -146,11 +148,14 @@ public class LocalImageAdapter extends BaseAdapter {
                 buttonUploading.setVisibility(View.GONE);
             }
 
-        grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light));
+//        grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light));
 
 
         if (mSelection.get(position) != null) {
-            grid.setBackgroundColor(activity.getResources().getColor(android.R.color.holo_blue_dark));
+//            grid.setBackgroundColor(activity.getResources().getColor(android.R.color.holo_blue_dark));
+            checkMark.setVisibility(View.VISIBLE);
+        }else {
+            checkMark.setVisibility(View.GONE);
         }
 
         ImageView imageView = (ImageView) grid.findViewById(R.id.image_view);
