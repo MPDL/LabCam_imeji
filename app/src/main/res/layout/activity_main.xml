@@ -40,7 +40,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="16dp"
             android:id="@+id/camera_icon"
-            android:src="@drawable/camera"/>
+            android:src="@drawable/camera_white"/>
 
         </RelativeLayout>
         </android.support.v7.widget.Toolbar>
