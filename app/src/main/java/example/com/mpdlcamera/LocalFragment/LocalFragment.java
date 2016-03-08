@@ -130,33 +130,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         //set header recycleView adapter
         loadTimeLinePicture();
 
-        simpleAdapter.setOnItemClickListener(new SimpleAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                if (actionMode != null) {
-                    // 如果当前处于多选状态，则进入多选状态的逻辑
-                    // 维护当前已选的position
-                    addOrRemove(position);
-                    simpleAdapter.setPositionSet(positionSet);
-                } else {
-                    // 如果不是多选状态，则进入点击事件的业务逻辑
-                    //  show picture
-                    boolean isLocalImage = true;
-                    Intent showDetailIntent = new Intent(getActivity(), DetailActivity.class);
-                    showDetailIntent.putExtra("itemPath", sortedImageNameList.get(position));
-                    showDetailIntent.putExtra("isLocalImage",isLocalImage);
-                    startActivity(showDetailIntent);
-
-                }
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-                if (actionMode == null) {
-                    actionMode = ((AppCompatActivity)getActivity()).startSupportActionMode(ActionModeCallback);
-                }
-            }
-        });
 
 
 
@@ -346,7 +319,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         Cursor cur = getActivity().getContentResolver().query(images, albums,null,null,null);
 
-
+        imageList.clear();
         /*
             Listing out all the image folders(Galleries) in the file system.
          */
@@ -391,6 +364,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         // sortedImageNameList is imagePath list
         ArrayList<String> ImageNameList = new ArrayList<>();
         sortedImageNameList = new ArrayList<>();
+        sortedImageNameList.clear();
         // sectionMap key is the date, value is the picture number
         List<String> dateAseList = new ArrayList<String>();
         List<String> dateList = new ArrayList<String>();
@@ -414,6 +388,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         for(int i=ImageNameList.size()-1;i>=0;i--){
             sortedImageNameList.add(ImageNameList.get(i));
         }
+
+        Log.e(LOG_TAG,sortedImageNameList.size()+"");
 
          simpleAdapter = new SimpleAdapter(getActivity(),sortedImageNameList);
 
@@ -447,6 +423,36 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         //Apply this adapter to the RecyclerView
         recyclerView.setAdapter(mSectionedAdapter);
+
+
+        simpleAdapter.setOnItemClickListener(new SimpleAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (actionMode != null) {
+                    // 如果当前处于多选状态，则进入多选状态的逻辑
+                    // 维护当前已选的position
+                    addOrRemove(position);
+                    simpleAdapter.setPositionSet(positionSet);
+                } else {
+                    // 如果不是多选状态，则进入点击事件的业务逻辑
+                    //  show picture
+                    boolean isLocalImage = true;
+                    Intent showDetailIntent = new Intent(getActivity(), DetailActivity.class);
+                    showDetailIntent.putExtra("itemPath", sortedImageNameList.get(position));
+                    showDetailIntent.putExtra("isLocalImage", isLocalImage);
+                    startActivity(showDetailIntent);
+
+                }
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+                if (actionMode == null) {
+                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(ActionModeCallback);
+                }
+            }
+        });
+
     }
 
 
@@ -558,5 +564,14 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         }
         return imageNum;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        prepareData();
+//        loadTimeLinePicture();
+        simpleAdapter.notifyDataSetChanged();
+        mSectionedAdapter.notifyDataSetChanged();
     }
 }

@@ -17,8 +17,8 @@
 
     <ImageView
         android:id="@+id/gallery_grid_check_mark"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginTop="4dp"
         android:visibility="gone"
         android:src="@drawable/btn_check"

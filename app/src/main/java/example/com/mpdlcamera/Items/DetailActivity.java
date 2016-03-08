@@ -46,10 +46,10 @@ public class DetailActivity extends Activity {
             itemPath = extras.getString("itemPath");
             ImageView imageView = (ImageView) rootView.findViewById(R.id.detail_image);
 
-            mAttacher = new PhotoViewAttacher(imageView);
+//            mAttacher = new PhotoViewAttacher(imageView);
             //mAttacher.setScaleType(ImageView.ScaleType.CENTER_INSIDE);  //scale and show the whole photo based on Longth
             //mAttacher.setScaleType(ImageView.ScaleType.FIT_CENTER);  //scale and show the whole photo based on Width
-            //mAttacher.setScaleType(ImageView.ScaleType.CENTER);     // no scale, cut the photo to fit
+//            mAttacher.setScaleType(ImageView.ScaleType.CENTER);     // no scale, cut the photo to fit
             //mAttacher.setScaleType(ImageView.ScaleType.CENTER_CROP); // no scale , cut by center
             //mAttacher.setScaleType(ImageView.ScaleType.FIT_XY);  //no scale, show the original photo
 
@@ -86,7 +86,7 @@ public class DetailActivity extends Activity {
             }
 
 
-            mAttacher.update();
+//            mAttacher.update();
 
         }
 
