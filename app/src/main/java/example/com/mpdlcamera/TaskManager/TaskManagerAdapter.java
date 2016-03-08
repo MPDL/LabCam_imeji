@@ -94,10 +94,10 @@ public class TaskManagerAdapter extends BaseAdapter {
         TextView taskNameTextView = (TextView) view.findViewById(R.id.tv_task_name);
         if(taskList.get(position).getUploadMode().equalsIgnoreCase("AU")){
             // AU
-            taskNameTextView.setText("Captured Fotos upload to");
+            taskNameTextView.setText("Captured photos upload to");
         }else {
             // MU
-            taskNameTextView.setText(taskList.get(position).getTotalItems()+" selected Fotos upload to");
+            taskNameTextView.setText(taskList.get(position).getTotalItems()+" selected photos upload to");
         }
         // set collection name
         TextView taskCollectionTextView = (TextView) view.findViewById(R.id.tv_task_collection);
