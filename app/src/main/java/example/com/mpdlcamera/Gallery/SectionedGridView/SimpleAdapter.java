@@ -3,6 +3,7 @@ package example.com.mpdlcamera.Gallery.SectionedGridView;
 import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,9 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import example.com.mpdlcamera.R;
 
@@ -26,6 +29,9 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
 
     private LayoutInflater inflater;
 
+    //remember selected positions
+    public Set<Integer> positionSet = new HashSet<>();
+
 
     private OnItemClickListener onItemClickListener;
 
@@ -35,10 +41,12 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
 
     public static class SimpleViewHolder extends RecyclerView.ViewHolder {
         public final ImageView imageView;
+        public final ImageView checkMark;
 
         public SimpleViewHolder(View view) {
             super(view);
             imageView = (ImageView) view.findViewById(R.id.header_grid_image);
+            checkMark = (ImageView) view.findViewById(R.id.header_grid_check_mark);
         }
     }
 
@@ -63,6 +71,12 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
                 .resize(235,235)
                 .centerCrop()
                 .into(holder.imageView);
+
+        if(positionSet.contains(position)){
+            holder.checkMark.setVisibility(View.VISIBLE);
+        }else {
+            holder.checkMark.setVisibility(View.GONE);
+        }
 
 
         if (onItemClickListener!=null){
@@ -101,6 +115,11 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
         return mItems.size();
     }
 
+    public void setPositionSet(Set<Integer> positionSet){
+        this.positionSet = positionSet;
+        Log.e("positionSet",positionSet.size()+"");
+        notifyDataSetChanged();
+    }
 
     public interface OnItemClickListener{
         void onItemClick(View view, int position);

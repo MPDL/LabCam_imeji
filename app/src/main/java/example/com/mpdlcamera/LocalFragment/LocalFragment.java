@@ -136,6 +136,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     // 如果当前处于多选状态，则进入多选状态的逻辑
                     // 维护当前已选的position
                     addOrRemove(position);
+                    simpleAdapter.setPositionSet(positionSet);
                 } else {
                     // 如果不是多选状态，则进入点击事件的业务逻辑
                     // maybe show picture
