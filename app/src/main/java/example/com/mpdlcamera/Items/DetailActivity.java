@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -14,6 +15,8 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
+
+import java.io.File;
 
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Settings.SettingsActivity;
@@ -43,8 +46,6 @@ public class DetailActivity extends Activity {
             itemPath = extras.getString("itemPath");
             ImageView imageView = (ImageView) rootView.findViewById(R.id.detail_image);
 
-            Log.v(LOG_TAG, itemPath);
-
             mAttacher = new PhotoViewAttacher(imageView);
             //mAttacher.setScaleType(ImageView.ScaleType.CENTER_INSIDE);  //scale and show the whole photo based on Longth
             //mAttacher.setScaleType(ImageView.ScaleType.FIT_CENTER);  //scale and show the whole photo based on Width
@@ -65,14 +66,24 @@ public class DetailActivity extends Activity {
 //                        where("filename = ?", itemName).executeSingle();
 //                Log.v(LOG_TAG, item.getWebResolutionUrlUrl());
 
-
-            Picasso.with(activity)
-                    .load(itemPath)
-                    .resize(size.x, size.y)
-                    .centerInside()
-                    //.centerCrop()
-                    //.placeholder(R.drawable.progress_animation)
-                    .into(imageView);
+            boolean isLocalImage = extras.getBoolean("isLocalImage",false);
+            if(isLocalImage){
+                Uri uri = Uri.fromFile(new File(itemPath));
+                Log.e(LOG_TAG, itemPath);
+                Picasso.with(activity)
+                        .load(uri)
+                        .resize(size.x, size.y)
+                        .centerInside()
+                                //.centerCrop()
+                                //.placeholder(R.drawable.progress_animation)
+                        .into(imageView);
+            }else {
+                   Picasso.with(activity)
+                           .load(itemPath)
+                           .resize(size.x, size.y)
+                           .centerInside()
+                           .into(imageView);
+            }
 
 
             mAttacher.update();

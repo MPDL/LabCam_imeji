@@ -64,7 +64,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     @Override
     public void onBindViewHolder(SimpleViewHolder holder, final int position) {
         String filePath = mItems.get(position);
-        File imageFile = new File(filePath);
         Uri uri = Uri.fromFile(new File(filePath));
         Picasso.with(mContext)
                 .load(uri)

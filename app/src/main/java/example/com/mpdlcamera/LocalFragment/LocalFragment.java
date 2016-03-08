@@ -44,6 +44,7 @@ import example.com.mpdlcamera.Gallery.LocalImageActivity;
 import example.com.mpdlcamera.Gallery.RemoteListDialogFragment;
 import example.com.mpdlcamera.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
 import example.com.mpdlcamera.Gallery.SectionedGridView.SimpleAdapter;
+import example.com.mpdlcamera.Items.DetailActivity;
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
@@ -139,7 +140,13 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     simpleAdapter.setPositionSet(positionSet);
                 } else {
                     // 如果不是多选状态，则进入点击事件的业务逻辑
-                    // maybe show picture
+                    //  show picture
+                    boolean isLocalImage = true;
+                    Intent showDetailIntent = new Intent(getActivity(), DetailActivity.class);
+                    showDetailIntent.putExtra("itemPath", sortedImageNameList.get(position));
+                    showDetailIntent.putExtra("isLocalImage",isLocalImage);
+                    startActivity(showDetailIntent);
+
                 }
             }
 
