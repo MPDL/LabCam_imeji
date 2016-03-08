@@ -88,17 +88,17 @@
         android:layout_centerVertical="true"
         >
     <ImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:id="@+id/task_delete"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
-        android:src="@drawable/cancel_red"/>
+        android:src="@drawable/btn_delete"/>
 
 
     <CheckBox
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_toLeftOf="@id/task_delete"
         android:layout_marginRight="16dp"
         android:background="@xml/checkbox_pause_play"

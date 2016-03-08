@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
 
+import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
@@ -88,6 +89,12 @@ public class ServiceGenerator {
                 .create();
 
         // set endpoint url and use OkHTTP as HTTP client
+        //TODO: sometimes there is a base url null error
+        /** add a default url here **/
+        if(baseUrl ==null){
+            baseUrl = DeviceStatus.BASE_URL;
+        }
+
         builder.setEndpoint(baseUrl)
                 .setConverter(new GsonConverter(gson))
                 .setClient(new OkClient(new OkHttpClient()));
