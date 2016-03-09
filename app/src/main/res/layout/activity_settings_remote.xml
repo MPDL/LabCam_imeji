@@ -16,16 +16,15 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="7dp"
             android:orientation="horizontal"
             android:background="@color/primary">
 
             <TextView
                 android:id="@+id/locationText"
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:text="@string/title_activity_remote_collection"
+                android:gravity="center_vertical"
                 android:textColor="@color/white"
                 android:textSize="20dp" />
 

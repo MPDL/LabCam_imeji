@@ -16,14 +16,13 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="7dp"
             android:orientation="horizontal"
             android:background="@color/primary">
             <TextView
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
+                android:gravity="center_vertical"
                 android:layout_marginEnd="50dp"
                 android:layout_marginTop="03dp"
                 android:text="@string/title_activity_Images"
