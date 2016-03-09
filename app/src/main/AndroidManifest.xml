@@ -23,7 +23,7 @@
         android:name="com.activeandroid.app.Application"
         android:allowBackup="true"
         android:backupAgent=".Utils.BackupFileHelper"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/icon_app"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:theme="@style/AppTheme.WithoutActionBar" >
