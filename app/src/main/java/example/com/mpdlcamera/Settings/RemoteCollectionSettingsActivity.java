@@ -490,7 +490,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                 }
                             }
                         })
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(R.drawable.error_alert)
                 .show();
 
         // not dismiss by wrong click

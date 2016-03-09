@@ -663,7 +663,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                                     // do
                                 }
                             })
-                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setIcon(R.drawable.error_alert)
                             .show();
                 }else {
 

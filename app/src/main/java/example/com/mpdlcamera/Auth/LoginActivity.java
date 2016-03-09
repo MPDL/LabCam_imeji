@@ -400,7 +400,7 @@ public class LoginActivity extends AppCompatActivity {
                                 finish();
                             }
                         })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setIcon(R.drawable.error_alert)
                         .show();
             }else if(isFinished){
                 Intent intent = new Intent(activity, MainActivity.class);
