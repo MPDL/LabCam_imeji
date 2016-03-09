@@ -3,6 +3,7 @@ package example.com.mpdlcamera.AutoRun;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.ExifInterface;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import example.com.mpdlcamera.Model.LocalModel.Image;
+import example.com.mpdlcamera.Model.LocalModel.Settings;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -26,8 +28,25 @@ import example.com.mpdlcamera.Utils.DeviceStatus;
  * Created by yingli on 12/16/15.
  */
 public class CameraEventReceiver extends BroadcastReceiver implements UploadResultReceiver.Receiver{
+
+    private String userId;
+    private SharedPreferences mPrefs;
+
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        mPrefs = context.getSharedPreferences("myPref", 0);
+        userId = mPrefs.getString("userId","");
+        try {
+        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+        if(!settings.isAutoUpload()){
+            Log.i("EEE","return");
+            return;
+        }
+        }catch (Exception e){
+            Log.e("CameraEventReceiver","exception, return");
+            return;
+        }
 
         Cursor cursor = context.getContentResolver().query(intent.getData(), null, null, null, null);
         cursor.moveToFirst();

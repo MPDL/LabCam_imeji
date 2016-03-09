@@ -44,7 +44,7 @@
     
         <ListView
             android:layout_width="match_parent"
-            android:layout_height="320dp"
+            android:layout_height="340dp"
             android:choiceMode="singleChoice"
             android:divider="@null"
             android:dividerHeight="0dp"
