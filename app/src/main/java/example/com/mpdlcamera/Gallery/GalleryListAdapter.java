@@ -50,19 +50,9 @@ public class GalleryListAdapter extends BaseAdapter {
     boolean flag = false;
     Boolean matchGallery = false;
   //  SharedPreferences mPreferences;
-    String status = "Off";
     TextView title;
-    TextView mStatus;
-    TextView upCount;
-    String message;
-    ProgressBar progressBar;
     ImageView imageView;
     Point size;
-
-
-    private void setLocalPath(String path) {
-        this.localPath = path;
-    }
 
     public GalleryListAdapter(Activity activity) {
         this.activity = activity;
@@ -119,8 +109,6 @@ public class GalleryListAdapter extends BaseAdapter {
 
         imageView = (ImageView) convertView.findViewById(R.id.list_gallery_cell_thumbnail);
         title = (TextView) convertView.findViewById(R.id.list_item_gallery_title);
-        mStatus = (TextView) convertView.findViewById(R.id.list_item_gallery_status);
-        upCount = (TextView) convertView.findViewById(R.id.list_item_gallery_ucount);
 
         SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 
@@ -167,7 +155,6 @@ public class GalleryListAdapter extends BaseAdapter {
 
             }
         }
-       // title.setText(gallery.getGalleryName());
 
         String galleryPath = gallery.getGalleryPath();
 
@@ -190,8 +177,6 @@ public class GalleryListAdapter extends BaseAdapter {
         SharedPreferences filePreferences = activity.getSharedPreferences("myPref", 0);
         CollectionId = filePreferences.getString("collectionID","");
 
-        int uCount = getUploadingCount(gallery);
-        int fCount = gallery.getCount();
 
         File directory = new File(galleryPath);
         int fCount2 = 0;
@@ -204,158 +189,20 @@ public class GalleryListAdapter extends BaseAdapter {
         }
         if(mPreferences.contains(gallery.getGalleryName())) {
 
-            status = mPreferences.getString(gallery.getGalleryName(), "");
-
-
-            if (status.equalsIgnoreCase("On")) {
-
-                message = "Activated";
-                upCount.setVisibility(View.INVISIBLE);
-//                if (nPreferences.getString("UploadStatus", "").equalsIgnoreCase("true")) {
-//                    message = "Uploaded";
-//                  //  progressBar.setVisibility(View.INVISIBLE);
-//                    upCount.setVisibility(View.GONE);
-//
-//                } else {
-//                    message = "Uploading";
-//                    upCount.setText(gallery.getCount()-uCount + "file(s) are remaining");
-//                 //   progressBar.setVisibility(View.INVISIBLE);
-//                }
-            } else {
-                message = "Not Activated";
-              //  progressBar.setVisibility(View.INVISIBLE);
-                upCount.setVisibility(View.GONE);
-            }
-
-
             if(gallery.getGalleryName().equalsIgnoreCase("Camera")) {
-                title.setText(gallery.getGalleryName() + "(" + (fCount2) + ")");
+                title.setText(gallery.getGalleryName() + " (" + (fCount2) + ")");
             }
-            else  title.setText(gallery.getGalleryName() + "(" + (fCount2) + ")");
+            else  title.setText(gallery.getGalleryName() + " (" + (fCount2) + ")");
 
-            mStatus.setText(message);
            // upCount.setVisibility(View.INVISIBLE);
         }
         else {if(gallery.getGalleryName().equalsIgnoreCase("Camera")) {
-            title.setText(gallery.getGalleryName() + "(" + (fCount2) + ")");
+            title.setText(gallery.getGalleryName() + " (" + (fCount2) + ")");
         }
-            else title.setText(gallery.getGalleryName() + "(" + (fCount2) + ")");
-
-            mStatus.setText("Not Activated");
-            upCount.setVisibility(View.GONE);
+            else title.setText(gallery.getGalleryName() + " (" + (fCount2) + ")");
 
         }
 
         return convertView;
     }
-
-    /*
-        returns the uploading count of the gallery
-     */
-    private int getUploadingCount(Gallery gallery) {
-
-        Integer uploadCount = 0;
-        String folderPath = gallery.getGalleryPath();
-        File directory = new File(folderPath);
-        File[] files = directory.listFiles();
-        MySQLiteHelper db = new MySQLiteHelper(activity);
-        SQLiteDatabase dBase = db.getWritableDatabase();
-
-        List<FileId> fileIds = db.getAllFiles();
-
-        for(File imageFile : files) {
-
-            String fileName = imageFile.getName();
-            String filePlusId = fileName + CollectionId;
-            if(db.getFileStatus(filePlusId).equalsIgnoreCase("uploaded")){
-                uploadCount++;
-            }
-        }
-
-        return uploadCount;
-
-
-    }
-
-/*    private void simplify(Gallery gallery) {
-
-        Thumbnail thumbnail = new Thumbnail(activity);
-        String imPath = null;
-
-        if(!galleriesOne.contains(gallery.getGalleryName())) {
-            flag = true;
-            imPath = thumbnail.getLatestImage(gallery,flag);
-            galleriesOne.add(gallery.getGalleryName());
-        }
-        else {
-            flag = false;
-            imPath = thumbnail.getLatestImage(gallery, flag);
-        }
-
-
-        //ListGalleries(gallery);
-
-        if (gallery.getItems() != null) {
-            if (gallery.getItems().size() > 0) {
-                Gallery m = gallery.getItems().get(0);
-
-            }
-        }
-        title.setText(gallery.getGalleryName());
-
-        String gpath = gallery.getGalleryPath();
-
-        String iPath = this.localPath;
-        // File imgFile = new File(iPath);
-        File imgFile1 = new File(imPath);
-
-        Uri uri = Uri.fromFile(imgFile1);
-
-        if(imgFile1.exists()) {
-          // imageView.setImageDrawable(draw);
-               Picasso.with(activity)
-                        .load(uri)
-                       .resize(size.x / 2, size.y)
-                       .centerInside()
-                        .into(imageView);
-        }
-        SharedPreferences mPreferences = activity.getSharedPreferences("folder", Context.MODE_PRIVATE);
-        SharedPreferences nPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
-
-        if(mPreferences.contains(gallery.getGalleryName())) {
-
-            status = mPreferences.getString(gallery.getGalleryName(),"");
-
-        }
-
-        if(status.equalsIgnoreCase("On")) {
-
-            if(nPreferences.getString("UStatus","").equalsIgnoreCase("true")) {
-                gh="Uploaded....";
-                progressBar.setVisibility(View.INVISIBLE);
-
-            }
-            else {
-                gh="Uploading";
-                progressBar.setVisibility(View.VISIBLE);
-            }
-        }
-        else {
-            gh="Not Activated";
-            progressBar.setVisibility(View.INVISIBLE);
-        }
-
-
-        title.setText(gallery.getGalleryName() + "(" + gallery.getCount() + ")");
-        mStatus.setText(gh);
-
-
-
-
-
-    }*/
-
-
-
-
 }

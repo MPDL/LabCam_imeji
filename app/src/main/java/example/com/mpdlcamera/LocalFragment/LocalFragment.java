@@ -274,28 +274,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 Gallery gallery = (Gallery) adapter.getItem(position);
-
-                String status = preferences.getString(gallery.getGalleryName(), "");
-
-                //// FIXME: 2/2/16 why need this if else?
-//                if(status.equalsIgnoreCase("On")) {
-//
-//                    /*
-//                        Sending the galleryname and the gallerypath to the next activity(for the activated gallery)
-//                     */
-//                    Intent activatedGalleryIntent = new Intent(getActivity(), ActivatedGalleryActivity.class);
-//                    activatedGalleryIntent.putExtra("galleryName", gallery.getGalleryName());
-//                    activatedGalleryIntent.putExtra("galleryPath", gallery.getGalleryPath());
-//
-//                    startActivity(activatedGalleryIntent);
-//
-//                }
-//                else {
-                    /*
-                        Sending the gallerytitle for the next activity(not activated gallery)
-                     */
-
-
                 Intent galleryImagesIntent = new Intent(getActivity(), LocalImageActivity.class);
                 galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
 
