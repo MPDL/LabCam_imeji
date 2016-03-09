@@ -76,7 +76,7 @@
         <Button
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:background="@drawable/qr2_64px_grey"
+            android:background="@drawable/qr_scan"
             android:id="@+id/qr_scanner"
             android:layout_margin="4dp"
             android:layout_gravity="center_horizontal"

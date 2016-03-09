@@ -174,9 +174,10 @@ public class TaskUploadService extends Service{
     }
 
     private boolean taskIsStopped (){
-        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+
 
         try{
+            task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
             if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
             Log.v(TAG,"taskIsStopped");
             return true;
