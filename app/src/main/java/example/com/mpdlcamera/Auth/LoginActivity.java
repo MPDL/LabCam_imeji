@@ -198,6 +198,8 @@ public class LoginActivity extends AppCompatActivity {
                     Log.v("col",url);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
+                    return;
                 }
 
 
@@ -208,7 +210,14 @@ public class LoginActivity extends AppCompatActivity {
                     String path = u.getPath();
 
                     if (path != null) {
-                        collectionId = path.substring(path.lastIndexOf("/") + 1);
+                        try {
+                            collectionId = path.substring(path.lastIndexOf("/") + 1);
+                            Log.i(LOG_TAG,collectionId);
+                        }catch (Exception e){
+                            Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
                     }
 
                     //get collection

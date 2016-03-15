@@ -214,8 +214,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         actionMode = null;
         positionSet.clear();
         actionBar.show();
-//        simpleAdapter.notifyDataSetChanged();
-//        mSectionedAdapter.notifyDataSetChanged();
+        simpleAdapter.notifyDataSetChanged();
+        mSectionedAdapter.notifyDataSetChanged();
     }
 
     private void addOrRemove(int position) {
@@ -551,5 +551,10 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 //        loadTimeLinePicture();
         simpleAdapter.notifyDataSetChanged();
         mSectionedAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 }

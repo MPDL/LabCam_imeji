@@ -254,9 +254,9 @@ public class TaskManagerAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View view) {
                     new AlertDialog.Builder(activity)
-                            .setTitle("abort uploading")
+                            .setTitle("Abort Uploading")
                             .setMessage("Are you sure you want to give up this uploading process?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
 
                                     if (task.getUploadMode().equalsIgnoreCase("AU")) {
@@ -304,7 +304,7 @@ public class TaskManagerAdapter extends BaseAdapter {
 
                                 }
                             })
-                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     // do nothing
                                 }

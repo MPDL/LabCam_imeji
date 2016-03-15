@@ -13,10 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.activeandroid.query.Select;
+
 import java.util.List;
 
 import example.com.mpdlcamera.AutoRun.TaskUploadService;
 import example.com.mpdlcamera.AutoRun.dbObserver;
+import example.com.mpdlcamera.Model.LocalModel.Settings;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -52,6 +55,10 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
         //taskManager listview
         taskManagerListView = (ListView) view.findViewById(R.id.listView_task);
         taskList = DeviceStatus.getUserTasks(userId);
+        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+
+        // auTask only for delete
+        Task auTask = new Task();
         for(Task task:taskList){
             Log.v(LOG_TAG,"mode: "+task.getUploadMode());
             Log.v(LOG_TAG,"collection: "+task.getCollectionName());
@@ -59,8 +66,11 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
             Log.v(LOG_TAG,"finished: "+task.getFinishedItems());
             Log.v(LOG_TAG,"CollectionId: "+task.getCollectionId());
             Log.v(LOG_TAG,"State: "+task.getState());
+            if(task.getUploadMode().equalsIgnoreCase("AU")&&!settings.isAutoUpload()){
+                auTask = task;
+            }
         }
-
+        taskList.remove(auTask);
         taskManagerAdapter = new TaskManagerAdapter(this.getActivity(),taskList,this);
         taskManagerAdapter.notifyDataSetChanged();
         taskManagerListView.setAdapter(taskManagerAdapter);
@@ -101,6 +111,17 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
                     Log.v("~~~", "1234~~~");
                     try {
                         taskList = DeviceStatus.getUserTasks(userId);
+                        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+                        Task auTask = new Task();
+                        for(Task task:taskList){
+                            if(task.getUploadMode().equalsIgnoreCase("AU")&&!settings.isAutoUpload()){
+                                if(task.getUploadMode().equalsIgnoreCase("AU")&&!settings.isAutoUpload()){
+                                    auTask = task;
+                                }
+                            }
+                            taskList.remove(auTask);
+                        }
+
                         if(taskList!=null){
                             taskManagerAdapter.notifyDataSetChanged();
                         }
@@ -157,42 +178,4 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
         public void onFragmentInteraction(Uri uri);
     }
 
-//    private ServiceConnection mConnection = new ServiceConnection() {
-//        public void onServiceConnected(ComponentName className, IBinder service) {
-//            // This is called when the connection with the service has been
-//            // established, giving us the service object we can use to
-//            // interact with the service.  Because we have bound to a explicit
-//            // service that we know is running in our own process, we can
-//            // cast its IBinder to a concrete class and directly access it.
-//            mBoundService = ((TaskUploadService.AutoUploadServiceBinder) service).getService();
-//
-//        }
-//
-//        public void onServiceDisconnected(ComponentName className) {
-//            // This is called when the connection with the service has been
-//            // unexpectedly disconnected -- that is, its process crashed.
-//            // Because it is running in our same process, we should never
-//            // see this happen.
-//            mBoundService = null;
-//        }
-//    };
-//
-//
-//    void doBindService() {
-//        // Establish a connection with the service.  We use an explicit
-//        // class name because we want a specific service implementation that
-//        // we know will be running in our own process (and thus won't be
-//        // supporting component replacement by other applications).
-//        getActivity().bindService(new Intent(getActivity(), TaskUploadService.class), mConnection, Context.BIND_AUTO_CREATE);
-//
-//        mIsBound = true;
-//    }
-//
-//    void doUnbindService() {
-//        if (mIsBound) {
-//            // Detach our existing connection.
-//            getActivity().unbindService(mConnection);
-//            mIsBound = false;
-//        }
-//    }
 }

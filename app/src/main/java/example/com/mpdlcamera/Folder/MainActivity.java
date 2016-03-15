@@ -602,7 +602,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 if(!isFinished){
                     new AlertDialog.Builder(context)
                             .setTitle("Logout")
-                            .setMessage("There are still pictures waiting for uploading,are you sure you want to logout?")
+                            .setMessage("There are still pictures waiting for uploading, are you sure you want to logout?")
                             .setPositiveButton("LOGOUT", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     // LOGOUT

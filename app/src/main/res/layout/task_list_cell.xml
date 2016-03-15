@@ -92,7 +92,7 @@
         android:layout_height="30dp"
         android:id="@+id/task_delete"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="10dp"
+        android:layout_marginRight="21dp"
         android:src="@drawable/btn_delete"/>
 
 
