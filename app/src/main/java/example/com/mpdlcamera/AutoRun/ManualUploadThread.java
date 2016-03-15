@@ -8,10 +8,12 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.squareup.otto.Produce;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
@@ -116,8 +118,24 @@ public class ManualUploadThread extends Thread {
                     String jsonPart1 = "\"collectionId\" : \"" +
                             collectionID +
                             "\"";
+                    File f = new File(filePath);
+                    if(f.exists() && !f.isDirectory()) {
+                        // do something
+                        Log.i(TAG,collectionID+": file exist");
+                    }else {
+                        Log.i(TAG, "file not exist: " + currentImageId);
+                        // delete Image from task
+                        new Delete()
+                                .from(Image.class)
+                                .where("imageId = ?", currentImageId)
+                                .execute();
+                        // continue unpload
+                        uploadNext();
 
-                    typedFile = new TypedFile("multipart/form-data", new File(filePath));
+                        return;
+                    }
+
+                    typedFile = new TypedFile("multipart/form-data", f);
                     json = "{" + jsonPart1 + "}";
                     Log.v(TAG, "start uploading: " + filePath);
                     RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
@@ -145,7 +163,25 @@ public class ManualUploadThread extends Thread {
                         collectionID +
                         "\"";
 
-                typedFile = new TypedFile("multipart/form-data", new File(filePath));
+
+                File f = new File(filePath);
+                if(f.exists() && !f.isDirectory()) {
+                    // do something
+                    Log.i(TAG,collectionID+": file exist");
+                }else {
+                    Log.i(TAG, "file not exist: " + currentImageId);
+                    // delete Image from task
+                    new Delete()
+                            .from(Image.class)
+                            .where("imageId = ?", currentImageId)
+                            .execute();
+                    // continue unpload
+                    uploadNext();
+
+                    return;
+                }
+
+                typedFile = new TypedFile("multipart/form-data", f);
                 json = "{" + jsonPart1 + "}";
                 Log.v(TAG, "start uploading: " + filePath);
                 RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
@@ -270,7 +306,7 @@ public class ManualUploadThread extends Thread {
                         handler=new Handler(Looper.getMainLooper());
                         handler.post(new Runnable() {
                             public void run() {
-//                            Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Photo already exists", Toast.LENGTH_SHORT).show();
                             }
                         });
                         currentImage.setLog(error.getKind().name() + " already exists");
@@ -293,32 +329,9 @@ public class ManualUploadThread extends Thread {
                 Log.v(TAG, String.valueOf(error));
 
                 //TODO: continue upload
+                uploadNext();
 
 
-                try {
-                    /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
-                    finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
-                } catch (Exception e) {
-                }
-
-                //DELETE TESTING
-                Log.i(TAG, "finishedImages " + finishedImages.size());
-
-                task.setFinishedItems(finishedImages.size());
-                task.save();
-
-                /** move on to next **/
-                int finishedNum = task.getFinishedItems();
-                int totalNum = task.getTotalItems();
-                if(totalNum>finishedNum){
-                    // continue anyway
-                    Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
-                    if(image!=null){
-                        upload(image);
-                    }
-                }else {
-                    Log.i(TAG,"task finished");
-                }
             }
         }
     };
@@ -337,7 +350,35 @@ public class ManualUploadThread extends Thread {
             Log.e(TAG,"taskIsStopped exception");
             return false;
         }
+    }
 
+    private void uploadNext(){
+        int totalNum = task.getTotalItems();
+        try {
+            /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
+            finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+            List<Image> allImages= new Select().from(Image.class).where("taskId = ?", currentTaskId).execute();
+            totalNum = allImages.size();
+        } catch (Exception e) {
+        }
 
+        //DELETE TESTING
+        Log.i(TAG, "finishedImages " + finishedImages.size());
+        task.setTotalItems(totalNum);
+        task.setFinishedItems(finishedImages.size());
+        task.save();
+
+        /** move on to next **/
+        int finishedNum = task.getFinishedItems();
+//        totalNum = task.getTotalItems();
+        if(totalNum>finishedNum){
+            // continue anyway
+            Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
+            if(image!=null){
+                upload(image);
+            }
+        }else {
+            Log.i(TAG,"task finished");
+        }
     }
 }
