@@ -368,7 +368,12 @@ public class TaskUploadService extends Service{
             if (!taskIsStopped()) {
                 Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
                 //TODO:what to do with interrupted
-
+                if(currentImage!=null){
+                    //do sth
+                }else {
+                    Log.v(TAG,"currentImage:"+ currentImageId+ "is null");
+                    return;
+                }
 //
 //                    currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
 //                    currentImage.setLog(error.getKind().name());

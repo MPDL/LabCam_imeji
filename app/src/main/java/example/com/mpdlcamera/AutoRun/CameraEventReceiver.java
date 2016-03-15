@@ -100,7 +100,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         photo.setCreateTime(createTime);
         photo.setSize(fileSize);
         photo.setState(imageState);
-        photo.setTaskId(getTask().getTaskId());
+        photo.setTaskId(DeviceStatus.getAuTask(userId).getTaskId());
         photo.save();
 
         //get current Task id
@@ -112,9 +112,9 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
 
             task.save();
 
-            Log.v("taskid", getTask().getTaskId());
+            Log.v("taskid", DeviceStatus.getAuTask(userId).getTaskId());
             Log.v("taskId", getImage().getTaskId());
-            Log.v("taskNum", getTask().getTotalItems() + "");
+            Log.v("taskNum", DeviceStatus.getAuTask(userId).getTotalItems() + "");
 
             UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
             mReceiver.setReceiver(this);
@@ -133,13 +133,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
 
     }
 
-    //get latest task
-    public static Task getTask() {
-        return new Select()
-                .from(Task.class)
-                .orderBy("startDate DESC")
-                .executeSingle();
-    }
+
 
     //get latest image
     public static Image getImage() {

@@ -19,6 +19,7 @@ import java.util.List;
 
 import example.com.mpdlcamera.AutoRun.TaskUploadService;
 import example.com.mpdlcamera.AutoRun.dbObserver;
+import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Settings;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
@@ -60,12 +61,20 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
         // auTask only for delete
         Task auTask = new Task();
         for(Task task:taskList){
-            Log.v(LOG_TAG,"mode: "+task.getUploadMode());
+            Log.v(LOG_TAG,"--------------------------");
+            Log.v(LOG_TAG,"taskMode: "+task.getUploadMode());
             Log.v(LOG_TAG,"collection: "+task.getCollectionName());
-            Log.v(LOG_TAG,"total:: "+task.getTotalItems());
+            Log.v(LOG_TAG,"taskTotalItems: "+task.getTotalItems());
             Log.v(LOG_TAG,"finished: "+task.getFinishedItems());
             Log.v(LOG_TAG,"CollectionId: "+task.getCollectionId());
-            Log.v(LOG_TAG,"State: "+task.getState());
+            Log.v(LOG_TAG, "taskState: " + task.getState());
+            List<Image> imageList = new Select().from(Image.class).where("taskId = ?", task.getTaskId()).execute();
+            Log.v(LOG_TAG,"imageNum: "+imageList.size());
+            for (Image image: imageList){
+                Log.v(LOG_TAG,"imageName: "+image.getImageName());
+                Log.v(LOG_TAG,"imageState: "+image.getState());
+            }
+
             if(task.getUploadMode().equalsIgnoreCase("AU")&&!settings.isAutoUpload()){
                 auTask = task;
             }

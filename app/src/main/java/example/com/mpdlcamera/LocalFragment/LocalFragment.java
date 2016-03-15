@@ -328,7 +328,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     folders1.add(currentAlbum);
                 }
 
-                Log.i("ListingImages", " album=" + album);
+//                Log.i("ListingImages", " album=" + album);
             } while (cur.moveToNext());
         }
 
@@ -354,7 +354,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             String dateStr = dt.format(d);
             dateAseList.add(dateStr);
             ImageNameList.add(entry.getValue());
-            Log.v(LOG_TAG,dateStr+" -> "+entry.getValue());
+//            Log.v(LOG_TAG,dateStr+" -> "+entry.getValue());
         }
 
 

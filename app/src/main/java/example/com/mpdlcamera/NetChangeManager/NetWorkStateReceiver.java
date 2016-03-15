@@ -54,6 +54,7 @@ public class NetWorkStateReceiver extends BroadcastReceiver {
                 if (autoTask.getUploadMode().equalsIgnoreCase("AU")) {
                     // start AU TaskUploadService
                     Intent uploadIntent = new Intent(context, TaskUploadService.class);
+                    Log.e(TAG,"reStart AU after reconnect to internet");
                     context.startService(uploadIntent);
                 }
 
