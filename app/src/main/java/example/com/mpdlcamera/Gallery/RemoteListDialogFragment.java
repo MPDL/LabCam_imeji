@@ -244,6 +244,8 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                     Log.v("col",url);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
+                    return;
                 }
 
 
@@ -252,9 +254,16 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                     URL u = new URL(url);
 
                     String path = u.getPath();
-
+                    String qrCollectionId = "";
                     if (path != null) {
-                        String qrCollectionId = path.substring(path.lastIndexOf("/") + 1);
+                        try {
+                            qrCollectionId = path.substring(path.lastIndexOf("/") + 1);
+                            Log.i(LOG_TAG,qrCollectionId);
+                        }catch (Exception e){
+                            Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
                         /** set choose **/
                         //create task if collection is selected
                         if (!qrCollectionId.equals("") && !qrCollectionId.equals(null)) {

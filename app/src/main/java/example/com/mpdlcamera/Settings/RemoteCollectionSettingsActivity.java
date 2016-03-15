@@ -323,6 +323,8 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                     Log.v("col",url);
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
+                    return;
                 }
 
 
@@ -331,9 +333,16 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                     URL u = new URL(url);
 
                     String path = u.getPath();
-
+                    String qrCollectionId = "";
                     if (path != null) {
-                       String qrCollectionId = path.substring(path.lastIndexOf("/") + 1);
+                        try {
+                            qrCollectionId = path.substring(path.lastIndexOf("/") + 1);
+                            Log.i(LOG_TAG,qrCollectionId);
+                        }catch (Exception e){
+                            Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
                         /** set choose **/
                         //create task if collection is selected
                         if (!qrCollectionId.equals("") && !qrCollectionId.equals(null)) {
@@ -379,7 +388,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
         final AlertDialog alertDialog =
                 new AlertDialog.Builder(context)
-                        .setTitle("There are some photos waiting for uploading, Upload them to the ")
+                        .setTitle("There are some photos waiting for uploading. Upload them to ")
                         .setSingleChoiceItems(arrayCollection, 0, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {

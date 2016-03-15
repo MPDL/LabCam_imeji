@@ -572,6 +572,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     settings.setIsAutoUpload(false);
                     settings.save();
                 }
+
+
             }
         });
     }
