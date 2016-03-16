@@ -139,6 +139,7 @@ public class ItemsActivity extends AppCompatActivity {
 
                     Intent showDetailIntent = new Intent(activity, DetailActivity.class);
                     showDetailIntent.putStringArrayListExtra("itemPathList", imagePathList);
+                    showDetailIntent.putExtra("positionInList",position);
                     startActivity(showDetailIntent);
                 }
             });

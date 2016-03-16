@@ -417,7 +417,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     boolean isLocalImage = true;
                     Intent showDetailIntent = new Intent(getActivity(), DetailActivity.class);
                     showDetailIntent.putStringArrayListExtra("itemPathList", sortedImageNameList);
-
+                    showDetailIntent.putExtra("positionInList",position);
                     showDetailIntent.putExtra("isLocalImage", isLocalImage);
                     startActivity(showDetailIntent);
 

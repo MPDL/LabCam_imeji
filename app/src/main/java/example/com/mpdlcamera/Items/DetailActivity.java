@@ -40,7 +40,7 @@ public class DetailActivity extends Activity implements ActionMode.Callback{
 
     private ActionMode actionMode;
     ActionMode.Callback ActionModeCallback = this;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +54,7 @@ public class DetailActivity extends Activity implements ActionMode.Callback{
         if (extras != null) {
             itemPathList = extras.getStringArrayList("itemPathList");
             boolean isLocalImage = extras.getBoolean("isLocalImage");
+            int positionInList = extras.getInt("positionInList");
 
             WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             Display display = windowManager.getDefaultDisplay();
@@ -64,14 +65,19 @@ public class DetailActivity extends Activity implements ActionMode.Callback{
             viewPager = (ViewPager) rootView.findViewById(R.id.view_pager_detail_image);
             viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList);
             viewPager.setAdapter(viewPagerAdapter);
-            viewPagerAdapter.setOnItemClickListener(new ViewPagerAdapter.OnItemClickListener() {
-                @Override
-                public void onItemLongClick(View view, int position) {
-                    if (actionMode == null) {
-                        actionMode = activity.startActionMode(ActionModeCallback);
+            viewPager.setCurrentItem(positionInList);
+            if(isLocalImage) {
+                viewPagerAdapter.setOnItemClickListener(new ViewPagerAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemLongClick(View view, int position) {
+                        if (actionMode == null) {
+                            actionMode = activity.startActionMode(ActionModeCallback);
+                        }
                     }
-                }
-            });
+                });
+            }else {
+                viewPagerAdapter.setOnItemClickListener(null);
+            }
         }
 
     }
