@@ -36,6 +36,7 @@ public class ItemsActivity extends AppCompatActivity {
 
 
     private List<DataItem> dataList = new ArrayList<DataItem>();
+    private ArrayList<String> imagePathList = new ArrayList<>();
     public  ItemsGridAdapter adapter;
     private GridView gridView;
     private View rootView;
@@ -69,9 +70,10 @@ public class ItemsActivity extends AppCompatActivity {
 
             ActiveAndroid.beginTransaction();
             try {
-                // here get the string of Metadata Json
+                imagePathList.clear();
                 for (DataItem item : dataList) {
                     dataListLocal.add(item);
+                    imagePathList.add(item.getFileUrl());
                     //item.save();
                 }
                 ActiveAndroid.setTransactionSuccessful();
@@ -136,7 +138,7 @@ public class ItemsActivity extends AppCompatActivity {
                     DataItem dataItem = (DataItem) adapter.getItem(position);
 
                     Intent showDetailIntent = new Intent(activity, DetailActivity.class);
-                    showDetailIntent.putExtra("itemPath", dataItem.getFileUrl());
+                    showDetailIntent.putStringArrayListExtra("itemPathList", imagePathList);
                     startActivity(showDetailIntent);
                 }
             });
@@ -152,15 +154,21 @@ public class ItemsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // app icon in action bar clicked; goto parent activity.
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void getFolderItems(String collectionId){
         RetrofitClient.getCollectionItems(collectionId, callback_Items, APIkey);
     }
 
+
+    /** rewrite home **/
 
 }

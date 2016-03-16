@@ -82,7 +82,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     TreeMap<Long, String> imageList = new TreeMap<Long, String>();
     TreeMap<String,String> imageTree = new TreeMap<String,String>();
-    List<String> sortedImageNameList;
+    ArrayList<String> sortedImageNameList;
 
 
     //user info
@@ -416,7 +416,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     //  show picture
                     boolean isLocalImage = true;
                     Intent showDetailIntent = new Intent(getActivity(), DetailActivity.class);
-                    showDetailIntent.putExtra("itemPath", sortedImageNameList.get(position));
+                    showDetailIntent.putStringArrayListExtra("itemPathList", sortedImageNameList);
+
                     showDetailIntent.putExtra("isLocalImage", isLocalImage);
                     startActivity(showDetailIntent);
 

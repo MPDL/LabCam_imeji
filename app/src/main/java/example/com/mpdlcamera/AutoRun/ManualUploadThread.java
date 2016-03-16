@@ -353,7 +353,9 @@ public class ManualUploadThread extends Thread {
     }
 
     private void uploadNext(){
-        int totalNum = task.getTotalItems();
+        /** exception here**/
+        int totalNum = 0;
+        if(task!= null){totalNum = task.getTotalItems();}
         try {
             /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
             finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -17,6 +18,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.List;
 
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Settings.SettingsActivity;
@@ -28,9 +30,11 @@ public class DetailActivity extends Activity {
 
     private Activity activity = this;
     private View rootView;
-    private String itemPath;
+    private List<String> itemPathList;
     private PhotoViewAttacher mAttacher;
 
+    private ViewPager viewPager;
+    private  ViewPagerAdapter viewPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,15 +47,8 @@ public class DetailActivity extends Activity {
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if (extras != null) {
-            itemPath = extras.getString("itemPath");
-            ImageView imageView = (ImageView) rootView.findViewById(R.id.detail_image);
-
-//            mAttacher = new PhotoViewAttacher(imageView);
-            //mAttacher.setScaleType(ImageView.ScaleType.CENTER_INSIDE);  //scale and show the whole photo based on Longth
-            //mAttacher.setScaleType(ImageView.ScaleType.FIT_CENTER);  //scale and show the whole photo based on Width
-//            mAttacher.setScaleType(ImageView.ScaleType.CENTER);     // no scale, cut the photo to fit
-            //mAttacher.setScaleType(ImageView.ScaleType.CENTER_CROP); // no scale , cut by center
-            //mAttacher.setScaleType(ImageView.ScaleType.FIT_XY);  //no scale, show the original photo
+            itemPathList = extras.getStringArrayList("itemPathList");
+            boolean isLocalImage = extras.getBoolean("isLocalImage");
 
             WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
             Display display = windowManager.getDefaultDisplay();
@@ -59,31 +56,32 @@ public class DetailActivity extends Activity {
             Point size = new Point();
             display.getSize(size);
 
-//            Log.v(size.x / 2 + " ", size.y / 2 + "");
+            viewPager = (ViewPager) rootView.findViewById(R.id.view_pager_detail_image);
+            viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList);
+            viewPager.setAdapter(viewPagerAdapter);
 
-//                DataItem item = new Select().
-//                        from(DataItem.class).
-//                        where("filename = ?", itemName).executeSingle();
-//                Log.v(LOG_TAG, item.getWebResolutionUrlUrl());
 
-            boolean isLocalImage = extras.getBoolean("isLocalImage",false);
-            if(isLocalImage){
-                Uri uri = Uri.fromFile(new File(itemPath));
-                Log.e(LOG_TAG, itemPath);
-                Picasso.with(activity)
-                        .load(uri)
-                        .resize(size.x, size.y)
-                        .centerInside()
-                                //.centerCrop()
-                                //.placeholder(R.drawable.progress_animation)
-                        .into(imageView);
-            }else {
-                   Picasso.with(activity)
-                           .load(itemPath)
-                           .resize(size.x, size.y)
-                           .centerInside()
-                           .into(imageView);
-            }
+
+
+
+//            boolean isLocalImage = extras.getBoolean("isLocalImage",false);
+//            if(isLocalImage){
+//                Uri uri = Uri.fromFile(new File(itemPath));
+//                Log.e(LOG_TAG, itemPath);
+//                Picasso.with(activity)
+//                        .load(uri)
+//                        .resize(size.x, size.y)
+//                        .centerInside()
+//                                //.centerCrop()
+//                                //.placeholder(R.drawable.progress_animation)
+//                        .into(imageView);
+//            }else {
+//                   Picasso.with(activity)
+//                           .load(itemPath)
+//                           .resize(size.x, size.y)
+//                           .centerInside()
+//                           .into(imageView);
+//            }
 
 
 //            mAttacher.update();
