@@ -8,8 +8,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.Display;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -25,7 +27,7 @@ import example.com.mpdlcamera.Settings.SettingsActivity;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 
-public class DetailActivity extends Activity {
+public class DetailActivity extends Activity implements ActionMode.Callback{
     private static final String LOG_TAG = DetailActivity.class.getSimpleName();
 
     private Activity activity = this;
@@ -36,6 +38,9 @@ public class DetailActivity extends Activity {
     private ViewPager viewPager;
     private  ViewPagerAdapter viewPagerAdapter;
 
+    private ActionMode actionMode;
+    ActionMode.Callback ActionModeCallback = this;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,33 +64,14 @@ public class DetailActivity extends Activity {
             viewPager = (ViewPager) rootView.findViewById(R.id.view_pager_detail_image);
             viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList);
             viewPager.setAdapter(viewPagerAdapter);
-
-
-
-
-
-//            boolean isLocalImage = extras.getBoolean("isLocalImage",false);
-//            if(isLocalImage){
-//                Uri uri = Uri.fromFile(new File(itemPath));
-//                Log.e(LOG_TAG, itemPath);
-//                Picasso.with(activity)
-//                        .load(uri)
-//                        .resize(size.x, size.y)
-//                        .centerInside()
-//                                //.centerCrop()
-//                                //.placeholder(R.drawable.progress_animation)
-//                        .into(imageView);
-//            }else {
-//                   Picasso.with(activity)
-//                           .load(itemPath)
-//                           .resize(size.x, size.y)
-//                           .centerInside()
-//                           .into(imageView);
-//            }
-
-
-//            mAttacher.update();
-
+            viewPagerAdapter.setOnItemClickListener(new ViewPagerAdapter.OnItemClickListener() {
+                @Override
+                public void onItemLongClick(View view, int position) {
+                    if (actionMode == null) {
+                        actionMode = activity.startActionMode(ActionModeCallback);
+                    }
+                }
+            });
         }
 
     }
@@ -111,5 +97,38 @@ public class DetailActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        if (actionMode == null) {
+            actionMode = mode;
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.contextual_menu_local, menu);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_upload_local:
+                mode.finish();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        actionMode = null;
     }
 }

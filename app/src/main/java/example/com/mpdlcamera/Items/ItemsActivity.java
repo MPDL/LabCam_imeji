@@ -168,7 +168,4 @@ public class ItemsActivity extends AppCompatActivity {
         RetrofitClient.getCollectionItems(collectionId, callback_Items, APIkey);
     }
 
-
-    /** rewrite home **/
-
 }

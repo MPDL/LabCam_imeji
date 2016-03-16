@@ -32,6 +32,11 @@ public class ViewPagerAdapter extends PagerAdapter {
     Point size;
     List<String> imagePathList;
     boolean isLocalImage;
+    private OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
 
     public ViewPagerAdapter(Context context, Point size,boolean isLocalImage, List<String> imagePathList) {
         this.context = context;
@@ -51,7 +56,7 @@ public class ViewPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(ViewGroup container, final int position) {
         ImageView imageView;
         inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -60,9 +65,6 @@ public class ViewPagerAdapter extends PagerAdapter {
 
         imageView = (ImageView) itemView.findViewById(R.id.detail_image);
 
-        Log.v("sss",imagePathList+"");
-        Log.v("sss",size.x+"");
-        Log.v("sss",size.y+"");
         if(isLocalImage){
             Uri uri = Uri.fromFile(new File(imagePathList.get(position)));
             Picasso.with(context)
@@ -80,6 +82,17 @@ public class ViewPagerAdapter extends PagerAdapter {
                     .into(imageView);
         }
 
+        if (onItemClickListener!=null){
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    onItemClickListener.onItemLongClick(v, position);
+                    return false;
+                }
+            });
+        }
+
         ((ViewPager) container).addView(itemView);
 
         return itemView;
@@ -88,5 +101,9 @@ public class ViewPagerAdapter extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         ((ViewPager) container).removeView((RelativeLayout) object);
+    }
+
+    public interface OnItemClickListener{
+        void onItemLongClick(View view,int position);
     }
 }
