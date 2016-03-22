@@ -5,6 +5,7 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,9 @@ import android.widget.RelativeLayout;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import example.com.mpdlcamera.R;
 
@@ -30,8 +33,15 @@ public class ViewPagerAdapter extends PagerAdapter {
     boolean isLocalImage;
     private OnItemClickListener onItemClickListener;
 
+    public Set<Integer> positionSet = new HashSet<>();
+
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
+    }
+    public void setPositionSet(Set<Integer> positionSet){
+        this.positionSet = positionSet;
+        Log.e("setPositionSet",positionSet.toString());
+        notifyDataSetChanged();
     }
 
     public ViewPagerAdapter(Context context, Point size,boolean isLocalImage, List<String> imagePathList) {
@@ -61,6 +71,15 @@ public class ViewPagerAdapter extends PagerAdapter {
 
         imageView = (ImageView) itemView.findViewById(R.id.detail_image);
 
+
+        //check mark
+        ImageView checkMark = (ImageView) itemView.findViewById(R.id.viewpager_check_mark);
+        if(positionSet.contains(position)){
+            checkMark.setVisibility(View.VISIBLE);
+        }else {
+            checkMark.setVisibility(View.GONE);
+        }
+
         if(isLocalImage){
             Uri uri = Uri.fromFile(new File(imagePathList.get(position)));
             Picasso.with(context)
@@ -87,10 +106,15 @@ public class ViewPagerAdapter extends PagerAdapter {
                     return false;
                 }
             });
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onItemClickListener.onItemClick(v, position);
+                }
+            });
         }
 
         ((ViewPager) container).addView(itemView);
-
         return itemView;
     }
 
@@ -99,7 +123,14 @@ public class ViewPagerAdapter extends PagerAdapter {
         ((ViewPager) container).removeView((RelativeLayout) object);
     }
 
+    // view pager need to remove all views and reload them all
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
+    }
+
     public interface OnItemClickListener{
+        void onItemClick(View view, int position);
         void onItemLongClick(View view,int position);
     }
 }

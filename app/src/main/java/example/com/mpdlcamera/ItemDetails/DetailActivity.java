@@ -12,6 +12,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.Display;
 import android.view.Menu;
@@ -20,7 +21,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import example.com.mpdlcamera.Gallery.RemoteListDialogFragment;
 import example.com.mpdlcamera.R;
@@ -36,8 +39,12 @@ public class DetailActivity extends AppCompatActivity implements android.support
     private List<String> itemPathList;
     private PhotoViewAttacher mAttacher;
 
+    // viewPager
     private ViewPager viewPager;
     private  ViewPagerAdapter viewPagerAdapter;
+
+    // positionSet
+    public Set<Integer> positionSet = new HashSet<>();
 
     private android.support.v7.view.ActionMode actionMode;
     android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
@@ -78,6 +85,14 @@ public class DetailActivity extends AppCompatActivity implements android.support
             if(isLocalImage) {
                 viewPagerAdapter.setOnItemClickListener(new ViewPagerAdapter.OnItemClickListener() {
                     @Override
+                    public void onItemClick(View view, int position) {
+                        if(actionMode != null) {
+                            addOrRemove(position);
+                            viewPagerAdapter.setPositionSet(positionSet);
+                        }
+                    }
+
+                    @Override
                     public void onItemLongClick(View view, int position) {
                         if (actionMode == null) {
                             actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
@@ -91,6 +106,10 @@ public class DetailActivity extends AppCompatActivity implements android.support
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -124,6 +143,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         return remoteListDialogFragment;
     }
 
+
     @Override
     public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
         if (actionMode == null) {
@@ -154,5 +174,28 @@ public class DetailActivity extends AppCompatActivity implements android.support
     @Override
     public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
         actionMode = null;
+        positionSet.clear();
+        viewPagerAdapter.notifyDataSetChanged();
+    }
+
+    private void addOrRemove(int position) {
+
+        if (positionSet.contains(position)) {
+            // 如果包含，则撤销选择
+            positionSet.remove(position);
+        } else {
+            // 如果不包含，则添加
+            positionSet.add(position);
+        }
+        if (positionSet.size() == 0) {
+            // 如果没有选中任何的item，则退出多选模式
+            actionMode.finish();
+        } else {
+            // 设置ActionMode标题
+            actionMode.setTitle(positionSet.size() + " selected");
+            // 更新列表界面，否则无法显示已选的item
+            viewPagerAdapter.notifyDataSetChanged();
+//            mSectionedAdapter.notifyDataSetChanged();
+        }
     }
 }
