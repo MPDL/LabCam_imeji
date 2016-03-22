@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.media.ExifInterface;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -21,13 +22,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import example.com.mpdlcamera.Gallery.RemoteListDialogFragment;
+import example.com.mpdlcamera.Model.LocalModel.Image;
+import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Settings.SettingsActivity;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 
@@ -132,18 +142,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
         }
         return super.onOptionsItemSelected(item);
     }
-
-    /** upload methods **/
-    public static RemoteListDialogFragment newInstance(String taskId)
-    {
-        RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
-        Bundle args = new Bundle();
-        args.putString("taskId", taskId);
-        remoteListDialogFragment.setArguments(args);
-        return remoteListDialogFragment;
-    }
-
-
     @Override
     public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
         if (actionMode == null) {
@@ -165,17 +163,134 @@ public class DetailActivity extends AppCompatActivity implements android.support
     public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_upload_local:
+                Log.v(LOG_TAG, "upload");
+
+                Log.v(LOG_TAG, " "+positionSet.size());
+                List uploadPathList = new ArrayList();
+                for(Integer i:positionSet){
+                    uploadPathList.add(itemPathList.get(i));
+                }
+
+                if(uploadPathList != null) {
+                    uploadList(uploadPathList);
+                }
+                uploadPathList.clear();
                 mode.finish();
                 return true;
             default:
                 return false;
-        }    }
+        }
+    }
 
     @Override
     public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
         actionMode = null;
         positionSet.clear();
         viewPagerAdapter.notifyDataSetChanged();
+    }
+
+
+
+    /**upload methods**/
+     /*
+            upload the selected files
+        */
+    private void uploadList(List<String> fileList) {
+        String currentTaskId = createTask(fileList);
+
+        newInstance(currentTaskId).show(this.getFragmentManager(), "remoteListDialog");
+    }
+
+    public static RemoteListDialogFragment newInstance(String taskId)
+    {
+        RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("taskId", taskId);
+        remoteListDialogFragment.setArguments(args);
+        return remoteListDialogFragment;
+    }
+
+    private String createTask(List<String> fileList){
+
+        String uniqueID = UUID.randomUUID().toString();
+        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+        Long now = new Date().getTime();
+
+        Task task = new Task();
+        task.setTotalItems(fileList.size());
+        task.setFinishedItems(0);
+        task.setTaskId(uniqueID);
+        task.setUploadMode("MU");
+        task.setState(String.valueOf(DeviceStatus.state.WAITING));
+        task.setUserName(username);
+        task.setUserId(userId);
+        task.setStartDate(String.valueOf(now));
+        task.save();
+        int num = addImages(fileList, task.getTaskId());
+        task.setTotalItems(num);
+        task.save();
+        Log.v(LOG_TAG,"MU task"+task.getTaskId() );
+        Log.v(LOG_TAG, "setTotalItems:" + num);
+
+        return task.getTaskId();
+    }
+
+    private int addImages(List<String> fileList,String taskId){
+
+        int imageNum = 0;
+        for (String filePath: fileList) {
+            File file = new File(filePath);
+            File imageFile = file.getAbsoluteFile();
+            String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
+
+            //imageSize
+            String fileSize = String.valueOf(file.length() / 1024);
+
+
+            ExifInterface exif = null;
+            try {
+                exif = new ExifInterface(filePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            //createTime
+            String createTime = exif.getAttribute(ExifInterface.TAG_DATETIME);
+
+            //latitude
+            String latitude = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
+
+            //longitude
+            String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
+
+            //state
+            String imageState = String.valueOf(DeviceStatus.state.WAITING);
+
+
+
+            try {
+
+                String imageId = UUID.randomUUID().toString();
+                //store image in local database
+                Image photo = new Image();
+                photo.setImageId(imageId);
+                photo.setImageName(imageName);
+                photo.setImagePath(filePath);
+                photo.setLongitude(longitude);
+                photo.setLatitude(latitude);
+                photo.setCreateTime(createTime);
+                photo.setSize(fileSize);
+                photo.setState(imageState);
+                photo.setTaskId(taskId);
+                photo.save();
+                imageNum = imageNum + 1;
+
+            } catch (Exception e) {
+            }
+
+        }
+        return imageNum;
     }
 
     private void addOrRemove(int position) {
@@ -198,4 +313,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
 //            mSectionedAdapter.notifyDataSetChanged();
         }
     }
+
+
+
 }
