@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import example.com.mpdlcamera.Folder.FolderListAdapter;
-import example.com.mpdlcamera.Items.ItemsActivity;
+import example.com.mpdlcamera.ItemDetails.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;

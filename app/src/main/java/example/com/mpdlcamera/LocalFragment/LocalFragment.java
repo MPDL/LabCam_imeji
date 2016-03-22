@@ -44,7 +44,7 @@ import example.com.mpdlcamera.Gallery.LocalImageActivity;
 import example.com.mpdlcamera.Gallery.RemoteListDialogFragment;
 import example.com.mpdlcamera.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
 import example.com.mpdlcamera.Gallery.SectionedGridView.SimpleAdapter;
-import example.com.mpdlcamera.Items.DetailActivity;
+import example.com.mpdlcamera.ItemDetails.DetailActivity;
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;

@@ -1,4 +1,4 @@
-package example.com.mpdlcamera.Items;
+package example.com.mpdlcamera.ItemDetails;
 
 import android.app.Activity;
 import android.content.Intent;

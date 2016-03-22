@@ -1,12 +1,17 @@
-package example.com.mpdlcamera.Items;
+package example.com.mpdlcamera.ItemDetails;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ActionMode;
 import android.view.Display;
 import android.view.Menu;
@@ -23,7 +28,7 @@ import example.com.mpdlcamera.Settings.SettingsActivity;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 
-public class DetailActivity extends Activity implements ActionMode.Callback{
+public class DetailActivity extends AppCompatActivity implements android.support.v7.view.ActionMode.Callback{
     private static final String LOG_TAG = DetailActivity.class.getSimpleName();
 
     private Activity activity = this;
@@ -34,8 +39,8 @@ public class DetailActivity extends Activity implements ActionMode.Callback{
     private ViewPager viewPager;
     private  ViewPagerAdapter viewPagerAdapter;
 
-    private ActionMode actionMode;
-    ActionMode.Callback ActionModeCallback = this;
+    private android.support.v7.view.ActionMode actionMode;
+    android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
 
     //user info
     private SharedPreferences mPrefs;
@@ -75,7 +80,7 @@ public class DetailActivity extends Activity implements ActionMode.Callback{
                     @Override
                     public void onItemLongClick(View view, int position) {
                         if (actionMode == null) {
-                            actionMode = activity.startActionMode(ActionModeCallback);
+                            actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
                         }
                     }
                 });
@@ -109,8 +114,18 @@ public class DetailActivity extends Activity implements ActionMode.Callback{
         return super.onOptionsItemSelected(item);
     }
 
+    /** upload methods **/
+    public static RemoteListDialogFragment newInstance(String taskId)
+    {
+        RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("taskId", taskId);
+        remoteListDialogFragment.setArguments(args);
+        return remoteListDialogFragment;
+    }
+
     @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+    public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
         if (actionMode == null) {
             actionMode = mode;
             MenuInflater inflater = mode.getMenuInflater();
@@ -122,34 +137,22 @@ public class DetailActivity extends Activity implements ActionMode.Callback{
     }
 
     @Override
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+    public boolean onPrepareActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
         return false;
     }
 
     @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+    public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_upload_local:
                 mode.finish();
                 return true;
             default:
                 return false;
-        }
-    }
+        }    }
 
     @Override
-    public void onDestroyActionMode(ActionMode mode) {
+    public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
         actionMode = null;
     }
-
-    /** upload methods **/
-    public static RemoteListDialogFragment newInstance(String taskId)
-    {
-        RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
-        Bundle args = new Bundle();
-        args.putString("taskId", taskId);
-        remoteListDialogFragment.setArguments(args);
-        return remoteListDialogFragment;
-    }
-
 }
