@@ -14,8 +14,7 @@
         android:id="@+id/list_gallery_cell_thumbnail"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:scaleType="centerCrop"
-        android:background="@drawable/custom_border"/>
+        android:scaleType="centerCrop" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -34,7 +33,7 @@
             android:layout_marginTop="5dp"
             android:gravity="center_vertical"
             android:textColor="@color/lightGrey"
-            android:layout_marginStart="10dip"
+            android:layout_marginLeft="10dp"
             android:text="Title"
             android:typeface="sans"
             android:textSize="18dp"

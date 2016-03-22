@@ -86,7 +86,7 @@ public class LocalImageAdapter extends BaseAdapter {
     }
 
     /*
-        reloads the view everytime the screen refreshes
+        reloads the view every time the screen refreshes
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
