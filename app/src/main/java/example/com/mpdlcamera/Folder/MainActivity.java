@@ -241,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     }
 
 
+
     @Override
     public void onPostCreate(Bundle savedInstanceState) {
         drawerToggle.syncState();
@@ -248,6 +249,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     }
 
+    // when rotate，not destroy activity
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         drawerToggle.onConfigurationChanged(newConfig);
@@ -451,7 +453,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
             @Override
             public void onPageSelected(int position) {
-
                 //if the tab is not the selected one, set its text and icon style as inactive
 
                 if (0 != position && 0 != selectedIndex) {

@@ -61,6 +61,7 @@
         <!-- Folders and Items -->
         <activity
             android:name=".Folder.MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name" >
         </activity>
         <activity

@@ -510,11 +510,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
             //state
             String imageState = String.valueOf(DeviceStatus.state.WAITING);
-
-
-
-            try {
-
                 String imageId = UUID.randomUUID().toString();
                 //store image in local database
                 Image photo = new Image();
@@ -529,10 +524,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 photo.setTaskId(taskId);
                 photo.save();
                 imageNum = imageNum + 1;
-
-            } catch (Exception e) {
-            }
-
         }
         return imageNum;
     }

@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -72,6 +73,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
+        this.setCancelable(false);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.fragment_dialog_remote_list, null);
         activity = this.getActivity();
@@ -106,10 +108,14 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                //delete task
+
+                                new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
                                 dialog.dismiss();
                             }
                         }
                 );
+
 
         //remote folder list
         listView = (ListView) view.findViewById(R.id.settings_remote_listView);
