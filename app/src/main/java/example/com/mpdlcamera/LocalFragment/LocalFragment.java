@@ -540,14 +540,15 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     @Override
     public void onResume() {
         super.onResume();
-        prepareData();
-//        loadTimeLinePicture();
-        simpleAdapter.notifyDataSetChanged();
-        mSectionedAdapter.notifyDataSetChanged();
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        prepareData();
+//        loadTimeLinePicture();
+        simpleAdapter.notifyDataSetChanged();
+        mSectionedAdapter.notifyDataSetChanged();
     }
 }

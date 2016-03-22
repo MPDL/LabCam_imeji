@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
@@ -92,9 +93,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private String userId;
     private SharedPreferences mPrefs;
 
-    //TESTING DB
-    private boolean isAdd = false;
 
+    //current tab
+    private int currentTab = 0;
     //uri register
     private static UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
     private static final int TASK_CODE = 2016;
@@ -203,6 +204,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     @Override
     public void onResume(){
         super.onResume();
+        SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(tabAdapter);
+        viewPager.setCurrentItem(currentTab);
 
         //set selected collection name
         TextView collectionNameTextView = (TextView) findViewById(R.id.collection_name);
@@ -219,6 +223,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     public void onPause(){
         super.onPause();
         hidePDialog();
+        // set current tab
+        currentTab = viewPager.getCurrentItem();
     }
 
     @Override
@@ -496,14 +502,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
             android.support.v4.app.Fragment fragment;
 
-            Log.v(LOG_TAG, position + "");
             //try with exception
-
             switch (position) {
                 case 0:
                     fragment = new LocalFragment();
                     return fragment;
-
                 case 1:
                     fragment = new ImejiFragment();
                     return fragment;
@@ -515,7 +518,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             }
 
         }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
     }
+
 
     //drawer layout(settings)
     public void initRadioButtonGroup(){
