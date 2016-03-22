@@ -136,7 +136,7 @@ public class DeviceStatus {
     //delete tasks
 
     //delete finished tasks
-    public static void deleteFinishedTasks(){
+    public static void deleteFinishedAUTasks(){
 
         // get All au tasks first
         List<Task> finishedTasks = new Select()

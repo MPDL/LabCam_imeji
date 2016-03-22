@@ -196,12 +196,6 @@ public class ManualUploadThread extends Thread {
         public void success(DataItem dataItem, Response response) {
 
             if(!taskIsStopped()){
-                handler=new Handler(Looper.getMainLooper());
-                handler.post(new Runnable() {
-                    public void run() {
-                        Toast.makeText(context, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                    }
-                });
 
                 Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
@@ -248,6 +242,13 @@ public class ManualUploadThread extends Thread {
                     }
                 }else {
                     task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                    task.save();
+                    handler=new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        public void run() {
+                            Toast.makeText(context, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                     Log.i(TAG,"task finished");
                 }
             }

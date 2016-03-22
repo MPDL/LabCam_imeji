@@ -3,6 +3,7 @@ package example.com.mpdlcamera.Items;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,10 +21,16 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
+import example.com.mpdlcamera.Gallery.RemoteListDialogFragment;
+import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Settings.SettingsActivity;
+import example.com.mpdlcamera.Utils.DeviceStatus;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 
@@ -41,11 +48,19 @@ public class DetailActivity extends Activity implements ActionMode.Callback{
     private ActionMode actionMode;
     ActionMode.Callback ActionModeCallback = this;
 
+    //user info
+    private SharedPreferences mPrefs;
+    private String username;
+    private String userId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        mPrefs = this.getSharedPreferences("myPref", 0);
+        username = mPrefs.getString("username", "");
+        userId = mPrefs.getString("userId","");
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
@@ -137,4 +152,15 @@ public class DetailActivity extends Activity implements ActionMode.Callback{
     public void onDestroyActionMode(ActionMode mode) {
         actionMode = null;
     }
+
+    /** upload methods **/
+    public static RemoteListDialogFragment newInstance(String taskId)
+    {
+        RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("taskId", taskId);
+        remoteListDialogFragment.setArguments(args);
+        return remoteListDialogFragment;
+    }
+
 }

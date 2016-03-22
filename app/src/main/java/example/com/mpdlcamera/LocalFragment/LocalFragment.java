@@ -442,15 +442,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private void uploadList(List<String> fileList) {
         String currentTaskId = createTask(fileList);
 
-        // go to RemoteCollectionSettings
-//        Intent remoteCollectionSettingIntent = new Intent(this, RemoteCollectionSettingsActivity.class);
-//        remoteCollectionSettingIntent.putExtra("Manual",)
-
         newInstance(currentTaskId).show(getActivity().getFragmentManager(), "remoteListDialog");
-//
-//        Intent manualUploadServiceIntent = new Intent(this,ManualUploadService.class);
-//        manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
-//        startService(manualUploadServiceIntent);
     }
 
     public static RemoteListDialogFragment newInstance(String taskId)

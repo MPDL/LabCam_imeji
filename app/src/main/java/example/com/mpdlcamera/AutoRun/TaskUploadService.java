@@ -283,11 +283,6 @@ public class TaskUploadService extends Service{
         public void success(DataItem dataItem, Response response) {
 
             if(!taskIsStopped()) {
-                handler.post(new Runnable() {
-                    public void run() {
-                        Toast.makeText(activity, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                    }
-                });
 
                 Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
@@ -348,6 +343,13 @@ public class TaskUploadService extends Service{
                         }
                     } else {
                         task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                        task.save();
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Toast.makeText(activity, "Auto Task Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
                         Log.i(TAG, "task finished");
                     }
                 }

@@ -221,7 +221,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                     /**
                      * delete all AU Task if finished
                      * */
-                    DeviceStatus.deleteFinishedTasks();
+                    DeviceStatus.deleteFinishedAUTasks();
 
                     /**create Task**/
                     createTask(collectionID);
@@ -352,7 +352,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                             /**
                              * delete all AU Task if finished
                              * */
-                            DeviceStatus.deleteFinishedTasks();
+                            DeviceStatus.deleteFinishedAUTasks();
                             collectionID = qrCollectionId;
                             /**create Task**/
                             createTask(qrCollectionId);
