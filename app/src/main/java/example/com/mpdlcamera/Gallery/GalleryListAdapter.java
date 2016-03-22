@@ -3,7 +3,6 @@ package example.com.mpdlcamera.Gallery;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -18,7 +17,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -30,8 +28,6 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.R;
-import example.com.mpdlcamera.SQLite.FileId;
-import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 
 /**
  * Created by kiran on 22.10.15.

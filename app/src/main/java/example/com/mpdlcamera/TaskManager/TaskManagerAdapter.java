@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -94,7 +93,7 @@ public class TaskManagerAdapter extends BaseAdapter {
         TextView taskNameTextView = (TextView) view.findViewById(R.id.tv_task_name);
         if(taskList.get(position).getUploadMode().equalsIgnoreCase("AU")){
             // AU
-            taskNameTextView.setText("Captured photos upload to");
+            taskNameTextView.setText("Automatic upload to");
         }else {
             // MU
             taskNameTextView.setText(taskList.get(position).getTotalItems()+" selected photos upload to");

@@ -17,7 +17,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
 

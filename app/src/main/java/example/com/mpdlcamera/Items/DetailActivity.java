@@ -5,10 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.Display;
 import android.view.Menu;
@@ -16,21 +14,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
-
-import java.io.File;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import example.com.mpdlcamera.Gallery.RemoteListDialogFragment;
-import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Settings.SettingsActivity;
-import example.com.mpdlcamera.Utils.DeviceStatus;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 

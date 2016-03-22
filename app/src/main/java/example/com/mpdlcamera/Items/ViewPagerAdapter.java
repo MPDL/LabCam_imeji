@@ -5,12 +5,9 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -19,7 +16,6 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.util.List;
 
-import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.R;
 
 /**

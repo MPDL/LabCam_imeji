@@ -3,35 +3,15 @@ package example.com.mpdlcamera.AutoRun;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.activeandroid.query.Select;
-import com.squareup.otto.Produce;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import example.com.mpdlcamera.Model.DataItem;
-import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
-import example.com.mpdlcamera.Otto.OttoSingleton;
-import example.com.mpdlcamera.Otto.UploadEvent;
-import example.com.mpdlcamera.Retrofit.RetrofitClient;
-import example.com.mpdlcamera.Utils.DeviceStatus;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.mime.TypedByteArray;
-import retrofit.mime.TypedFile;
 
 /**
  * Created by yingli on 2/3/16.

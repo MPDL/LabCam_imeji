@@ -36,7 +36,6 @@ import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Settings.SettingsListAdapter;
 import example.com.mpdlcamera.UploadActivity.CollectionIdInterface;
-import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;

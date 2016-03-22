@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,7 +12,6 @@ import com.activeandroid.query.Select;
 import com.squareup.otto.Produce;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
