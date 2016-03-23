@@ -3,7 +3,9 @@ package example.com.mpdlcamera.LocalFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -62,7 +65,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private static final String LOG_TAG = LocalFragment.class.getSimpleName();
     private android.support.v7.view.ActionMode actionMode;
     public Set<Integer> positionSet = new HashSet<>();
-    //TODO: from kiran's galleryListActivity, remove lava later
     private View rootView;
     android.support.v7.app.ActionBar actionBar;
 
@@ -116,10 +118,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
-        // timeline recycleView
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_recycleView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+
+         renderTimeLine();
+
 
         //prepare local gallery image data
         prepareData();
@@ -129,9 +130,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         //set header recycleView adapter
         loadTimeLinePicture();
-
-
-
 
         //switch
         Switch modeSwitch = (Switch) rootView.findViewById(R.id.switch_mode);
@@ -434,6 +432,23 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     }
 
+    private void renderTimeLine(){
+        // get current screen width
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+
+        // calculate spanCount in GridLayoutManager
+        int spanCount = 3;
+        spanCount = width/235;
+        Log.v(LOG_TAG, "spanCount: "+spanCount);
+
+        // timeline recycleView
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_recycleView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
+    }
 
     /**upload methods**/
      /*
@@ -531,7 +546,13 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     @Override
     public void onResume() {
         super.onResume();
+    }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        renderTimeLine();
+        loadTimeLinePicture();
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override
