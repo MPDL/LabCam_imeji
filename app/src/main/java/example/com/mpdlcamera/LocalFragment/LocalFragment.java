@@ -65,6 +65,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private static final String LOG_TAG = LocalFragment.class.getSimpleName();
     private android.support.v7.view.ActionMode actionMode;
     public Set<Integer> positionSet = new HashSet<>();
+    public Set<Integer> albumPositionSet = new HashSet<>();
     private View rootView;
     android.support.v7.app.ActionBar actionBar;
 
@@ -118,9 +119,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
-
-         renderTimeLine();
-
+        renderTimeLine();
 
         //prepare local gallery image data
         prepareData();
@@ -190,16 +189,21 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
                 Log.v(LOG_TAG, "upload");
 
-                Log.v(LOG_TAG, " "+positionSet.size());
-                List uploadPathList = new ArrayList();
-                for(Integer i:positionSet){
-                    uploadPathList.add(sortedImageNameList.get(i));
-                }
+                if(positionSet.size()!=0) {
+                    Log.v(LOG_TAG, " "+positionSet.size());
+                    List uploadPathList = new ArrayList();
+                    for (Integer i : positionSet) {
+                        uploadPathList.add(sortedImageNameList.get(i));
+                    }
 
-                if(uploadPathList != null) {
-                    uploadList(uploadPathList);
+                    if (uploadPathList != null) {
+                        uploadList(uploadPathList);
+                    }
+                    uploadPathList.clear();
+
+                }else if(albumPositionSet.size()!=0){
+
                 }
-                uploadPathList.clear();
                 mode.finish();
                 return true;
             default:
@@ -214,6 +218,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         actionBar.show();
         simpleAdapter.notifyDataSetChanged();
         mSectionedAdapter.notifyDataSetChanged();
+        Log.e(LOG_TAG,"onDestroyActionMode");
     }
 
     private void addOrRemove(int position) {
@@ -226,15 +231,40 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         }
         if (positionSet.size() == 0) {
             // 如果没有选中任何的item，则退出多选模式
+            Log.e(LOG_TAG, "addOrRemove() is called");
             actionMode.finish();
         } else {
             // 设置ActionMode标题
-            actionMode.setTitle(positionSet.size() + " selected");
+            actionMode.setTitle(positionSet.size() + " selected photos");
             // 更新列表界面，否则无法显示已选的item
 //            simpleAdapter.notifyDataSetChanged();
 //            mSectionedAdapter.notifyDataSetChanged();
         }
     }
+
+
+    private void addOrRemoveAlbum(int position) {
+        if (albumPositionSet.contains(position)) {
+            // 如果包含，则撤销选择
+            albumPositionSet.remove(position);
+        } else {
+            // 如果不包含，则添加
+            albumPositionSet.add(position);
+        }
+        if (albumPositionSet.size() == 0) {
+            // 如果没有选中任何的item，则退出多选模式
+            Log.e(LOG_TAG,"addOrRemoveAlbum() is called");
+            actionMode.finish();
+        } else {
+            // 设置ActionMode标题
+            actionMode.setTitle(albumPositionSet.size() + " selected albums");
+            // 更新列表界面，否则无法显示已选的item
+//            simpleAdapter.notifyDataSetChanged();
+//            mSectionedAdapter.notifyDataSetChanged();
+        }
+    }
+
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -267,20 +297,34 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         gridView.setAdapter(adapter);
 
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        adapter.setOnItemClickListener(new GalleryListAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(View view, int position) {
 
-                Gallery gallery = (Gallery) adapter.getItem(position);
-                Intent galleryImagesIntent = new Intent(getActivity(), LocalImageActivity.class);
-                galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
+                if (actionMode != null) {
+                    // 如果当前处于多选状态，则进入多选状态的逻辑
+                    // 维护当前已选的position
+                    addOrRemoveAlbum(position);
+                    adapter.setPositionSet(albumPositionSet);
+                } else {
+                    // 如果不是多选状态，则进入点击事件的业务逻辑
+                    //  show picture
+                    //  go to album detail
+                    Gallery gallery = (Gallery) adapter.getItem(position);
+                    Intent galleryImagesIntent = new Intent(getActivity(), LocalImageActivity.class);
+                    galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
 
-                startActivity(galleryImagesIntent);
+                    startActivity(galleryImagesIntent);
+                }
             }
-//            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+                if (actionMode == null) {
+                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(ActionModeCallback);
+                }
+            }
         });
-
-
     }
 
 
@@ -325,8 +369,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     folders.add(album);
                     folders1.add(currentAlbum);
                 }
-
-//                Log.i("ListingImages", " album=" + album);
             } while (cur.moveToNext());
         }
 
@@ -429,7 +471,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 }
             }
         });
-
     }
 
     private void renderTimeLine(){

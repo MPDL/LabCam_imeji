@@ -252,6 +252,7 @@ public class ImejiFragment extends Fragment {
             JsonArray array;
             List<DataItem> dataList = new ArrayList<>();
 
+            //TODO: null pointer exception
             array = jsonObject.getAsJsonArray("results");
             Log.i("results", array.toString());
             Gson gson = new Gson();

@@ -24,7 +24,9 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.R;
@@ -49,6 +51,15 @@ public class GalleryListAdapter extends BaseAdapter {
     TextView title;
     ImageView imageView;
     Point size;
+
+    // album positionSet
+    public Set<Integer> albumPositionSet = new HashSet<>();
+
+    private OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
 
     public GalleryListAdapter(Activity activity) {
         this.activity = activity;
@@ -79,20 +90,22 @@ public class GalleryListAdapter extends BaseAdapter {
             reloads the view everytime the screen refreshes
      */
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
+        //get display size
         WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         size = new Point();
         display.getSize(size);
 
-
+        // inflate layout
         if (inflater == null)
             inflater = (LayoutInflater) activity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (convertView == null)
             convertView = inflater.inflate(R.layout.gallery_list_cell, null);
 
+        // didn't understand what's here
         RelativeLayout relativeLayout = (RelativeLayout) convertView.findViewById(R.id.relOne);
         ShapeDrawable rectangleShape = new ShapeDrawable();
 
@@ -103,9 +116,11 @@ public class GalleryListAdapter extends BaseAdapter {
         paint.setStrokeWidth(1);
         relativeLayout.setBackground(rectangleShape);
 
+        // view element declare
         imageView = (ImageView) convertView.findViewById(R.id.list_gallery_cell_thumbnail);
         title = (TextView) convertView.findViewById(R.id.list_item_gallery_title);
 
+        // onSharedPreferenceChanged?
         SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 
             @Override
@@ -123,14 +138,12 @@ public class GalleryListAdapter extends BaseAdapter {
             imageView.getLayoutParams().height = size.y /3;
         }
 
-       // for(int i=0; i<galleryList.size();i++) {
-            // getting item data for the row
-            Gallery gallery = galleryList.get(position);
-            //Gallery gallery = galleryList.get(i);
-            Log.v(LOG_TAG, gallery.getGalleryName());
+        Gallery gallery = galleryList.get(position);
+        //Gallery gallery = galleryList.get(i);
+        Log.v(LOG_TAG, gallery.getGalleryName());
 
         Thumbnail thumbnail = new Thumbnail(activity);
-        String imagePath = null;
+        String imagePath;
 
         if(!galleriesOne.contains(gallery.getGalleryName())) {
             flag = true;
@@ -199,6 +212,35 @@ public class GalleryListAdapter extends BaseAdapter {
 
         }
 
+        if (onItemClickListener!=null){
+            convertView.setOnClickListener(new View.OnClickListener() {
+                 @Override
+                 public void onClick(View v) {
+                     onItemClickListener.onItemClick(v, position);
+                 }
+             });
+            convertView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    onItemClickListener.onItemLongClick(v,position);
+                    return false;
+                }
+            });
+        }
+
         return convertView;
     }
+
+
+    public void setPositionSet(Set<Integer> positionSet){
+        this.albumPositionSet = positionSet;
+        Log.e("albumPositionSet",positionSet.size()+"");
+        notifyDataSetChanged();
+    }
+
+    public interface OnItemClickListener{
+        void onItemClick(View view, int position);
+        void onItemLongClick(View view,int position);
+    }
+
 }
