@@ -17,7 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_gravity="center"
-        android:text="PHOTOS"
+        android:text="LOCAL"
         android:textStyle="bold"
         android:textSize="18dp"
         android:textColor="?attr/colorPrimary"

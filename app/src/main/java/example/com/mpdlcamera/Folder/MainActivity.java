@@ -82,8 +82,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     private List<Task> manualTasks = new ArrayList<>();
 
-
-
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     static final int PICK_COLLECTION_REQUEST = 1997;
     private RadioGroup radioGroup;
@@ -92,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private String username;
     private String userId;
     private SharedPreferences mPrefs;
-
 
     //current tab
     private int currentTab = 0;
