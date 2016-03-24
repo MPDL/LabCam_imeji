@@ -1,7 +1,11 @@
 package example.com.mpdlcamera.Folder;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -723,17 +727,45 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         Log.e("~~~", cls);
 
         if(pack.equalsIgnoreCase("com.sec.android.app.camera")){
-            Toast.makeText(context,"this device not support open camerea here",Toast.LENGTH_SHORT).show();
+            Toast.makeText(context,"this device not support open camera here",Toast.LENGTH_SHORT).show();
         }else {
+
             Intent mIntent = new Intent();
-
+            mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             ComponentName comp = new ComponentName(pack,cls);
-
             mIntent.setComponent(comp);
+            mIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+            mIntent.setAction("android.intent.action.View");
 
-            mIntent.setAction("android.intent.action.VIEW");
 
             startActivity(mIntent);
+//
+//            //1
+//            Intent intent1 = new Intent("android.media.action.STILL_IMAGE_CAMERA"); //调用照相机
+//            startActivity(intent1);
+////            2
+//            Intent i = new Intent(Intent.ACTION_CAMERA_BUTTON, null);
+//            this.sendBroadcast(i);
+////            3
+//            long dateTaken = System.currentTimeMillis();
+//            String name = String.valueOf(dateTaken) + ".jpg";
+//            String fileName =   name;
+//            ContentValues values = new ContentValues();
+//            values.put(MediaStore.Images.Media.TITLE, fileName);
+//            values.put("_data", fileName);
+//            values.put(MediaStore.Images.Media.PICASA_ID, fileName);
+//            values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+//            values.put(MediaStore.Images.Media.DESCRIPTION, fileName);
+//            values.put(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME, fileName);
+//            Uri photoUri = getContentResolver().insert(
+//                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,values);
+//
+//            Intent inttPhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//            inttPhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+//            startActivityForResult(inttPhoto, 10);
+//
+
+
         }
 
     }

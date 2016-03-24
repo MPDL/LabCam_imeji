@@ -45,4 +45,9 @@
 
     <string name="change_account">Change Account</string>
 
+    <!--notification-->
+    <string name="notification_title">notification</string>
+
+
+
 </resources>

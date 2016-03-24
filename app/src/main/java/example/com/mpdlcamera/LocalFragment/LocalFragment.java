@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -202,7 +203,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     uploadPathList.clear();
 
                 }else if(albumPositionSet.size()!=0){
-
+                    Toast.makeText(getActivity(),"albums upload",Toast.LENGTH_SHORT).show();
                 }
                 mode.finish();
                 return true;
