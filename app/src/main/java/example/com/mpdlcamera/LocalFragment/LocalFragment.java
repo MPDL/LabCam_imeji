@@ -80,14 +80,21 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
 
-    //adapter data
+    //
     final ArrayList<Gallery> folders = new ArrayList<Gallery>();
-    final ArrayList<String> folders1 = new ArrayList<String>();
 
+    /**
+     * imageList store all images date and path
+     * treeMap auto sort it by date (prepare data for timeline view)
+     * <imageDate,imagePath> **/
     TreeMap<Long, String> imageList = new TreeMap<Long, String>();
-    TreeMap<String,String> imageTree = new TreeMap<String,String>();
     ArrayList<String> sortedImageNameList;
 
+    /**
+     *
+     * store the imagePathList of each album
+     */
+    ArrayList<List<String[]>> imagePathListAllAlbums = new ArrayList<>();
 
     //user info
     private SharedPreferences mPrefs;
@@ -136,6 +143,12 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         modeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+
+                if(actionMode != null){
+                    // finish actionMode when switch
+                    actionMode.finish();
+                }
+                // switch from timeLine view to album view
                 if(!compoundButton.isChecked()){
                     gridView.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
@@ -204,6 +217,18 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
                 }else if(albumPositionSet.size()!=0){
                     Toast.makeText(getActivity(),"albums upload",Toast.LENGTH_SHORT).show();
+                    // upload albums
+                    List<String> imagePathListForAlbumTask = new ArrayList<>();
+                    // add selected albums
+                    for (Integer i: albumPositionSet){
+                        // add path by album
+                            for(String[] imageStrArray: imagePathListAllAlbums.get(i)){
+                            imagePathListForAlbumTask.add(imageStrArray[1]);
+                        }
+                    }
+                    Log.e(LOG_TAG,"imagePathListForAlbumTask: " +imagePathListForAlbumTask.size());
+                    uploadList(imagePathListForAlbumTask);
+                    imagePathListForAlbumTask.clear();
                 }
                 mode.finish();
                 return true;
@@ -215,7 +240,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     @Override
     public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
         actionMode = null;
+
+        // clear selection Sets
+        albumPositionSet.clear();
         positionSet.clear();
+
         actionBar.show();
         simpleAdapter.notifyDataSetChanged();
         mSectionedAdapter.notifyDataSetChanged();
@@ -293,7 +322,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         ArrayList<Gallery> imageFolders = new ArrayList<Gallery>();
         imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
 
-
         adapter = new GalleryListAdapter(getActivity(), imageFolders );
 
         gridView.setAdapter(adapter);
@@ -330,6 +358,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
 
     private void prepareData(){
+        folders.clear();
+        imagePathListAllAlbums.clear();
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME
                 ,MediaStore.Images.Media.DATA
                 , MediaStore.Images.Media.DATE_TAKEN
@@ -353,22 +383,56 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             int dateColumn = cur.getColumnIndex(
                     MediaStore.Images.Media.DATE_TAKEN);
 
+            /**
+             * albumName store the albumName of last image
+             * compare albumName to detect album changes
+             * imagePathListForEachAlbum is created for each album to store image path
+             */
+            List<String> albumNames = new ArrayList<>();
+//            HashMap<String,String> imagePathListForEachAlbum = new HashMap<>();
             do {
+                /** for timeline view **/
                 //get all image and date
-
-
                 Long imageDate =  cur.getLong(dateColumn);
 //                Date d = new Date(imageDate);
                 String imagePath = cur.getString(nameColumn);
                 imageList.put(imageDate,imagePath);
 
-                //gallery view
+                /** for gallery view **/
+                /**
+                 * imagePathListByAlbum
+                 * create List<String> imagePathList for each Album
+                 * need to be same order with folder
+                 */
+
+                // existing code, need to rewrite gallery view
                 Gallery album = new Gallery();
                 album.setGalleryName(cur.getString(albumLocation));
                 String currentAlbum = cur.getString(albumLocation);
-                if(!folders1.contains(currentAlbum)) {
-                    folders.add(album);
-                    folders1.add(currentAlbum);
+                if(!albumNames.contains(currentAlbum)) {
+                    // new album
+                    folders.add(album); // adapter rewrite later
+                    albumNames.add(currentAlbum);
+
+                    List<String[]> imagePathListForCurrentAlbum = new ArrayList<>();
+                    // add picture to current album
+                    String[] imageStrArray = new String[2];
+                    imageStrArray[0] = currentAlbum;
+                    imageStrArray[1] = cur.getString(nameColumn);
+                    imagePathListForCurrentAlbum.add(imageStrArray);
+                    // add current album hash map
+                    imagePathListAllAlbums.add(imagePathListForCurrentAlbum);
+
+                }else {
+                    for (List<String[]> albumList :imagePathListAllAlbums){
+                        // if exist, get first imageStrArray, compare
+                        if(albumList.get(0)[0].equalsIgnoreCase(currentAlbum)){
+                            String[] imageStrArray = new String[2];
+                            imageStrArray[0] = currentAlbum;
+                            imageStrArray[1] = cur.getString(nameColumn);
+                            albumList.add(imageStrArray);
+                        }
+                    }
                 }
             } while (cur.moveToNext());
         }

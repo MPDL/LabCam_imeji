@@ -37,16 +37,19 @@ import example.com.mpdlcamera.R;
 
 public class GalleryListAdapter extends BaseAdapter {
 
-    private Activity activity;
-    private List<Gallery> galleryList;
     private final String LOG_TAG = GalleryListAdapter.class.getSimpleName();
+    private Activity activity;
+
+    // all albums
+    private List<Gallery> galleryList;
     private LayoutInflater inflater;
     private ArrayList<Gallery> galleries = new ArrayList<Gallery>();
     private String localPath;
     private ArrayList<String> galleriesOne = new ArrayList<>();
     private String CollectionId;
+    // flag for what?
     boolean flag = false;
-    Boolean matchGallery = false;
+
   //  SharedPreferences mPreferences;
     TextView title;
     ImageView imageView;
@@ -87,7 +90,7 @@ public class GalleryListAdapter extends BaseAdapter {
 
 
     /*
-            reloads the view everytime the screen refreshes
+            reloads the view every time the screen refreshes
      */
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -138,13 +141,15 @@ public class GalleryListAdapter extends BaseAdapter {
             imageView.getLayoutParams().height = size.y /3;
         }
 
+        // get current album
         Gallery gallery = galleryList.get(position);
-        //Gallery gallery = galleryList.get(i);
+
         Log.v(LOG_TAG, gallery.getGalleryName());
 
         Thumbnail thumbnail = new Thumbnail(activity);
         String imagePath;
 
+        // why not
         if(!galleriesOne.contains(gallery.getGalleryName())) {
             flag = true;
             imagePath = thumbnail.getLatestImage(gallery,flag);
