@@ -1,9 +1,14 @@
 package example.com.mpdlcamera.AutoRun;
 
+import android.app.ActivityManager;
 import android.app.Service;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+
+import java.util.List;
 
 import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
@@ -57,5 +62,18 @@ public class AutoRunService extends Service implements UploadResultReceiver.Rece
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
 
+    }
+
+
+//    check if the app is running in the foreground using this method
+    public static boolean isForeground(Context ctx, String myPackage){
+        ActivityManager manager = (ActivityManager) ctx.getSystemService(ACTIVITY_SERVICE);
+        List< ActivityManager.RunningTaskInfo > runningTaskInfo = manager.getRunningTasks(1);
+
+        ComponentName componentInfo = runningTaskInfo.get(0).topActivity;
+        if(componentInfo.getPackageName().equals(myPackage)) {
+            return true;
+        }
+        return false;
     }
 }

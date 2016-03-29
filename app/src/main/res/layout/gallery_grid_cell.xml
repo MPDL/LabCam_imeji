@@ -24,29 +24,29 @@
         android:src="@drawable/btn_check"
         />
 
-    <Button
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:visibility="gone"
-        android:background="@drawable/cloud"
-        android:id="@+id/cloud"
-        android:layout_margin="4dp"
-        android:layout_gravity="right|top"
-        android:clickable="false"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        />
-    <Button
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:background="@drawable/uploading"
-        android:id="@+id/uploading"
-        android:layout_margin="4dp"
-        android:layout_gravity="right|top"
-        android:clickable="false"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        />
+    <!--<Button-->
+        <!--android:layout_width="20dp"-->
+        <!--android:layout_height="20dp"-->
+        <!--android:visibility="gone"-->
+        <!--android:background="@drawable/cloud"-->
+        <!--android:id="@+id/cloud"-->
+        <!--android:layout_margin="4dp"-->
+        <!--android:layout_gravity="right|top"-->
+        <!--android:clickable="false"-->
+        <!--android:scaleType="fitCenter"-->
+        <!--android:adjustViewBounds="true"-->
+        <!--/>-->
+    <!--<Button-->
+        <!--android:layout_width="20dp"-->
+        <!--android:layout_height="20dp"-->
+        <!--android:background="@drawable/uploading"-->
+        <!--android:id="@+id/uploading"-->
+        <!--android:layout_margin="4dp"-->
+        <!--android:layout_gravity="right|top"-->
+        <!--android:clickable="false"-->
+        <!--android:scaleType="fitCenter"-->
+        <!--android:adjustViewBounds="true"-->
+        <!--/>-->
 
 
 </FrameLayout>
