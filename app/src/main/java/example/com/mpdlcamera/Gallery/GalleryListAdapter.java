@@ -233,6 +233,15 @@ public class GalleryListAdapter extends BaseAdapter {
             });
         }
 
+        // checkMark
+        ImageView checkMark = (ImageView) convertView.findViewById(R.id.album_check_mark);
+
+        if(albumPositionSet.contains(position)){
+            checkMark.setVisibility(View.VISIBLE);
+        }else {
+            checkMark.setVisibility(View.GONE);
+        }
+
         return convertView;
     }
 

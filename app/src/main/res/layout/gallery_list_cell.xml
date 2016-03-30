@@ -16,6 +16,15 @@
         android:layout_alignParentLeft="true"
         android:scaleType="centerCrop" />
 
+    <ImageView
+        android:id="@+id/album_check_mark"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="4dp"
+        android:visibility="gone"
+        android:src="@drawable/btn_check"
+        />
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
