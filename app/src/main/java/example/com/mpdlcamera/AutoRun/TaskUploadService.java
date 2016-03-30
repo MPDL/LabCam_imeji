@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.squareup.otto.Produce;
 
@@ -313,10 +314,8 @@ public class TaskUploadService extends Service{
 
                     /** move on to next **/
 
-                    try {
-                        finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
-                    } catch (Exception e) {
-                    }
+                    finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+
 
                     //DELETE TESTING
                     Log.i(TAG, "finishedImages " + finishedImages.size());
@@ -340,8 +339,18 @@ public class TaskUploadService extends Service{
                             }, 3000);
                         }
                     } else {
+                        /** delete finished tasks before reset Au task **/
+                        new Delete().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
+
                         task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                        task.setTotalItems(0);
+                        task.setFinishedItems(0);
                         task.save();
+
+                        Log.e(TAG, "getTotalItems:" + task.getTotalItems());
+                        Log.e(TAG, "getFinishedItems:" + task.getFinishedItems());
+
+
                         handler.post(new Runnable() {
                             public void run() {
                                 Toast.makeText(activity, "Auto Task Uploaded Successfully", Toast.LENGTH_SHORT).show();
@@ -434,7 +443,7 @@ public class TaskUploadService extends Service{
 
                 //TODO: continue upload
 
-                try {
+
                     finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
                     Log.e(TAG, "finishedImages " + finishedImages.size());
                     task.setFinishedItems(finishedImages.size());
@@ -452,11 +461,9 @@ public class TaskUploadService extends Service{
                             upload(image);
                         }
                     } else {
-                        task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+//                        task.setState(String.valueOf(DeviceStatus.state.FINISHED));
                         Log.i(TAG, "task finished");
                     }
-                } catch (Exception e) {
-                }
             }
         }
     };

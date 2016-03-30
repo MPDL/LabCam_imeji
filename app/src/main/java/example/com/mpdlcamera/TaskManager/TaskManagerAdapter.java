@@ -117,7 +117,10 @@ public class TaskManagerAdapter extends BaseAdapter {
         TextView percentTextView = (TextView) view.findViewById(R.id.tv_percent);
         int percent;
         if(maxNum!=0){
-            percent = (currentNum * 100) / maxNum;}
+            percent = (currentNum * 100) / maxNum;
+            Log.e(TAG,"currentNum: "+currentNum);
+            Log.e(TAG,"maxNum: "+maxNum);}
+
         else {
             percent = 0;
         }
@@ -146,7 +149,12 @@ public class TaskManagerAdapter extends BaseAdapter {
                 phrase = MU_UPLOADING;
             }
         }
-//
+        Log.e("~~~","phrase: "+phrase);
+        Log.e(TAG,task.getTaskId());
+        Log.e(TAG,"finished: "+task.getFinishedItems());
+        Log.e(TAG,"total: "+task.getTotalItems());
+
+
         //collection error
         if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.INTERRUPTED))){
             if(task.getUploadMode().equalsIgnoreCase("AU")){
@@ -318,6 +326,17 @@ public class TaskManagerAdapter extends BaseAdapter {
 
         //pause/play Task
         final CheckBox isPausedCheckBox = (CheckBox) view.findViewById(R.id.checkBox_is_paused);
+        Log.e(TAG,"state: "+task.getState());
+
+        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
+            isPausedCheckBox.setChecked(false);
+        }else if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
+            //true is play button, means state now is paused
+            isPausedCheckBox.setChecked(true);
+        }else if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
+
+        }
+
 
         isPausedCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -386,12 +405,7 @@ public class TaskManagerAdapter extends BaseAdapter {
             }
         });
 
-        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))){
-            isPausedCheckBox.setChecked(false);
-        }else {
-            //true is play button, means state now is paused
-            isPausedCheckBox.setChecked(true);
-        }
+
 
 
         return view;
