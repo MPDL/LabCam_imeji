@@ -25,7 +25,9 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.io.File;
 import java.io.IOException;
@@ -138,25 +140,37 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         loadTimeLinePicture();
 
         //switch
-        Switch modeSwitch = (Switch) rootView.findViewById(R.id.switch_mode);
-        modeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        final TextView dateLabel = (TextView) rootView.findViewById(R.id.label_date);
+        final TextView albumLabel = (TextView) rootView.findViewById(R.id.label_album);
 
+        dateLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 if(actionMode != null){
                     // finish actionMode when switch
                     actionMode.finish();
                 }
-                // switch from timeLine view to album view
-                if(!compoundButton.isChecked()){
-                    gridView.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                }else {
-                    gridView.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                }
+                dateLabel.setTextColor(getResources().getColor(R.color.primary));
+                albumLabel.setTextColor(getResources().getColor(R.color.lightGrey));
+                gridView.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
             }
         });
+
+        albumLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (actionMode != null) {
+                    // finish actionMode when switch
+                    actionMode.finish();
+                }
+                dateLabel.setTextColor(getResources().getColor(R.color.lightGrey));
+                albumLabel.setTextColor(getResources().getColor(R.color.primary));
+                gridView.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+            }
+        });
+
 
         return rootView;
 
