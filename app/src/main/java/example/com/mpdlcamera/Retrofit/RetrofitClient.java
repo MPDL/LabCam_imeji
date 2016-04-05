@@ -7,6 +7,7 @@ import java.util.List;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
+import example.com.mpdlcamera.Model.MessageModel.ItemMessage;
 import example.com.mpdlcamera.Model.User;
 import retrofit.Callback;
 import retrofit.client.Response;
@@ -98,7 +99,7 @@ public class RetrofitClient {
 
 
     public static void getCollectionItems(String collectionId,
-                                      Callback<JsonObject> callback,
+                                      Callback<ItemMessage> callback,
                                       String APIkey) {
         ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
 

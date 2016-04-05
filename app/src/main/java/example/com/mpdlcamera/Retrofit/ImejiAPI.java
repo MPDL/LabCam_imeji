@@ -7,6 +7,7 @@ import java.util.List;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
+import example.com.mpdlcamera.Model.MessageModel.ItemMessage;
 import example.com.mpdlcamera.Model.User;
 import retrofit.Callback;
 import retrofit.client.Response;
@@ -86,7 +87,7 @@ public interface ImejiAPI {
     //get all items by collection id
     @GET("/collections/{id}/items?size=300")
     void getCollectionItems(@Path("id") String collectionId,
-                            Callback<JsonObject> callback);
+                            Callback<ItemMessage> callback);
 
     //get collection by id
     @GET("/collections/{id}")

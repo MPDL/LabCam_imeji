@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.Model.MessageModel.ItemMessage;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import retrofit.Callback;
@@ -50,24 +51,16 @@ public class ItemsActivity extends AppCompatActivity {
 
     Toolbar toolbar;
 
-    Callback<JsonObject> callback_Items = new Callback<JsonObject>() {
+    Callback<ItemMessage> callback_Items = new Callback<ItemMessage>() {
         @Override
-        public void success(JsonObject jsonObject, Response response) {
-            JsonArray array;
+        public void success(ItemMessage itemMessage, Response response) {
             List<DataItem> dataList = new ArrayList<>();
-
-            array = jsonObject.getAsJsonArray("results");
-            Log.i("results", array.toString());
-            Gson gson = new Gson();
-            for(int i = 0 ; i < array.size() ; i++){
-                DataItem dataItem = gson.fromJson(array.get(i), DataItem.class);
-                dataList.add(dataItem);
-            }
 
             //load all data from imeji
             //adapter =  new CustomListAdapter(getActivity(), dataList);
             List<DataItem> dataListLocal = new ArrayList<DataItem>();
-
+            dataListLocal = itemMessage.getResults();
+            
             ActiveAndroid.beginTransaction();
             try {
                 imagePathList.clear();

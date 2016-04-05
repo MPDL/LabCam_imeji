@@ -1,17 +1,23 @@
 package example.com.mpdlcamera.ImejiFragment;
 
 import android.app.ProgressDialog;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,14 +31,25 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import example.com.mpdlcamera.Folder.FolderListAdapter;
+import example.com.mpdlcamera.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
+import example.com.mpdlcamera.Gallery.SectionedGridView.SimpleAdapter;
+import example.com.mpdlcamera.ItemDetails.DetailActivity;
 import example.com.mpdlcamera.ItemDetails.ItemsActivity;
 import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
+import example.com.mpdlcamera.Model.MessageModel.ItemMessage;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -58,21 +75,25 @@ public class ImejiFragment extends Fragment {
 
     private ProgressDialog pDialog;
 
-    //private FolderGridAdapter adapter;
-    //private GridView gridview;
-
-    private NavigationView navigation;
-
     private FolderListAdapter adapter;
     private ListView listView;
 
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
-    private ImejiFolder currentCollectionLocal = new ImejiFolder();
 
     SharedPreferences preferencesFiles;
 
-    //TESTING DB
-    private boolean isAdd = false;
+    /** reuse the adapters in Local fragment **/
+    SectionedGridRecyclerViewAdapter mSectionedAdapter;
+    SimpleAdapter simpleAdapter;
+
+    RecyclerView recyclerView;
+    /**
+     * imageList store all images date and path
+     * treeMap auto sort it by date (prepare data for timeline view)
+     * <imageDate,imagePath> **/
+    TreeMap<Long, String> imageList = new TreeMap<Long, String>();
+    ArrayList<String> sortedImageNameList;
+
 
     private OnFragmentInteractionListener mListener;
 
@@ -235,31 +256,130 @@ public class ImejiFragment extends Fragment {
         pDialog.setMessage("Loading...");
         pDialog.show();
 //        RetrofitClient.getCollections(callback, username, password);
-        RetrofitClient.getCollections(callback_collection,APIKey);
+        RetrofitClient.getCollections(callback_collection, APIKey);
     }
 
     private void getFolderItems(String collectionId){
         RetrofitClient.getCollectionItems(collectionId, callback_Items, APIKey);
     }
 
+
+    //load timeLinePicture
+    private void loadTimeLinePicture(){
+        // Your RecyclerView.Adapter
+        // sortedImageNameList is imagePath list
+        ArrayList<String> ImageNameList = new ArrayList<>();
+        sortedImageNameList = new ArrayList<>();
+        sortedImageNameList.clear();
+        // sectionMap key is the date, value is the picture number
+        List<String> dateAseList = new ArrayList<String>();
+        List<String> dateList = new ArrayList<String>();
+        HashMap<String,Integer> sectionMap = new HashMap<String,Integer>();
+
+        for(Map.Entry<Long,String> entry: imageList.entrySet()){
+            Date d = new Date(entry.getKey());
+            SimpleDateFormat dt = new SimpleDateFormat(" dd.MM.yyyy");
+            String dateStr = dt.format(d);
+            dateAseList.add(dateStr);
+            ImageNameList.add(entry.getValue());
+        }
+
+
+        // treeMap order is ASE, need DSE, so reverse
+        for(int i=dateAseList.size()-1;i>=0;i--){
+            dateList.add(dateAseList.get(i));
+        }
+
+        for(int i=ImageNameList.size()-1;i>=0;i--){
+            sortedImageNameList.add(ImageNameList.get(i));
+        }
+
+        Log.e(LOG_TAG,sortedImageNameList.size()+"");
+
+        simpleAdapter = new SimpleAdapter(getActivity(),sortedImageNameList);
+
+        //This is the code to provide a sectioned grid
+        List<SectionedGridRecyclerViewAdapter.Section> sections =
+                new ArrayList<SectionedGridRecyclerViewAdapter.Section>();
+
+
+        // section init
+        String preStr = "";
+        int count = 0;
+//        int imgPosition = 0;
+        for(String dateStr:dateList){
+            // count is img position
+            if(preStr.equalsIgnoreCase(dateStr)){
+                count++;
+            }else {
+                //init
+                sections.add(new SectionedGridRecyclerViewAdapter.Section(count,dateStr));
+                count++;
+            }
+            preStr = dateStr;
+        }
+
+
+        //Add your adapter to the sectionAdapter
+        SectionedGridRecyclerViewAdapter.Section[] dummy = new SectionedGridRecyclerViewAdapter.Section[sections.size()];
+        mSectionedAdapter = new
+                SectionedGridRecyclerViewAdapter(getActivity(),R.layout.header_grid_section,R.id.section_text,recyclerView,simpleAdapter);
+        mSectionedAdapter.setSections(sections.toArray(dummy));
+
+        //Apply this adapter to the RecyclerView
+        recyclerView.setAdapter(mSectionedAdapter);
+
+
+        simpleAdapter.setOnItemClickListener(new SimpleAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+
+                    // 如果不是多选状态，则进入点击事件的业务逻辑
+                    //  show picture
+                    boolean isLocalImage = true;
+                    Intent showDetailIntent = new Intent(getActivity(), DetailActivity.class);
+                    showDetailIntent.putStringArrayListExtra("itemPathList", sortedImageNameList);
+                    showDetailIntent.putExtra("positionInList",position);
+                    showDetailIntent.putExtra("isLocalImage", isLocalImage);
+                    startActivity(showDetailIntent);
+
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+            }
+        });
+    }
+
+    private void renderTimeLine(){
+        // get current screen width
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+
+        // calculate spanCount in GridLayoutManager
+        int spanCount = 3;
+        spanCount = width/235;
+        Log.v(LOG_TAG, "spanCount: "+spanCount);
+
+        // timeline recycleView
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_recycleView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
+    }
+
+
     /**
      * Callbacks
      */
 
-    Callback<JsonObject> callback_Items = new Callback<JsonObject>() {
+    Callback<ItemMessage> callback_Items = new Callback<ItemMessage>() {
         @Override
-        public void success(JsonObject jsonObject, Response response) {
+        public void success(ItemMessage itemMessage, Response response) {
             JsonArray array;
             List<DataItem> dataList = new ArrayList<>();
-
-            //TODO: null pointer exception
-            array = jsonObject.getAsJsonArray("results");
-            Log.i("results", array.toString());
-            Gson gson = new Gson();
-            for(int i = 0 ; i < array.size() ; i++){
-                DataItem dataItem = gson.fromJson(array.get(i), DataItem.class);
-                dataList.add(dataItem);
-            }
+            dataList = itemMessage.getResults();
 
             if(dataList != null) {
                 ActiveAndroid.beginTransaction();
@@ -313,6 +433,7 @@ public class ImejiFragment extends Fragment {
 
             ActiveAndroid.beginTransaction();
             try {
+                // clear imeji folder list
                 collectionListLocal.clear();
                 for(ImejiFolder folder : folderList){
                     Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
@@ -322,6 +443,18 @@ public class ImejiFragment extends Fragment {
                     //TODO Here is a bug, collectionLocal will be random one collection
                     //collectionLocal = folder;
 
+//                    List<DataItem> dataItems= folder.getItems();
+//                    for (DataItem dataItem:dataItems){
+//                        // date example 2015-02-16T13:02:27 +0100
+//                        String time = dataItem.getCreatedDate();
+//                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss Z");
+//                        Date dt = df.parse(time);
+//                        Long l = dt.getTime();
+//                        Log.e(LOG_TAG,String.valueOf(dt.getTimezoneOffset()));
+//
+//                        dataItem.getFileUrl();
+////                        imageList.put(dataItem.getCreatedDate());
+//                    }
                     collectionListLocal.add(folder);
                     //folder.save();
                 }
