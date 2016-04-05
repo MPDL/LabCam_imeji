@@ -59,10 +59,14 @@ import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
 import example.com.mpdlcamera.TaskManager.TaskFragment;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.Utils.DeviceStatus;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by kiran on 25.08.15.
@@ -88,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private String email;
     private String username;
     private String userId;
+    private String apiKey;
     private SharedPreferences mPrefs;
 
     //current tab
@@ -131,6 +136,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         setContentView(R.layout.activity_main);
         Log.v("Main activity", "started");
 
+        //user info
+        mPrefs = this.getSharedPreferences("myPref", 0);
+        email = mPrefs.getString("email", "");
+        username =  mPrefs.getString("username", "");
+        userId = mPrefs.getString("userId","");
+        apiKey = mPrefs.getString("apiKey","");
+
         try{
         Bundle args = this.getIntent().getExtras();
         isTaskFragment= args.getBoolean("isTaskFragment", false);}
@@ -157,6 +169,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
 
         initInstances();
+
+
+        Log.e(LOG_TAG,apiKey);
+        RetrofitClient.createCollection("muji","muji muji",createCollection_callback,apiKey);
                 /*
                     file system
                  */
@@ -175,11 +191,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 //                NewFileObserver newFileObserver = new NewFileObserver(handler,this);
 //                getApplicationContext().getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,false, newFileObserver);
 
-        //create drawer view
-        mPrefs = this.getSharedPreferences("myPref", 0);
-        email = mPrefs.getString("email", "");
-        username =  mPrefs.getString("username", "");
-        userId = mPrefs.getString("userId","");
 
         //init radioButton group
         initRadioButtonGroup();
@@ -211,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             if(lastAUTask!= null){
             collectionNameTextView.setText(lastAUTask.getCollectionName());}
             else{
-                collectionNameTextView.setText("unset");
+                collectionNameTextView.setText("none");
             }
     }
 
@@ -798,5 +809,17 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 .executeSingle();
     }
 
+
+    Callback<ImejiFolder> createCollection_callback = new Callback<ImejiFolder>() {
+        @Override
+        public void success(ImejiFolder imejiFolder, Response response) {
+            Log.e(LOG_TAG,"createCollection_callback success");
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.e(LOG_TAG,error.getMessage());
+        }
+    };
 
 }

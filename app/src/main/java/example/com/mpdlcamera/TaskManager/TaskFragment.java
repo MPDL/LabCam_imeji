@@ -75,9 +75,14 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
                 Log.v(LOG_TAG,"imageState: "+image.getState());
             }
 
-            if(task.getUploadMode().equalsIgnoreCase("AU")&&!settings.isAutoUpload()){
-                auTask = task;
-            }
+            /** exception **/
+               if(task!=null){
+                   if (task.getUploadMode().equalsIgnoreCase("AU") && !settings.isAutoUpload()) {
+                       auTask = task;
+                   }
+               }
+
+
         }
         taskList.remove(auTask);
         taskManagerAdapter = new TaskManagerAdapter(this.getActivity(),taskList,this);

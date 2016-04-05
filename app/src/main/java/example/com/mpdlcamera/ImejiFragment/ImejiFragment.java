@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.net.Uri;
@@ -132,6 +133,10 @@ public class ImejiFragment extends Fragment {
         username = mPrefs.getString("username", "");
         APIKey = mPrefs.getString("apiKey", "");
 
+//        renderTimeLine();
+
+        //set header recycleView adapter
+//        loadTimeLinePicture();
 
 //        loadImejiFolder();
         adapter = new FolderListAdapter(getActivity(), collectionListLocal);
@@ -165,6 +170,14 @@ public class ImejiFragment extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    /** screen orientation **/
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+//        renderTimeLine();
+//        loadTimeLinePicture();
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -377,10 +390,31 @@ public class ImejiFragment extends Fragment {
     Callback<ItemMessage> callback_Items = new Callback<ItemMessage>() {
         @Override
         public void success(ItemMessage itemMessage, Response response) {
-            JsonArray array;
             List<DataItem> dataList = new ArrayList<>();
             dataList = itemMessage.getResults();
 
+            /** store image **/
+            // date example 2015-02-16T13:02:27 +0100
+
+            for(DataItem dataItem:dataList ) {
+                String time = dataItem.getCreatedDate();
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss Z");
+                Date dt = null;
+                Long dtLong = null;
+                try {
+                    dt = df.parse(time);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if(dt!=null){
+                    dtLong= dt.getTime();
+                }else {
+                    dtLong = null;
+                }
+
+                dataItem.getFileUrl();
+//                imageList.put(dtLong, dataItem.getFileUrl());
+            }
             if(dataList != null) {
                 ActiveAndroid.beginTransaction();
                 try {
@@ -394,7 +428,6 @@ public class ImejiFragment extends Fragment {
                                 folder.setCoverItemUrl(coverItem.getWebResolutionUrlUrl());
                                 folder.setImejiId(folder.id);
                                 folder.save();
-
                             }
                         }
                     }
@@ -443,18 +476,6 @@ public class ImejiFragment extends Fragment {
                     //TODO Here is a bug, collectionLocal will be random one collection
                     //collectionLocal = folder;
 
-//                    List<DataItem> dataItems= folder.getItems();
-//                    for (DataItem dataItem:dataItems){
-//                        // date example 2015-02-16T13:02:27 +0100
-//                        String time = dataItem.getCreatedDate();
-//                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss Z");
-//                        Date dt = df.parse(time);
-//                        Long l = dt.getTime();
-//                        Log.e(LOG_TAG,String.valueOf(dt.getTimezoneOffset()));
-//
-//                        dataItem.getFileUrl();
-////                        imageList.put(dataItem.getCreatedDate());
-//                    }
                     collectionListLocal.add(folder);
                     //folder.save();
                 }

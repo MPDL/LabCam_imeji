@@ -5,20 +5,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="example.com.mpdlcamera.LocalFragment.LocalFragment">
 
+    <!--label_album-->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
-        android:id="@+id/label_date"
-        android:text="Date"
-        android:textColor="@color/primary"
+        android:id="@+id/label_album"
+        android:text="Album"
         android:textSize="20dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/label_date"
+        android:layout_toLeftOf="@id/label_album"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:id="@+id/label_or"
@@ -29,9 +29,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/label_or"
-        android:id="@+id/label_album"
-        android:text="Album"
+        android:id="@+id/label_date"
+        android:text="Date"
+        android:textColor="@color/primary"
         android:textSize="20dp"/>
+
+
+
+
 
     <!-- TODO: Update blank fragment layout -->
 

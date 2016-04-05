@@ -60,7 +60,7 @@ public class ItemsActivity extends AppCompatActivity {
             //adapter =  new CustomListAdapter(getActivity(), dataList);
             List<DataItem> dataListLocal = new ArrayList<DataItem>();
             dataListLocal = itemMessage.getResults();
-            
+
             ActiveAndroid.beginTransaction();
             try {
                 imagePathList.clear();

@@ -117,4 +117,19 @@ public class RetrofitClient {
         imejiAPI.getCollectionById(collectionId, callback);
     }
 
+    //createCollection
+    public static void createCollection(String title,
+                                        String description,
+                                         Callback<ImejiFolder> callback,
+                                         String APIkey) {
+        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("title",title);
+        jsonObject.addProperty("description",description);
+        System.out.println(jsonObject);
+        // Fetch and print a list of the items to this library.
+        imejiAPI.createCollection(jsonObject, callback);
+    }
+
 }

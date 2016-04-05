@@ -11,6 +11,7 @@ import example.com.mpdlcamera.Model.MessageModel.ItemMessage;
 import example.com.mpdlcamera.Model.User;
 import retrofit.Callback;
 import retrofit.client.Response;
+import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.Multipart;
@@ -19,6 +20,7 @@ import retrofit.http.Part;
 import retrofit.http.Path;
 import retrofit.http.Query;
 import retrofit.mime.TypedFile;
+import retrofit.mime.TypedString;
 
 /**
  * Created by allen on 27/08/15.
@@ -93,5 +95,9 @@ public interface ImejiAPI {
     @GET("/collections/{id}")
     void getCollectionById (@Path("id") String collectionId,
                             Callback<ImejiFolder> callback);
+
+    @POST("/collections")
+    void createCollection(@Body JsonObject jsonBody ,
+                          Callback<ImejiFolder> callback) ;
 
 }

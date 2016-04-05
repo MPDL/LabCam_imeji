@@ -667,6 +667,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         super.onResume();
     }
 
+    /** screen orientation **/
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         renderTimeLine();
