@@ -88,7 +88,7 @@ public class RetrofitClient {
         imejiAPI.getCollectionMessage(callback);
     }
 
-    public static void getGrantCollectionMessage(Callback<JsonObject> callback,
+    public static void getGrantCollectionMessage(Callback<CollectionMessage> callback,
                                             String APIkey) {
         ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
 

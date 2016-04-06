@@ -33,6 +33,7 @@ import example.com.mpdlcamera.Auth.QRScannerActivity;
 import example.com.mpdlcamera.AutoRun.ManualUploadService;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.LocalModel.Task;
+import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Settings.SettingsListAdapter;
@@ -168,20 +169,17 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
 
     //callbacks
 
-    Callback<JsonObject> callback = new Callback<JsonObject>() {
+    Callback<CollectionMessage> callback = new Callback<CollectionMessage>() {
         @Override
-        public void success(JsonObject jsonObject, Response response) {
+        public void success(CollectionMessage collectionMessage, Response response) {
 
-            JsonArray array;
+            Log.e(LOG_TAG,"collectionMessage success");
+            /** get collections **/
             List<ImejiFolder> folderList = new ArrayList<>();
+            folderList = collectionMessage.getResults();
 
-            array = jsonObject.getAsJsonArray("results");
-            Log.i("results", array.toString());
-            Gson gson = new Gson();
-            for(int i = 0 ; i < array.size() ; i++){
-                ImejiFolder imejiFolder = gson.fromJson(array.get(i), ImejiFolder.class);
-                folderList.add(imejiFolder);
-            }
+
+
             ActiveAndroid.beginTransaction();
             try {
                 collectionList.clear();

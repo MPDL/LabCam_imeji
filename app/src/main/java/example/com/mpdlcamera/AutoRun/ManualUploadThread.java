@@ -363,7 +363,6 @@ public class ManualUploadThread extends Thread {
         } catch (Exception e) {
         }
 
-        //DELETE TESTING
         Log.i(TAG, "finishedImages " + finishedImages.size());
         task.setTotalItems(totalNum);
         task.setFinishedItems(finishedImages.size());

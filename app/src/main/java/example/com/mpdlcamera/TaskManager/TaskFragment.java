@@ -76,7 +76,7 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
             }
 
             /** exception **/
-               if(task!=null){
+               if(task!=null&& settings!=null){
                    if (task.getUploadMode().equalsIgnoreCase("AU") && !settings.isAutoUpload()) {
                        auTask = task;
                    }

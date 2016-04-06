@@ -172,7 +172,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
 
         Log.e(LOG_TAG,apiKey);
-        RetrofitClient.createCollection("muji","muji muji",createCollection_callback,apiKey);
                 /*
                     file system
                  */
@@ -808,18 +807,4 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 .orderBy("createTime DESC")
                 .executeSingle();
     }
-
-
-    Callback<ImejiFolder> createCollection_callback = new Callback<ImejiFolder>() {
-        @Override
-        public void success(ImejiFolder imejiFolder, Response response) {
-            Log.e(LOG_TAG,"createCollection_callback success");
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-            Log.e(LOG_TAG,error.getMessage());
-        }
-    };
-
 }

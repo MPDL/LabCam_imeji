@@ -9,9 +9,11 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -37,6 +39,7 @@ import example.com.mpdlcamera.AutoRun.TaskUploadService;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
+import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.UploadActivity.CollectionIdInterface;
@@ -76,21 +79,41 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
 
 
-    Callback<JsonObject> callback = new Callback<JsonObject>() {
+    Callback<CollectionMessage> callback = new Callback<CollectionMessage>() {
         @Override
-        public void success(JsonObject jsonObject, Response response) {
+        public void success(CollectionMessage collectionMessage, Response response) {
 
-            JsonArray array;
             List<ImejiFolder> folderList = new ArrayList<>();
+            folderList = collectionMessage.getResults();
 
-            array = jsonObject.getAsJsonArray("results");
-            Log.i("results", array.toString());
-            Gson gson = new Gson();
-            for(int i = 0 ; i < array.size() ; i++){
-                ImejiFolder imejiFolder = gson.fromJson(array.get(i), ImejiFolder.class);
-                folderList.add(imejiFolder);
-            }
             new Delete().from(ImejiFolder.class).execute();
+
+            /** show alert if no collection available **/
+            if(folderList.size()==0){
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                // Set up the input
+                final EditText input = new EditText(activity);
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+                builder.setTitle("Create Collection")
+                        .setMessage("There is no collection available, do you want to create one?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with delete
+                                RetrofitClient.createCollection(String.valueOf(input.getText()),"no description yet",createCollection_callback,APIkey);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+
+
             ActiveAndroid.beginTransaction();
             try {
                 collectionListLocal.clear();
@@ -137,6 +160,22 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 //
             adapter = new SettingsListAdapter(activity, collectionListLocal,ie);
             listView.setAdapter(adapter);
+        }
+    };
+
+    Callback<ImejiFolder> createCollection_callback = new Callback<ImejiFolder>() {
+        @Override
+        public void success(ImejiFolder imejiFolder, Response response) {
+            Log.v(LOG_TAG, "createCollection_callback success");
+            imejiFolder.setImejiId(imejiFolder.id);
+            collectionListLocal.add(imejiFolder);
+            adapter.notifyDataSetChanged();
+
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.v(LOG_TAG, error.getMessage());
         }
     };
 
