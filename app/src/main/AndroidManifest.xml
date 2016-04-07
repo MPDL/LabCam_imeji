@@ -134,15 +134,6 @@
                 android:value=".Settings.SettingsActivity" />
         </activity>
         <activity
-            android:name=".Gallery.GalleryListActivity"
-            android:label="Local Gallery"
-            android:parentActivityName=".Folder.MainActivity" >
-        </activity>
-        <activity
-            android:name=".Gallery.ActivatedGalleryActivity"
-            android:label="Activated Gallery"
-            android:parentActivityName=".Gallery.GalleryListActivity" />
-        <activity
             android:name=".Upload.PopupActivity"
             android:excludeFromRecents="true"
             android:label="Logout Confirmation"

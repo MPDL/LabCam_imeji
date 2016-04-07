@@ -18,7 +18,9 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.R;
@@ -33,10 +35,17 @@ public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.Vi
     private Activity activity;
     private List<String> galleryItems;
     private HashMap<Integer, Boolean> mSelection = new HashMap<Integer, Boolean>();
+    public Set<Integer> positionSet = new HashSet<>();
 
     public LocalAlbumAdapter(Activity activity, List<String> galleryItems) {
         this.activity = activity;
         this.galleryItems = galleryItems;
+    }
+
+    private OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
     public void setNewSelection(int position, boolean value) {
@@ -81,7 +90,7 @@ public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.Vi
         return new ViewHolder(view);    }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
 
         //prepare data
         Point size = getPoint();
@@ -123,10 +132,37 @@ public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.Vi
                 .resize(235,235)
                 .centerCrop()
                 .into(holder.imageView);
+
+        if (onItemClickListener!=null){
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onItemClickListener.onItemClick(v,position);
+                }
+            });
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    onItemClickListener.onItemLongClick(v,position);
+                    return false;
+                }
+            });
+        }
     }
 
     @Override
     public int getItemCount() {
         return galleryItems.size();
+    }
+
+    public void setPositionSet(Set<Integer> positionSet){
+        this.positionSet = positionSet;
+        Log.e("positionSet",positionSet.size()+"");
+        notifyDataSetChanged();
+    }
+
+    public interface OnItemClickListener{
+        void onItemClick(View view, int position);
+        void onItemLongClick(View view,int position);
     }
 }

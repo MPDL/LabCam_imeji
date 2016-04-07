@@ -2,16 +2,20 @@ package example.com.mpdlcamera.Gallery;
 
 import android.app.Activity;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -23,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dd.CircularProgressButton;
 
@@ -31,10 +36,13 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import example.com.mpdlcamera.Gallery.LocalAlbum.LocalAlbumAdapter;
+import example.com.mpdlcamera.ItemDetails.DetailActivity;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
@@ -44,16 +52,13 @@ import example.com.mpdlcamera.Utils.ImageFileFilter;
 /**
  * Created by allen on 03/09/15.
  */
-public class LocalImageActivity extends AppCompatActivity {
+public class LocalImageActivity extends AppCompatActivity implements android.support.v7.view.ActionMode.Callback {
 
-    private List<String> dataPathList = new ArrayList<String>();
-    private List<String> selectedDataPathList = new ArrayList<String>();
+    private ArrayList<String> dataPathList = new ArrayList<String>();
 
-    public LocalImageAdapter adapter;
     public LocalAlbumAdapter localAlbumAdapter;
 
 //    public  ImagesGridAdapter adapter;
-    private GridView gridView;
     private RecyclerView recyclerView;
     private View rootView;
     private Activity activity = this;
@@ -63,25 +68,26 @@ public class LocalImageActivity extends AppCompatActivity {
     private String userId;
 
 
+    //actionMode
+    private android.support.v7.view.ActionMode actionMode;
+
+    android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
+    public Set<Integer> positionSet = new HashSet<>();
 
     private Toolbar toolbar;
     private String folderPath;
-
-    private CircularProgressButton circularButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.active_gallery_gridview);
+
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         TextView titleView = (TextView) findViewById(R.id.title);
-
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
@@ -122,129 +128,43 @@ public class LocalImageActivity extends AppCompatActivity {
             }
         }
 
-        adapter = new LocalImageAdapter(activity, dataPathList, false);
         // replace with album
         localAlbumAdapter = new LocalAlbumAdapter(activity,dataPathList);
-
-        gridView = (GridView) findViewById(R.id.image_gridView);
-        gridView.setAdapter(adapter);
 
         recyclerView = (RecyclerView) findViewById(R.id.album_detail_recycle_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(activity, 2));
         recyclerView.setAdapter(localAlbumAdapter);
 
-        circularButton = (CircularProgressButton) findViewById(R.id.circularButton);
-
-        gridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            private int selectedCount = 0;
-
+        localAlbumAdapter.setOnItemClickListener(new LocalAlbumAdapter.OnItemClickListener() {
             @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                // TODO Auto-generated method stub
-                return false;
-            }
+            public void onItemClick(View view, int position) {
+                if (actionMode != null) {
+                    // 如果当前处于多选状态，则进入多选状态的逻辑
+                    // 维护当前已选的position
+                    addOrRemove(position);
+                    localAlbumAdapter.setPositionSet(positionSet);
+                } else {
+                    // 如果不是多选状态，则进入点击事件的业务逻辑
+                    //  show picture
+                    boolean isLocalImage = true;
+                    Intent showDetailIntent = new Intent(activity, DetailActivity.class);
+                    showDetailIntent.putStringArrayListExtra("itemPathList", dataPathList);
+                    showDetailIntent.putExtra("positionInList",position);
+                    showDetailIntent.putExtra("isLocalImage", isLocalImage);
+                    startActivity(showDetailIntent);
 
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-                // TODO Auto-generated method stub
-                adapter.clearSelection();
-                toolbar.setVisibility(View.VISIBLE);
-                circularButton.setVisibility(View.GONE);
-
-                //adapter.getCheckBox().setVisibility(View.GONE);
-
-            }
-
-      @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        // TODO Auto-generated method stub
-        selectedCount = 0;
-
-        toolbar.setVisibility(View.GONE);
-
-        //adapter.getCheckBox().setVisibility(View.VISIBLE);
-
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.contextual_menu_local, menu);
-//                menu.add(Menu.NONE, R.id.item_delete_local, Menu.NONE, "Delete");
-//                menu.add(Menu.NONE, R.id.item_upload_local, Menu.NONE, "Upload");
-
-        return true;
-    }
-
-    @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        // TODO Auto-generated method stub
-        int id = item.getItemId();
-        Log.v(LOG_TAG, ""+ id);
-
-        switch (item.getItemId()) {
-
-            case R.id.item_upload_local:
-//                        nr = 0;
-//                        adapter.clearSelection();
-                Log.v(LOG_TAG,"upload");
-
-                Log.v(LOG_TAG, " "+selectedDataPathList.size());
-
-                Log.v(LOG_TAG, selectedDataPathList.get(0));
-
-                circularButton.setVisibility(View.VISIBLE);
-                circularButton.setIndeterminateProgressMode(true); // turn on indeterminate progress
-                circularButton.setProgress(50); // set progress > 0 & < 100 to display indeterminate progress
-
-                if(selectedDataPathList != null) {
-                    uploadList(selectedDataPathList);
                 }
-                selectedDataPathList.clear();
-                adapter.clearSelection();
+            }
 
-                mode.finish();
-                break;
-
-        }
-
-        return false;
-    }
-
-    @Override
-    public void onItemCheckedStateChanged(ActionMode mode,
-                                          int position,
-                                          long id,
-                                          boolean checked) {
-        if (checked) {
-            selectedCount++;
-            adapter.setNewSelection(position, checked);
-            selectedDataPathList.add(dataPathList.get(position));
-            //adapter.getCheckBox().setChecked(true);
-
-        } else {
-            selectedCount--;
-            adapter.removeSelection(position);
-            selectedDataPathList.remove(dataPathList.get(position));
-            //adapter.getCheckBox().setChecked(false);
-
-        }
-        mode.setTitle(selectedCount + " selected");
-
-    }
-});
-
-        gridView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-
-
-        gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-@Override
-public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-        int position, long arg3) {
-        gridView.setItemChecked(position, !adapter.isPositionChecked(position));
-        return false;
-        }
+            @Override
+            public void onItemLongClick(View view, int position) {
+                if (actionMode == null) {
+                    actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
+                }
+            }
         });
-
-        }
+    }
 
 
     @Override
@@ -269,6 +189,27 @@ public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
         return super.onOptionsItemSelected(item);
     }
 
+    /** add or remove image in upload task **/
+    private void addOrRemove(int position) {
+        if (positionSet.contains(position)) {
+            // 如果包含，则撤销选择
+            positionSet.remove(position);
+        } else {
+            // 如果不包含，则添加
+            positionSet.add(position);
+        }
+        if (positionSet.size() == 0) {
+            // 如果没有选中任何的item，则退出多选模式
+            Log.e(LOG_TAG, "addOrRemove() is called");
+            actionMode.finish();
+        } else {
+            // 设置ActionMode标题
+            actionMode.setTitle(positionSet.size() + " selected photos");
+            // 更新列表界面，否则无法显示已选的item
+        }
+    }
+
+
     public static RemoteListDialogFragment newInstance(String taskId)
     {
         RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
@@ -282,10 +223,6 @@ public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
             upload the selected files
         */
     private void uploadList(List<String> fileList) {
-        circularButton.setVisibility(View.VISIBLE);
-        circularButton.setIndeterminateProgressMode(true); // turn on indeterminate progress
-        circularButton.setProgress(50);
-
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         String currentTaskId = "";
@@ -375,5 +312,62 @@ public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
 
         }
         return imageNum;
+    }
+
+    @Override
+    public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
+        if (actionMode == null) {
+            actionMode = mode;
+            toolbar.setVisibility(View.GONE);
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.contextual_menu_local, menu);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean onPrepareActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_upload_local:
+
+                Log.v(LOG_TAG, "upload");
+
+                if (positionSet.size() != 0) {
+                    Log.v(LOG_TAG, " " + positionSet.size());
+                    List uploadPathList = new ArrayList();
+                    for (Integer i : positionSet) {
+                        uploadPathList.add(dataPathList.get(i));
+                    }
+
+                    if (uploadPathList != null) {
+                        uploadList(uploadPathList);
+                    }
+                    uploadPathList.clear();
+
+                }
+                mode.finish();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
+        actionMode = null;
+
+        // clear selection Sets
+        positionSet.clear();
+
+        toolbar.setVisibility(View.VISIBLE);
+        localAlbumAdapter.notifyDataSetChanged();
+        Log.e(LOG_TAG,"onDestroyActionMode");
     }
 }
