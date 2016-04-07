@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ActionMode;
@@ -32,6 +34,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import example.com.mpdlcamera.Gallery.LocalAlbum.LocalAlbumAdapter;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
@@ -47,8 +50,11 @@ public class LocalImageActivity extends AppCompatActivity {
     private List<String> selectedDataPathList = new ArrayList<String>();
 
     public LocalImageAdapter adapter;
+    public LocalAlbumAdapter localAlbumAdapter;
+
 //    public  ImagesGridAdapter adapter;
     private GridView gridView;
+    private RecyclerView recyclerView;
     private View rootView;
     private Activity activity = this;
     private final String LOG_TAG = LocalImageActivity.class.getSimpleName();
@@ -60,15 +66,8 @@ public class LocalImageActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private String folderPath;
-    private AbsListView.MultiChoiceModeListener mMultiChoiceModeListener;
 
     private CircularProgressButton circularButton;
-
-    //Bind Manual uploading service
-    private Service myService;
-    private boolean bound;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,12 +123,16 @@ public class LocalImageActivity extends AppCompatActivity {
         }
 
         adapter = new LocalImageAdapter(activity, dataPathList, false);
+        // replace with album
+        localAlbumAdapter = new LocalAlbumAdapter(activity,dataPathList);
 
-        //rootView = inflater.inflate(R.layout.fragment_section_list_swipe, container, false);
         gridView = (GridView) findViewById(R.id.image_gridView);
-        //listView = (SwipeMenuListView) rootView.findViewById(R.id.listView);
         gridView.setAdapter(adapter);
-        //registerForContextMenu(gridView);
+
+        recyclerView = (RecyclerView) findViewById(R.id.album_detail_recycle_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(activity, 2));
+        recyclerView.setAdapter(localAlbumAdapter);
 
         circularButton = (CircularProgressButton) findViewById(R.id.circularButton);
 
@@ -177,22 +180,6 @@ public class LocalImageActivity extends AppCompatActivity {
         Log.v(LOG_TAG, ""+ id);
 
         switch (item.getItemId()) {
-//            case R.id.item_delete_local:
-//                selectedCount = 0;
-//                Log.v(LOG_TAG,"##delete");
-//                if(selectedDataPathList != null) {
-//                    delete(selectedDataPathList);
-//                    for(String str: selectedDataPathList){
-//                        dataPathList.remove(str);
-//                    }
-//                    adapter.notifyDataSetChanged();
-//
-//                }
-//                selectedDataPathList.clear();
-//                adapter.clearSelection();
-//
-//                mode.finish();
-//                break;
 
             case R.id.item_upload_local:
 //                        nr = 0;
@@ -303,18 +290,10 @@ public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
         mPrefs = activity.getSharedPreferences("myPref", 0);
         String currentTaskId = "";
 
-
         currentTaskId = createTask(fileList);
 
-        // go to RemoteCollectionSettings
-//        Intent remoteCollectionSettingIntent = new Intent(this, RemoteCollectionSettingsActivity.class);
-//        remoteCollectionSettingIntent.putExtra("Manual",)
-
         newInstance(currentTaskId).show(getFragmentManager(), "remoteListDialog");
-//
-//        Intent manualUploadServiceIntent = new Intent(this,ManualUploadService.class);
-//        manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
-//        startService(manualUploadServiceIntent);
+
     }
 
 
@@ -374,8 +353,6 @@ public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
             //state
             String imageState = String.valueOf(DeviceStatus.state.WAITING);
 
-
-
             try {
 
                 String imageId = UUID.randomUUID().toString();
@@ -398,18 +375,5 @@ public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
 
         }
         return imageNum;
-    }
-    /*
-        delete the selected files
-     */
-    private void delete(List<String> toBeDeleteImagePathList) {
-        for(String imagePath : toBeDeleteImagePathList) {
-
-            File file = new File(imagePath);
-            Boolean deleted = file.delete();
-            Log.v(LOG_TAG, "deleted:" + deleted);
-            //  adapter.notifyDataSetChanged();
-
-        }
     }
 }

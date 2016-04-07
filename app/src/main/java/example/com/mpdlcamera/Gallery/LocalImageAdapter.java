@@ -127,31 +127,20 @@ public class LocalImageAdapter extends BaseAdapter {
         catch (Exception e){
         }
 
-            //not uploaded for active folder
-            if (fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.INTERRUPTED)) ||
+         if (fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.INTERRUPTED)) ||
                     fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED)) ||
                     fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
-//                    buttonCloud.setVisibility(View.GONE);
-//                    buttonUploading.setVisibility(View.GONE);
                 }
              else if(fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STARTED))){ //uploading
-//                buttonCloud.setVisibility(View.GONE);
-//                buttonUploading.setVisibility(View.VISIBLE);
+//
             }
               else if(fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
 
-//                buttonCloud.setVisibility(View.VISIBLE);
-//                buttonUploading.setVisibility(View.GONE);
         }else {
-//                buttonCloud.setVisibility(View.GONE);
-//                buttonUploading.setVisibility(View.GONE);
+
             }
 
-//        grid.setBackgroundColor(activity.getResources().getColor(android.R.color.background_light));
-
-
         if (mSelection.get(position) != null) {
-//            grid.setBackgroundColor(activity.getResources().getColor(android.R.color.holo_blue_dark));
             checkMark.setVisibility(View.VISIBLE);
         }else {
             checkMark.setVisibility(View.GONE);

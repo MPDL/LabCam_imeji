@@ -253,7 +253,7 @@ public class ManualUploadThread extends Thread {
         }
 
         @Override
-        public void failure(RetrofitError error) {
+        public void failure(final RetrofitError error) {
 
             // set Task "INTERRUPTED" while 403||422
 //            if(error.getResponse().getStatus() == 403 || error.getResponse().getStatus() == 422 ) {
@@ -266,7 +266,7 @@ public class ManualUploadThread extends Thread {
 //            }
 
             if (!taskIsStopped()) {
-                Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
+                final Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
                 //change state not saved here
 
 //                    currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
@@ -293,6 +293,9 @@ public class ManualUploadThread extends Thread {
                         handler.post(new Runnable() {
                             public void run() {
                                 Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
+                                Log.e("Upload failed", error.getMessage());
+                                Log.e("Upload failed", error.getResponse().getStatus()+"");
+                                Log.e("Upload failed",currentImage.getImageName());
                             }
                         });
                     }
@@ -319,6 +322,9 @@ public class ManualUploadThread extends Thread {
                         handler.post(new Runnable() {
                             public void run() {
                                 Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
+                                Log.e("Upload failed", error.getMessage());
+                                Log.e("Upload failed", error.getResponse().getStatus()+"");
+                                Log.e("Upload failed", currentImage.getImageName());
                             }
                         });
                     }
