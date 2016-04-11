@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     static final int PICK_COLLECTION_REQUEST = 1997;
-    private RadioGroup radioGroup;
 
     private String email;
     private String username;
@@ -192,7 +191,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
 
         //init radioButton group
-        initRadioButtonGroup();
 
         //choose collection
         chooseCollection();
@@ -530,13 +528,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         public int getItemPosition(Object object) {
             return POSITION_NONE;
         }
-    }
-
-
-    //drawer layout(settings)
-    public void initRadioButtonGroup(){
-        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
-//        radioGroup.clearCheck();
     }
 
     //choose collection

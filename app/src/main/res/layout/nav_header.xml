@@ -1,107 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="example.com.mpdlcamera.UploadActivity.UploadFragment">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_height="130dp"
         android:clickable="true"
         android:gravity="left"
-        android:id="@+id/netOption">
+        android:background="@color/primary"
+        android:id="@+id/layout_user_info">
 
-        <!--name-->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/tv_username"
-            android:textColor="@color/black"
-            android:text=""
-            android:textSize="20dp"
-            android:layout_marginLeft="10dp"/>
-
-        <!--email-->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/tv_user_email"
-            android:textColor="@color/black"
-            android:text=""
-            android:textSize="16dp"
-            android:layout_marginLeft="10dp"/>
-
-
-        <!--divider-->
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="20dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:background="#80808080" >
-        </LinearLayout>
-
-
-        <!--auto upload-->
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            <!--name-->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView"
-                android:text="@string/auto_upload"
-                android:textColor="@color/tabUnselect"
-                android:textSize="15dp"
-                android:paddingLeft="10dp"/>
+                android:layout_marginTop="30dp"
+                android:id="@+id/tv_username"
+                android:textColor="@color/white"
+                android:text="blar"
+                android:textSize="20dp"
+                android:layout_marginLeft="10dp"/>
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            <Switch
+            <!--email-->
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/switch_auto_upload"
-                android:layout_alignParentRight="true"
-                android:checked="true"
-                android:layout_marginRight="10dp" />
-            </RelativeLayout>
-        </RelativeLayout>
-        <!--divider-->
+                android:layout_marginBottom="35dp"
+                android:id="@+id/tv_user_email"
+                android:layout_below="@id/tv_username"
+                android:textColor="@color/white"
+                android:text="123@123"
+                android:textSize="16dp"
+                android:layout_marginLeft="10dp"/>
+        
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="80dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/drawer_header"/>
 
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:background="#80808080" >
-        </LinearLayout>
+    </RelativeLayout>
 
 
-    </LinearLayout>
 
 
-    <!--choose_collection-->
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_auto_upload">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:text="@string/choose_collection"
+            android:layout_marginLeft="16dp"
+            android:text="Selected Collection"
             android:id="@+id/tv_choose_collection"
             android:textSize="16dp"
-            android:textColor="@color/black" />
+            android:layout_marginTop="10dp" />
+
 
         <TextView
             android:layout_width="100dp"
@@ -117,203 +79,122 @@
 
     </RelativeLayout>
 
-    <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="@string/ocr"-->
-        <!--android:id="@+id/ocr"-->
-        <!--android:layout_marginBottom="16dp"-->
-        <!--android:textSize="16dp"-->
-
-
-        <!--android:textColor="@color/black"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_alignParentStart="true"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:paddingTop="10dp"-->
-        <!--android:paddingLeft="10dp"/>-->
-
-    <!--&lt;!&ndash;privacy setting&ndash;&gt;-->
-    <!--<RelativeLayout-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content">-->
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/privacy_setting"-->
-            <!--android:textColor="@color/tabUnselect"-->
-            <!--android:textSize="15dp"-->
-            <!--android:paddingLeft="10dp"/>-->
-
-    <!--</RelativeLayout>-->
-
-    <!--&lt;!&ndash;divider&ndash;&gt;-->
-
-    <!--<LinearLayout-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="1dp"-->
-        <!--android:layout_marginStart="10dp"-->
-        <!--android:layout_marginEnd="10dp"-->
-        <!--android:background="#80808080" >-->
-    <!--</LinearLayout>-->
-
-    <!--&lt;!&ndash;logout after uploading&ndash;&gt;-->
-
-    <!--<RelativeLayout-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginTop="10dp">-->
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/logout_after_upload"-->
-            <!--android:textColor="@color/black"-->
-            <!--android:textSize="16dp"-->
-            <!--android:paddingLeft="10dp"/>-->
-
-        <!--<RelativeLayout-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content">-->
-            <!--<Switch-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_alignParentRight="true"-->
-                <!--android:checked="false"-->
-                <!--android:layout_marginRight="10dp" />-->
-        <!--</RelativeLayout>-->
-    <!--</RelativeLayout>-->
-
-    <!--&lt;!&ndash;remove photos&ndash;&gt;-->
-    <!--<RelativeLayout-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content">-->
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="@string/remove_after_upload"-->
-            <!--android:textColor="@color/black"-->
-            <!--android:textSize="16dp"-->
-            <!--android:paddingLeft="10dp"/>-->
-
-        <!--<RelativeLayout-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content">-->
-            <!--<Switch-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_alignParentRight="true"-->
-                <!--android:checked="false"-->
-                <!--android:layout_marginRight="10dp" />-->
-        <!--</RelativeLayout>-->
-    <!--</RelativeLayout>-->
-
     <!--upload option-->
     <RelativeLayout
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
+        android:layout_below="@id/layout_user_info"
+        android:id="@+id/layout_upload_option"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="30dp">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/upload_options"
+            android:id="@+id/label_upload_option"
             android:textColor="@color/tabUnselect"
-            android:textSize="15dp"
-            android:paddingLeft="10dp"/>
+            android:textSize="14sp"
+            android:layout_marginLeft="16dp"/>
 
-    </RelativeLayout>
-
-    <!--divider-->
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:background="#80808080" >
-    </LinearLayout>
-
-    <!--wifi options-->
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        <!--divider-->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:orientation="horizontal"
+            android:layout_below="@id/label_upload_option"
+            android:id="@+id/divider_upload_option"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#80808080" >
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_below="@id/divider_upload_option"
             android:layout_marginTop="10dp"
-            android:text="@string/option_wifi"
-            android:id="@+id/tv_option_wifi"
-            android:textSize="16dp"
-            android:textColor="@color/black" />
+            android:layout_marginLeft="16dp"
+            android:text="Upload via"
+            android:textSize="16sp" />
 
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginLeft="10dp"-->
-            <!--android:layout_marginTop="10dp"-->
-            <!--android:layout_below="@id/tv_option_wifi"-->
-            <!--android:text="@string/option_cellular"-->
-            <!--android:id="@+id/tv_option_cellular"-->
-            <!--android:textSize="16dp"-->
-            <!--android:textColor="@color/black" />-->
-
-        <RadioGroup
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/radio_group"
+            android:layout_below="@id/divider_upload_option"
+            android:layout_marginTop="10dp"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="2dp"
-            android:orientation="vertical">
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/radioButton_wifi"
-                android:checked="true"
-                android:layout_marginRight="30dp"/>
-
-            <!--<RadioButton-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:id="@+id/radioButton_cellular"-->
-                <!--android:layout_below="@id/radioButton_wifi"-->
-                <!--android:layout_marginRight="30dp"/>-->
-        </RadioGroup>
+            android:layout_marginRight="16dp"
+            android:text="Wi-Fi"
+            android:textSize="16sp" />
 
     </RelativeLayout>
 
-    <!--divider-->
-
-    <LinearLayout
+    <!--auto upload-->
+    <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="1dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_auto_upload"
         android:layout_marginTop="30dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:background="#80808080" >
-    </LinearLayout>
+        android:layout_below="@id/layout_upload_option">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/label_choose_folder"
+            android:text="@string/auto_upload"
+            android:textColor="@color/tabUnselect"
+            android:textSize="14sp"
+            android:layout_marginLeft="16dp"/>
+
+        <!--divider-->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_below="@id/label_choose_folder"
+            android:background="#80808080" >
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/layout_switch">
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/switch_auto_upload"
+                android:layout_alignParentRight="true"
+                android:checked="true"
+                android:layout_marginRight="10dp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
 
     <!--logout-->
+
+
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/layout_auto_upload"
+            android:id="@+id/divider_logout"
+            android:layout_marginTop="150dp"
+            android:layout_marginBottom="10dp"
+            android:background="#80808080" >
+        </LinearLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_below="@id/divider_logout"
+        android:layout_marginLeft="16dp"
         android:text="Logout"
         android:id="@+id/tv_logout"
-        android:textSize="16dp"
-        android:textColor="@color/black" />
+        android:textSize="16dp" />
 
-    <!--divider-->
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:background="#80808080" >
-    </LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>
