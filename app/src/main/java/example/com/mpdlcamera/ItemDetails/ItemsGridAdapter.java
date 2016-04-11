@@ -79,7 +79,7 @@ public class ItemsGridAdapter extends BaseAdapter {
                 .resize(size.x / 2, size.y)
                 .centerInside()
                 .error(R.drawable.error_alert).into(imageView);
-        
+
         title.setText(dataItem.getFilename());
 
         return grid;

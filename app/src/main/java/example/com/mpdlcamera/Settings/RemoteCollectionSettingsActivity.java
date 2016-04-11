@@ -88,32 +88,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
             new Delete().from(ImejiFolder.class).execute();
 
-            /** show alert if no collection available **/
-            if(folderList.size()==0){
-                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                // Set up the input
-                final EditText input = new EditText(activity);
-                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                builder.setView(input);
-                builder.setTitle("Create Collection")
-                        .setMessage("There is no collection available, do you want to create one?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // continue with delete
-                                RetrofitClient.createCollection(String.valueOf(input.getText()),"no description yet",createCollection_callback,APIkey);
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-
-
             ActiveAndroid.beginTransaction();
             try {
                 collectionListLocal.clear();
@@ -160,22 +134,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 //
             adapter = new SettingsListAdapter(activity, collectionListLocal,ie);
             listView.setAdapter(adapter);
-        }
-    };
-
-    Callback<ImejiFolder> createCollection_callback = new Callback<ImejiFolder>() {
-        @Override
-        public void success(ImejiFolder imejiFolder, Response response) {
-            Log.v(LOG_TAG, "createCollection_callback success");
-            imejiFolder.setImejiId(imejiFolder.id);
-            collectionListLocal.add(imejiFolder);
-            adapter.notifyDataSetChanged();
-
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-            Log.v(LOG_TAG, error.getMessage());
         }
     };
 

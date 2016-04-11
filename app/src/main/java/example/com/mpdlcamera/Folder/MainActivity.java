@@ -27,17 +27,20 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
@@ -56,11 +59,13 @@ import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Settings;
 import example.com.mpdlcamera.Model.LocalModel.Task;
+import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.NetChangeManager.NetChangeObserver;
 import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
+import example.com.mpdlcamera.Settings.SettingsListAdapter;
 import example.com.mpdlcamera.TaskManager.TaskFragment;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -96,6 +101,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     //current tab
     private int currentTab = 0;
+
+    //create collection
+    private List<ImejiFolder>folderList = null;
     //uri register
     private static UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
     private static final int TASK_CODE = 2016;
@@ -149,6 +157,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 //            Log.v(LOG_TAG,e.getMessage());
         }
 
+        /** show alert if no collection available **/
+        RetrofitClient.getGrantCollectionMessage(callback, apiKey);
         getLocalCamFolder();
         // register NetStateObserver
         NetWorkStateReceiver.registerNetStateObserver(this);
@@ -781,6 +791,63 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 //        }
 //    }
 
+
+
+    Callback<ImejiFolder> createCollection_callback = new Callback<ImejiFolder>() {
+        @Override
+        public void success(ImejiFolder imejiFolder, Response response) {
+            Log.v(LOG_TAG, "createCollection_callback success");
+//            imejiFolder.setImejiId(imejiFolder.id);
+//            collectionListLocal.add(imejiFolder);
+//            adapter.notifyDataSetChanged();
+
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.v(LOG_TAG, error.getMessage());
+        }
+    };
+
+    Callback<CollectionMessage> callback = new Callback<CollectionMessage>() {
+        @Override
+        public void success(CollectionMessage collectionMessage, Response response) {
+
+            List<ImejiFolder> folderList = new ArrayList<>();
+            folderList = collectionMessage.getResults();
+
+            if(folderList.size()==0){
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                // Set up the input
+                final EditText input = new EditText(context);
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+                builder.setTitle("Create Collection")
+                        .setMessage("There is no collection available, do you want to create one?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with delete
+                                RetrofitClient.createCollection(String.valueOf(input.getText()),"no description yet",createCollection_callback,apiKey);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.v(LOG_TAG, "get list failed");
+            Log.v(LOG_TAG, error.toString());
+        }
+    };
 
 
     //get latest task
