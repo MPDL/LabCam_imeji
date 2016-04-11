@@ -3,6 +3,7 @@ package example.com.mpdlcamera.Folder;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
+import android.net.Uri;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -13,12 +14,19 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Utils.camPicassoLoader;
 
 /**
  * Created by allen on 06/04/15.
@@ -85,10 +93,13 @@ public class FolderListAdapter extends BaseAdapter {
 //                if (collection.getItems().size() > 0) {
 //                    DataItem m = collection.getItems().get(0);
 //                    Log.e(LOG_TAG, m.getWebResolutionUrlUrl());
+            Picasso myPicasso = new Picasso.Builder(activity).downloader(new camPicassoLoader(activity)).build();
+            myPicasso.load(collection.getCoverItemUrl())
+                    .error(R.drawable.error_alert).into(imageView);
 
-                    Picasso.with(activity)
-                            .load(collection.getCoverItemUrl())
-                            .into(imageView);
+//            Picasso.with(activity)
+//                            .load(collection.getCoverItemUrl())
+//                            .into(imageView);
 //                }
 //            }
             title.setText(collection.getTitle());

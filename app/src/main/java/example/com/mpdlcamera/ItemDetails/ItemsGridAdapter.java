@@ -19,6 +19,7 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Utils.camPicassoLoader;
 
 /**
  * Created by allen on 27/08/15.
@@ -73,13 +74,12 @@ public class ItemsGridAdapter extends BaseAdapter {
 
         DataItem dataItem = dataItems.get(position);
 
-        Picasso.with(activity)
-                .load(dataItem.getWebResolutionUrlUrl())
+        Picasso myPicasso = new Picasso.Builder(activity).downloader(new camPicassoLoader(activity)).build();
+        myPicasso.load(dataItem.getWebResolutionUrlUrl())
                 .resize(size.x / 2, size.y)
                 .centerInside()
-                .into(imageView);
-
-
+                .error(R.drawable.error_alert).into(imageView);
+        
         title.setText(dataItem.getFilename());
 
         return grid;

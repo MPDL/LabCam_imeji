@@ -20,23 +20,12 @@
 
 
         <ImageView
-            android:layout_width="320dp"
-            android:layout_height="165dp"
+            android:layout_width="240dp"
+            android:layout_height="120dp"
             android:background="@drawable/icon_for_login"
             android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal"
             />
-
-        <!-- TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
-            android:gravity="center"
-            android:text="Transfer your research data"
-            android:textSize="18dp"
-            android:textColor="#cccccc" />
-            -->
-
 
         <EditText
             android:id="@+id/serverURL"

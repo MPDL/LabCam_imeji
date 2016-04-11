@@ -5,6 +5,7 @@ import android.content.Context;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -13,7 +14,11 @@ import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.LocalModel.Image;

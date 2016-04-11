@@ -588,8 +588,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     //logout
     static Task autoTask;
     private void setLogout(){
-        TextView logoutTextView = (TextView) findViewById(R.id.tv_logout);
-        logoutTextView.setOnClickListener(new View.OnClickListener() {
+        ImageView logout = (ImageView) findViewById(R.id.tv_logout);
+        logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
