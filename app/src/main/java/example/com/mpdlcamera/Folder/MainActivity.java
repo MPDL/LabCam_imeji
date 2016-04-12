@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -35,12 +36,10 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
@@ -65,7 +64,6 @@ import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
-import example.com.mpdlcamera.Settings.SettingsListAdapter;
 import example.com.mpdlcamera.TaskManager.TaskFragment;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -146,7 +144,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         //user info
         mPrefs = this.getSharedPreferences("myPref", 0);
         email = mPrefs.getString("email", "");
-        username =  mPrefs.getString("username", "");
+//        username =  mPrefs.getString("username", "");
+        username = mPrefs.getString("familyName","")+" "+mPrefs.getString("givenName","");
         userId = mPrefs.getString("userId","");
         apiKey = mPrefs.getString("apiKey","");
 
@@ -163,10 +162,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         // register NetStateObserver
         NetWorkStateReceiver.registerNetStateObserver(this);
 
-
         //init drawer toggle
-
-
         toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -568,11 +564,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         if(settings!=null){
             autoUploadSwitch.setChecked(settings.isAutoUpload());
         }
+
         autoUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
-
+                TextView chooseCollectionLabel = (TextView) findViewById(R.id.tv_choose_collection);
+                TextView collectionNameTextView = (TextView) findViewById(R.id.collection_name);
                 //init settings
                 if (settings == null) {
                     settings = new Settings();
@@ -583,14 +581,21 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(true);
                     settings.save();
+                    chooseCollectionLabel.setEnabled(true);
+                    collectionNameTextView.setEnabled(true);
+                    chooseCollectionLabel.setTextColor(getResources().getColor(R.color.dark_text));
+                    collectionNameTextView.setTextColor(getResources().getColor(R.color.dark_text));
+
                 } else {
                     Log.e(TAG, "userId" + userId);
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(false);
                     settings.save();
+                    chooseCollectionLabel.setEnabled(false);
+                    collectionNameTextView.setEnabled(false);
+                    chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
+                    collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
                 }
-
-
             }
         });
     }
@@ -720,10 +725,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private void dispatchTakePictureIntent() {
-//        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-//        }
+
         PackageManager packman = getPackageManager();
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         String pack = intent.resolveActivity(packman).getPackageName();
@@ -743,55 +745,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             mIntent.addCategory(Intent.CATEGORY_LAUNCHER);
             mIntent.setAction("android.intent.action.View");
 
-
             startActivity(mIntent);
-//
-//            //1
-//            Intent intent1 = new Intent("android.media.action.STILL_IMAGE_CAMERA"); //调用照相机
-//            startActivity(intent1);
-////            2
-//            Intent i = new Intent(Intent.ACTION_CAMERA_BUTTON, null);
-//            this.sendBroadcast(i);
-////            3
-//            long dateTaken = System.currentTimeMillis();
-//            String name = String.valueOf(dateTaken) + ".jpg";
-//            String fileName =   name;
-//            ContentValues values = new ContentValues();
-//            values.put(MediaStore.Images.Media.TITLE, fileName);
-//            values.put("_data", fileName);
-//            values.put(MediaStore.Images.Media.PICASA_ID, fileName);
-//            values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-//            values.put(MediaStore.Images.Media.DESCRIPTION, fileName);
-//            values.put(MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME, fileName);
-//            Uri photoUri = getContentResolver().insert(
-//                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,values);
-//
-//            Intent inttPhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//            inttPhoto.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-//            startActivityForResult(inttPhoto, 10);
-//
-
-
         }
 
     }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-//            Bundle extras = data.getExtras();
-//            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//
-//            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//            String imageFileName = "JPEG_" + timeStamp + "_";
-//
-//            MediaStore.Images.Media.insertImage(getContentResolver(), imageBitmap, imageFileName , null);
-//
-//
-//        }
-//    }
-
-
 
     Callback<ImejiFolder> createCollection_callback = new Callback<ImejiFolder>() {
         @Override
@@ -824,7 +781,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
                 builder.setView(input);
                 builder.setTitle("Create Collection")
-                        .setMessage("There is no collection available, do you want to create one?")
+                        .setMessage("There is no collection available, create one by giving a name")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // continue with delete
@@ -836,7 +793,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                                 // do nothing
                             }
                         })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setIcon(R.drawable.error_alert)
                         .show();
             }
 

@@ -33,5 +33,7 @@
     <color name="grayDivider">#ffd2d2d2</color>
 
     <color name="black_overlay">#66000000</color>
+    <color name="dark_text">#555555</color>
+
 
 </resources>

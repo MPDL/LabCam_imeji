@@ -125,7 +125,12 @@ public class LoginActivity extends AppCompatActivity {
 
                 username = usernameView.getText().toString();
                 password = passwordView.getText().toString();
+
+                String url;
                 serverURL = serverURLView.getText().toString();
+
+
+
                 RetrofitClient.setRestServer(serverURL);
 
 
@@ -518,6 +523,8 @@ public class LoginActivity extends AppCompatActivity {
                 mPrefs = getSharedPreferences("myPref", 0);
                 SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.putString("username",user.getPerson().getCompleteName()).apply();
+                    mEditor.putString("familyName",user.getPerson().getFamilyName()).apply();
+                    mEditor.putString("givenName",user.getPerson().getGivenName()).apply();
                     mEditor.putString("userId",user.getPerson().getId()).apply();
                     mEditor.putString("email",user.getEmail()).apply();
                     mEditor.putString("apiKey",user.getApiKey()).apply();
@@ -548,7 +555,7 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void failure(RetrofitError error) {
-            Log.v(LOG_TAG,"faulure");
+            Log.v(LOG_TAG,"failed");
         }
     };
 }

@@ -22,7 +22,7 @@
                 android:id="@+id/tv_username"
                 android:textColor="@color/white"
                 android:text="blar"
-                android:textSize="20dp"
+                android:textSize="18sp"
                 android:layout_marginLeft="10dp"/>
 
             <!--email-->
@@ -34,7 +34,7 @@
                 android:layout_below="@id/tv_username"
                 android:textColor="@color/white"
                 android:text="123@123"
-                android:textSize="16dp"
+                android:textSize="14sp"
                 android:layout_marginLeft="10dp"/>
         
         <ImageView
@@ -50,34 +50,7 @@
 
 
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/layout_auto_upload">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:text="Selected Collection"
-            android:id="@+id/tv_choose_collection"
-            android:textSize="16dp"
-            android:layout_marginTop="10dp" />
-
-
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
-            android:id="@+id/collection_name"
-            android:text=""
-            android:textSize="16dp"
-
-            />
-
-    </RelativeLayout>
 
     <!--upload option-->
     <RelativeLayout
@@ -116,7 +89,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="16dp"
             android:text="Upload via"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="@color/dark_text" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -126,7 +100,8 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="16dp"
             android:text="Wi-Fi"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="@color/dark_text" />
 
     </RelativeLayout>
 
@@ -171,6 +146,37 @@
                 android:checked="true"
                 android:layout_marginRight="10dp" />
         </RelativeLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_auto_upload">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:text="Selected Collection"
+            android:id="@+id/tv_choose_collection"
+            android:textColor="@color/dark_text"
+            android:textSize="16dp"
+            android:layout_marginTop="10dp" />
+
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:gravity="right"
+            android:id="@+id/collection_name"
+            android:text="b"
+            android:textColor="@color/dark_text"
+            android:textSize="16dp"
+            />
+
     </RelativeLayout>
 
 </RelativeLayout>

@@ -297,21 +297,6 @@ public class TaskUploadService extends Service{
                     //TODO: ReWrite "remove after upload" function later
                     mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
-            /*
-                Delete the file if the setting "Remove the photos after upload" is On
-             */
-                    if (mPrefs.contains("RemovePhotosAfterUpload")) {
-                        if (mPrefs.getBoolean("RemovePhotosAfterUpload", true)) {
-
-                            File file = typedFile.file();
-                            Boolean deleted = file.delete();
-                            Log.v(TAG, "deleted:" + deleted);
-                        }
-                    }
-                    //TODO: remove picture
-//            adapter.notifyDataSetChanged();
-
-
                     /** move on to next **/
 
                     finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();

@@ -321,7 +321,6 @@ public class ManualUploadThread extends Thread {
                         handler=new Handler(Looper.getMainLooper());
                         handler.post(new Runnable() {
                             public void run() {
-                                Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
                                 Log.e("Upload failed", error.getMessage());
                                 Log.e("Upload failed", error.getResponse().getStatus()+"");
                                 Log.e("Upload failed", currentImage.getImageName());
