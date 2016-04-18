@@ -51,6 +51,7 @@ import example.com.mpdlcamera.Utils.ImageFileFilter;
 
 /**
  * Created by allen on 03/09/15.
+ * it is the album pictures view (for a single album)
  */
 public class LocalImageActivity extends AppCompatActivity implements android.support.v7.view.ActionMode.Callback {
 
@@ -86,6 +87,10 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
 
         TextView titleView = (TextView) findViewById(R.id.title);
 

@@ -82,8 +82,7 @@
         </activity>
         <activity
             android:name=".Gallery.LocalImageActivity"
-            android:label="@string/title_local_activity"
-            android:parentActivityName=".Gallery.GalleryListActivity" >
+            android:label="@string/title_local_activity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Folder.MainActivity" />

@@ -97,27 +97,6 @@ public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.Vi
         String filePath = galleryItems.get(position);
         Image image = new Select().from(Image.class).where("imagePath = ?",filePath).executeSingle();
 
-        //file status
-        String fileStatus = "";
-        try{
-            fileStatus = image.getState();
-        }
-        catch (Exception e){
-        }
-
-        if (fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.INTERRUPTED)) ||
-                fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED)) ||
-                fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
-        }
-        else if(fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.STARTED))){ //uploading
-//
-        }
-        else if(fileStatus.equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
-
-        }else {
-
-        }
-
         // show mark when selected
         if (mSelection.get(position) != null) {
             holder.checkMark.setVisibility(View.VISIBLE);
@@ -129,7 +108,7 @@ public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.Vi
         Uri uri = Uri.fromFile(new File(filePath));
         Picasso.with(activity)
                 .load(uri)
-                .resize(235,235)
+                .resize(size.x/2,size.y/3)
                 .centerCrop()
                 .into(holder.imageView);
 
