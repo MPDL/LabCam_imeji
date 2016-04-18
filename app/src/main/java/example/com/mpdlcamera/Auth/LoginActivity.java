@@ -76,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         mPrefs = getSharedPreferences("myPref", 0);
         String Key = mPrefs.getString("apiKey", "");
 
@@ -114,8 +115,8 @@ public class LoginActivity extends AppCompatActivity {
 
         //it is called at login, what about without login?
         RetrofitClient.setRestServer(serverURL);
-
-        serverURLView.setText(serverURL);
+        
+        serverURLView.setText(parseServerUrl(serverURL));
 
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,9 +131,9 @@ public class LoginActivity extends AppCompatActivity {
                 String url;
                 serverURL = serverURLView.getText().toString();
 
+                /** parse server url **/
 
-
-                RetrofitClient.setRestServer(serverURL);
+                RetrofitClient.setRestServer(parseServerUrl(serverURL));
 
 
                 Log.v(LOG_TAG,serverURL);
@@ -503,6 +504,42 @@ public class LoginActivity extends AppCompatActivity {
 
         // QR login
         accountLogin(userId);
+    }
+
+    /**
+     * method for parse server url, examples as below
+     *
+     * https://spot.mpdl.mpg.de/rest
+     * https://spot.mpdl.mpg.de/rest/
+     * spot.mpdl.mpg.de
+     * spot.mpdl.mpg.de/rest
+     * spot.mpdl.mpg.de/rest/
+     */
+    private String url1 = "https://spot.mpdl.mpg.de/rest";
+    private String url2 = "https://spot.mpdl.mpg.de/rest/";
+    private String url3 = "spot.mpdl.mpg.de";
+    private String url4 = "spot.mpdl.mpg.de/rest";
+    private String url5 = "spot.mpdl.mpg.de/rest/";
+
+    private String parseServerUrl(String Url){
+        // divide string
+        String[] parts = Url.split("/");
+        String coreUrl = null;
+        String serverUrl = null;
+        for (int i = 0;i < parts.length;i++){
+            if(parts[i].equalsIgnoreCase("https:")){
+                // ignore https:
+            } else if(parts[i].equalsIgnoreCase("")){
+                // ignore empty
+            } else if (parts[i].equalsIgnoreCase("rest")) {
+                // also ignore rest
+            } else {
+                 coreUrl = parts[i];
+            }
+        }
+        serverUrl = "https://"+coreUrl+"/rest/";
+        Log.e(LOG_TAG,serverUrl);
+        return serverUrl;
     }
 
     /**
