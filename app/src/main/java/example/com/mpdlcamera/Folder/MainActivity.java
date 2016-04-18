@@ -44,6 +44,7 @@ import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -105,6 +106,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     //uri register
     private static UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
     private static final int TASK_CODE = 2016;
+
+    // seleced collectionName
+    TextView collectionNameTextView;
 
     static {
         matcher.addURI("example.com.mpdlcamera", "tasks", TASK_CODE);
@@ -219,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         viewPager.setCurrentItem(currentTab);
 
         //set selected collection name
-        TextView collectionNameTextView = (TextView) findViewById(R.id.collection_name);
+        collectionNameTextView = (TextView) findViewById(R.id.collection_name);
 
             Task lastAUTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
             if(lastAUTask!= null){
@@ -754,6 +758,32 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         @Override
         public void success(ImejiFolder imejiFolder, Response response) {
             Log.v(LOG_TAG, "createCollection_callback success");
+
+            /** create autoTask(already deleted old one), set text **/
+
+            Task task = new Task();
+            String uniqueID = UUID.randomUUID().toString();
+            task.setTaskId(uniqueID);
+            task.setUploadMode("AU");
+            task.setCollectionId(imejiFolder.getImejiId());
+            Log.e(LOG_TAG,"collectionId: "+imejiFolder.getImejiId());
+            task.setState(String.valueOf(DeviceStatus.state.WAITING));
+            task.setUserName(username);
+            task.setUserId(userId);
+            task.setTotalItems(0);
+            task.setFinishedItems(0);
+
+            String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+            Long now = new Date().getTime();
+            Log.v("now", now + "");
+            task.setStartDate(String.valueOf(now));
+            task.setCollectionName(imejiFolder.getTitle());
+            Log.e(LOG_TAG, "collectionName: " + imejiFolder.getTitle());
+            task.save();
+
+            //set selected collection name text
+            collectionNameTextView.setText(imejiFolder.getTitle());
+
 //            imejiFolder.setImejiId(imejiFolder.id);
 //            collectionListLocal.add(imejiFolder);
 //            adapter.notifyDataSetChanged();
@@ -774,6 +804,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             folderList = collectionMessage.getResults();
 
             if(folderList.size()==0){
+                // first delete AutoTask
+                new Delete().from(Task.class).where("uploadMode = ?", "AU").execute();
+                collectionNameTextView.setText("none");
+                // create dialog
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 // Set up the input
                 final EditText input = new EditText(context);
