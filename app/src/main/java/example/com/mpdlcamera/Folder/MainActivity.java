@@ -430,9 +430,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(tabAdapter);
 
-
         if(isTaskFragment){
-        viewPager.setCurrentItem(2);
+            currentTab = 2;
+        viewPager.setCurrentItem(currentTab);
         }
 
         tabLayout.setupWithViewPager(viewPager);
