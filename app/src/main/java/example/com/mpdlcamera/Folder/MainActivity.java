@@ -765,8 +765,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             String uniqueID = UUID.randomUUID().toString();
             task.setTaskId(uniqueID);
             task.setUploadMode("AU");
-            task.setCollectionId(imejiFolder.getImejiId());
-            Log.e(LOG_TAG,"collectionId: "+imejiFolder.getImejiId());
+            task.setCollectionId(imejiFolder.id);
+            Log.e(LOG_TAG,"collectionId: "+imejiFolder.id);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
             task.setUserName(username);
             task.setUserId(userId);
