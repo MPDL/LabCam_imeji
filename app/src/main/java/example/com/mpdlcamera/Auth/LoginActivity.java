@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.eclipse.jetty.util.MultiMap;
@@ -476,12 +477,10 @@ public class LoginActivity extends AppCompatActivity {
             task.save();
 
         }else if(!latestTask.getCollectionId().equals(collectionId)) {
-            if(latestTask!=null){
-                Log.v("latestTask",latestTask.getCollectionId());}
-            else {
-                Log.v("latestTask","latest task is null");
-            }
+            // last AuTask exist delete and create new
             Log.v("collectionID",collectionId);
+            new Delete().from(Task.class).where("uploadMode = ?", "AU").execute();
+
             Task task = new Task();
             String uniqueID = UUID.randomUUID().toString();
             task.setTaskId(uniqueID);
