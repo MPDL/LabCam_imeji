@@ -102,6 +102,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private String username;
     private String userId;
 
+    //UI flag(timeLine/Album)
+    private static TextView dateLabel = null;
+    private static TextView albumLabel = null;
+    private boolean isAlbum = false;
+
     private OnFragmentInteractionListener mListener;
 
     public LocalFragment() {
@@ -140,8 +145,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         loadTimeLinePicture();
 
         //switch
-        final TextView dateLabel = (TextView) rootView.findViewById(R.id.label_date);
-        final TextView albumLabel = (TextView) rootView.findViewById(R.id.label_album);
+        dateLabel = (TextView) rootView.findViewById(R.id.label_date);
+        albumLabel = (TextView) rootView.findViewById(R.id.label_album);
 
         dateLabel.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,6 +155,12 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     // finish actionMode when switch
                     actionMode.finish();
                 }
+
+                SharedPreferences.Editor mEditor = mPrefs.edit();
+                mEditor.putBoolean("isAlbum",false).apply();
+                mEditor.commit();
+                isAlbum = false;
+
                 dateLabel.setTextColor(getResources().getColor(R.color.primary));
                 albumLabel.setTextColor(getResources().getColor(R.color.lightGrey));
                 gridView.setVisibility(View.GONE);
@@ -164,6 +175,12 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     // finish actionMode when switch
                     actionMode.finish();
                 }
+
+                SharedPreferences.Editor mEditor = mPrefs.edit();
+                mEditor.putBoolean("isAlbum",true).apply();
+                mEditor.commit();
+                isAlbum = true;
+
                 dateLabel.setTextColor(getResources().getColor(R.color.lightGrey));
                 albumLabel.setTextColor(getResources().getColor(R.color.primary));
                 gridView.setVisibility(View.VISIBLE);
@@ -665,6 +682,14 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     @Override
     public void onResume() {
         super.onResume();
+        /** remember the date/timeLine option **/
+        isAlbum = mPrefs.getBoolean("isAlbum",isAlbum);
+        if(isAlbum) {
+            dateLabel.setTextColor(getResources().getColor(R.color.lightGrey));
+            albumLabel.setTextColor(getResources().getColor(R.color.primary));
+            gridView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        }
     }
 
     /** screen orientation **/
