@@ -35,10 +35,13 @@ import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 import example.com.mpdlcamera.Folder.FolderListAdapter;
@@ -459,29 +462,19 @@ public class ImejiFragment extends Fragment {
     Callback<CollectionMessage> callback_collection = new Callback<CollectionMessage>() {
         @Override
         public void success(CollectionMessage collectionMessage, Response response) {
-            Log.i("callback_collection","callback_collection success");
+            Log.i("callback_collection", "callback_collection success");
 
             List<ImejiFolder> folderList = new ArrayList<>();
             folderList = collectionMessage.getResults();
+            Collections.sort(folderList,new CustomComparator());
 
-            ActiveAndroid.beginTransaction();
-            try {
-                // clear imeji folder list
-                collectionListLocal.clear();
-                for(ImejiFolder folder : folderList){
-                    Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
-
-                    getFolderItems(folder.id);
-
-                    //TODO Here is a bug, collectionLocal will be random one collection
-                    //collectionLocal = folder;
-
-                    collectionListLocal.add(folder);
-                    //folder.save();
-                }
-                ActiveAndroid.setTransactionSuccessful();
-            } finally{
-                ActiveAndroid.endTransaction();
+            // clear imeji folder list
+            collectionListLocal.clear();
+            for (ImejiFolder folder : folderList) {
+                Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
+                getFolderItems(folder.id);
+                collectionListLocal.add(folder);
+                //folder.save();
             }
 
             if(pDialog != null) {
@@ -495,5 +488,12 @@ public class ImejiFragment extends Fragment {
 
         }
     };
+
+    public class CustomComparator implements Comparator<ImejiFolder> {
+        @Override
+        public int compare(ImejiFolder o1, ImejiFolder o2) {
+            return o2.getModifiedDate().compareTo(o1.getModifiedDate());
+        }
+    }
 
 }

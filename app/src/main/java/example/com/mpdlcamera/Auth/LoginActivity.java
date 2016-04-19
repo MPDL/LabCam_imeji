@@ -115,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
 
         //it is called at login, what about without login?
         RetrofitClient.setRestServer(serverURL);
-        
+
         serverURLView.setText(parseServerUrl(serverURL));
 
         signIn.setOnClickListener(new View.OnClickListener() {
@@ -205,7 +205,8 @@ public class LoginActivity extends AppCompatActivity {
                     Log.v("col",url);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
+//                    Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity,QRText,Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -538,7 +539,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
         serverUrl = "https://"+coreUrl+"/rest/";
-        Log.e(LOG_TAG,serverUrl);
         return serverUrl;
     }
 

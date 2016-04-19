@@ -1,5 +1,6 @@
 package example.com.mpdlcamera.Folder;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -78,6 +79,7 @@ import retrofit.client.Response;
 public class MainActivity extends AppCompatActivity implements UploadResultReceiver.Receiver,NetChangeObserver {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private Activity activity = this;
 
     private ProgressDialog pDialog;
 
@@ -783,10 +785,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
             //set selected collection name text
             collectionNameTextView.setText(imejiFolder.getTitle());
+            pDialog.dismiss();
 
-//            imejiFolder.setImejiId(imejiFolder.id);
-//            collectionListLocal.add(imejiFolder);
-//            adapter.notifyDataSetChanged();
+            // go to fragment
+            SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
+            viewPager.setAdapter(tabAdapter);
+            currentTab = 1;
+            viewPager.setCurrentItem(currentTab);
 
         }
 
@@ -818,7 +823,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                         .setMessage("There is no collection available, create one by giving a name")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                // continue with delete
+                                // create dialog and create collection
+                                pDialog = new ProgressDialog(activity);
+                                pDialog.setMessage("Loading...");
+                                pDialog.show();
                                 RetrofitClient.createCollection(String.valueOf(input.getText()),"no description yet",createCollection_callback,apiKey);
                             }
                         })
