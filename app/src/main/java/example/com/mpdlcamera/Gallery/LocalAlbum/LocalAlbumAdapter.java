@@ -48,20 +48,6 @@ public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.Vi
         this.onItemClickListener = onItemClickListener;
     }
 
-    public void setNewSelection(int position, boolean value) {
-        mSelection.put(position, value);
-        notifyDataSetChanged();
-    }
-
-    public boolean isPositionChecked(int position) {
-        Boolean result = mSelection.get(position);
-        return result == null ? false : result;
-    }
-
-    public void removeSelection(int position) {
-        mSelection.remove(position);
-        notifyDataSetChanged();
-    }
 
     // get screen size
     private Point getPoint(){
@@ -98,7 +84,7 @@ public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.Vi
         Image image = new Select().from(Image.class).where("imagePath = ?",filePath).executeSingle();
 
         // show mark when selected
-        if (mSelection.get(position) != null) {
+        if (positionSet.contains(position)) {
             holder.checkMark.setVisibility(View.VISIBLE);
         }else {
             holder.checkMark.setVisibility(View.GONE);
