@@ -31,14 +31,12 @@
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
 
-    <GridView
-        android:id="@+id/item_gridView"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/server_folder_detail_recycle_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:numColumns="2"
-        android:verticalSpacing="0dp"
-        android:horizontalSpacing="0dp"
-        android:gravity="center"
-        android:stretchMode="columnWidth"/>
+        android:layout_height="wrap_content"
+        android:gravity="center">
+    </android.support.v7.widget.RecyclerView>
+
 
 </LinearLayout>

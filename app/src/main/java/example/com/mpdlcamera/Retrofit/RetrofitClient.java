@@ -99,12 +99,13 @@ public class RetrofitClient {
 
 
     public static void getCollectionItems(String collectionId,
+                                          int offset,
                                       Callback<ItemMessage> callback,
                                       String APIkey) {
         ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
 
         // Fetch and print a list of the items to this library.
-        imejiAPI.getCollectionItems(collectionId, callback);
+        imejiAPI.getCollectionItems(collectionId,10, offset, callback);
     }
 
     //getCollectionById

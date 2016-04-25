@@ -87,8 +87,10 @@ public interface ImejiAPI {
     void getGrantedCollectionMessage(@Query("q") String q,Callback<CollectionMessage> callback);
 
     //get all items by collection id
-    @GET("/collections/{id}/items?size=300")
+    @GET("/collections/{id}/items")
     void getCollectionItems(@Path("id") String collectionId,
+                            @Query("size") int size,
+                            @Query("offset") int offset,
                             Callback<ItemMessage> callback);
 
     //get collection by id

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Utils.camPicassoLoader;
 
 /**
  * Created by yingli on 3/16/16.
@@ -90,11 +91,11 @@ public class ViewPagerAdapter extends PagerAdapter {
                             //.placeholder(R.drawable.progress_animation)
                     .into(imageView);
         }else {
-            Picasso.with(context)
-                    .load(imagePathList.get(position))
+            Picasso myPicasso = new Picasso.Builder(context).downloader(new camPicassoLoader(context)).build();
+            myPicasso.load(imagePathList.get(position))
                     .resize(size.x, size.y)
                     .centerInside()
-                    .into(imageView);
+                    .error(R.drawable.error_alert).into(imageView);
         }
 
         if (onItemClickListener!=null){

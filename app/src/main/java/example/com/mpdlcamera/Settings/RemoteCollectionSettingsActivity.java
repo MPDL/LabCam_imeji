@@ -56,7 +56,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     //user info
     private String username;
     private String userId;
-    private String APIkey;
+    private String apiKey;
     private String email;
     private SharedPreferences mPrefs;
 
@@ -153,7 +153,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         userId = mPrefs.getString("userId","");
-        APIkey = mPrefs.getString("apiKey", "");
+        apiKey = mPrefs.getString("apiKey", "");
         email = mPrefs.getString("email", "");
 
         /** scan QR **/
@@ -198,7 +198,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     }
 
     private void updateFolder(){
-        RetrofitClient.getGrantCollectionMessage(callback, APIkey);
+        RetrofitClient.getGrantCollectionMessage(callback, apiKey);
     }
 
     private void saveCollection(){
@@ -312,6 +312,10 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                 try {
                     JSONObject jsonObject = new JSONObject(QRText);
                     APIkey = jsonObject.getString("key");
+                    if(APIkey!= apiKey){
+                        Toast.makeText(activity,"this folder doesn't look like yours",Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     Log.v("APIkey",APIkey);
                     url = jsonObject.getString("col");
                     Log.v("col",url);
@@ -341,7 +345,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                         //create task if collection is selected
                         if (!qrCollectionId.equals("") && !qrCollectionId.equals(null)) {
                             Log.i("~qrCollectionId", qrCollectionId);
-
 
                             /**
                              * delete all AU Task if finished

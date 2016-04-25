@@ -52,7 +52,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
 
     //user
     private String username;
-    private String APIkey;
+    private String apiKey;
     private String email;
     private SharedPreferences mPrefs;
 
@@ -82,7 +82,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
-        APIkey = mPrefs.getString("apiKey", "");
+        apiKey = mPrefs.getString("apiKey", "");
         email = mPrefs.getString("email", "");
 
         /** scan QR **/
@@ -124,7 +124,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
         listView.setAdapter(adapter);
 
         //updateFolder
-        RetrofitClient.getGrantCollectionMessage(callback, APIkey);
+        RetrofitClient.getGrantCollectionMessage(callback, apiKey);
 
         b.setView(view);
         return b.create();
@@ -243,6 +243,10 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                     JSONObject jsonObject = new JSONObject(QRText);
                     APIkey = jsonObject.getString("key");
                     Log.v("APIkey",APIkey);
+                    if(APIkey!= apiKey){
+                        Toast.makeText(activity,"this folder doesn't look like yours",Toast.LENGTH_LONG).show();
+                        return;
+                    }
                     url = jsonObject.getString("col");
                     Log.v("col",url);
                 } catch (JSONException e) {

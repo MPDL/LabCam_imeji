@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -32,23 +34,32 @@ import retrofit.client.Response;
 
 /**
  * Created by allen on 03/09/15.
+ *
+ * itemsActivity is used for display items in imeji folder
  */
 public class ItemsActivity extends AppCompatActivity {
 
+    private final String LOG_TAG = ItemsActivity.class.getSimpleName();
 
     private List<DataItem> dataList = new ArrayList<DataItem>();
     private ArrayList<String> imagePathList = new ArrayList<>();
-    public  ItemsGridAdapter adapter;
-    private GridView gridView;
+
+    private ServerFolderItemsAdapter serverFolderItemsAdapter;
+
     private View rootView;
     private String dataCollectionId;
     private Activity activity = this;
-    private final String LOG_TAG = ItemsActivity.class.getSimpleName();
+
     SharedPreferences mPrefs;
     private String username;
     private String APIkey;
 
+    //pagination
+    private int paging = 0;
 
+
+    //UI element
+    static RecyclerView recyclerView;
     Toolbar toolbar;
 
     Callback<ItemMessage> callback_Items = new Callback<ItemMessage>() {
@@ -57,29 +68,27 @@ public class ItemsActivity extends AppCompatActivity {
             List<DataItem> dataList = new ArrayList<>();
 
             //load all data from imeji
-            //adapter =  new CustomListAdapter(getActivity(), dataList);
             List<DataItem> dataListLocal = new ArrayList<DataItem>();
             dataListLocal = itemMessage.getResults();
 
-            ActiveAndroid.beginTransaction();
-            try {
-                imagePathList.clear();
-                for (DataItem item : dataList) {
-                    dataListLocal.add(item);
-                    imagePathList.add(item.getFileUrl());
-                    //item.save();
-                }
-                ActiveAndroid.setTransactionSuccessful();
-            } finally{
-                ActiveAndroid.endTransaction();
-
-                adapter =  new ItemsGridAdapter(activity, dataListLocal);
-                gridView.setAdapter(adapter);
-
-                adapter.notifyDataSetChanged();
-
+            if(paging == 0){
+            imagePathList.clear();
+            }
+            // Deserialize API response and then construct new objects to append to the adapter
+            // Add the new objects to the data source for the adapter
+            for (DataItem item : dataListLocal) {
+                imagePathList.add(item.getWebResolutionUrlUrl());
             }
 
+            if(paging == 0){
+                serverFolderItemsAdapter.notifyDataSetChanged();
+            }else {
+                // For efficiency purposes, notify the adapter of only the elements that got changed
+                // curSize will equal to the index of the first element inserted because the list is 0-indexed
+                int curSize = serverFolderItemsAdapter.getItemCount();
+                serverFolderItemsAdapter.notifyItemRangeInserted(curSize, imagePathList.size() - 1);
+
+            }
         }
 
         @Override
@@ -112,31 +121,32 @@ public class ItemsActivity extends AppCompatActivity {
             dataCollectionId = intent.getStringExtra(Intent.EXTRA_TEXT);
             String title = intent.getStringExtra("folderTitle");
 
-            getFolderItems(dataCollectionId);
-
-
             titleView.setText(title);
-            //adapter =  new CustomListAdapter(getActivity(), dataList);
-            adapter = new ItemsGridAdapter(activity, dataList);
 
-
-            //rootView = inflater.inflate(R.layout.fragment_section_list_swipe, container, false);
-            gridView = (GridView) findViewById(R.id.item_gridView);
-            //listView = (SwipeMenuListView) rootView.findViewById(R.id.listView);
-            gridView.setAdapter(adapter);
-
-            gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            recyclerView = (RecyclerView)findViewById(R.id.server_folder_detail_recycle_view);
+            serverFolderItemsAdapter = new ServerFolderItemsAdapter(activity,imagePathList);
+            recyclerView.setHasFixedSize(true);
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(activity,2);
+            recyclerView.setLayoutManager(gridLayoutManager);
+            recyclerView.setAdapter(serverFolderItemsAdapter);
+            recyclerView.setOnScrollListener(new EndlessRecyclerViewScrollListener(gridLayoutManager) {
                 @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                    DataItem dataItem = (DataItem) adapter.getItem(position);
-
-                    Intent showDetailIntent = new Intent(activity, DetailActivity.class);
-                    showDetailIntent.putStringArrayListExtra("itemPathList", imagePathList);
-                    showDetailIntent.putExtra("positionInList",position);
-                    startActivity(showDetailIntent);
+                public void onLoadMore(int page, int totalItemsCount) {
+                    paging = 1;
+                    customLoadMoreDataFromApi(page*10);
                 }
             });
+
+            getFolderItems(dataCollectionId, 0);
+
         }
+    }
+
+    // Append more data into the adapter
+    // This method probably sends out a network request and appends new data items to your adapter.
+    public void customLoadMoreDataFromApi(int offset) {
+        // Send an API request to retrieve appropriate data using the offset value as a parameter.
+        getFolderItems(dataCollectionId,offset);
     }
 
 
@@ -158,8 +168,8 @@ public class ItemsActivity extends AppCompatActivity {
         }
     }
 
-    private void getFolderItems(String collectionId){
-        RetrofitClient.getCollectionItems(collectionId, callback_Items, APIkey);
+    private void getFolderItems(String collectionId,int offset){
+        RetrofitClient.getCollectionItems(collectionId, offset, callback_Items, APIkey);
     }
 
 }

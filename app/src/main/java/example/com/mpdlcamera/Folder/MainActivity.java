@@ -683,9 +683,12 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                                     mEditor.remove("apiKey").commit();
                                     mEditor.remove("userId").commit();
                                     mEditor.remove("username").commit();
+                                    mEditor.remove("isAlbum").commit();
 
                                     Intent logoutIntent = new Intent(context, LoginActivity.class);
                                     startActivity(logoutIntent);
+
+                                    finish();
                                 }
                             })
                             .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -709,9 +712,12 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     mEditor.remove("apiKey").commit();
                     mEditor.remove("userId").commit();
                     mEditor.remove("username").commit();
+                    mEditor.remove("isAlbum").commit();
 
                 Intent logoutIntent = new Intent(context, LoginActivity.class);
                 startActivity(logoutIntent);
+
+                finish();
                 }
             }
         });

@@ -94,9 +94,7 @@ public class TaskUploadService extends Service{
 
         super.onCreate();
 
-
                 Log.v(TAG, "TaskUploadService onCreate!");
-
 
                 // prepare auth for upload
                 mPrefs = this.getSharedPreferences("myPref", 0);
@@ -126,7 +124,6 @@ public class TaskUploadService extends Service{
                 // auto task is WAITING
 
                     startUpload();
-
             }
 
     @Override
@@ -155,19 +152,22 @@ public class TaskUploadService extends Service{
             if(task!=null) {
                 collectionID = task.getCollectionId();
                 Log.v(TAG,"collectionID set");
+
+                if(!taskIsStopped()) {
+                    Log.v(TAG,"not stopped");
+                    Log.v(TAG,task.getState());
+                    // auto task is WAITING
+                    if (task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
+                        //start uploading
+                        startUpload();
+                    }
+                }
+
             }else{
                 Log.v(TAG,"mTask is null, can't get collectionID");
             }
 
-            if(!taskIsStopped()) {
-                Log.v(TAG,"not stopped");
-                Log.v(TAG,task.getState());
-                // auto task is WAITING
-                if (task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
-                    //start uploading
-                    startUpload();
-                }
-            }
+
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -199,15 +199,17 @@ public class TaskUploadService extends Service{
                 /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
                 waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
                 finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+                //DELETE TESTING
+                Log.i(TAG, "waitingImages: " + waitingImages.size());
+                Log.i(TAG, "finishedImages "+finishedImages.size());
+                Log.i(TAG, "totalImages: " + task.getTotalItems());
+                task.setFinishedItems(finishedImages.size());
+                task.save();
+
             } catch (Exception e) {
             }
 
-            //DELETE TESTING
-            Log.i(TAG, "waitingImages: " + waitingImages.size());
-            Log.i(TAG, "finishedImages "+finishedImages.size());
-            Log.i(TAG, "totalImages: " + task.getTotalItems());
-            task.setFinishedItems(finishedImages.size());
-            task.save();
+
 
             if (waitingImages != null && waitingImages.size() > 0) {
 
