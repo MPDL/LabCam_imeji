@@ -104,7 +104,9 @@ public class TaskUploadService extends Service{
 
                 //set task
                 try{
+                    // AuTask can not be more than 1 (<=1)
                     task =  DeviceStatus.getAuTask(userId);
+                    // set currentTask id
                     currentTaskId = task.getTaskId();
                     Log.i(TAG, "currentTaskId" + currentTaskId);
                     finishedNum = task.getFinishedItems();
@@ -120,10 +122,10 @@ public class TaskUploadService extends Service{
                     Log.v(TAG+"onCreate","collectionID set");
                 }else{
                     Log.v(TAG,"mTask is null, can't get collectionID");
+                    return;
                 }
-                // auto task is WAITING
-
-                    startUpload();
+                // task exist,then start task
+                startUpload();
             }
 
     @Override
@@ -139,6 +141,7 @@ public class TaskUploadService extends Service{
             //set task
             try{
                 task =  DeviceStatus.getAuTask(userId);
+                //set currentTaskId
                 currentTaskId = task.getTaskId();
                 Log.i(TAG, "currentTaskId: " + currentTaskId);
                 finishedNum = task.getFinishedItems();
@@ -166,8 +169,6 @@ public class TaskUploadService extends Service{
             }else{
                 Log.v(TAG,"mTask is null, can't get collectionID");
             }
-
-
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -197,6 +198,9 @@ public class TaskUploadService extends Service{
         if(!taskIsStopped()) {
             try {
                 /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
+
+                // search in database, count the number of images that have state = waiting/finished
+                // update the finishedItems number in task
                 waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
                 finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
                 //DELETE TESTING
@@ -209,19 +213,24 @@ public class TaskUploadService extends Service{
             } catch (Exception e) {
             }
 
-
-
             if (waitingImages != null && waitingImages.size() > 0) {
 
-                //upload begin with the first in list
-
+                // look into database, get first image of a task in create time desc order
+                // upload begin with the first in list
                 Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("createTime DESC").executeSingle();
                 String imageState = image.getState();
                 String filePath = image.getImagePath();
+                // important: set currentImageId, so that in the callback can find it
                 currentImageId = image.getImageId();
-                Log.e(TAG, currentImageId);
+                Log.e(TAG, "---------------------------");
+                Log.e(TAG, "==> step 1");
+                Log.e(TAG, "prepare upload picture");
+                Log.e(TAG, "currentImageId: "+currentImageId);
+                Log.e(TAG, "filePath: "+filePath);
+                Log.e(TAG, "createTime: "+ image.getCreateTime());
+                Log.e(TAG, "==> step 2");
 
-
+                // double check state, not have to..
                 if (imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
                     // TODO:upload image
                     String jsonPart1 = "\"collectionId\" : \"" +
@@ -230,11 +239,15 @@ public class TaskUploadService extends Service{
 
                     typedFile = new TypedFile("multipart/form-data", new File(filePath));
                     json = "{" + jsonPart1 + "}";
-                    Log.v(TAG, "start uploading: " + filePath);
+                    Log.e(TAG, "start uploading~ " + filePath);
+                    Log.e(TAG, "TO remote :"+collectionID + "from local:"+ filePath);
+                    Log.e(TAG, "==> step 3");
+
 //                    image.setState(String.valueOf(DeviceStatus.state.STARTED));
                     RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
 
                 } else {
+                    // TODO: consider more than one state
                     Log.e(TAG, "illegal imageState:" + imageState);
                 }
             }
@@ -282,17 +295,19 @@ public class TaskUploadService extends Service{
         @Override
         @Produce
         public void success(DataItem dataItem, Response response) {
+            Log.e(TAG, "currentImageId: "+currentImageId);
+            Log.e(TAG, "upload success");
 
             if(!taskIsStopped()) {
 
-                Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
+                Log.e(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
-                Log.e(TAG, currentImageId);
                 Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
                 if (currentImage == null) {
                     Log.v(TAG, currentImageId + "is not in database, task might be resumed");
                     // task is deleted/resumed so break and left callback
                 } else {
+                    // set image state finished
                     currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
                     currentImage.save();
 
@@ -300,9 +315,7 @@ public class TaskUploadService extends Service{
                     mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
                     /** move on to next **/
-
                     finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
-
 
                     //DELETE TESTING
                     Log.i(TAG, "finishedImages " + finishedImages.size());
@@ -340,11 +353,11 @@ public class TaskUploadService extends Service{
 
                         handler.post(new Runnable() {
                             public void run() {
-                                Toast.makeText(activity, "Auto Task Uploaded Successfully", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(activity, "Auto Task Uploaded Successfully", Toast.LENGTH_SHORT).show();
                             }
                         });
 
-                        Log.i(TAG, "task finished");
+                        Log.e(TAG, "task finished");
                     }
                 }
             }
@@ -352,6 +365,9 @@ public class TaskUploadService extends Service{
 
         @Override
         public void failure(RetrofitError error) {
+
+            Log.e(TAG, "currentImageId: "+currentImageId);
+            Log.e(TAG, "upload failure");
 
 //            if(error.getResponse().getStatus() == 403 || error.getResponse().getStatus() == 422 ) {
 //                task.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
@@ -362,6 +378,9 @@ public class TaskUploadService extends Service{
 
 
             if (!taskIsStopped()) {
+                /** get currentImage by currentImageId
+                 *  Image can be any state
+                 * **/
                 Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
                 //TODO:what to do with interrupted
                 if(currentImage!=null){
@@ -370,7 +389,7 @@ public class TaskUploadService extends Service{
                     Log.v(TAG,"currentImage:"+ currentImageId+ "is null");
                     return;
                 }
-//
+
 //                    currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
 //                    currentImage.setLog(error.getKind().name());
 //                    Log.e(TAG, error.getKind().name());
@@ -381,20 +400,10 @@ public class TaskUploadService extends Service{
                     if (error.getKind().name().equalsIgnoreCase("NETWORK")) {
 
                 // NETWORK disconnect situation don't need to change image state
-                        handler = new Handler(Looper.getMainLooper());
-                        handler.post(new Runnable() {
-                            public void run() {
-//                                Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    } else {
+                        Log.v(TAG,"network error");
 
-                        handler = new Handler(Looper.getMainLooper());
-                        handler.post(new Runnable() {
-                            public void run() {
-                                Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                    } else {
+                        /** error == null, but it is not network error **/
                     }
                 } else {
                     OttoSingleton.getInstance().post(
@@ -402,12 +411,7 @@ public class TaskUploadService extends Service{
                     String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                     if (jsonBody.contains("already exists")) {
 
-                        handler = new Handler(Looper.getMainLooper());
-                        handler.post(new Runnable() {
-                            public void run() {
-//                                Toast.makeText(activity, "Photo already exists", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        Log.e(TAG, currentImage.getImageName() + "  already exists");
 
                         try{
                         currentImage.setLog(error.getKind().name() + " already exists");
@@ -416,12 +420,7 @@ public class TaskUploadService extends Service{
 
                     } else {
 
-                        handler = new Handler(Looper.getMainLooper());
-                        handler.post(new Runnable() {
-                            public void run() {
-                                Toast.makeText(activity, "Upload failed", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                       Log.e(TAG,"failed");
                     }
                 }
                 // save state changes
@@ -451,6 +450,8 @@ public class TaskUploadService extends Service{
 //                        task.setState(String.valueOf(DeviceStatus.state.FINISHED));
                         Log.i(TAG, "task finished");
                     }
+            } else {
+                Log.e(TAG,"task is stopped");
             }
         }
     };

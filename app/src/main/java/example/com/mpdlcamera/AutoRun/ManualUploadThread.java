@@ -94,7 +94,6 @@ public class ManualUploadThread extends Thread {
             waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
             finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
-
             //DELETE TESTING
             Log.i(TAG, "waitingImages: " + waitingImages.size());
             Log.i(TAG, "finishedImages: " + finishedImages.size());
@@ -103,12 +102,20 @@ public class ManualUploadThread extends Thread {
 
             if (waitingImages!=null && waitingImages.size() > 0) {
 
-
+                // look into database, get first image of a task in create time desc order
+                // upload begin with the first in list
                 Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
                 String imageState = image.getState();
                 String filePath = image.getImagePath();
+                // important: set currentImageId, so that in the callback can find it
                 currentImageId = image.getImageId();
-                Log.e(TAG,currentImageId);
+                Log.e(TAG, "---------------------------");
+                Log.e(TAG, "==> step 1");
+                Log.e(TAG, "prepare upload picture");
+                Log.e(TAG, "currentImageId: "+currentImageId);
+                Log.e(TAG, "filePath: "+filePath);
+                Log.e(TAG, "createTime: "+ image.getCreateTime());
+                Log.e(TAG, "==> step 2");
 
 
                 if (imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
@@ -135,7 +142,10 @@ public class ManualUploadThread extends Thread {
 
                     typedFile = new TypedFile("multipart/form-data", f);
                     json = "{" + jsonPart1 + "}";
-                    Log.v(TAG, "start uploading: " + filePath);
+                    Log.e(TAG, "start uploading~ " + filePath);
+                    Log.e(TAG, "TO remote :"+collectionID + "from local:"+ filePath);
+                    Log.e(TAG, "==> step 3");
+
                     RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
 
                 }else {
@@ -267,6 +277,14 @@ public class ManualUploadThread extends Thread {
 
             if (!taskIsStopped()) {
                 final Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
+
+                if(currentImage!=null){
+                    //do sth
+                }else {
+                    Log.v(TAG,"currentImage:"+ currentImageId+ "is null");
+                    return;
+                }
+
                 //change state not saved here
 
 //                    currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
@@ -276,23 +294,17 @@ public class ManualUploadThread extends Thread {
                 //
 
 
+
                 if (error == null || error.getResponse() == null) {
                     OttoSingleton.getInstance().post(new UploadEvent(null));
                     if(error.getKind().name().equalsIgnoreCase("NETWORK")) {
 
 
-                        handler=new Handler(Looper.getMainLooper());
-                        handler.post(new Runnable() {
-                            public void run() {
-//                            Toast.makeText(activity, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();
-                            }
-                        });
                     }else {
 
                         handler=new Handler(Looper.getMainLooper());
                         handler.post(new Runnable() {
                             public void run() {
-                                Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
                                 Log.e("Upload failed", error.getMessage());
                                 Log.e("Upload failed", error.getResponse().getStatus()+"");
                                 Log.e("Upload failed",currentImage.getImageName());
