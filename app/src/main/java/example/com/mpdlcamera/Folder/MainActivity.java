@@ -93,6 +93,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     static final int PICK_COLLECTION_REQUEST = 1997;
+    // flag
+    private boolean isFirstCollection = false;
 
     private String email;
     private String username;
@@ -583,6 +585,21 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 // by default choose collection not enabled
             }
         }
+        autoUploadSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!autoUploadSwitch.isChecked()){
+                    //on to off
+                    return;
+                }
+                //off to on
+                if (isFirstCollection) {
+                    isFirstCollection = false;
+                    Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
+                    startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
+                }
+            }
+        });
 
         autoUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -778,7 +795,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         @Override
         public void success(ImejiFolder imejiFolder, Response response) {
             Log.v(LOG_TAG, "createCollection_callback success");
-
+            isFirstCollection = true;
 
             /** create autoTask(already deleted old one), set text **
 
@@ -806,12 +823,14 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             collectionNameTextView.setText(imejiFolder.getTitle());
 
 
+
+            **/
+
             // go to fragment
             SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
             viewPager.setAdapter(tabAdapter);
-            currentTab = 1;
-            viewPager.setCurrentItem(currentTab);
-            **/
+//            currentTab = 0;
+//            viewPager.setCurrentItem(currentTab);
 
             pDialog.dismiss();
             // switch
@@ -819,6 +838,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
             // set setting Auto Upload off
             Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+            //init settings
+            if (settings == null) {
+                settings = new Settings();
+            }
             settings.setUserId(userId);
             settings.setIsAutoUpload(false);
             settings.save();
@@ -865,6 +888,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                                 pDialog = new ProgressDialog(activity);
                                 pDialog.setMessage("Loading...");
                                 pDialog.show();
+                                if(String.valueOf(input.getText()).equalsIgnoreCase("")){
+                                    Toast.makeText(activity,"canceled create collection",Toast.LENGTH_SHORT).show();
+                                    pDialog.dismiss();
+                                    return;
+                                }
                                 RetrofitClient.createCollection(String.valueOf(input.getText()),"no description yet",createCollection_callback,apiKey);
                             }
                         })

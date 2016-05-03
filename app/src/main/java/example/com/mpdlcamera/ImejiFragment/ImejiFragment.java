@@ -336,9 +336,7 @@ public class ImejiFragment extends Fragment {
                     listView.setAdapter(adapter);
                 }
             }else{
-                DeviceStatus.showToast(getActivity(), "no items");
-                Log.v(LOG_TAG, "no items");
-
+                Log.e(LOG_TAG, "no items");
             }
 
             Log.v(LOG_TAG, "get DataItem success");
