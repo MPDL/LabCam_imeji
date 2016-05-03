@@ -67,6 +67,7 @@
         <activity
             android:name=".ItemDetails.ItemsActivity"
             android:label="@string/title_item_activity"
+            android:screenOrientation="portrait"
             android:parentActivityName=".Folder.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -85,6 +86,7 @@
             android:label="@string/title_local_activity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
+                android:screenOrientation="portrait"
                 android:value=".Folder.MainActivity" />
         </activity>
 

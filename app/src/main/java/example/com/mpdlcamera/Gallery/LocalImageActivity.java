@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -171,6 +172,10 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
         });
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

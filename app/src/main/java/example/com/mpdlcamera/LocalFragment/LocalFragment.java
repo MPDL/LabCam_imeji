@@ -505,6 +505,10 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         Log.e(LOG_TAG,sortedImageNameList.size()+"");
 
          simpleAdapter = new SimpleAdapter(getActivity(),sortedImageNameList);
+        if(positionSet!=null){
+            simpleAdapter.setPositionSet(positionSet);
+        }
+
 
         //This is the code to provide a sectioned grid
         List<SectionedGridRecyclerViewAdapter.Section> sections =
@@ -576,9 +580,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         int width = size.x;
 
         // calculate spanCount in GridLayoutManager
-        int spanCount = 3;
+        int spanCount;
         spanCount = width/235;
-        Log.v(LOG_TAG, "spanCount: "+spanCount);
 
         // timeline recycleView
         recyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_recycleView);

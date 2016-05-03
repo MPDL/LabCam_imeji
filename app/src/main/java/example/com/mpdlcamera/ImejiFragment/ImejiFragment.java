@@ -260,7 +260,6 @@ public class ImejiFragment extends Fragment {
         username = mPrefs.getString("username", "");
         APIKey = mPrefs.getString("apiKey", "");
 
-
         collectionListLocal = new Select()
                 .from(ImejiFolder.class)
                 .execute();
