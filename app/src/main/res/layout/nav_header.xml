@@ -143,7 +143,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/switch_auto_upload"
                 android:layout_alignParentRight="true"
-                android:checked="true"
+                android:checked="false"
                 android:layout_marginRight="10dp" />
         </RelativeLayout>
     </RelativeLayout>
@@ -159,7 +159,8 @@
             android:layout_marginLeft="16dp"
             android:text="Selected Collection"
             android:id="@+id/tv_choose_collection"
-            android:textColor="@color/dark_text"
+            android:enabled="false"
+            android:textColor="@color/grayDivider"
             android:textSize="16dp"
             android:layout_marginTop="10dp" />
 
@@ -172,8 +173,9 @@
             android:layout_marginRight="10dp"
             android:gravity="right"
             android:id="@+id/collection_name"
-            android:text="b"
-            android:textColor="@color/dark_text"
+            android:text=""
+            android:enabled="false"
+            android:textColor="@color/grayDivider"
             android:textSize="16dp"
             />
 

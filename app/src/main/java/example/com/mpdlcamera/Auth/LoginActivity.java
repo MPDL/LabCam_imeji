@@ -230,19 +230,11 @@ public class LoginActivity extends AppCompatActivity {
                     }
 
                     //get collection
-
-                    Log.i("QRAPIkey1",mPrefs.getString("APIkey",""));
                     mPrefs = getSharedPreferences("myPref", 0);
                     SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.putString("APIkey",APIkey).apply();
-                    Log.v("QRAPIkey",mPrefs.getString("APIkey",APIkey));
-//                    mEditor.putString("username", values.getString("username")).apply();
-//                    mEditor.putString("password", values.getString("password")).apply();
                     mEditor.putString("collectionID", collectionId).apply();
                     mEditor.commit();
-                    Log.i("QRAPIkey2", mPrefs.getString("APIkey", ""));
-//                    Log.v(LOG_TAG, values.getString("username"));Log
-//                    Log.v(LOG_TAG, values.getString("password"));
                     RetrofitClient.apiLogin(APIkey,callback_login);
 
 //                    accountLogin();

@@ -567,17 +567,27 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     //auto upload switch
     private void setAutoUpload(){
         autoUploadSwitch = (Switch) findViewById(R.id.switch_auto_upload);
+        chooseCollectionLabel = (TextView) findViewById(R.id.tv_choose_collection);
+        collectionNameTextView = (TextView) findViewById(R.id.collection_name);
+
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
         if(settings!=null){
             autoUploadSwitch.setChecked(settings.isAutoUpload());
+            // if auto is on in settings, enable choose collection
+            if(settings.isAutoUpload()){
+                chooseCollectionLabel.setEnabled(true);
+                collectionNameTextView.setEnabled(true);
+                chooseCollectionLabel.setTextColor(getResources().getColor(R.color.dark_text));
+                collectionNameTextView.setTextColor(getResources().getColor(R.color.dark_text));
+            }else {
+                // by default choose collection not enabled
+            }
         }
 
         autoUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
-                chooseCollectionLabel = (TextView) findViewById(R.id.tv_choose_collection);
-                collectionNameTextView = (TextView) findViewById(R.id.collection_name);
                 //init settings
                 if (settings == null) {
                     settings = new Settings();
@@ -603,7 +613,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
                     collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
                 }
-                Log.e(LOG_TAG,settings.isAutoUpload()+"");
+                Log.e(LOG_TAG, settings.isAutoUpload() + "");
             }
         });
     }
