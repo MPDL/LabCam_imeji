@@ -90,36 +90,156 @@
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="fill_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
         app:itemIconTint="#333"
         app:itemTextColor="#333"
         >
 
-        <!--logout-->
+        <ScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:layout_marginTop="130dp">
 
         <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical"
-            android:gravity="bottom"
-            android:layout_gravity="bottom">
+            android:layout_width="wrap_content"
+            android:layout_height="400dp">
+            <!--upload option-->
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/layout_upload_option"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="30dp">
 
-            <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="fill_parent"-->
-                <!--android:gravity="bottom"-->
-                <!--android:layout_marginLeft="16dp"-->
-                <!--android:layout_marginBottom="40dp"-->
-                <!--android:text="Logout"-->
-                <!--android:id="@+id/tv_logout"-->
-                <!--android:textSize="16dp" />-->
-            
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/upload_options"
+                    android:id="@+id/label_upload_option"
+                    android:textColor="@color/tabUnselect"
+                    android:textSize="14sp"
+                    android:layout_marginLeft="16dp"/>
+
+                <!--divider-->
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/label_upload_option"
+                    android:id="@+id/divider_upload_option"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="#80808080" >
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/divider_upload_option"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="16dp"
+                    android:text="Upload via"
+                    android:textSize="16sp"
+                    android:textColor="@color/dark_text" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/divider_upload_option"
+                    android:layout_marginTop="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"
+                    android:text="Wi-Fi"
+                    android:textSize="16sp"
+                    android:textColor="@color/dark_text" />
+
+            </RelativeLayout>
+
+            <!--auto upload-->
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/layout_auto_upload"
+                android:layout_marginTop="30dp"
+                android:layout_below="@id/layout_upload_option">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/label_choose_folder"
+                    android:text="@string/auto_upload"
+                    android:textColor="@color/tabUnselect"
+                    android:textSize="14sp"
+                    android:layout_marginLeft="16dp"/>
+
+                <!--divider-->
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_below="@id/label_choose_folder"
+                    android:background="#80808080" >
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout_switch">
+
+                    <Switch
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/switch_auto_upload"
+                        android:layout_alignParentRight="true"
+                        android:checked="false"
+                        android:layout_marginRight="10dp" />
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/layout_auto_upload">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:text="Selected Collection"
+                    android:id="@+id/tv_choose_collection"
+                    android:enabled="false"
+                    android:textColor="@color/grayDivider"
+                    android:textSize="16dp"
+                    android:layout_marginTop="10dp" />
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="10dp"
+                    android:gravity="right"
+                    android:id="@+id/collection_name"
+                    android:text=""
+                    android:enabled="false"
+                    android:textColor="@color/grayDivider"
+                    android:textSize="16dp"
+                    />
+
+            </RelativeLayout>
+
+            <!--logout-->
+
             <ImageView
                 android:layout_width="200dp"
                 android:layout_height="60dp"
-                android:gravity="bottom"
+                android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:id="@+id/tv_logout"
                 android:layout_marginBottom="16dp"
@@ -127,10 +247,9 @@
 
         </RelativeLayout>
 
+
+        </ScrollView>
     </android.support.design.widget.NavigationView>
-
-
-
 
     <!--app:menu="@menu/navigation_drawer_items"-->
 </android.support.v4.widget.DrawerLayout>
