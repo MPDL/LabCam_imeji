@@ -746,9 +746,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         Log.e("~~~", pack);
         Log.e("~~~", cls);
 
-        if(pack.equalsIgnoreCase("com.sec.android.app.camera")){
-            Toast.makeText(context,"this device not support open camera here",Toast.LENGTH_SHORT).show();
-        }else {
+//        if(pack.equalsIgnoreCase("com.sec.android.app.camera")){
+//            Toast.makeText(context,"this device not support open camera here",Toast.LENGTH_SHORT).show();
+//        }else {
 
             Intent mIntent = new Intent();
             mIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -758,7 +758,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             mIntent.setAction("android.intent.action.View");
 
             startActivity(mIntent);
-        }
+//        }
 
     }
 

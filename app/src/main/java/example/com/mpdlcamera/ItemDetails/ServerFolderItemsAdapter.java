@@ -3,8 +3,10 @@ package example.com.mpdlcamera.ItemDetails;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.net.Uri;
+import android.support.v4.util.LruCache;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Display;
@@ -14,33 +16,30 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.activeandroid.query.Select;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
-import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Utils.camPicassoLoader;
+
 
 /**
  * Created by yingli on 4/25/16.
  */
 public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderItemsAdapter.ViewHolder>  {
 
-
-
     private Activity activity;
     private ArrayList<String> galleryItems;
+    private String apiKey;
+    private SharedPreferences mPrefs;
 
     public ServerFolderItemsAdapter(Activity activity, ArrayList<String> galleryItems) {
         this.activity = activity;
         this.galleryItems = galleryItems;
+
+        mPrefs = activity.getSharedPreferences("myPref", 0);
+        apiKey = mPrefs.getString("apiKey","");
     }
 
     // get screen size
@@ -73,9 +72,24 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
         //prepare data
         Point size = getPoint();
         String filePath = galleryItems.get(position);
+        int cacheSize = 4 * 1024 * 1024;
 //
-//        //show image
-//        Picasso myPicasso = new Picasso.Builder(activity).downloader(new camPicassoLoader(activity)).build();
+        //show image
+//        OkHttpClient client = new OkHttpClient.Builder()
+//                .addInterceptor(new Interceptor() {
+//                    @Override
+//                    public Response intercept(Chain chain) throws IOException {
+//                        Request newRequest = chain.request().newBuilder()
+//                                .addHeader("Authorization", "Bearer "+apiKey)
+//                                .build();
+//                        return chain.proceed(newRequest);
+//                    }
+//                })
+//                .build();
+
+//        Picasso myPicasso = new Picasso.Builder(activity)
+//                .downloader(new camPicassoLoader(activity))
+//                .build();
 //        myPicasso.load(filePath)
 //                .resize(size.x / 2, size.y/3)
 //                .centerInside()
@@ -83,6 +97,7 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
 
         Picasso.with(activity)
                 .load(filePath)
+
                 .centerInside().resize(size.x/2, size.y/3)
                 .into(holder.imageView);
 

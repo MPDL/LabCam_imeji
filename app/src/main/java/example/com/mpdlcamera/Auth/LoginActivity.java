@@ -116,7 +116,8 @@ public class LoginActivity extends AppCompatActivity {
         //it is called at login, what about without login?
         RetrofitClient.setRestServer(serverURL);
 
-        serverURLView.setText(parseServerUrl(serverURL));
+//        serverURLView.setText(parseServerUrl(serverURL));
+        serverURLView.setText(serverURL);
 
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,8 +134,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 /** parse server url **/
 
-                RetrofitClient.setRestServer(parseServerUrl(serverURL));
-
+//                RetrofitClient.setRestServer(parseServerUrl(serverURL));
+                RetrofitClient.setRestServer(serverURL);
 
                 Log.v(LOG_TAG,serverURL);
                 usernameView.setError(null);
@@ -538,7 +539,7 @@ public class LoginActivity extends AppCompatActivity {
                  coreUrl = parts[i];
             }
         }
-        serverUrl = "https://"+coreUrl+"/rest/";
+        serverUrl = "http://"+coreUrl+"/rest/";
         return serverUrl;
     }
 
@@ -575,7 +576,18 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void failure(RetrofitError error) {
-            Log.v("~~~","login failed" );
+
+
+            if(error.getResponse()==null){
+                Toast.makeText(activity, "network not connected, try later", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if(error.getResponse().getStatus()==401) {
+                Toast.makeText(activity, "username or password wrong", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(activity, "user doesn't exist", Toast.LENGTH_SHORT).show();
+            }
             try{
             Log.v("~~~", error.getMessage());}catch (Exception e){}
         }

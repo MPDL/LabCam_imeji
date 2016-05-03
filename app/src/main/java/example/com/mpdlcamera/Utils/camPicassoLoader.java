@@ -17,8 +17,6 @@ import java.net.HttpURLConnection;
 public class camPicassoLoader extends UrlConnectionDownloader {
 
     String apiKey;
-    String username;
-    String password;
     SharedPreferences mPrefs;
     public camPicassoLoader(Context context) {
         super(context);
