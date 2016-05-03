@@ -109,9 +109,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private static UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
     private static final int TASK_CODE = 2016;
 
-    // seleced collectionName
-    TextView collectionNameTextView;
-
+    //UI
+    static Switch autoUploadSwitch = null;
+    static TextView chooseCollectionLabel = null;
+    static TextView collectionNameTextView = null;
     static {
         matcher.addURI("example.com.mpdlcamera", "tasks", TASK_CODE);
     }
@@ -565,7 +566,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     //auto upload switch
     private void setAutoUpload(){
-        Switch autoUploadSwitch = (Switch) findViewById(R.id.switch_auto_upload);
+        autoUploadSwitch = (Switch) findViewById(R.id.switch_auto_upload);
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
         if(settings!=null){
             autoUploadSwitch.setChecked(settings.isAutoUpload());
@@ -575,8 +576,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
-                TextView chooseCollectionLabel = (TextView) findViewById(R.id.tv_choose_collection);
-                TextView collectionNameTextView = (TextView) findViewById(R.id.collection_name);
+                chooseCollectionLabel = (TextView) findViewById(R.id.tv_choose_collection);
+                collectionNameTextView = (TextView) findViewById(R.id.collection_name);
                 //init settings
                 if (settings == null) {
                     settings = new Settings();
@@ -602,6 +603,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
                     collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
                 }
+                Log.e(LOG_TAG,settings.isAutoUpload()+"");
             }
         });
     }
@@ -767,7 +769,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         public void success(ImejiFolder imejiFolder, Response response) {
             Log.v(LOG_TAG, "createCollection_callback success");
 
-            /** create autoTask(already deleted old one), set text **/
+
+            /** create autoTask(already deleted old one), set text **
 
             Task task = new Task();
             String uniqueID = UUID.randomUUID().toString();
@@ -791,13 +794,32 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
             //set selected collection name text
             collectionNameTextView.setText(imejiFolder.getTitle());
-            pDialog.dismiss();
+
 
             // go to fragment
             SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
             viewPager.setAdapter(tabAdapter);
             currentTab = 1;
             viewPager.setCurrentItem(currentTab);
+            **/
+
+            pDialog.dismiss();
+            // switch
+            autoUploadSwitch.setChecked(false);
+
+            // set setting Auto Upload off
+            Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+            settings.setUserId(userId);
+            settings.setIsAutoUpload(false);
+            settings.save();
+
+            // choose collection text disable
+            chooseCollectionLabel = (TextView) findViewById(R.id.tv_choose_collection);
+            collectionNameTextView = (TextView) findViewById(R.id.collection_name);
+            chooseCollectionLabel.setEnabled(false);
+            collectionNameTextView.setEnabled(false);
+            chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
+            collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
 
         }
 
