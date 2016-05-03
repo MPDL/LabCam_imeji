@@ -317,12 +317,12 @@ public class ManualUploadThread extends Thread {
                     String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                     if (jsonBody.contains("already exists")) {
 
-                        handler=new Handler(Looper.getMainLooper());
-                        handler.post(new Runnable() {
-                            public void run() {
-                            Toast.makeText(context, "Photo already exists", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+//                        handler=new Handler(Looper.getMainLooper());
+//                        handler.post(new Runnable() {
+//                            public void run() {
+//                            Toast.makeText(context, "Photo already exists", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
                         currentImage.setLog(error.getKind().name() + " already exists");
                         currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
                         currentImage.save();
