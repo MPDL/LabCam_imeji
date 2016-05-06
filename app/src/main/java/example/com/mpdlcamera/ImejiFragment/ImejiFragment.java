@@ -320,7 +320,6 @@ public class ImejiFragment extends Fragment {
                             //check for each folder, if the current items belongs to the current folder
                             if(coverItem.getCollectionId().equals(folder.id)){
 //                                folder.setItems(dataList);
-//
                                 folder.setCoverItemUrl(coverItem.getWebResolutionUrlUrl());
                                 folder.setImejiId(folder.id);
                                 folder.save();
