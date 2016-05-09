@@ -291,7 +291,6 @@ public class ImejiFragment extends Fragment {
 
             /** store image **/
             // date example 2015-02-16T13:02:27 +0100
-
             for(DataItem dataItem:dataList ) {
                 String time = dataItem.getCreatedDate();
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss Z");
@@ -311,14 +310,17 @@ public class ImejiFragment extends Fragment {
                 dataItem.getFileUrl();
 //                imageList.put(dtLong, dataItem.getFileUrl());
             }
+
+
             if(dataList != null) {
                 ActiveAndroid.beginTransaction();
                 try {
                     for (ImejiFolder folder : collectionListLocal) {
+                        // compare all the collectionID with the first dataItem's collectionId
                         if(dataList.size()>0) {
                             DataItem coverItem = dataList.get(0);
                             //check for each folder, if the current items belongs to the current folder
-                            if(coverItem.getCollectionId().equals(folder.id)){
+                            if(coverItem.getCollectionId().equals(folder.id)) {
 //                                folder.setItems(dataList);
                                 folder.setCoverItemUrl(coverItem.getWebResolutionUrlUrl());
                                 folder.setImejiId(folder.id);
@@ -336,6 +338,7 @@ public class ImejiFragment extends Fragment {
                 }
             }else{
                 Log.e(LOG_TAG, "no items");
+
             }
 
             Log.v(LOG_TAG, "get DataItem success");

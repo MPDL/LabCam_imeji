@@ -2,6 +2,7 @@ package example.com.mpdlcamera.Folder;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.Uri;
 import android.util.Log;
@@ -14,6 +15,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -26,6 +30,7 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Utils.CustomImageDownaloder;
 import example.com.mpdlcamera.Utils.camPicassoLoader;
 
 /**
@@ -89,13 +94,31 @@ public class FolderListAdapter extends BaseAdapter {
             ImejiFolder collection = folderItems.get(position);
             Log.v(LOG_TAG, collection.getTitle());
 //
-//            if (collection.getItems() != null) {
-//                if (collection.getItems().size() > 0) {
-//                    DataItem m = collection.getItems().get(0);
-//                    Log.e(LOG_TAG, m.getWebResolutionUrlUrl());
-            Picasso myPicasso = new Picasso.Builder(activity).downloader(new camPicassoLoader(activity)).build();
-            myPicasso.load(collection.getCoverItemUrl())
-                    .error(R.drawable.error_alert).into(imageView);
+            //创建默认的ImageLoader配置参数
+            ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(activity)
+                    .imageDownloader(new CustomImageDownaloder(activity))
+                    .writeDebugLogs() //打印log信息
+                    .build();
+
+
+            //Initialize ImageLoader with configuration.
+//        ImageSize targetSize = new ImageSize(size.x / 2, size.y/3);
+            ImageLoader imageLoader = ImageLoader.getInstance();
+            ImageLoader.getInstance().init(configuration);
+
+
+            //显示图片的配置
+            DisplayImageOptions options = new DisplayImageOptions.Builder()
+//                .showImageOnLoading(R.drawable.progress_image)
+                    .showImageOnFail(R.drawable.error_alert)
+                    .cacheInMemory(true)
+                    .cacheOnDisk(true)
+                    .bitmapConfig(Bitmap.Config.RGB_565)
+                    .build();
+
+
+
+            imageLoader.displayImage(collection.getCoverItemUrl(), imageView, options);
 
 //            Picasso.with(activity)
 //                            .load(collection.getCoverItemUrl())

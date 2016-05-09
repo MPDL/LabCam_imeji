@@ -94,7 +94,7 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
 
         //显示图片的配置
         DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .showImageOnLoading(R.drawable.progress_image)
+//                .showImageOnLoading(R.drawable.progress_image)
                 .showImageOnFail(R.drawable.error_alert)
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
