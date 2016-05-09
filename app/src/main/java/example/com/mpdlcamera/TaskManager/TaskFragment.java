@@ -44,8 +44,11 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
 
     private TaskManagerAdapter taskManagerAdapter;
 
-
-
+    // db observer handler
+    static ContentResolver resolver;
+    static Handler mHandler;
+    static dbObserver dbObserver;
+    static Uri uri;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -111,12 +114,12 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Uri uri = Uri.parse("content://example.com.mpdlcamera/tasks");
-        ContentResolver resolver = getActivity().getContentResolver();
+        uri = Uri.parse("content://example.com.mpdlcamera/tasks");
+        resolver = getActivity().getContentResolver();
 
         mPrefs = getActivity().getSharedPreferences("myPref", 0);
         userId =  mPrefs.getString("userId", "");
-        Handler mHandler = new Handler(){
+        mHandler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
@@ -141,8 +144,8 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
                 }
             }
         };
-
-        resolver.registerContentObserver(uri, true, new dbObserver(getActivity(), mHandler));
+        dbObserver = new dbObserver(getActivity(),mHandler);
+        resolver.registerContentObserver(uri, true, dbObserver);
 
     }
 
@@ -151,6 +154,18 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    @Override
+    public void onPause() {
+        resolver.unregisterContentObserver(dbObserver);
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        resolver.registerContentObserver(uri, true, dbObserver);
+        super.onResume();
     }
 
     @Override
