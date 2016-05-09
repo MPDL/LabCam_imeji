@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.Uri;
 import android.support.v4.util.LruCache;
@@ -16,11 +17,16 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Utils.CustomImageDownaloder;
 import example.com.mpdlcamera.Utils.camPicassoLoader;
 
 
@@ -72,34 +78,48 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
         //prepare data
         Point size = getPoint();
         String filePath = galleryItems.get(position);
-        int cacheSize = 4 * 1024 * 1024;
-//
-        //show image
-//        OkHttpClient client = new OkHttpClient.Builder()
-//                .addInterceptor(new Interceptor() {
-//                    @Override
-//                    public Response intercept(Chain chain) throws IOException {
-//                        Request newRequest = chain.request().newBuilder()
-//                                .addHeader("Authorization", "Bearer "+apiKey)
-//                                .build();
-//                        return chain.proceed(newRequest);
-//                    }
-//                })
-//                .build();
+
+        //创建默认的ImageLoader配置参数
+        ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(activity)
+                .imageDownloader(new CustomImageDownaloder(activity))
+                .writeDebugLogs() //打印log信息
+                .build();
+
+
+        //Initialize ImageLoader with configuration.
+//        ImageSize targetSize = new ImageSize(size.x / 2, size.y/3);
+        ImageLoader imageLoader = ImageLoader.getInstance();
+        ImageLoader.getInstance().init(configuration);
+
+
+        //显示图片的配置
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .showImageOnLoading(R.drawable.progress_image)
+                .showImageOnFail(R.drawable.error_alert)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .build();
+
+
+
+        imageLoader.displayImage(filePath, holder.imageView, options);
 
 //        Picasso myPicasso = new Picasso.Builder(activity)
 //                .downloader(new camPicassoLoader(activity))
 //                .build();
+//
 //        myPicasso.load(filePath)
 //                .resize(size.x / 2, size.y/3)
+////                .networkPolicy(NetworkPolicy.OFFLINE)
 //                .centerInside()
 //                .error(R.drawable.error_alert).into(holder.imageView);
 
-        Picasso.with(activity)
-                .load(filePath)
-
-                .centerInside().resize(size.x/2, size.y/3)
-                .into(holder.imageView);
+//        Picasso.with(activity)
+//                .load(filePath)
+//                .networkPolicy(NetworkPolicy.OFFLINE)
+//                .centerInside().resize(size.x/2, size.y/3)
+//                .into(holder.imageView);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

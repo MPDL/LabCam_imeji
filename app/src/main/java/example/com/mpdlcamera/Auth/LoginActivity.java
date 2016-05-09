@@ -206,7 +206,6 @@ public class LoginActivity extends AppCompatActivity {
                     Log.v("col",url);
                 } catch (JSONException e) {
                     e.printStackTrace();
-//                    Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
                     Toast.makeText(activity,QRText,Toast.LENGTH_LONG).show();
                     return;
                 }
@@ -229,10 +228,20 @@ public class LoginActivity extends AppCompatActivity {
 
                     }
 
+                    serverURL = serverURLView.getText().toString();
+
+                    /** parse server url **/
+
+//                RetrofitClient.setRestServer(parseServerUrl(serverURL));
+                    RetrofitClient.setRestServer(serverURL);
+
+                    Log.v(LOG_TAG,serverURL);
+
                     //get collection
                     mPrefs = getSharedPreferences("myPref", 0);
                     SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.putString("APIkey",APIkey).apply();
+                    mEditor.putString("server", serverURL).apply();
                     mEditor.putString("collectionID", collectionId).apply();
                     mEditor.commit();
                     RetrofitClient.apiLogin(APIkey,callback_login);
@@ -569,7 +578,6 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void failure(RetrofitError error) {
 
-
             if(error.getResponse()==null){
                 Toast.makeText(activity, "network not connected, try later", Toast.LENGTH_SHORT).show();
                 return;
@@ -580,8 +588,6 @@ public class LoginActivity extends AppCompatActivity {
             }else {
                 Toast.makeText(activity, "user doesn't exist", Toast.LENGTH_SHORT).show();
             }
-            try{
-            Log.v("~~~", error.getMessage());}catch (Exception e){}
         }
     };
 
