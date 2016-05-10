@@ -2,6 +2,7 @@ package example.com.mpdlcamera.Folder;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.Uri;
@@ -26,7 +27,9 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
@@ -42,9 +45,20 @@ public class FolderListAdapter extends BaseAdapter {
     private List<ImejiFolder> folderItems;
     private final String LOG_TAG = FolderListAdapter.class.getSimpleName();
 
+    private SharedPreferences mPrefs;
+    private String apiKey;
+
+    private Map<String, String> headers = new HashMap<String,String>() {};
+
     public FolderListAdapter(Activity activity, List<ImejiFolder> folderItems) {
         this.activity = activity;
         this.folderItems = folderItems;
+
+        mPrefs = activity.getSharedPreferences("myPref", 0);
+        apiKey = mPrefs.getString("apiKey","");
+
+        this.headers.put("Authorization","Bearer "+apiKey);
+
     }
 
     @Override
@@ -102,9 +116,8 @@ public class FolderListAdapter extends BaseAdapter {
 
 
             //Initialize ImageLoader with configuration.
-//        ImageSize targetSize = new ImageSize(size.x / 2, size.y/3);
             ImageLoader imageLoader = ImageLoader.getInstance();
-            ImageLoader.getInstance().init(configuration);
+            imageLoader.init(configuration);
 
 
             //显示图片的配置
@@ -113,9 +126,9 @@ public class FolderListAdapter extends BaseAdapter {
                     .showImageOnFail(R.drawable.error_alert)
                     .cacheInMemory(true)
                     .cacheOnDisk(true)
+                    .extraForDownloader(headers)
                     .bitmapConfig(Bitmap.Config.RGB_565)
                     .build();
-
 
 
             imageLoader.displayImage(collection.getCoverItemUrl(), imageView, options);

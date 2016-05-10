@@ -201,9 +201,9 @@ public class TaskUploadService extends Service{
                 waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
                 finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
-                if(finishedImages==null) {
-                    return;
-                }
+            if(finishedImages==null||task==null) {
+                return;
+            }
             task.setFinishedItems(finishedImages.size());
             task.save();
 
@@ -255,7 +255,7 @@ public class TaskUploadService extends Service{
         } catch (Exception e) {
         }
 
-        if(finishedImages==null) {
+        if(finishedImages==null||task==null) {
             return;
         }
         task.setFinishedItems(finishedImages.size());
@@ -310,9 +310,9 @@ public class TaskUploadService extends Service{
                     /** move on to next **/
                     finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
-                   if(finishedImages==null) {
-                       return;
-                   }
+                    if(finishedImages==null||task==null) {
+                        return;
+                    }
                     task.setFinishedItems(finishedImages.size());
                     task.save();
 
@@ -426,7 +426,7 @@ public class TaskUploadService extends Service{
                     finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
                     Log.e(TAG, "finishedImages " + finishedImages.size());
 
-                if(finishedImages==null) {
+                if(finishedImages==null||task==null) {
                     return;
                 }
                 task.setFinishedItems(finishedImages.size());

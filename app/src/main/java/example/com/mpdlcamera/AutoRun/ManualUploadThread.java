@@ -237,7 +237,7 @@ public class ManualUploadThread extends Thread {
                 //DELETE TESTING
                 Log.i(TAG, "finishedImages " + finishedImages.size());
 
-                if(finishedImages==null) {
+                if(finishedImages==null||task==null) {
                     return;
                 }
                 task.setFinishedItems(finishedImages.size());
@@ -383,7 +383,7 @@ public class ManualUploadThread extends Thread {
         } catch (Exception e) {
         }
 
-        if(finishedImages==null){
+        if(finishedImages==null||task==null) {
             return;
         }
         task.setTotalItems(totalNum);

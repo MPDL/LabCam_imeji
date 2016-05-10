@@ -26,6 +26,8 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Utils.CustomImageDownaloder;
@@ -41,13 +43,17 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
     private ArrayList<String> galleryItems;
     private String apiKey;
     private SharedPreferences mPrefs;
-
+    private Map<String, String> headers = new HashMap<String,String>() {
+    };
     public ServerFolderItemsAdapter(Activity activity, ArrayList<String> galleryItems) {
         this.activity = activity;
         this.galleryItems = galleryItems;
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         apiKey = mPrefs.getString("apiKey","");
+
+
+        this.headers.put("Authorization","Bearer "+apiKey);
     }
 
     // get screen size
@@ -87,7 +93,6 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
                 .writeDebugLogs() //打印log信息
                 .build();
 
-
         android.view.ViewGroup.LayoutParams layoutParams = holder.imageView.getLayoutParams();
         layoutParams.width = (size.x / 2)-6;
         layoutParams.height = (size.y/4)+5;
@@ -105,6 +110,7 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
 //                .showImageOnFail(R.drawable.error_alert)
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
+                .extraForDownloader(headers)
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
 
@@ -136,4 +142,5 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
     public int getItemCount() {
         return galleryItems.size();
     }
+
 }

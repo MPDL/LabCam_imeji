@@ -15,14 +15,8 @@ import java.util.Map;
  */
 public class CustomImageDownaloder extends BaseImageDownloader {
 
-    String apiKey;
-    SharedPreferences mPrefs;
     public CustomImageDownaloder(Context context) {
         super(context);
-        //user info
-        mPrefs = context.getSharedPreferences("myPref", 0);
-        apiKey = mPrefs.getString("apiKey", "");
-        Log.e("CustomImageDownaloder",apiKey);
     }
 
     public CustomImageDownaloder(Context context, int connectTimeout, int readTimeout) {
@@ -32,7 +26,12 @@ public class CustomImageDownaloder extends BaseImageDownloader {
     @Override
     protected HttpURLConnection createConnection(String url, Object extra) throws IOException {
         HttpURLConnection conn = super.createConnection(url, extra);
-        conn.setRequestProperty("Authorization", "Bearer "+apiKey);
+        Map<String, String> headers = (Map<String, String>) extra;
+        if (headers != null) {
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                conn.setRequestProperty(header.getKey(), header.getValue());
+            }
+        }
         return conn;
     }
 }
