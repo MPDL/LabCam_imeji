@@ -165,7 +165,6 @@ public class ImejiFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateFolder();
     }
 
     // TODO: Rename method, update argument and hook method into UI event

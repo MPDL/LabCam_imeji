@@ -29,13 +29,26 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="35dp"
+                android:layout_marginTop="4dp"
                 android:id="@+id/tv_user_email"
                 android:layout_below="@id/tv_username"
                 android:textColor="@color/white"
                 android:text="123@123"
                 android:textSize="14sp"
                 android:layout_marginLeft="10dp"/>
+
+             <!--email-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:id="@+id/tv_server_url"
+                android:layout_below="@id/tv_user_email"
+                android:textColor="@color/white"
+                android:text="123@123"
+                android:textSize="14sp"
+                android:layout_marginLeft="10dp"/>
+
         
         <ImageView
             android:layout_width="80dp"

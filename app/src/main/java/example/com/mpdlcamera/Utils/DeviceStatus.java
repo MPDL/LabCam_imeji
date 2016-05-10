@@ -166,4 +166,29 @@ public class DeviceStatus {
         Log.v(LOG_TAG,num +"_finished");
     }
 
+    public static String parseServerUrl(String Url){
+        // divide string
+        String[] parts = Url.split("/");
+        String coreUrl = null;
+        String serverUrl = null;
+        for (int i = 0;i < parts.length;i++){
+            if(parts[i].equalsIgnoreCase("https:")){
+                // ignore https:
+            } else if(parts[i].equalsIgnoreCase("http:")){
+                // ignore empty
+            } else if (parts[i].equalsIgnoreCase("")) {
+                // also ignore rest
+            }else if (parts[i].equalsIgnoreCase("rest")) {
+                // also ignore rest
+            } else if (parts[i].equalsIgnoreCase("imeji")) {
+                // also ignore rest
+            } else {
+                coreUrl = parts[i];
+            }
+        }
+//        serverUrl = "http://"+coreUrl+"/rest/";
+        serverUrl = coreUrl;
+        return serverUrl;
+    }
+
 }

@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private String username;
     private String userId;
     private String apiKey;
+    private String serverUrl;
     private SharedPreferences mPrefs;
 
     //current tab
@@ -157,6 +158,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         username = mPrefs.getString("familyName","")+" "+mPrefs.getString("givenName","");
         userId = mPrefs.getString("userId","");
         apiKey = mPrefs.getString("apiKey","");
+        serverUrl = mPrefs.getString("server","");
+        serverUrl = DeviceStatus.parseServerUrl(serverUrl);
+
 
         try{
         Bundle args = this.getIntent().getExtras();
@@ -183,29 +187,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
 
         initInstances();
-
-
-        Log.e(LOG_TAG,apiKey);
-                /*
-                    file system
-                 */
-//                UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
-//                mReceiver.setReceiver(this);
-//                Intent intent = new Intent(this, UploadService.class);
-//                intent.putExtra("receiver", mReceiver);
-//                this.startService(intent);
-
-
-                Handler handler = new Handler();
-
-            /*
-                camera
-             */
-//                NewFileObserver newFileObserver = new NewFileObserver(handler,this);
-//                getApplicationContext().getContentResolver().registerContentObserver(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,false, newFileObserver);
-
-
-        //init radioButton group
 
         //choose collection
         chooseCollection();
@@ -362,26 +343,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 File file = new File(filePath);
                 String directory = file.getParent();
                 Log.i("filePath/directory", directory);
-//                SharedPreferences.Editor editor = preferencesFiles.edit();
-//                editor.putString(album, directory);
-//                editor.commit();
                 folders.add(album);
                 Log.i("ListingImages", " album=" + album);
             } while (cur.moveToNext());
         }
     }
-
-  /*  public class ResponseReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            //acknowledge
-            Toast.makeText(MainActivity.this,
-                    "Download complete. Download URI: ",
-                    Toast.LENGTH_LONG).show();
-        }
-    }
-*/
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
@@ -413,13 +379,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     @Override
     public void OnConnect() {
         Toast.makeText(this, "network Connect...", Toast.LENGTH_LONG).show();
-
-//        UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
-//        mReceiver.setReceiver(this);
-//        Intent intent = new Intent(this, UploadService.class);
-//        intent.putExtra("receiver", mReceiver);
-//
-//        this.startService(intent);
     }
 
     // monitor network when DisConnect
@@ -758,8 +717,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private void setUserInfoText(){
         TextView nameTextView = (TextView) findViewById(R.id.tv_username);
         TextView emailTextView = (TextView) findViewById(R.id.tv_user_email);
+        TextView serverTextView = (TextView) findViewById(R.id.tv_server_url);
         nameTextView.setText(username);
         emailTextView.setText(email);
+        serverTextView.setText(serverUrl);
     }
 
 
