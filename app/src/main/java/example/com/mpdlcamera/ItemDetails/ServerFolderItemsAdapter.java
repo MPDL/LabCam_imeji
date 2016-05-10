@@ -20,7 +20,9 @@ import android.widget.ImageView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -73,7 +75,7 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
         return new ViewHolder(view);    }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
 
         //prepare data
         Point size = getPoint();
@@ -86,40 +88,37 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
                 .build();
 
 
+        android.view.ViewGroup.LayoutParams layoutParams = holder.imageView.getLayoutParams();
+        layoutParams.width = (size.x / 2)-6;
+        layoutParams.height = (size.y/4)+5;
+        holder.imageView.setLayoutParams(layoutParams);
+
         //Initialize ImageLoader with configuration.
 //        ImageSize targetSize = new ImageSize(size.x / 2, size.y/3);
-        ImageLoader imageLoader = ImageLoader.getInstance();
+
         ImageLoader.getInstance().init(configuration);
 
 
         //显示图片的配置
         DisplayImageOptions options = new DisplayImageOptions.Builder()
 //                .showImageOnLoading(R.drawable.progress_image)
-                .showImageOnFail(R.drawable.error_alert)
+//                .showImageOnFail(R.drawable.error_alert)
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
 
 
+        ImageLoader.getInstance().loadImage(filePath, options, new SimpleImageLoadingListener() {
 
-        imageLoader.displayImage(filePath, holder.imageView, options);
+            @Override
+            public void onLoadingComplete(String imageUri, View view,
+                                          Bitmap loadedImage) {
+                super.onLoadingComplete(imageUri, view, loadedImage);
+                holder.imageView.setImageBitmap(loadedImage);
+            }
 
-//        Picasso myPicasso = new Picasso.Builder(activity)
-//                .downloader(new camPicassoLoader(activity))
-//                .build();
-//
-//        myPicasso.load(filePath)
-//                .resize(size.x / 2, size.y/3)
-////                .networkPolicy(NetworkPolicy.OFFLINE)
-//                .centerInside()
-//                .error(R.drawable.error_alert).into(holder.imageView);
-
-//        Picasso.with(activity)
-//                .load(filePath)
-//                .networkPolicy(NetworkPolicy.OFFLINE)
-//                .centerInside().resize(size.x/2, size.y/3)
-//                .into(holder.imageView);
+        });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

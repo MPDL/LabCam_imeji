@@ -55,6 +55,46 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
         mPrefs = getActivity().getSharedPreferences("myPref", 0);
         userId =  mPrefs.getString("userId", "");
 
+
+        /** handler observer **/
+        mHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+
+                if(msg.what==1234){
+                    Log.v("~~~", "1234~~~");
+
+                        taskList = DeviceStatus.getUserTasks(userId);
+                        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+                        Task auTask = new Task();
+                        if(taskList==null){
+                            Log.e("handler", "task list is empty");
+                            return;
+                        }
+
+                        // settings not null, auto task exist
+                        if(settings!=null) {
+                            // get autoTask and remove from list
+                            for (Task task : taskList) {
+                                if (task.getUploadMode().equalsIgnoreCase("AU") && !settings.isAutoUpload()) {
+                                    auTask = task;
+                                }
+                                taskList.remove(auTask);
+                            }
+                        }
+
+                        if(taskList!=null){
+                            taskManagerAdapter.notifyDataSetChanged();
+                        }
+                }
+            }
+        };
+        dbObserver = new dbObserver(getActivity(),mHandler);
+        resolver.registerContentObserver(uri, true, dbObserver);
+
+
+
         View view = inflater.inflate(R.layout.fragment_task, container,false);
         //taskManager listview
         taskManagerListView = (ListView) view.findViewById(R.id.listView_task);
@@ -119,34 +159,6 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
 
         mPrefs = getActivity().getSharedPreferences("myPref", 0);
         userId =  mPrefs.getString("userId", "");
-        mHandler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-
-                if(msg.what==1234){
-                    Log.v("~~~", "1234~~~");
-                    try {
-                        taskList = DeviceStatus.getUserTasks(userId);
-                        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
-                        Task auTask = new Task();
-                        for(Task task:taskList){
-                            if(task.getUploadMode().equalsIgnoreCase("AU")&&!settings.isAutoUpload()){
-                                    auTask = task;
-                            }
-                            taskList.remove(auTask);
-                        }
-
-                        if(taskList!=null){
-                            taskManagerAdapter.notifyDataSetChanged();
-                        }
-                    }catch (Exception e){}
-                }
-            }
-        };
-        dbObserver = new dbObserver(getActivity(),mHandler);
-        resolver.registerContentObserver(uri, true, dbObserver);
-
     }
 
     // TODO: Rename method, update argument and hook method into UI event

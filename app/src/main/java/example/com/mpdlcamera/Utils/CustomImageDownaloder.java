@@ -2,6 +2,7 @@ package example.com.mpdlcamera.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 
@@ -20,7 +21,8 @@ public class CustomImageDownaloder extends BaseImageDownloader {
         super(context);
         //user info
         mPrefs = context.getSharedPreferences("myPref", 0);
-        apiKey = mPrefs.getString("apiKey","");
+        apiKey = mPrefs.getString("apiKey", "");
+        Log.e("CustomImageDownaloder",apiKey);
     }
 
     public CustomImageDownaloder(Context context, int connectTimeout, int readTimeout) {

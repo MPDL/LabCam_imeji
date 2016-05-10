@@ -196,22 +196,16 @@ public class TaskUploadService extends Service{
         Log.v(TAG, "startUpload()");
 
         if(!taskIsStopped()) {
-            try {
-                /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
-
                 // search in database, count the number of images that have state = waiting/finished
                 // update the finishedItems number in task
                 waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
                 finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
-                //DELETE TESTING
-                Log.i(TAG, "waitingImages: " + waitingImages.size());
-                Log.i(TAG, "finishedImages "+finishedImages.size());
-                Log.i(TAG, "totalImages: " + task.getTotalItems());
-                task.setFinishedItems(finishedImages.size());
-                task.save();
 
-            } catch (Exception e) {
-            }
+                if(finishedImages==null) {
+                    return;
+                }
+            task.setFinishedItems(finishedImages.size());
+            task.save();
 
             if (waitingImages != null && waitingImages.size() > 0) {
 
@@ -261,14 +255,13 @@ public class TaskUploadService extends Service{
         } catch (Exception e) {
         }
 
-        //DELETE TESTING
-        Log.i(TAG, "finishedImages "+finishedImages.size());
-        Log.i(TAG, "totalImages: " + task.getTotalItems());
+        if(finishedImages==null) {
+            return;
+        }
         task.setFinishedItems(finishedImages.size());
         task.save();
 
-
-            if(!taskIsStopped()){
+        if(!taskIsStopped()){
             //upload image
             String imageState = image.getState();
             String filePath = image.getImagePath();
@@ -317,9 +310,9 @@ public class TaskUploadService extends Service{
                     /** move on to next **/
                     finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
-                    //DELETE TESTING
-                    Log.i(TAG, "finishedImages " + finishedImages.size());
-                    Log.i(TAG, "totalImages: " + task.getTotalItems());
+                   if(finishedImages==null) {
+                       return;
+                   }
                     task.setFinishedItems(finishedImages.size());
                     task.save();
 
@@ -432,10 +425,12 @@ public class TaskUploadService extends Service{
 
                     finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
                     Log.e(TAG, "finishedImages " + finishedImages.size());
-                    task.setFinishedItems(finishedImages.size());
-                    task.save();
 
-
+                if(finishedImages==null) {
+                    return;
+                }
+                task.setFinishedItems(finishedImages.size());
+                task.save();
                     /** move on to next **/
                     int finishedNum = task.getFinishedItems();
                     int totalNum = task.getTotalItems();
