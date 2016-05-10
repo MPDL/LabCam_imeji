@@ -225,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         super.onResume();
         SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(tabAdapter);
+        viewPager.setOffscreenPageLimit(1);
         viewPager.setCurrentItem(currentTab);
 
         //set selected collection name
