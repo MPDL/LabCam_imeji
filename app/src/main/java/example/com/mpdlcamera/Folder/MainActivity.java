@@ -94,7 +94,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     static final int PICK_COLLECTION_REQUEST = 1997;
     // flag
-    private boolean isFirstCollection = false;
+    // no collection selected before
+//    private boolean isFirstCollection = false;
 
     private String email;
     private String username;
@@ -553,8 +554,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     return;
                 }
                 //off to on
-                if (isFirstCollection) {
-                    isFirstCollection = false;
+                Task auTask = new Select().from(Task.class).where("uploadMode = ?","AU").executeSingle();
+
+                if(auTask==null){
+//                if (isFirstCollection) {
+//                    isFirstCollection = false;
                     Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
                     startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
                 }
@@ -757,7 +761,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         @Override
         public void success(ImejiFolder imejiFolder, Response response) {
             Log.v(LOG_TAG, "createCollection_callback success");
-            isFirstCollection = true;
+//            isFirstCollection = true;
 
             /** create autoTask(already deleted old one), set text **
 
