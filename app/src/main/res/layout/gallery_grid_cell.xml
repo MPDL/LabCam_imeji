@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:id="@+id/image_view"
         android:gravity="center"
-        android:scaleType="fitXY"
+        android:scaleType="centerCrop"
         android:layout_gravity="center" />
 
     <ImageView
