@@ -237,6 +237,8 @@ public class ManualUploadThread extends Thread {
                 //DELETE TESTING
                 Log.i(TAG, "finishedImages " + finishedImages.size());
 
+                task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+
                 if(finishedImages==null||task==null) {
                     return;
                 }
@@ -382,6 +384,8 @@ public class ManualUploadThread extends Thread {
             totalNum = allImages.size();
         } catch (Exception e) {
         }
+
+        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
 
         if(finishedImages==null||task==null) {
             return;

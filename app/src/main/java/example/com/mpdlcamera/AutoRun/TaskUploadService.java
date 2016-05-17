@@ -201,6 +201,8 @@ public class TaskUploadService extends Service{
                 waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
                 finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
+            task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+
             if(finishedImages==null||task==null) {
                 return;
             }
@@ -254,6 +256,8 @@ public class TaskUploadService extends Service{
             finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
         } catch (Exception e) {
         }
+
+        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
 
         if(finishedImages==null||task==null) {
             return;
@@ -309,6 +313,8 @@ public class TaskUploadService extends Service{
 
                     /** move on to next **/
                     finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+
+                    task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
 
                     if(finishedImages==null||task==null) {
                         return;
@@ -425,6 +431,8 @@ public class TaskUploadService extends Service{
 
                     finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
                     Log.e(TAG, "finishedImages " + finishedImages.size());
+
+                task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
 
                 if(finishedImages==null||task==null) {
                     return;
