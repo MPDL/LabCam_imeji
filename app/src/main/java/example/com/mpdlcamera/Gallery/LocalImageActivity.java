@@ -193,7 +193,23 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
 
         if (id == R.id.action_select) {
             Log.v(LOG_TAG, "selected");
-
+            // create
+            if(actionMode==null){
+                actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
+                for(int i = 0;i<dataPathList.size();i++){
+                    positionSet.add(i);
+                }
+                if (positionSet.size() == 0) {
+                    // 如果没有选中任何的item，则退出多选模式
+                    Log.e(LOG_TAG, "addOrRemove() is called");
+                    actionMode.finish();
+                } else {
+                    // 设置ActionMode标题
+                    actionMode.setTitle(positionSet.size() + " selected photos");
+                    // 更新列表界面，否则无法显示已选的item
+                }
+                localAlbumAdapter.setPositionSet(positionSet);
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
