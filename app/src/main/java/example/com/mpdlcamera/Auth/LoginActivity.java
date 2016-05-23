@@ -13,10 +13,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
@@ -119,59 +122,29 @@ public class LoginActivity extends AppCompatActivity {
 //        serverURLView.setText(parseServerUrl(serverURL));
         serverURLView.setText(serverURL);
 
+//        passwordView.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+//
+//            @Override
+//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+//                        actionId == EditorInfo.IME_ACTION_DONE ||
+//                        event.getAction() == KeyEvent.ACTION_DOWN &&
+//                                event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+//                    if (!event.isShiftPressed()) {
+//                        // the user is done typing.
+//                        login();
+//                        return true; // consume.
+//                    }
+//                }
+//                return false; // pass on to other listeners.
+//            }
+//        });
+
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                boolean cancel = false;
-                View focusView = null;
-
-                username = usernameView.getText().toString();
-                password = passwordView.getText().toString();
-
-                String url;
-                serverURL = serverURLView.getText().toString();
-
-                /** parse server url **/
-
-//                RetrofitClient.setRestServer(parseServerUrl(serverURL));
-                RetrofitClient.setRestServer(serverURL);
-
-                Log.v(LOG_TAG,serverURL);
-                usernameView.setError(null);
-                passwordView.setError(null);
-
-                // Check for a valid password, if the user entered one.
-                if (TextUtils.isEmpty(username)) {
-                    usernameView.setError(getString(R.string.error_field_required));
-                    focusView = usernameView;
-                    cancel = true;
-                } else if (TextUtils.isEmpty(password)) {
-                    passwordView.setError(getString(R.string.error_field_required));
-                    focusView = passwordView;
-                    cancel = true;
-                }
-
-                if (cancel) {
-                    // There was an error, focus the first form field with an error.
-                    focusView.requestFocus();
-                } else {
-//                    usernameView.setEnabled(false);
-//                    passwordView.setEnabled(false);
-
-                    mPrefs = getSharedPreferences("myPref", 0);
-                    SharedPreferences.Editor mEditor = mPrefs.edit();
-                    mEditor.putString("username", username).apply();
-                    mEditor.putString("password", password).apply();
-                    mEditor.putString("server", serverURL).apply();
-                    SharedPreferences preferences = getSharedPreferences("folder", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor ed = preferences.edit();
-                    ed.putString("Camera", "On");
-                    ed.commit();
-//                    DeviceStatus.showSnackbar(rootView, "Login Successfully");
-                    RetrofitClient.login(username,password,callback_login);
-                }
-
+                login();
 
             }
         });
@@ -184,6 +157,58 @@ public class LoginActivity extends AppCompatActivity {
                 startActivityForResult(intent, INTENT_QR);
             }
         });
+
+    }
+
+    private void login(){
+        boolean cancel = false;
+        View focusView = null;
+
+        username = usernameView.getText().toString();
+        password = passwordView.getText().toString();
+
+        String url;
+        serverURL = serverURLView.getText().toString();
+
+        /** parse server url **/
+
+//                RetrofitClient.setRestServer(parseServerUrl(serverURL));
+        RetrofitClient.setRestServer(serverURL);
+
+        Log.v(LOG_TAG,serverURL);
+        usernameView.setError(null);
+        passwordView.setError(null);
+
+        // Check for a valid password, if the user entered one.
+        if (TextUtils.isEmpty(username)) {
+            usernameView.setError(getString(R.string.error_field_required));
+            focusView = usernameView;
+            cancel = true;
+        } else if (TextUtils.isEmpty(password)) {
+            passwordView.setError(getString(R.string.error_field_required));
+            focusView = passwordView;
+            cancel = true;
+        }
+
+        if (cancel) {
+            // There was an error, focus the first form field with an error.
+            focusView.requestFocus();
+        } else {
+//                    usernameView.setEnabled(false);
+//                    passwordView.setEnabled(false);
+
+            mPrefs = getSharedPreferences("myPref", 0);
+            SharedPreferences.Editor mEditor = mPrefs.edit();
+            mEditor.putString("username", username).apply();
+            mEditor.putString("password", password).apply();
+            mEditor.putString("server", serverURL).apply();
+            SharedPreferences preferences = getSharedPreferences("folder", Context.MODE_PRIVATE);
+            SharedPreferences.Editor ed = preferences.edit();
+            ed.putString("Camera", "On");
+            ed.commit();
+//                    DeviceStatus.showSnackbar(rootView, "Login Successfully");
+            RetrofitClient.login(username,password,callback_login);
+        }
 
     }
 
