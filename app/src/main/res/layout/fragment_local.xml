@@ -8,7 +8,8 @@
     <!--label_album-->
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
         android:id="@+id/label_album"
@@ -17,7 +18,8 @@
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center"
         android:layout_toLeftOf="@id/label_album"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
@@ -27,15 +29,13 @@
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:gravity="center"
         android:layout_toLeftOf="@id/label_or"
         android:id="@+id/label_date"
         android:text="Date"
         android:textColor="@color/primary"
         android:textSize="20dp"/>
-
-
-
 
 
     <!-- TODO: Update blank fragment layout -->
@@ -45,6 +45,7 @@
         android:id="@+id/gallery_gridView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:layout_below="@id/label_date"
         android:numColumns="2"
         android:verticalSpacing="0dp"
