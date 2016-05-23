@@ -206,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
                     Log.v("col",url);
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(activity,QRText,Toast.LENGTH_LONG).show();
+                    Toast.makeText(activity,"parse qrCode failed, please scan again",Toast.LENGTH_LONG).show();
                     return;
                 }
 
