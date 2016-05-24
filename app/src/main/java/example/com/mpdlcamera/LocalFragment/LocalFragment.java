@@ -687,6 +687,10 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         super.onResume();
         /** remember the date/timeLine option **/
         isAlbum = mPrefs.getBoolean("isAlbum",isAlbum);
+
+        renderTimeLine();
+        loadTimeLinePicture();
+
         if(isAlbum) {
             dateLabel.setTextColor(getResources().getColor(R.color.lightGrey));
             albumLabel.setTextColor(getResources().getColor(R.color.primary));

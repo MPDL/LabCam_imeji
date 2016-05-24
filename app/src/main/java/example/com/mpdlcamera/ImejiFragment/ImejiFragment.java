@@ -77,7 +77,7 @@ public class ImejiFragment extends Fragment {
     private String APIKey;
     private SharedPreferences mPrefs;
 
-    private ProgressDialog pDialog;
+//    private ProgressDialog pDialog;
 
     private FolderListAdapter adapter;
     private ListView listView;
@@ -266,9 +266,9 @@ public class ImejiFragment extends Fragment {
     }
 
     private void updateFolder(){
-        pDialog = new ProgressDialog(getActivity());
-        pDialog.setMessage("Loading...");
-        pDialog.show();
+//        pDialog = new ProgressDialog(getActivity());
+//        pDialog.setMessage("Loading...");
+//        pDialog.show();
 //        RetrofitClient.getCollections(callback, username, password);
         RetrofitClient.getCollections(callback_collection, APIKey);
     }
@@ -377,9 +377,9 @@ public class ImejiFragment extends Fragment {
                 //folder.save();
             }
 
-            if(pDialog != null) {
-                pDialog.hide();
-            }
+//            if(pDialog != null) {
+//                pDialog.hide();
+//            }
         }
 
         @Override
