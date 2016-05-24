@@ -314,7 +314,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
        String path_DCIM = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
        Log.i("DCIM path_DCIM:",path_DCIM);
 
-
     }
 
     boolean doubleBackToExitPressedOnce = false;

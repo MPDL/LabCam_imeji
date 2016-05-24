@@ -50,17 +50,29 @@
             android:id="@+id/settings_remote_listView"
             android:layout_below="@id/im_qr_scan"/>
 
+    <!--<Button-->
+        <!--android:layout_width="80dp"-->
+        <!--android:layout_marginLeft="10dp"-->
+        <!--android:layout_marginRight="10dp"-->
+        <!--android:layout_marginTop="40dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:id="@+id/save_collection"-->
+        <!--android:background="@color/primary"-->
+        <!--android:text="save"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:layout_below="@id/settings_remote_listView"-->
+        <!--android:layout_alignParentRight="true"/>-->
+
+
     <Button
-        android:layout_width="80dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="40dp"
-        android:layout_height="40dp"
-        android:id="@+id/save_collection"
-        android:background="@color/primary"
+        android:layout_width="fill_parent"
+        android:layout_height="53dp"
         android:text="save"
         android:textColor="@color/white"
-        android:layout_below="@id/settings_remote_listView"
-        android:layout_alignParentRight="true"/>
+        android:background="@color/primary"
+        android:textSize="17dp"
+        android:id="@+id/save_collection"
+        android:layout_alignParentBottom="true"/>
+
 
 </RelativeLayout>
