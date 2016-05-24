@@ -95,7 +95,7 @@ public class DeviceStatus {
     }
 
     public enum state{
-        WAITING, STARTED, STOPPED, INTERRUPTED, FINISHED
+        WAITING, STARTED, STOPPED, INTERRUPTED, FAILED,FINISHED
     }
 
     //get latest task (sometimes its not right need to distinguish Au Mu)

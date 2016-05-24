@@ -54,6 +54,10 @@ public class FolderListAdapter extends BaseAdapter {
         this.activity = activity;
         this.folderItems = folderItems;
 
+        if(activity==null){
+            return;
+        }
+
         mPrefs = activity.getSharedPreferences("myPref", 0);
         apiKey = mPrefs.getString("apiKey","");
 

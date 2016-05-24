@@ -18,6 +18,7 @@ import com.activeandroid.query.Select;
 import com.squareup.otto.Produce;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
@@ -51,6 +52,7 @@ public class TaskUploadService extends Service{
 
     // Images
     List<Image> waitingImages = null;
+    List<Image> failedImages = null;
     List<Image>  finishedImages = null;
 
     private SharedPreferences mPrefs;
@@ -108,6 +110,11 @@ public class TaskUploadService extends Service{
                     task =  DeviceStatus.getAuTask(userId);
                     // set currentTask id
                     currentTaskId = task.getTaskId();
+
+                    if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+                        return;
+                    }
+
                     Log.i(TAG, "currentTaskId" + currentTaskId);
                     finishedNum = task.getFinishedItems();
                     Log.v(TAG,"onCreate getFinishedItems: "+finishedNum);
@@ -141,6 +148,10 @@ public class TaskUploadService extends Service{
             //set task
             try{
                 task =  DeviceStatus.getAuTask(userId);
+
+                if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+                    return super.onStartCommand(intent, flags, startId);
+                }
                 //set currentTaskId
                 currentTaskId = task.getTaskId();
                 Log.i(TAG, "currentTaskId: " + currentTaskId);
@@ -198,18 +209,29 @@ public class TaskUploadService extends Service{
         if(!taskIsStopped()) {
                 // search in database, count the number of images that have state = waiting/finished
                 // update the finishedItems number in task
-                waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
-                finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+            waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
+            failedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FAILED)).orderBy("RANDOM()").execute();
+            finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
             task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+
+            // joinList is a list join waiting and failed
+            List<Image> joinList = new ArrayList<>();
+            joinList.addAll(waitingImages);
+            joinList.addAll(failedImages);
 
             if(finishedImages==null||task==null) {
                 return;
             }
+
+            if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+                return;
+            }
+
             task.setFinishedItems(finishedImages.size());
             task.save();
 
-            if (waitingImages != null && waitingImages.size() > 0) {
+            if (joinList != null && joinList.size() > 0) {
 
                 // look into database, get first image of a task in create time desc order
                 // upload begin with the first in list
@@ -239,8 +261,9 @@ public class TaskUploadService extends Service{
                     Log.e(TAG, "TO remote :"+collectionID + "from local:"+ filePath);
                     Log.e(TAG, "==> step 3");
 
-//                    image.setState(String.valueOf(DeviceStatus.state.STARTED));
+                    // image set state stated
                     RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+                    image.setState(String.valueOf(DeviceStatus.state.STARTED));
 
                 } else {
                     // TODO: consider more than one state
@@ -262,6 +285,12 @@ public class TaskUploadService extends Service{
         if(finishedImages==null||task==null) {
             return;
         }
+
+        // Failed task ignore
+        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+            return;
+        }
+
         task.setFinishedItems(finishedImages.size());
         task.save();
 
@@ -281,8 +310,10 @@ public class TaskUploadService extends Service{
                 typedFile = new TypedFile("multipart/form-data", new File(filePath));
                 json = "{" + jsonPart1 + "}";
                 Log.v(TAG, "start uploading: " + filePath);
-//                image.setState(String.valueOf(DeviceStatus.state.STARTED));
+
                 RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+                image.setState(String.valueOf(DeviceStatus.state.STARTED));
+
             }
         }
     }
@@ -295,69 +326,76 @@ public class TaskUploadService extends Service{
             Log.e(TAG, "currentImageId: "+currentImageId);
             Log.e(TAG, "upload success");
 
-            if(!taskIsStopped()) {
+            if(taskIsStopped()) {
+               return;
+            }
 
-                Log.e(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
+            Log.e(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
-                Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
-                if (currentImage == null) {
-                    Log.v(TAG, currentImageId + "is not in database, task might be resumed");
-                    // task is deleted/resumed so break and left callback
-                } else {
-                    // set image state finished
-                    currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                    currentImage.save();
+            Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
+            if (currentImage == null) {
+                Log.v(TAG, currentImageId + "is not in database, task might be resumed");
+                // task is deleted/resumed so break and left callback
+            } else {
+                // set image state finished
+                currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                currentImage.save();
 
-                    //TODO: ReWrite "remove after upload" function later
-                    mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
+                //TODO: ReWrite "remove after upload" function later
+                mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
-                    /** move on to next **/
-                    finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+                /** move on to next **/
+                finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
-                    task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+                task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
 
-                    if(finishedImages==null||task==null) {
-                        return;
+                if(finishedImages==null||task==null) {
+                    return;
+                }
+
+                // Failed task ignore
+                if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+                    return;
+                }
+
+                task.setFinishedItems(finishedImages.size());
+                task.save();
+
+                int finishedNum = finishedImages.size();
+                int totalNum = task.getTotalItems();
+
+                Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
+                if (totalNum > finishedNum) {
+                    Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
+                    if (image != null) {
+                        upload(image);
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+                                // Actions to do after 3 seconds
+                            }
+                        }, 3000);
                     }
-                    task.setFinishedItems(finishedImages.size());
+                } else {
+                    /** delete finished tasks before reset Au task **/
+                    new Delete().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
+
+                    task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                    task.setTotalItems(0);
+                    task.setFinishedItems(0);
                     task.save();
 
-                    int finishedNum = finishedImages.size();
-                    int totalNum = task.getTotalItems();
-
-                    Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
-                    if (totalNum > finishedNum) {
-                        Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
-                        if (image != null) {
-                            upload(image);
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                public void run() {
-                                    // Actions to do after 3 seconds
-                                }
-                            }, 3000);
-                        }
-                    } else {
-                        /** delete finished tasks before reset Au task **/
-                        new Delete().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
-
-                        task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                        task.setTotalItems(0);
-                        task.setFinishedItems(0);
-                        task.save();
-
-                        Log.e(TAG, "getTotalItems:" + task.getTotalItems());
-                        Log.e(TAG, "getFinishedItems:" + task.getFinishedItems());
+                    Log.e(TAG, "getTotalItems:" + task.getTotalItems());
+                    Log.e(TAG, "getFinishedItems:" + task.getFinishedItems());
 
 
-                        handler.post(new Runnable() {
-                            public void run() {
+                    handler.post(new Runnable() {
+                        public void run() {
 //                                Toast.makeText(activity, "Auto Task Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        }
+                    });
 
-                        Log.e(TAG, "task finished");
-                    }
+                    Log.e(TAG, "task finished");
                 }
             }
         }
@@ -368,15 +406,19 @@ public class TaskUploadService extends Service{
             Log.e(TAG, "currentImageId: "+currentImageId);
             Log.e(TAG, "upload failure");
 
-//            if(error.getResponse().getStatus() == 403 || error.getResponse().getStatus() == 422 ) {
-//                task.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
-//                task.save();
-//                Log.e(TAG,task.getState());
-//                isInterrupted = true;
-//            }
+            if(error.getResponse().getStatus() == 403 || error.getResponse().getStatus() == 422 ) {
+                task.setState(String.valueOf(DeviceStatus.state.FAILED));
+                task.save();
+                Log.e(TAG,task.getState());
+                return;
+            }
 
 
-            if (!taskIsStopped()) {
+            if (taskIsStopped()) {
+                Log.e(TAG,"task is stopped");
+                return;
+            }
+
                 /** get currentImage by currentImageId
                  *  Image can be any state
                  * **/
@@ -384,6 +426,7 @@ public class TaskUploadService extends Service{
                 //TODO:what to do with interrupted
                 if(currentImage!=null){
                     //do sth
+                    currentImage.setState(String.valueOf(DeviceStatus.state.FAILED));
                 }else {
                     Log.v(TAG,"currentImage:"+ currentImageId+ "is null");
                     return;
@@ -445,7 +488,7 @@ public class TaskUploadService extends Service{
                     Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
                     if (totalNum > finishedNum) {
                         // continue anyway
-                        Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
+                        Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
                         if (image != null) {
                             upload(image);
                         }
@@ -453,10 +496,7 @@ public class TaskUploadService extends Service{
 //                        task.setState(String.valueOf(DeviceStatus.state.FINISHED));
                         Log.i(TAG, "task finished");
                     }
-            } else {
-                Log.e(TAG,"task is stopped");
             }
-        }
     };
 
 

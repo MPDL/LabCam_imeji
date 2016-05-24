@@ -62,8 +62,8 @@ public class ManualUploadThread extends Thread {
         super("ManualUploadThread");
         this.context = context;
         this.currentTaskId = currentTaskId;
-
     }
+
     public void run() {
         //Code
         Log.i(TAG,"Thread --> startUpload()");
@@ -77,6 +77,12 @@ public class ManualUploadThread extends Thread {
             Log.v(TAG, task.getState());
 
             task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+
+            // set task failed
+            if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+                return;
+            }
+
             //prepare collectionId
             collectionID =task.getCollectionId();
 
