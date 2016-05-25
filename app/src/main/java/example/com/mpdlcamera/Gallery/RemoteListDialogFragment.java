@@ -243,7 +243,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                     JSONObject jsonObject = new JSONObject(QRText);
                     APIkey = jsonObject.getString("key");
                     Log.v("APIkey",APIkey);
-                    if(APIkey!= apiKey){
+                    if(!apiKey.equals(APIkey)){
                         Toast.makeText(activity,"this folder doesn't look like yours",Toast.LENGTH_LONG).show();
                         return;
                     }
