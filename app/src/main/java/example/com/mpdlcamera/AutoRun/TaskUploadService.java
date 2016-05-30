@@ -17,12 +17,16 @@ import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.squareup.otto.Produce;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.LocalModel.Image;
+import example.com.mpdlcamera.Model.LocalModel.LocalAlbum;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
@@ -33,6 +37,7 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import retrofit.mime.TypedByteArray;
 import retrofit.mime.TypedFile;
+import retrofit.mime.TypedInput;
 
 /**
  * Created by yingli on 1/26/16.
@@ -111,6 +116,7 @@ public class TaskUploadService extends Service{
                     // set currentTask id
                     currentTaskId = task.getTaskId();
 
+                    // task already failed
                     if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
                         return;
                     }
@@ -220,6 +226,7 @@ public class TaskUploadService extends Service{
             joinList.addAll(waitingImages);
             joinList.addAll(failedImages);
 
+            // task not exist
             if(finishedImages==null||task==null) {
                 return;
             }
@@ -274,48 +281,28 @@ public class TaskUploadService extends Service{
     }
     private void upload(Image image){
 
-        try {
-            /** WAITING, INTERRUPTED, STARTED, (FINISHED + STOPPED) **/
-            finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
-        } catch (Exception e) {
-        }
-
-        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
-
-        if(finishedImages==null||task==null) {
-            return;
-        }
-
-        // Failed task ignore
-        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
-            return;
-        }
-
-        task.setFinishedItems(finishedImages.size());
-        task.save();
-
         if(!taskIsStopped()){
-            //upload image
-            String imageState = image.getState();
-            String filePath = image.getImagePath();
-            currentImageId = image.getImageId();
-            Log.e(TAG, "upload" + currentImageId);
-
-            if (imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
-                // TODO:upload image
-                String jsonPart1 = "\"collectionId\" : \"" +
-                        collectionID +
-                        "\"";
-
-                typedFile = new TypedFile("multipart/form-data", new File(filePath));
-                json = "{" + jsonPart1 + "}";
-                Log.v(TAG, "start uploading: " + filePath);
-
-                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
-                image.setState(String.valueOf(DeviceStatus.state.STARTED));
-
-            }
+            return;
         }
+
+        // prepare image
+        String imageState = image.getState();
+        String filePath = image.getImagePath();
+        currentImageId = image.getImageId();
+        Log.e(TAG, "upload" + currentImageId);
+
+        // upload image
+        String jsonPart1 = "\"collectionId\" : \"" +
+                collectionID +
+                "\"";
+
+        typedFile = new TypedFile("multipart/form-data", new File(filePath));
+        json = "{" + jsonPart1 + "}";
+        Log.v(TAG, "start uploading: " + filePath);
+
+        RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+        image.setState(String.valueOf(DeviceStatus.state.STARTED));
+
     }
 
     //callback
@@ -325,10 +312,7 @@ public class TaskUploadService extends Service{
         public void success(DataItem dataItem, Response response) {
             Log.e(TAG, "currentImageId: "+currentImageId);
             Log.e(TAG, "upload success");
-
-            if(taskIsStopped()) {
-               return;
-            }
+            Log.e(TAG,"collection:"+ collectionID);
 
             Log.e(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
@@ -336,67 +320,57 @@ public class TaskUploadService extends Service{
             if (currentImage == null) {
                 Log.v(TAG, currentImageId + "is not in database, task might be resumed");
                 // task is deleted/resumed so break and left callback
+                return;
+            }
+            // set image state finished
+            currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
+            currentImage.save();
+
+            mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
+
+            finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+
+            task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+
+            if(finishedImages==null||task==null) {
+                return;
+            }
+
+            task.setFinishedItems(finishedImages.size());
+            task.save();
+
+            /** move on to next **/
+            if(taskIsStopped()) {
+                return;
+            }
+
+            // Failed task ignore
+            if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+                return;
+            }
+
+            int finishedNum = finishedImages.size();
+            int totalNum = task.getTotalItems();
+
+            Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
+            if (totalNum > finishedNum) {
+                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
+                if (image != null) {
+                    upload(image);
+                }
             } else {
-                // set image state finished
-                currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                currentImage.save();
+                /** delete finished tasks before reset Au task **/
+                new Delete().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
 
-                //TODO: ReWrite "remove after upload" function later
-                mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
-
-                /** move on to next **/
-                finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
-
-                task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
-
-                if(finishedImages==null||task==null) {
-                    return;
-                }
-
-                // Failed task ignore
-                if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
-                    return;
-                }
-
-                task.setFinishedItems(finishedImages.size());
+                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                task.setTotalItems(0);
+                task.setFinishedItems(0);
                 task.save();
 
-                int finishedNum = finishedImages.size();
-                int totalNum = task.getTotalItems();
+                Log.e(TAG, "getTotalItems:" + task.getTotalItems());
+                Log.e(TAG, "getFinishedItems:" + task.getFinishedItems());
 
-                Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
-                if (totalNum > finishedNum) {
-                    Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
-                    if (image != null) {
-                        upload(image);
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            public void run() {
-                                // Actions to do after 3 seconds
-                            }
-                        }, 3000);
-                    }
-                } else {
-                    /** delete finished tasks before reset Au task **/
-                    new Delete().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
-
-                    task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                    task.setTotalItems(0);
-                    task.setFinishedItems(0);
-                    task.save();
-
-                    Log.e(TAG, "getTotalItems:" + task.getTotalItems());
-                    Log.e(TAG, "getFinishedItems:" + task.getFinishedItems());
-
-
-                    handler.post(new Runnable() {
-                        public void run() {
-//                                Toast.makeText(activity, "Auto Task Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    Log.e(TAG, "task finished");
-                }
+                Log.e(TAG, "task finished");
             }
         }
 
@@ -405,13 +379,88 @@ public class TaskUploadService extends Service{
 
             Log.e(TAG, "currentImageId: "+currentImageId);
             Log.e(TAG, "upload failure");
+            Log.e(TAG,"collection:"+ collectionID);
 
-            if(error.getResponse().getStatus() == 403 || error.getResponse().getStatus() == 422 ) {
-                task.setState(String.valueOf(DeviceStatus.state.FAILED));
-                task.save();
-                Log.e(TAG,task.getState());
+            /** get currentImage by currentImageId
+             *  Image can be any state
+             * **/
+            Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
+            //TODO:what to do with interrupted
+            if(currentImage!=null){
+                //do sth
+                currentImage.setState(String.valueOf(DeviceStatus.state.FAILED));
+            }else {
+                Log.v(TAG,"currentImage:"+ currentImageId+ "is null");
                 return;
             }
+
+            // error kinds: "network", 403, 422, other
+            if (error == null || error.getResponse() == null) {
+                OttoSingleton.getInstance().post(new UploadEvent(null));
+                if (error.getKind().name().equalsIgnoreCase("NETWORK")) {
+                    Log.e(TAG,"network error");
+                } else {
+                    // error == null, but it is not network error
+                }
+            } else {
+                OttoSingleton.getInstance().post(
+                        new UploadEvent(error.getResponse().getStatus()));
+
+                int statusCode = error.getResponse().getStatus();
+                switch (statusCode){
+                    case 403:
+                        // set TASK state failed, print log
+                        try{
+                            task.setState(String.valueOf(DeviceStatus.state.FAILED));
+                            task.save();
+                            Log.e(TAG, collectionID + "forbidden");
+                        }catch (Exception e){}
+                        break;
+                    case 422:
+                        String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
+                        if (jsonBody.contains("already exists")) {
+                            // set currentImage state finished, print log
+                            try{
+                                currentImage.setLog(error.getKind().name() + " already exists");
+                                currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                                currentImage.save();
+                                Log.e(TAG, currentImage.getImageName() + "  already exists");
+                            }catch (Exception e){}
+                        }else {
+                            // case: collectionId not exist, Task failed
+                            try {
+                                currentImage.setLog(error.getKind().name() + " collectionId not exist, no such folder");
+                                task.setState(String.valueOf(DeviceStatus.state.FAILED));
+                                task.save();
+                                Log.e(TAG, currentImage.getImageName() + " collectionId not exist, no such folder");
+                            }catch (Exception e){}
+                        }
+                        break;
+                    default:
+                        // 400 401 500 ...
+                        // set currentImage state finished, print log
+                        try{
+                            currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                            currentImage.save();
+                        }catch (Exception e){}
+                        Log.e(TAG, currentImage.getImageName() + "failed, code: "+ statusCode);
+                }
+            }
+            // save state changes
+            currentImage.save();
+            Log.v(TAG, String.valueOf(error));
+
+            //TODO: continue upload
+            finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+            Log.e(TAG, "finishedImages " + finishedImages.size());
+
+            task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+
+            if(finishedImages==null||task==null) {
+                return;
+            }
+            task.setFinishedItems(finishedImages.size());
+            task.save();
 
 
             if (taskIsStopped()) {
@@ -419,85 +468,18 @@ public class TaskUploadService extends Service{
                 return;
             }
 
-                /** get currentImage by currentImageId
-                 *  Image can be any state
-                 * **/
-                Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
-                //TODO:what to do with interrupted
-                if(currentImage!=null){
-                    //do sth
-                    currentImage.setState(String.valueOf(DeviceStatus.state.FAILED));
-                }else {
-                    Log.v(TAG,"currentImage:"+ currentImageId+ "is null");
-                    return;
+            /** move on to next **/
+            int finishedNum = task.getFinishedItems();
+            int totalNum = task.getTotalItems();
+            if (totalNum > finishedNum) {
+                // continue anyway
+                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
+                if (image != null) {
+                    upload(image);
                 }
-
-//                    currentImage.setState(String.valueOf(DeviceStatus.state.INTERRUPTED));
-//                    currentImage.setLog(error.getKind().name());
-//                    Log.e(TAG, error.getKind().name());
-
-
-                if (error == null || error.getResponse() == null) {
-                    OttoSingleton.getInstance().post(new UploadEvent(null));
-                    if (error.getKind().name().equalsIgnoreCase("NETWORK")) {
-
-                // NETWORK disconnect situation don't need to change image state
-                        Log.v(TAG,"network error");
-
-                    } else {
-                        /** error == null, but it is not network error **/
-                    }
-                } else {
-                    OttoSingleton.getInstance().post(
-                            new UploadEvent(error.getResponse().getStatus()));
-                    String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
-                    if (jsonBody.contains("already exists")) {
-
-                        Log.e(TAG, currentImage.getImageName() + "  already exists");
-
-                        try{
-                        currentImage.setLog(error.getKind().name() + " already exists");
-                        currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                        currentImage.save();}catch (Exception e){}
-
-                    } else {
-
-                       Log.e(TAG,"failed");
-                    }
-                }
-                // save state changes
-                currentImage.save();
-                Log.v(TAG, String.valueOf(error));
-
-                //TODO: continue upload
-
-
-                    finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
-                    Log.e(TAG, "finishedImages " + finishedImages.size());
-
-                task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
-
-                if(finishedImages==null||task==null) {
-                    return;
-                }
-                task.setFinishedItems(finishedImages.size());
-                task.save();
-                    /** move on to next **/
-                    int finishedNum = task.getFinishedItems();
-                    int totalNum = task.getTotalItems();
-                    Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
-                    if (totalNum > finishedNum) {
-                        // continue anyway
-                        Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
-                        if (image != null) {
-                            upload(image);
-                        }
-                    } else {
-//                        task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                        Log.i(TAG, "task finished");
-                    }
+            } else {
+                Log.i(TAG, "task finished");
             }
+        }
     };
-
-
 }
