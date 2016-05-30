@@ -312,7 +312,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                 try {
                     JSONObject jsonObject = new JSONObject(QRText);
                     APIkey = jsonObject.getString("key");
-                    if(APIkey!= apiKey){
+                    if(!apiKey.equals(APIkey)){
                         Toast.makeText(activity,"this folder doesn't look like yours",Toast.LENGTH_LONG).show();
                         return;
                     }
