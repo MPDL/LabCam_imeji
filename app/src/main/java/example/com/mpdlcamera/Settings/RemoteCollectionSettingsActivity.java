@@ -431,6 +431,9 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                 }else if(i == 1){
                                     // new collection selected
                                     // change totalNum of old task
+                                    //TODO: handle change folder during uploading
+//                                    List<Image> startedImage = new Select().from(Image.class).where()
+//                                    String finishedImageNum = new S
                                     latestTask.setTotalItems(latestTask.getFinishedItems());
                                     latestTask.setState(String.valueOf(DeviceStatus.state.WAITING));
                                     latestTask.save();

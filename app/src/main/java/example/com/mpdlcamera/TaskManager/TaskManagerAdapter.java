@@ -52,8 +52,8 @@ public class TaskManagerAdapter extends BaseAdapter {
     static final int MU_FINISH = 2003;
 
     // interrupt (collectionID not exist)
-    static final int AU_INTERRUPT = 3001;
-    static final int MU_INTERRUPT = 3002;
+    static final int AU_FAILED = 3001;
+    static final int MU_FAILED = 3002;
 
     public TaskManagerAdapter() {
     }
@@ -156,11 +156,11 @@ public class TaskManagerAdapter extends BaseAdapter {
 
 
         //collection error
-        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.INTERRUPTED))){
+        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
             if(task.getUploadMode().equalsIgnoreCase("AU")){
-            phrase = AU_INTERRUPT;
+            phrase = AU_FAILED;
             }else {
-                phrase = MU_INTERRUPT;
+                phrase = MU_FAILED;
             }
         }
 
@@ -218,22 +218,33 @@ public class TaskManagerAdapter extends BaseAdapter {
                 Log.v(TAG, "MU_FINISH");
                 break;
 
-            case AU_INTERRUPT:
+            case AU_FAILED:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.GONE);
                 clearButton.setVisibility(View.VISIBLE);
                 errorLayout.setVisibility(View.VISIBLE);
                 //error
-
-                Log.v(TAG, "AU_INTERRUPT");
+                clearButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        deleteTask(task, position);
+                    }
+                });
+                Log.v(TAG, "AU_FAILED");
 
                 break;
-            case MU_INTERRUPT:
+            case MU_FAILED:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.GONE);
                 clearButton.setVisibility(View.VISIBLE);
                 errorLayout.setVisibility(View.VISIBLE);
-                Log.v(TAG, "MU_INTERRUPT");
+                clearButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        deleteTask(task, position);
+                    }
+                });
+                Log.v(TAG, "MU_FAILED");
                 break;
 
         }
@@ -414,7 +425,7 @@ public class TaskManagerAdapter extends BaseAdapter {
     private void deleteTask(Task task,int position){
         String currentTaskId = task.getTaskId();
         new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
-        Log.v(TAG, "task delete clicked");
+        Log.e(TAG, "task delete clicked");
         //TODO: delete from data list
         removeTaskInterface.remove(position);
         taskList.remove(task);

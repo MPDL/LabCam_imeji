@@ -15,6 +15,7 @@ import android.widget.ListView;
 
 import com.activeandroid.query.Select;
 
+import java.util.Iterator;
 import java.util.List;
 
 import example.com.mpdlcamera.AutoRun.TaskUploadService;
@@ -75,10 +76,12 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
 
                         // settings not null, auto task exist
                         if(settings!=null) {
+
                             // get autoTask and remove from list
-                            for (Task task : taskList) {
-                                if (task.getUploadMode().equalsIgnoreCase("AU") && !settings.isAutoUpload()) {
-                                    auTask = task;
+                            Iterator<Task> taskIterator = taskList.iterator();
+                            while (taskIterator.hasNext()) {
+                                if (taskIterator.next().getUploadMode().equalsIgnoreCase("AU") && !settings.isAutoUpload()) {
+                                    auTask = taskIterator.next();
                                 }
                                 taskList.remove(auTask);
                             }
