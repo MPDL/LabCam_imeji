@@ -396,7 +396,6 @@ public class TaskUploadService extends Service{
                 if (error.getKind().name().equalsIgnoreCase("NETWORK")) {
                     Log.e(TAG,"network error");
                 } else {
-                    // error == null, but it is not network error
                 }
             } else {
                 OttoSingleton.getInstance().post(

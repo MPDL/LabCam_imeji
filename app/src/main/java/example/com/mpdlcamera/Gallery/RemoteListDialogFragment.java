@@ -101,7 +101,13 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                 .setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-
+                                if(collectionId==null || collectionId.equalsIgnoreCase("")){
+                                    Log.e(LOG_TAG,"collectionId is null or empty");
+                                    //delete task (created earlier)
+                                    new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
+                                    dialog.dismiss();
+                                    return;
+                                }
                                 setMUCollection();
                             }
                         }
@@ -109,8 +115,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                //delete task
-
+                                //delete task (created earlier)
                                 new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
                                 dialog.dismiss();
                             }
