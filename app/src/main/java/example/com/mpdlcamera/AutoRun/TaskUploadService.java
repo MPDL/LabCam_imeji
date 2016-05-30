@@ -103,42 +103,42 @@ public class TaskUploadService extends Service{
 
                 Log.v(TAG, "TaskUploadService onCreate!");
 
-                // prepare auth for upload
-                mPrefs = this.getSharedPreferences("myPref", 0);
-                username = mPrefs.getString("username", "");
-                apiKey = mPrefs.getString("apiKey", "");
-                userId = mPrefs.getString("userId", "");
-
-                //set task
-                try{
-                    // AuTask can not be more than 1 (<=1)
-                    task =  DeviceStatus.getAuTask(userId);
-                    // set currentTask id
-                    currentTaskId = task.getTaskId();
-
-                    // task already failed
-                    if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
-                        return;
-                    }
-
-                    Log.i(TAG, "currentTaskId" + currentTaskId);
-                    finishedNum = task.getFinishedItems();
-                    Log.v(TAG,"onCreate getFinishedItems: "+finishedNum);
-                }
-                catch (Exception e){
-                    // no task or exception in query
-                    Log.v(TAG,"no task or exception in query");
-                }
-                // set collectionId
-                if(task!=null) {
-                    collectionID = task.getCollectionId();
-                    Log.v(TAG+"onCreate","collectionID set");
-                }else{
-                    Log.v(TAG,"mTask is null, can't get collectionID");
-                    return;
-                }
-                // task exist,then start task
-                startUpload();
+//                // prepare auth for upload
+//                mPrefs = this.getSharedPreferences("myPref", 0);
+//                username = mPrefs.getString("username", "");
+//                apiKey = mPrefs.getString("apiKey", "");
+//                userId = mPrefs.getString("userId", "");
+//
+//                //set task
+//                try{
+//                    // AuTask can not be more than 1 (<=1)
+//                    task =  DeviceStatus.getAuTask(userId);
+//                    // set currentTask id
+//                    currentTaskId = task.getTaskId();
+//
+//                    // task already failed
+//                    if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+//                        return;
+//                    }
+//
+//                    Log.i(TAG, "currentTaskId" + currentTaskId);
+//                    finishedNum = task.getFinishedItems();
+//                    Log.v(TAG,"onCreate getFinishedItems: "+finishedNum);
+//                }
+//                catch (Exception e){
+//                    // no task or exception in query
+//                    Log.v(TAG,"no task or exception in query");
+//                }
+//                // set collectionId
+//                if(task!=null) {
+//                    collectionID = task.getCollectionId();
+//                    Log.v(TAG+"onCreate","collectionID set");
+//                }else{
+//                    Log.v(TAG,"mTask is null, can't get collectionID");
+//                    return;
+//                }
+//                // task exist,then start task
+//                startUpload();
             }
 
     @Override
@@ -150,6 +150,7 @@ public class TaskUploadService extends Service{
             mPrefs = this.getSharedPreferences("myPref", 0);
             username = mPrefs.getString("username", "");
             apiKey = mPrefs.getString("apiKey", "");
+            userId = mPrefs.getString("userId", "");
 
             //set task
             try{
@@ -242,7 +243,7 @@ public class TaskUploadService extends Service{
 
                 // look into database, get first image of a task in create time desc order
                 // upload begin with the first in list
-                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("createTime DESC").executeSingle();
+                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?", String.valueOf(DeviceStatus.state.FINISHED)).where("state != ?", String.valueOf(DeviceStatus.state.STARTED)).orderBy("createTime DESC").executeSingle();
                 String imageState = image.getState();
                 String filePath = image.getImagePath();
                 // important: set currentImageId, so that in the callback can find it
@@ -255,27 +256,22 @@ public class TaskUploadService extends Service{
                 Log.e(TAG, "createTime: "+ image.getCreateTime());
                 Log.e(TAG, "==> step 2");
 
-                // double check state, not have to..
-                if (imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
-                    // TODO:upload image
-                    String jsonPart1 = "\"collectionId\" : \"" +
-                            collectionID +
-                            "\"";
 
-                    typedFile = new TypedFile("multipart/form-data", new File(filePath));
-                    json = "{" + jsonPart1 + "}";
-                    Log.e(TAG, "start uploading~ " + filePath);
-                    Log.e(TAG, "TO remote :"+collectionID + "from local:"+ filePath);
-                    Log.e(TAG, "==> step 3");
+                // TODO:upload image
+                String jsonPart1 = "\"collectionId\" : \"" +
+                        collectionID +
+                        "\"";
 
-                    // image set state stated
-                    RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
-                    image.setState(String.valueOf(DeviceStatus.state.STARTED));
+                typedFile = new TypedFile("multipart/form-data", new File(filePath));
+                json = "{" + jsonPart1 + "}";
+                Log.e(TAG, "start uploading~ " + filePath);
+                Log.e(TAG, "TO remote :"+collectionID + "from local:"+ filePath);
+                Log.e(TAG, "==> step 3");
 
-                } else {
-                    // TODO: consider more than one state
-                    Log.e(TAG, "illegal imageState:" + imageState);
-                }
+                // image set state stated
+                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+                image.setState(String.valueOf(DeviceStatus.state.STARTED));
+
             }
         }
     }
@@ -354,7 +350,7 @@ public class TaskUploadService extends Service{
 
             Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
             if (totalNum > finishedNum) {
-                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
+                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?", String.valueOf(DeviceStatus.state.FINISHED)).where("state != ?", String.valueOf(DeviceStatus.state.STARTED)).orderBy("RANDOM()").executeSingle();
                 if (image != null) {
                     upload(image);
                 }
@@ -414,6 +410,13 @@ public class TaskUploadService extends Service{
                             task.setState(String.valueOf(DeviceStatus.state.FAILED));
                             task.save();
                             Log.e(TAG, collectionID + "forbidden");
+                            handler=new Handler(Looper.getMainLooper());
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(activity, "Unauthorized to upload", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            return;
                         }catch (Exception e){}
                         break;
                     case 422:
@@ -433,6 +436,13 @@ public class TaskUploadService extends Service{
                                 task.setState(String.valueOf(DeviceStatus.state.FAILED));
                                 task.save();
                                 Log.e(TAG, currentImage.getImageName() + " collectionId not exist, no such folder");
+                                handler=new Handler(Looper.getMainLooper());
+                                handler.post(new Runnable() {
+                                    public void run() {
+                                        Toast.makeText(activity, "remote collectionId not exist, no such folder", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                return;
                             }catch (Exception e){}
                         }
                         break;

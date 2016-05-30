@@ -127,7 +127,7 @@ public class ManualUploadThread extends Thread {
 
                 // look into database, get first image of a task in create time desc order
                 // upload begin with the first in list
-                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
+                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?",String.valueOf(DeviceStatus.state.STARTED)).where("state != ?",String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
                 String imageState = image.getState();
                 String filePath = image.getImagePath();
                 // important: set currentImageId, so that in the callback can find it
@@ -140,40 +140,37 @@ public class ManualUploadThread extends Thread {
                 Log.e(TAG, "createTime: "+ image.getCreateTime());
                 Log.e(TAG, "==> step 2");
 
-
-                if (imageState.equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
-                    // TODO:upload image
-                    String jsonPart1 = "\"collectionId\" : \"" +
-                            collectionID +
-                            "\"";
-                    File f = new File(filePath);
-                    if(f.exists() && !f.isDirectory()) {
-                        // do something
-                        Log.i(TAG,collectionID+": file exist");
-                    }else {
-                        Log.i(TAG, "file not exist: " + currentImageId);
-                        // delete Image from task
-                        new Delete()
-                                .from(Image.class)
-                                .where("imageId = ?", currentImageId)
-                                .execute();
-                        // continue unpload
-                        uploadNext();
-
-                        return;
-                    }
-
-                    typedFile = new TypedFile("multipart/form-data", f);
-                    json = "{" + jsonPart1 + "}";
-                    Log.e(TAG, "start uploading~ " + filePath);
-                    Log.e(TAG, "TO remote :"+collectionID + "from local:"+ filePath);
-                    Log.e(TAG, "==> step 3");
-
-                    RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
-
+                // TODO:upload image
+                String jsonPart1 = "\"collectionId\" : \"" +
+                        collectionID +
+                        "\"";
+                File f = new File(filePath);
+                if(f.exists() && !f.isDirectory()) {
+                    // do something
+                    Log.i(TAG,collectionID+": file exist");
                 }else {
-                    Log.e(TAG,"illegal imageState:"+imageState);
+                    Log.i(TAG, "file not exist: " + currentImageId);
+                    // delete Image from task
+                    new Delete()
+                            .from(Image.class)
+                            .where("imageId = ?", currentImageId)
+                            .execute();
+                    // continue unpload
+                    uploadNext();
+
+                    return;
                 }
+
+                typedFile = new TypedFile("multipart/form-data", f);
+                json = "{" + jsonPart1 + "}";
+
+
+                Log.e(TAG, "start uploading~ " + filePath);
+                Log.e(TAG, "TO remote :"+collectionID + "from local:"+ filePath);
+                Log.e(TAG, "==> step 3");
+
+                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+
             }
         }
     }
@@ -261,7 +258,7 @@ public class ManualUploadThread extends Thread {
             int finishedNum = task.getFinishedItems();
             int totalNum = task.getTotalItems();
             if(totalNum>finishedNum){
-                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?",String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
+                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?",String.valueOf(DeviceStatus.state.FINISHED)).where("state != ?",String.valueOf(DeviceStatus.state.STARTED)).orderBy("RANDOM()").executeSingle();
                 if(image!=null){
                     upload(image);
                 }
@@ -314,6 +311,13 @@ public class ManualUploadThread extends Thread {
                             task.setState(String.valueOf(DeviceStatus.state.FAILED));
                             task.save();
                             Log.e(TAG, collectionID + "forbidden");
+                            handler=new Handler(Looper.getMainLooper());
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(context, "Unauthorized to upload", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            return;
                         }catch (Exception e){}
                         break;
                     case 422:
@@ -333,6 +337,13 @@ public class ManualUploadThread extends Thread {
                                 task.setState(String.valueOf(DeviceStatus.state.FAILED));
                                 task.save();
                                 Log.e(TAG, currentImage.getImageName() + " collectionId not exist, no such folder");
+                                handler=new Handler(Looper.getMainLooper());
+                                handler.post(new Runnable() {
+                                    public void run() {
+                                        Toast.makeText(context, "remote collectionId not exist, no such folder", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                return;
                             }catch (Exception e){}
                         }
                         break;
@@ -384,9 +395,11 @@ public class ManualUploadThread extends Thread {
         List<Image> allImages= new Select().from(Image.class).where("taskId = ?", currentTaskId).execute();
         totalNum = allImages.size();
 
+        // finishedImages ofc >1
         if(finishedImages==null) {
             return;
         }
+
         task.setTotalItems(totalNum);
         task.setFinishedItems(finishedImages.size());
         task.save();
@@ -395,6 +408,9 @@ public class ManualUploadThread extends Thread {
         if (taskIsStopped()) {
             Log.e(TAG,"task is stopped");
             return;
+        }else if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+            Log.e(TAG,"task is failed");
+            return;
         }
 
         /** move on to next **/
@@ -402,7 +418,7 @@ public class ManualUploadThread extends Thread {
 //        totalNum = task.getTotalItems();
         if(totalNum>finishedNum){
             // continue anyway
-            Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?",String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").executeSingle();
+            Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?",String.valueOf(DeviceStatus.state.STARTED)).where("state != ?",String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
             if(image!=null){
                 upload(image);
             }
