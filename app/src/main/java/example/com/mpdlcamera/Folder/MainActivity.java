@@ -37,6 +37,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private List<Task> manualTasks = new ArrayList<>();
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    static final int PICK_COLLECTION_REQUEST = 1997;
+    public static final int PICK_COLLECTION_REQUEST = 1997;
     // flag
     // no collection selected before
 //    private boolean isFirstCollection = false;
@@ -212,13 +213,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         //set selected collection name
         collectionNameTextView = (TextView) findViewById(R.id.collection_name);
-
-            Task lastAUTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
-            if(lastAUTask!= null){
-            collectionNameTextView.setText(lastAUTask.getCollectionName());}
-            else{
-                collectionNameTextView.setText("none");
-            }
     }
 
     @Override
@@ -531,23 +525,33 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     //choose collection
     private void chooseCollection(){
-        TextView chooseCollectionTextView = (TextView) findViewById(R.id.tv_choose_collection);
-        chooseCollectionTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
-                startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
-            }
-        });
 
-        TextView choosedCollectionTextView = (TextView) findViewById(R.id.collection_name);
-        choosedCollectionTextView.setOnClickListener(new View.OnClickListener() {
+        // whole layout onclick
+        RelativeLayout chooseCollectionLayout = (RelativeLayout) findViewById(R.id.layout_choose_collection);
+        chooseCollectionLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
                 startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
             }
         });
+//        TextView chooseCollectionTextView = (TextView) findViewById(R.id.tv_choose_collection);
+//        chooseCollectionTextView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
+//                startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
+//            }
+//        });
+
+//        TextView choosedCollectionTextView = (TextView) findViewById(R.id.collection_name);
+//        choosedCollectionTextView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
+//                startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
+//            }
+//        });
     }
 
     //auto upload switch
@@ -777,6 +781,32 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
             startActivity(mIntent);
 //        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_COLLECTION_REQUEST) {
+            if(resultCode == RemoteCollectionSettingsActivity.INTENT_NONE) {
+                // get isNone, collectionId is not valid anymore
+                Log.e(TAG,data.getBooleanExtra("isNone",false)+"");
+                if(data.getBooleanExtra("isNone",false)){
+                    // set collection name none
+                    if(collectionNameTextView!=null){
+                        collectionNameTextView.setText("none");
+                    }
+                }
+            }else if(resultCode == RESULT_OK){
+
+                Task lastAUTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
+                if(lastAUTask!= null){
+                    collectionNameTextView.setText(lastAUTask.getCollectionName());}
+                else{
+                    collectionNameTextView.setText("none");
+                }
+            }
+        }
 
     }
 

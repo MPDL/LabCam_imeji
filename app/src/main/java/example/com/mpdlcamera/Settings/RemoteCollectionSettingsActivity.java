@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,6 +37,7 @@ import java.util.UUID;
 import example.com.mpdlcamera.Auth.QRScannerActivity;
 import example.com.mpdlcamera.AutoRun.ManualUploadService;
 import example.com.mpdlcamera.AutoRun.TaskUploadService;
+import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
@@ -52,7 +54,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
     private final String LOG_TAG = RemoteCollectionSettingsActivity.class.getSimpleName();
     private static final int INTENT_QR = 1001;
-
+    public static final int INTENT_NONE = 7991;
     //user info
     private String username;
     private String userId;
@@ -77,6 +79,9 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     //latestTask
     Task latestTask;
 
+    //flag
+    boolean isNone = true;
+
 
 
     Callback<CollectionMessage> callback = new Callback<CollectionMessage>() {
@@ -94,6 +99,12 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                 for(ImejiFolder folder : folderList){
                     Log.v(LOG_TAG, "collection title: " + String.valueOf(folder.getTitle()));
                     Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
+
+                    //check if origin AU collection still exist
+                    if(folder.getImejiId() == collectionID){
+                        isNone = false;
+                    }
+
                     folder.setImejiId(folder.id);
                     collectionListLocal.add(folder);
                     ImejiFolder imejiFolder = new ImejiFolder();
@@ -110,7 +121,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
                 adapter.notifyDataSetChanged();
             }
-
         }
 
         @Override
@@ -260,7 +270,10 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             task.setStartDate(String.valueOf(now));
 
             task.save();
-            Log.v(LOG_TAG,"finish");
+            Log.v(LOG_TAG, "finish");
+
+            Intent intent = new Intent();
+            setResult(RESULT_OK, intent);
             finish();
 
         }else if(!latestTask.getCollectionId().equals(collectionID)) {
@@ -284,6 +297,8 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             }
         }else {
            // save task
+            Intent intent = new Intent();
+            setResult(RESULT_OK, intent);
             finish();
         }
     }
@@ -427,7 +442,10 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     Intent uploadIntent = new Intent(activity, TaskUploadService.class);
                                     activity.startService(uploadIntent);
 
+                                    Intent intent = new Intent();
+                                    setResult(RESULT_OK, intent);
                                     finish();
+
                                 }else if(i == 1){
                                     // new collection selected
                                     // change totalNum of old task
@@ -495,6 +513,8 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     Intent uploadIntent = new Intent(activity, TaskUploadService.class);
                                     startService(uploadIntent);
 
+                                    Intent intent = new Intent();
+                                    setResult(RESULT_OK, intent);
                                     finish();
                                 }
                             }
@@ -516,5 +536,18 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                 });
             }
         } );
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent();
+                intent.putExtra("isNone", isNone);
+                setResult(INTENT_NONE,intent);
+                finish();
+                break;
+        }
+        return true;
     }
 }
