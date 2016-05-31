@@ -323,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         }
 
         this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Are you sure you want to go out?", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Press back again to quit the application", Toast.LENGTH_SHORT).show();
 
         new Handler().postDelayed(new Runnable() {
 
