@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -33,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.LogRecord;
 
 import example.com.mpdlcamera.Auth.QRScannerActivity;
 import example.com.mpdlcamera.AutoRun.ManualUploadService;
@@ -81,6 +84,10 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
     //flag
     boolean isNone = true;
+
+    Handler handler;
+    Task task;
+
 
 
 
@@ -277,7 +284,8 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             finish();
 
         }else if(!latestTask.getCollectionId().equals(collectionID)) {
-            // already have auto task
+
+            // case2: already have auto task
             if(latestTask!=null){
             Log.v("latestTask", latestTask.getCollectionId());
                 // make sure task is not finished
@@ -285,9 +293,15 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                   {
                       String oldCollectionName = latestTask.getCollectionName();
                       // stop latestTask, change mode/name, save
+                      Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+                      activity.stopService(uploadIntent);
+                      Log.e(LOG_TAG, "stop you service!");
+
+                      // now old task is MU, and stopped
                       latestTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
                       latestTask.setUploadMode("MU");
                       latestTask.save();
+                      Log.e(LOG_TAG, "stop latest!");
 
                       // Num of photo
 //                      int photoNum = latestTask.getTotalItems() - latestTask.getFinishedItems();
@@ -409,11 +423,12 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     // yes continue latestTask
                                     String taskId = latestTask.getTaskId();
 
-
                                     // change state of old task
+                                    // MU, STOPPED to WAITING
                                     latestTask.setState(String.valueOf(DeviceStatus.state.WAITING));
                                     latestTask.save();
 
+                                    // continue upload old task as "MU"
                                     Intent manualUploadServiceIntent = new Intent(activity, ManualUploadService.class);
                                     manualUploadServiceIntent.putExtra("currentTaskId", taskId);
                                     startService(manualUploadServiceIntent);
@@ -448,24 +463,32 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
                                 }else if(i == 1){
                                     // new collection selected
+
+                                    // latest task already stopped
+                                    // get remain Images
+
+
+
+                                    List<Image> remainImages = null;
+                                     remainImages = new Select().from(Image.class)
+                                            .where("taskId = ?", latestTask.getTaskId())
+                                            .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
+                                            .where("state != ?", String.valueOf(DeviceStatus.state.STARTED))
+                                            .execute();
+
                                     // change totalNum of old task
-                                    //TODO: handle change folder during uploading
-//                                    List<Image> startedImage = new Select().from(Image.class).where()
-//                                    String finishedImageNum = new S
-                                    latestTask.setTotalItems(latestTask.getFinishedItems());
-                                    latestTask.setState(String.valueOf(DeviceStatus.state.WAITING));
+                                    // handle change folder during uploading
+                                    int remainImageNum = 0;
+                                    if(remainImages!=null){
+                                        remainImageNum = remainImages.size();
+                                    }
+
+                                    // warning: latestTask is a MU task now
+                                    latestTask.setTotalItems(latestTask.getTotalItems() - remainImageNum);
+                                    latestTask.setState(String.valueOf(DeviceStatus.state.FINISHED));
                                     latestTask.save();
 
-                                    // stop/delete old upload process
-                                    Intent oldUploadIntent = new Intent(activity, TaskUploadService.class);
-                                    stopService(oldUploadIntent);
 
-                                    // move picture to new repository
-                                    // get remain Images
-                                    List<Image> remainImages = new Select().from(Image.class)
-                                            .where("taskId = ?", latestTask.getTaskId())
-                                            .where("state = ?", String.valueOf(DeviceStatus.state.WAITING))
-                                            .execute();
 
                                     //uniqueID as new AU taskId
                                     String uniqueID = UUID.randomUUID().toString();
@@ -484,15 +507,15 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                         ActiveAndroid.endTransaction();
                                     }
 
-                                    //delete old taskImage
-                                    new Delete().from(Image.class)
-                                            .where("taskId = ?", latestTask.getTaskId())
-                                            .where("state = ?", String.valueOf(DeviceStatus.state.FINISHED))
-                                            .execute();
+//                                    //delete old taskImage
+//                                    new Delete().from(Image.class)
+//                                            .where("taskId = ?", latestTask.getTaskId())
+//                                            .where("state = ?", String.valueOf(DeviceStatus.state.FINISHED))
+//                                            .execute();
 
                                     //create new task
-                                    Log.v("collectionID",collectionID);
-                                    Task task = new Task();
+                                    Log.v("collectionID", collectionID);
+                                    task = new Task();
                                     task.setTotalItems(remainImages.size());
                                     task.setFinishedItems(0);
 
@@ -509,21 +532,56 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
                                     task.save();
 
+
+                                    /**
+                                     * latest
+                                     */
+
+                                    List<Image> fsfasdfasf = new Select().from(Image.class)
+                                            .where("taskId = ?", latestTask.getTaskId())
+                                            .execute();
+
+                                    Log.e(LOG_TAG, "now print the latestTask,set!");
+                                    Log.e(LOG_TAG, "first:" + latestTask.getState());
+                                    Log.e(LOG_TAG, "getTotalItems:  " + latestTask.getTotalItems());
+                                    Log.e(LOG_TAG, "getFinishedItems:  " + latestTask.getFinishedItems());
+
+                                    for(Image image:fsfasdfasf){
+                                        Log.e(LOG_TAG, "imageName: "+image.getImageName());
+                                        Log.e(LOG_TAG,"getState:" +image.getState());
+                                    }
+
+                                    List<Image> dddd = new Select().from(Image.class)
+                                            .where("taskId = ?", task.getTaskId())
+                                            .execute();
+
+                                    Log.e(LOG_TAG, "now print the task!");
+                                    Log.e(LOG_TAG, "first:" + task.getState());
+                                    Log.e(LOG_TAG, "getTotalItems:  " + task.getTotalItems());
+                                    Log.e(LOG_TAG, "getFinishedItems:  " + task.getFinishedItems());
+
+                                    for(Image image:dddd){
+                                        Log.e(LOG_TAG, "imageName: "+image.getImageName());
+                                        Log.e(LOG_TAG,"getState:" +image.getState());
+                                    }
+
+                                    Log.e(LOG_TAG,"+++++++++++++++++++++");
+
                                     //start service
                                     Intent uploadIntent = new Intent(activity, TaskUploadService.class);
                                     startService(uploadIntent);
 
+
                                     Intent intent = new Intent();
                                     setResult(RESULT_OK, intent);
-                                    finish();
-                                }
+                                    finish();                                        }
                             }
                         })
-                .setIcon(R.drawable.error_alert)
-                .show();
+                        .setIcon(R.drawable.error_alert)
+                        .show();
 
         // not dismiss by wrong click
-        alertDialog.setOnShowListener(new DialogInterface.OnShowListener(){
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 
             @Override
             public void onShow(DialogInterface dialogInterface) {

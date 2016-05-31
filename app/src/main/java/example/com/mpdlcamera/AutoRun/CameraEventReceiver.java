@@ -145,22 +145,22 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         Log.i("CameraEventReceiver", String.valueOf(createTime));
 
         try{
-        //store image in local database
+            //store image in local database
 
-        String imageId = UUID.randomUUID().toString();
-        Image photo = new Image();
-        photo.setImageId(imageId);
-        photo.setImageName(imageName);
-        photo.setImagePath(imagePath);
-        photo.setLongitude(longitude);
-        photo.setLatitude(latitude);
-        photo.setCreateTime(createTime);
-        photo.setSize(fileSize);
-        photo.setState(imageState);
-        photo.setTaskId(DeviceStatus.getAuTask(userId).getTaskId());
-        photo.save();
+            String imageId = UUID.randomUUID().toString();
+            Image photo = new Image();
+            photo.setImageId(imageId);
+            photo.setImageName(imageName);
+            photo.setImagePath(imagePath);
+            photo.setLongitude(longitude);
+            photo.setLatitude(latitude);
+            photo.setCreateTime(createTime);
+            photo.setSize(fileSize);
+            photo.setState(imageState);
+            photo.setTaskId(DeviceStatus.getAuTask(userId).getTaskId());
+            photo.save();
 
-        //get current Task id
+            //get current Task id
 
 
             Task task = new Select().from(Task.class).where("uploadMode = ?","AU").orderBy("startDate DESC").executeSingle();

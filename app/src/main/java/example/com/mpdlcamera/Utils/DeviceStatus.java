@@ -148,7 +148,6 @@ public class DeviceStatus {
                 .from(Task.class)
                 .where("uploadMode = ?","AU")
                 .execute();
-        Log.v(LOG_TAG, finishedTasks.size() + "_all");
 
         // remove unfinished tasks form list
         for(Task task:finishedTasks){

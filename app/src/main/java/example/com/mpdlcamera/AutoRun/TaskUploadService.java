@@ -92,8 +92,8 @@ public class TaskUploadService extends Service{
 
     @Override
     public void onDestroy() {
+        Log.e(TAG, "TaskUploadService Destroy!");
         super.onDestroy();
-        Log.v(TAG, "TaskUploadService Destroy!");
     }
 
     @Override
@@ -269,8 +269,12 @@ public class TaskUploadService extends Service{
                 Log.e(TAG, "==> step 3");
 
                 // image set state stated
-                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
                 image.setState(String.valueOf(DeviceStatus.state.STARTED));
+                Log.e(TAG, "imageName! "+image.getImageName());
+                Log.e(TAG, "status! " + image.getState());
+                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+                Log.e(TAG, "2imageName! "+image.getImageName());
+                Log.e(TAG, "2status! " + image.getState());
 
             }
         }
