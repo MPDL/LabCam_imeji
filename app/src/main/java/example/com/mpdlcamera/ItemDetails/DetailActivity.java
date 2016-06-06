@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import java.io.File;
 import java.io.IOException;
@@ -107,6 +108,29 @@ public class DetailActivity extends AppCompatActivity implements android.support
             }else {
                 viewPagerAdapter.setOnItemClickListener(null);
             }
+
+            // upload current image
+            ImageView uploadCurrentImageView = (ImageView) findViewById(R.id.icon_upload);
+
+            // hide upload if it is remote image
+            if(isLocalImage){
+                uploadCurrentImageView.setVisibility(View.VISIBLE);
+            }else {
+                uploadCurrentImageView.setVisibility(View.GONE);
+            }
+
+            uploadCurrentImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // create list for reuse code upload list
+                    List<String> currentImageList = new ArrayList<>();
+                    String currentImageUrl = itemPathList.get(viewPager.getCurrentItem());
+                    currentImageList.add(currentImageUrl);
+
+                    uploadList(currentImageList);
+                }
+            });
+
         }
 
     }

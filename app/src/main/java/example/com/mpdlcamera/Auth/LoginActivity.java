@@ -13,13 +13,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
@@ -84,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
         String Key = mPrefs.getString("apiKey", "");
 
         if(Key.equalsIgnoreCase("")){
-        setContentView(R.layout.login);
+        setContentView(R.layout.layout_login);
         }else {
             serverURL = mPrefs.getString("server", "");
             RetrofitClient.setRestServer(serverURL);
@@ -116,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
             serverURL = DeviceStatus.BASE_URL;
         }
 
-        //it is called at login, what about without login?
+        //it is called at layout_login, what about without layout_login?
         RetrofitClient.setRestServer(serverURL);
 
 //        serverURLView.setText(parseServerUrl(serverURL));
@@ -132,7 +129,7 @@ public class LoginActivity extends AppCompatActivity {
 //                                event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
 //                    if (!event.isShiftPressed()) {
 //                        // the user is done typing.
-//                        login();
+//                        layout_login();
 //                        return true; // consume.
 //                    }
 //                }
@@ -430,7 +427,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Intent intent = new Intent(activity, MainActivity.class);
                                 intent.putExtra("isTaskFragment",isTaskFragment);
                                 startActivity(intent);
-                                // login out of stack
+                                // layout_login out of stack
                                 finish();
                             }
                         })
@@ -440,7 +437,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Intent intent = new Intent(activity, MainActivity.class);
                                 intent.putExtra("isTaskFragment",isTaskFragment);
                                 startActivity(intent);
-                                // login out of stack
+                                // layout_login out of stack
                                 finish();
                             }
                         })
@@ -450,7 +447,7 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = new Intent(activity, MainActivity.class);
                 intent.putExtra("isTaskFragment",isTaskFragment);
                 startActivity(intent);
-                // login out of stack
+                // layout_login out of stack
                 finish();
             }
     }
@@ -530,7 +527,7 @@ public class LoginActivity extends AppCompatActivity {
             task.save();
         }
 
-        // QR login
+        // QR layout_login
         accountLogin(userId);
     }
 

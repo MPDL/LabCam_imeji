@@ -314,6 +314,9 @@ public class TaskUploadService extends Service{
             Log.e(TAG, "upload success");
             Log.e(TAG,"collection:"+ collectionID);
 
+
+
+
             Log.e(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
             Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
@@ -322,9 +325,14 @@ public class TaskUploadService extends Service{
                 // task is deleted/resumed so break and left callback
                 return;
             }
+            Log.e(TAG, "state1111: "+currentImage.getState());
+
             // set image state finished
             currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
             currentImage.save();
+
+            Log.e(TAG, "state2222: " + currentImageId);
+
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 

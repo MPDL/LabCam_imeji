@@ -14,6 +14,7 @@
 
     <color name="primary">#006f7b</color>
     <color name="light_primary">#00bcd4</color>
+    <color name="no_focus_primary">#99CCCC</color>
     <color name="primary_dark">#ff6e1d0e</color>
     <color name="ripple">#F06292</color>
     <color name="ripple_light">#f0b3b3</color>

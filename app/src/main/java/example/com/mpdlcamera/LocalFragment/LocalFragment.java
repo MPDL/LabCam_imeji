@@ -162,7 +162,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 isAlbum = false;
 
                 dateLabel.setTextColor(getResources().getColor(R.color.primary));
-                albumLabel.setTextColor(getResources().getColor(R.color.lightGrey));
+                albumLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
                 gridView.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
             }
@@ -181,7 +181,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 mEditor.commit();
                 isAlbum = true;
 
-                dateLabel.setTextColor(getResources().getColor(R.color.lightGrey));
+                dateLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
                 albumLabel.setTextColor(getResources().getColor(R.color.primary));
                 gridView.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);

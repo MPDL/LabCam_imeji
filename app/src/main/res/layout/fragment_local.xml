@@ -13,6 +13,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
         android:id="@+id/label_album"
+        android:textColor="@color/no_focus_primary"
         android:text="Album"
         android:textSize="20dp"/>
 

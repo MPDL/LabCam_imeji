@@ -297,11 +297,23 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                       activity.stopService(uploadIntent);
                       Log.e(LOG_TAG, "stop you service!");
 
+                      List<Image> allImage = new Select().from(Image.class).execute();
+
+                      //log
+                      Log.e(LOG_TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                      for(Image image:allImage){
+                          Log.e(LOG_TAG, "imageName: "+image.getImageName());
+                          Log.e(LOG_TAG,"getState:" +image.getState());
+                      }
+                      Log.e(LOG_TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
+
                       // now old task is MU, and stopped
                       latestTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
                       latestTask.setUploadMode("MU");
                       latestTask.save();
                       Log.e(LOG_TAG, "stop latest!");
+
 
                       // Num of photo
 //                      int photoNum = latestTask.getTotalItems() - latestTask.getFinishedItems();

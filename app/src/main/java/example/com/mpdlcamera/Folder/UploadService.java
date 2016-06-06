@@ -219,7 +219,7 @@ public class UploadService extends IntentService {
         Log.v(TAG, json);
 
         if(isNetworkAvailable()) {
-            //TODO: set serverURL without login
+            //TODO: set serverURL without layout_login
             String BASE_URL = "https://dev-faces.mpdl.mpg.de/rest/";
             RetrofitClient.setRestServer(BASE_URL);
 
