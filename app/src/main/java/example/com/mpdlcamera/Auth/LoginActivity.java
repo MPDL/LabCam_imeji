@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
@@ -57,6 +58,7 @@ import retrofit.client.Response;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameView, passwordView, serverURLView;
+    private TextView newHereView;
     private Button signIn;
     private Button scan;
     private Activity activity = this;
@@ -98,6 +100,8 @@ public class LoginActivity extends AppCompatActivity {
         serverURLView = (EditText) findViewById(R.id.serverURL);
         usernameView = (EditText) findViewById(R.id.userName);
         passwordView = (EditText) findViewById(R.id.password);
+        newHereView = (TextView) findViewById(R.id.tv_new_here);
+
         signIn = (Button) findViewById(R.id.btnSignIn);
         scan = (Button) findViewById(R.id.qr_scanner);
         //error = (TextView) findViewById(R.id.tv_error);
@@ -152,6 +156,14 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(activity, QRScannerActivity.class);
                 startActivityForResult(intent, INTENT_QR);
+            }
+        });
+
+        newHereView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://labcam.mpdl.mpg.de/"));
+                startActivity(browserIntent);
             }
         });
 

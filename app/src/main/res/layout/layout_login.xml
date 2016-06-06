@@ -80,6 +80,16 @@
             android:textColor="@color/white"
             />
 
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_new_here"
+            android:gravity="right"
+            android:layout_marginTop="10dp"
+            android:text="New here?"
+            android:textSize="14sp"
+            />
+
         <Button
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -88,6 +98,9 @@
             android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal"
             />
+
+
+
     </LinearLayout>
 
 
