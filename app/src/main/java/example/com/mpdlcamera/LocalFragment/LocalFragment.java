@@ -64,6 +64,8 @@ import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Settings;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.TaskManager.ActiveTaskActivity;
+import example.com.mpdlcamera.TaskManager.TaskManagerAdapter;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import example.com.mpdlcamera.Utils.UiElements.CircleProgressBar;
 
@@ -230,6 +232,13 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
 
         activeTaskLayout = (RelativeLayout) rootView.findViewById(R.id.layout_active_task);
+        activeTaskLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent activeTaskIntent = new Intent(getActivity(), ActiveTaskActivity.class);
+                startActivity(activeTaskIntent);
+            }
+        });
         activeTaskLayout.setVisibility(View.GONE);
 
         /** handler observer **/
