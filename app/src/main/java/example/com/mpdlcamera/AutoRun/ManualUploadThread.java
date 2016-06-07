@@ -227,7 +227,6 @@ public class ManualUploadThread extends Thread {
 
             Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
             Log.e(TAG, currentImageId);
-
             Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
 
             if (currentImage == null) {
@@ -251,7 +250,8 @@ public class ManualUploadThread extends Thread {
 
             /** move on to next **/
 
-            if(taskIsStopped()){
+            if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
+                Log.e(TAG,"MU task, stopped");
                 return;
             }
 
@@ -423,6 +423,8 @@ public class ManualUploadThread extends Thread {
                 upload(image);
             }
         }else {
+            task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+            task.save();
             Log.i(TAG,"task finished");
         }
     }

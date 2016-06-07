@@ -425,7 +425,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setCustomView(R.layout.tab_local);
         tabLayout.getTabAt(1).setCustomView(R.layout.tab_imeji);
-//        tabLayout.getTabAt(2).setCustomView(R.layout.tab_upload);
+        tabLayout.getTabAt(2).setCustomView(R.layout.tab_upload);
 
         if(isTaskFragment){
             TextView taskTextView = (TextView)tabLayout.findViewById(R.id.tabicon_upload);
@@ -460,10 +460,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     TextView iconText1 = (TextView) tabLayout.findViewById(backgroundIconId[1]);
                     iconText1.setTextColor(getResources().getColor(R.color.tabUnselect));
                 }
-//                if (2 != position && 2 != selectedIndex) {
-//                    TextView iconText2 = (TextView) tabLayout.findViewById(backgroundIconId[2]);
-//                    iconText2.setTextColor(getResources().getColor(R.color.tabUnselect));
-//                }
+                if (2 != position && 2 != selectedIndex) {
+                    TextView iconText2 = (TextView) tabLayout.findViewById(backgroundIconId[2]);
+                    iconText2.setTextColor(getResources().getColor(R.color.tabUnselect));
+                }
 
                 //background icon
                 TextView iconText = (TextView) tabLayout.findViewById(backgroundIconId[position]);
@@ -492,7 +492,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         @Override
         public int getCount() {
-                return 2;
+                return 3;
         }
 
         @Override
@@ -508,9 +508,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 case 1:
                     fragment = new ImejiFragment();
                     return fragment;
-//                case 2:
-//                    fragment = new TaskFragment();
-//                    return fragment;
+                case 2:
+                    fragment = new TaskFragment();
+                    return fragment;
                 default:
                     return new LocalFragment();
             }

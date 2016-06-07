@@ -193,7 +193,6 @@ public class TaskUploadService extends Service{
 
     private boolean taskIsStopped (){
 
-
         try{
             task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
             if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
@@ -281,7 +280,7 @@ public class TaskUploadService extends Service{
     }
     private void upload(Image image){
 
-        if(!taskIsStopped()){
+        if(taskIsStopped()){
             return;
         }
 
@@ -314,25 +313,18 @@ public class TaskUploadService extends Service{
             Log.e(TAG, "upload success");
             Log.e(TAG,"collection:"+ collectionID);
 
-
-
-
             Log.e(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
             Image currentImage = new Select().from(Image.class).where("imageId = ?", currentImageId).executeSingle();
             if (currentImage == null) {
-                Log.v(TAG, currentImageId + "is not in database, task might be resumed");
+                Log.e(TAG, currentImageId + "is not in database, task might be resumed");
                 // task is deleted/resumed so break and left callback
                 return;
             }
-            Log.e(TAG, "state1111: "+currentImage.getState());
 
             // set image state finished
             currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
             currentImage.save();
-
-            Log.e(TAG, "state2222: " + currentImageId);
-
 
             mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
@@ -341,29 +333,36 @@ public class TaskUploadService extends Service{
             task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
 
             if(finishedImages==null||task==null) {
+                Log.e(TAG,"finishedImages==null||task==null");
                 return;
             }
 
             task.setFinishedItems(finishedImages.size());
             task.save();
 
+            Log.e(TAG, "x.1");
+
             /** move on to next **/
-            if(taskIsStopped()) {
+            if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
+                Log.e(TAG,"task stopped");
                 return;
             }
-
             // Failed task ignore
             if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+                Log.e(TAG,"task failed");
                 return;
             }
 
             int finishedNum = finishedImages.size();
             int totalNum = task.getTotalItems();
 
-            Log.i(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
+            Log.e(TAG,"x.2");
+
+            Log.e(TAG, "totalNum: " + totalNum + "  finishedNum" + finishedNum);
             if (totalNum > finishedNum) {
                 Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?", String.valueOf(DeviceStatus.state.FINISHED)).where("state != ?", String.valueOf(DeviceStatus.state.STARTED)).orderBy("RANDOM()").executeSingle();
                 if (image != null) {
+                    Log.e(TAG,"x.3");
                     upload(image);
                 }
             } else {
@@ -478,6 +477,7 @@ public class TaskUploadService extends Service{
             task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
 
             if(finishedImages==null||task==null) {
+                Log.e(TAG,"finishedImages==null||task==null");
                 return;
             }
             task.setFinishedItems(finishedImages.size());

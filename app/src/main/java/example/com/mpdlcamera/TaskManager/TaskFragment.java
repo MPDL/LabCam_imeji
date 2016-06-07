@@ -80,10 +80,13 @@ public class TaskFragment extends Fragment implements RemoveTaskInterface{
                             // get autoTask and remove from list
                             Iterator<Task> taskIterator = taskList.iterator();
                             while (taskIterator.hasNext()) {
-                                if (taskIterator.next().getUploadMode().equalsIgnoreCase("AU") && !settings.isAutoUpload()) {
-                                    auTask = taskIterator.next();
+                                //ConcurrentModificationException here
+                                Task theTask = taskIterator.next();
+                                if (theTask.getUploadMode().equalsIgnoreCase("AU") && !settings.isAutoUpload()) {
+//                                    auTask = theTask;
+                                    taskIterator.remove();
                                 }
-                                taskList.remove(auTask);
+//                                taskList.remove(auTask);
                             }
                         }
 

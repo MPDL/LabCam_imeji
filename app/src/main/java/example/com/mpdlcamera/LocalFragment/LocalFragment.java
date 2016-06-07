@@ -1,5 +1,6 @@
 package example.com.mpdlcamera.LocalFragment;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +10,8 @@ import android.graphics.Point;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -24,10 +27,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import com.activeandroid.query.Select;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +52,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import example.com.mpdlcamera.AutoRun.dbObserver;
 import example.com.mpdlcamera.Gallery.GalleryListAdapter;
 import example.com.mpdlcamera.Gallery.LocalImageActivity;
 import example.com.mpdlcamera.Gallery.RemoteListDialogFragment;
@@ -52,9 +61,11 @@ import example.com.mpdlcamera.Gallery.SectionedGridView.SimpleAdapter;
 import example.com.mpdlcamera.ItemDetails.DetailActivity;
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.Model.LocalModel.Image;
+import example.com.mpdlcamera.Model.LocalModel.Settings;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Utils.DeviceStatus;
+import example.com.mpdlcamera.Utils.UiElements.CircleProgressBar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -69,6 +80,17 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     public Set<Integer> positionSet = new HashSet<>();
     public Set<Integer> albumPositionSet = new HashSet<>();
     private View rootView;
+
+    //ui elements
+    //active task bar
+    private static TextView titleTaskTextView = null;
+    private static TextView numActiveTextView = null;
+    private static CircleProgressBar mCircleProgressBar = null;
+    private static RelativeLayout activeTaskLayout = null;
+    private static TextView percentTextView = null;
+
+    private List<Task> taskList = new ArrayList<>();
+
     android.support.v7.app.ActionBar actionBar;
 
     GridView gridView;
@@ -109,6 +131,13 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     private OnFragmentInteractionListener mListener;
 
+
+    // db observer handler
+    static ContentResolver resolver;
+    static Handler mHandler;
+    static example.com.mpdlcamera.AutoRun.dbObserver dbObserver;
+    static Uri uri;
+
     public LocalFragment() {
         // Required empty public constructor
     }
@@ -144,6 +173,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         //set header recycleView adapter
         loadTimeLinePicture();
 
+
+
+
         //switch
         dateLabel = (TextView) rootView.findViewById(R.id.label_date);
         albumLabel = (TextView) rootView.findViewById(R.id.label_album);
@@ -151,13 +183,13 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         dateLabel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(actionMode != null){
+                if (actionMode != null) {
                     // finish actionMode when switch
                     actionMode.finish();
                 }
 
                 SharedPreferences.Editor mEditor = mPrefs.edit();
-                mEditor.putBoolean("isAlbum",false).apply();
+                mEditor.putBoolean("isAlbum", false).apply();
                 mEditor.commit();
                 isAlbum = false;
 
@@ -177,7 +209,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 }
 
                 SharedPreferences.Editor mEditor = mPrefs.edit();
-                mEditor.putBoolean("isAlbum",true).apply();
+                mEditor.putBoolean("isAlbum", true).apply();
                 mEditor.commit();
                 isAlbum = true;
 
@@ -188,6 +220,137 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             }
         });
 
+        ImageView arrow = (ImageView) rootView.findViewById(R.id.im_right_arrow);
+        arrow.setRotation(-90);
+
+        titleTaskTextView = (TextView) rootView.findViewById(R.id.tv_title_task_info);
+        percentTextView = (TextView) rootView.findViewById(R.id.tv_percent);
+        numActiveTextView = (TextView) rootView.findViewById(R.id.tv_num_active_task);
+        mCircleProgressBar = (CircleProgressBar) rootView.findViewById(R.id.circleProgressBar);
+
+
+        activeTaskLayout = (RelativeLayout) rootView.findViewById(R.id.layout_active_task);
+        activeTaskLayout.setVisibility(View.GONE);
+
+        /** handler observer **/
+        mHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+
+                if(msg.what==1234){
+//                    taskList = DeviceStatus.getUserActiveTasks(userId);
+//                    if(taskList.size()==0){
+//                        activeTaskLayout.setVisibility(View.GONE);
+//                        return;
+//                    }
+//                    numActiveTextView.setText(taskList.size() + "");
+
+                    List<Task> waitingTasks = DeviceStatus.getUserWaitingTasks(userId);
+                    List<Task> stoppedTasks = DeviceStatus.getUserStoppedTasks(userId);
+                    int num_activate = 0;
+
+                    if(stoppedTasks.size()==0){
+                        if(waitingTasks.size()==0){
+                            activeTaskLayout.setVisibility(View.GONE);
+                            Log.e(LOG_TAG, "waitingTasks+stoppedTasks  is null");
+                            return;
+                        }
+
+                        // au task waiting
+                        if(waitingTasks.size()==1) {
+                            if(waitingTasks.get(0).getUploadMode().equalsIgnoreCase("AU")){
+                                Task auTask = DeviceStatus.getAuTask(userId);
+                                if(auTask.getTotalItems()==auTask.getFinishedItems()){
+                                    activeTaskLayout.setVisibility(View.GONE);
+                                    Log.e(LOG_TAG, "stoppedTasks is null,only au is waiting");
+                                    return;
+                                }else {
+                                    num_activate = 1;
+                                    Log.e(LOG_TAG, "stoppedTasks is null,only au is active");
+                                }
+                            }
+                        }else if(waitingTasks.size()>1){
+                            Task auTask = DeviceStatus.getAuTask(userId);
+                            if(auTask.getTotalItems()==auTask.getFinishedItems()){
+                                num_activate = waitingTasks.size()-1;
+                            }else {
+                                num_activate = waitingTasks.size();
+                            }
+                            Log.e(LOG_TAG, ">1 waiting tasks....");
+                        }
+                    }
+
+                    // if stopped task exist
+                    if(stoppedTasks.size()>0){
+                        Log.e(LOG_TAG,"stoppedTaskNum:"+stoppedTasks.size());
+                        if(waitingTasks==null){
+                            num_activate = stoppedTasks.size();
+                            Log.e(LOG_TAG, "stoppedTasks  is null,waiting tasks null");
+                        }else {
+                            Task auTask = DeviceStatus.getAuTask(userId);
+                            if(auTask.getTotalItems()==auTask.getFinishedItems()){
+                                num_activate = stoppedTasks.size()+ waitingTasks.size()-1;
+                            }else {
+                                num_activate = stoppedTasks.size()+ waitingTasks.size();
+                            }
+                            Log.e(LOG_TAG, "stopped tasks and waiting tasks");
+                        }
+                    }
+                    for(Task task:waitingTasks){
+                        Log.e(LOG_TAG,"waitingTasks~~~~~~~");
+                        Log.e(LOG_TAG,"mode:"+task.getUploadMode());
+                        Log.e(LOG_TAG,"state:"+task.getState());
+                        Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
+                        Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
+                    }
+                    for(Task task:stoppedTasks){
+                        Log.e(LOG_TAG,"stoppedTasks~~~~~~~");
+                        Log.e(LOG_TAG,"mode:"+task.getUploadMode());
+                        Log.e(LOG_TAG,"state:"+task.getState());
+                        Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
+                        Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
+                    }
+
+
+                    if(waitingTasks.size()>0){
+                        activeTaskLayout.setVisibility(View.VISIBLE);
+                        Task task = waitingTasks.get(0);
+
+                        //
+                        if(task.getTotalItems()==0){
+                            return;
+                        }
+                        titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
+                        numActiveTextView.setText(num_activate+"");
+
+                        int percent = (task.getFinishedItems()*100)/task.getTotalItems();
+                        percentTextView.setText(percent+"%");
+                        mCircleProgressBar.setProgress(percent);
+                    }else if(stoppedTasks.size()>0){
+                        activeTaskLayout.setVisibility(View.VISIBLE);
+                        Task task = stoppedTasks.get(0);
+
+                        //
+                        if(task.getTotalItems()==0){
+                            return;
+                        }
+                        titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
+                        numActiveTextView.setText(num_activate+"");
+
+                        int percent = (task.getFinishedItems()*100)/task.getTotalItems();
+                        percentTextView.setText(percent+"%");
+                        mCircleProgressBar.setProgress(percent);
+                    }
+                }
+
+            }
+        };
+
+        uri = Uri.parse("content://example.com.mpdlcamera/tasks");
+        resolver = getActivity().getContentResolver();
+        dbObserver = new dbObserver(getActivity(),mHandler);
+        resolver.registerContentObserver(uri, true, dbObserver);
 
         return rootView;
 
@@ -207,6 +370,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         super.onDetach();
         mListener = null;
     }
+
+
 
     @Override
     public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
@@ -684,7 +849,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     @Override
     public void onResume() {
-        super.onResume();
+        resolver.registerContentObserver(uri, true, dbObserver);
+
         /** remember the date/timeLine option **/
         isAlbum = mPrefs.getBoolean("isAlbum",isAlbum);
 
@@ -697,6 +863,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             gridView.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         }
+        super.onResume();
+
     }
 
     /** screen orientation **/
@@ -709,10 +877,14 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     @Override
     public void onPause() {
-        super.onPause();
+        resolver.unregisterContentObserver(dbObserver);
+
         prepareData();
 //        loadTimeLinePicture();
         simpleAdapter.notifyDataSetChanged();
         mSectionedAdapter.notifyDataSetChanged();
+
+        super.onPause();
+
     }
 }

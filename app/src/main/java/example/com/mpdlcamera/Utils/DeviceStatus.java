@@ -112,7 +112,7 @@ public class DeviceStatus {
         return new Select()
                 .from(Task.class)
                 .where("uploadMode = ?", mode)
-                .where("userId = ?",userId)
+                .where("userId = ?", userId)
                 .orderBy("startDate DESC")
                 .executeSingle();
     }
@@ -127,6 +127,39 @@ public class DeviceStatus {
                 .where("userId = ?",userId)
                 .execute();
     }
+
+    /**
+     * get User Active Tasks
+     * @param userId
+     * @return
+     */
+    public static List<Task> getUserActiveTasks(String userId){
+        return new Select()
+                .from(Task.class)
+                .where("userId = ?", userId)
+                .where("state != ?", String.valueOf(state.FAILED))
+                .where("state != ?", String.valueOf(state.FINISHED))
+                .execute();
+    }
+
+    public static List<Task> getUserStoppedTasks(String userId){
+        return new Select()
+                .from(Task.class)
+                .where("userId = ?", userId)
+                .where("state = ?", String.valueOf(state.STOPPED))
+                .orderBy("startDate DESC")
+                .execute();
+    }
+
+    public static List<Task> getUserWaitingTasks(String userId){
+        return new Select()
+                .from(Task.class)
+                .where("userId = ?", userId)
+                .where("state = ?", String.valueOf(state.WAITING))
+                .orderBy("startDate DESC")
+                .execute();
+    }
+
 
     //get Image list of a Task
     public static List<Image> getImagesByTaskId(String taskId){
