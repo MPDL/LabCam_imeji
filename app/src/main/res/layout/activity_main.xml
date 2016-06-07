@@ -234,6 +234,36 @@
 
             </RelativeLayout>
 
+            <!--recent processes-->
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/layout_recent_processes"
+                android:layout_below="@id/layout_choose_collection"
+                android:layout_marginTop="30dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/resent_processes"
+                    android:id="@+id/label_recent_processes"
+                    android:textColor="@color/tabUnselect"
+                    android:textSize="14sp"
+                    android:layout_marginLeft="16dp"/>
+
+                <!--divider-->
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/label_recent_processes"
+                    android:id="@+id/divider_recent_processes"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="#80808080" >
+                </LinearLayout>
+             </RelativeLayout>
+
             <!--logout-->
 
             <ImageView

@@ -369,6 +369,7 @@ public class TaskUploadService extends Service{
                 /** delete finished tasks before reset Au task **/
                 new Delete().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
 
+                task.setEndDate(DeviceStatus.dateNow());
                 task.setState(String.valueOf(DeviceStatus.state.FINISHED));
                 task.setTotalItems(0);
                 task.setFinishedItems(0);
@@ -417,6 +418,7 @@ public class TaskUploadService extends Service{
                     case 403:
                         // set TASK state failed, print log
                         try{
+                            task.setEndDate(DeviceStatus.dateNow());
                             task.setState(String.valueOf(DeviceStatus.state.FAILED));
                             task.save();
                             Log.e(TAG, collectionID + "forbidden");
@@ -443,6 +445,7 @@ public class TaskUploadService extends Service{
                             // case: collectionId not exist, Task failed
                             try {
                                 currentImage.setLog(error.getKind().name() + " collectionId not exist, no such folder");
+                                task.setEndDate(DeviceStatus.dateNow());
                                 task.setState(String.valueOf(DeviceStatus.state.FAILED));
                                 task.save();
                                 Log.e(TAG, currentImage.getImageName() + " collectionId not exist, no such folder");

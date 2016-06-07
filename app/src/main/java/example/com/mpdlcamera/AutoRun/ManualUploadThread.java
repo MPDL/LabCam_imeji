@@ -264,6 +264,7 @@ public class ManualUploadThread extends Thread {
                 }
             }else {
                 task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                task.setEndDate(DeviceStatus.dateNow());
                 task.save();
                 handler=new Handler(Looper.getMainLooper());
                 handler.post(new Runnable() {
@@ -309,6 +310,7 @@ public class ManualUploadThread extends Thread {
                         // set TASK state failed, print log
                         try{
                             task.setState(String.valueOf(DeviceStatus.state.FAILED));
+                            task.setEndDate(DeviceStatus.dateNow());
                             task.save();
                             Log.e(TAG, collectionID + "forbidden");
                             handler=new Handler(Looper.getMainLooper());
@@ -334,6 +336,7 @@ public class ManualUploadThread extends Thread {
                             // case: collectionId not exist, Task failed
                             try {
                                 currentImage.setLog(error.getKind().name() + " collectionId not exist, no such folder");
+                                task.setEndDate(DeviceStatus.dateNow());
                                 task.setState(String.valueOf(DeviceStatus.state.FAILED));
                                 task.save();
                                 Log.e(TAG, currentImage.getImageName() + " collectionId not exist, no such folder");
@@ -402,6 +405,7 @@ public class ManualUploadThread extends Thread {
 
         task.setTotalItems(totalNum);
         task.setFinishedItems(finishedImages.size());
+        task.setEndDate(DeviceStatus.dateNow());
         task.save();
 
 
@@ -424,6 +428,7 @@ public class ManualUploadThread extends Thread {
             }
         }else {
             task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+            task.setEndDate(DeviceStatus.dateNow());
             task.save();
             Log.i(TAG,"task finished");
         }

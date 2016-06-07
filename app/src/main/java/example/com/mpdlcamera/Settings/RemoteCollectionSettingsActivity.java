@@ -497,10 +497,9 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
                                     // warning: latestTask is a MU task now
                                     latestTask.setTotalItems(latestTask.getTotalItems() - remainImageNum);
+                                    task.setEndDate(DeviceStatus.dateNow());
                                     latestTask.setState(String.valueOf(DeviceStatus.state.FINISHED));
                                     latestTask.save();
-
-
 
                                     //uniqueID as new AU taskId
                                     String uniqueID = UUID.randomUUID().toString();

@@ -191,6 +191,8 @@
 
         <activity android:name=".TaskManager.ActiveTaskActivity" >
         </activity>
+        <activity android:name=".TaskManager.RecentProcessActivity" >
+        </activity>
     </application>
 
 </manifest>

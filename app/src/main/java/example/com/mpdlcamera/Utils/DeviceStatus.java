@@ -19,7 +19,13 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
@@ -133,12 +139,12 @@ public class DeviceStatus {
      * @param userId
      * @return
      */
-    public static List<Task> getUserActiveTasks(String userId){
+    public static List<Task> getRecentTasks(String userId){
         return new Select()
                 .from(Task.class)
                 .where("userId = ?", userId)
-                .where("state != ?", String.valueOf(state.FAILED))
-                .where("state != ?", String.valueOf(state.FINISHED))
+                .where("state != ?", String.valueOf(state.WAITING))
+                .where("state != ?", String.valueOf(state.STOPPED))
                 .execute();
     }
 
@@ -185,7 +191,9 @@ public class DeviceStatus {
         // remove unfinished tasks form list
         for(Task task:finishedTasks){
             if(task.getFinishedItems() == task.getTotalItems()){
+
                 task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                task.setEndDate(dateNow());
                 task.save();
             }
         }
@@ -221,6 +229,77 @@ public class DeviceStatus {
 //        serverUrl = "http://"+coreUrl+"/rest/";
         serverUrl = coreUrl;
         return serverUrl;
+    }
+
+    public static long dateNow(){
+        // Create an instance of SimpleDateFormat used for formatting
+        // the string representation of date (month/day/year)
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+        // Get the date today using Calendar object.
+        Date today = Calendar.getInstance().getTime();
+        long date = today.getTime();
+                // Using DateFormat format method we can create a string
+        // representation of a date with the defined format.
+
+        String reportDate = df.format(today);
+
+        // Print what date is today!
+//        System.out.println("Report Date: " + reportDate);
+        return date;
+    }
+
+    public static Date longToDate(long dateL){
+        Date date = new Date(dateL);
+        return date;
+    }
+
+    public static Date stringToDate(String dateStr){
+        Date date = new Date();
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        try {
+             date = df.parse(dateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
+
+    /**
+     * date diff
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public static String twoDateDistance(Date startDate,Date endDate){
+
+        if(startDate == null ||endDate == null){
+            return null;
+        }
+        long timeLong = endDate.getTime() - startDate.getTime();
+        if (timeLong<60*1000)
+            return timeLong/1000 + " seconds ago";
+        else if (timeLong<60*60*1000){
+            timeLong = timeLong/1000 /60;
+            return timeLong + " minutes ago";
+        }
+        else if (timeLong<60*60*24*1000){
+            timeLong = timeLong/60/60/1000;
+            return timeLong+" hours ago";
+        }
+        else if (timeLong<60*60*24*1000*7){
+            timeLong = timeLong/1000/ 60 / 60 / 24;
+            return timeLong + " days ago";
+        }
+        else if (timeLong<60*60*24*1000*7*4){
+            timeLong = timeLong/1000/ 60 / 60 / 24/7;
+            return timeLong + " weeks ago";
+        }
+        else {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT+02:00"));
+            return sdf.format(startDate);
+        }
     }
 
 }

@@ -67,6 +67,7 @@ import example.com.mpdlcamera.NetChangeManager.NetWorkStateReceiver;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Settings.RemoteCollectionSettingsActivity;
+import example.com.mpdlcamera.TaskManager.RecentProcessActivity;
 import example.com.mpdlcamera.TaskManager.TaskFragment;
 import example.com.mpdlcamera.Upload.UploadResultReceiver;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -192,8 +193,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         //choose collection
         chooseCollection();
+
+        checkRecent();
+
         setUserInfoText();
+
         setAutoUpload();
+
         setLogout();
 
     }
@@ -552,6 +558,17 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 //                startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
 //            }
 //        });
+    }
+
+    private void checkRecent(){
+        RelativeLayout chooseCollectionLayout = (RelativeLayout) findViewById(R.id.layout_recent_processes);
+        chooseCollectionLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent recentIntent = new Intent(context, RecentProcessActivity.class);
+                startActivity(recentIntent);
+            }
+        });
     }
 
     //auto upload switch

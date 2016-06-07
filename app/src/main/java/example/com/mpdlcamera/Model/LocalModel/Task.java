@@ -34,7 +34,7 @@ public class Task extends Model{
 
     @Expose
     @Column(name = "endDate")
-    private String endDate;
+    private long endDate;
 
     @Expose
     @Column(name = "userId")
@@ -77,7 +77,7 @@ public class Task extends Model{
         super();
     }
 
-    public Task(String taskId, String taskName, String state, String errorLevel, String startDate, String endDate, String userId, String userName, String apiKey, String collectionId, String collectionName, int finishedItems, int totalItems, String uploadMode, String logs) {
+    public Task(String taskId, String taskName, String state, String errorLevel, String startDate, long endDate, String userId, String userName, String apiKey, String collectionId, String collectionName, int finishedItems, int totalItems, String uploadMode, String logs) {
         this.taskId = taskId;
         this.taskName = taskName;
         this.state = state;
@@ -135,11 +135,11 @@ public class Task extends Model{
         this.startDate = startDate;
     }
 
-    public String getEndDate() {
+    public long getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(long endDate) {
         this.endDate = endDate;
     }
 

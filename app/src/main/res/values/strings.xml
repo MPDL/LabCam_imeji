@@ -37,6 +37,7 @@
     <string name="auto_upload">AUTOMATIC UPLOAD</string>
     <string name="privacy_setting">Privacy Settings</string>
     <string name="upload_options">UPLOAD OPTIONS</string>
+    <string name="resent_processes">RECENT PROCESSES</string>
     <string name="ocr">OCR</string>
 
     <string name="option_wifi">WI-FI</string>
