@@ -4,17 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.ContentObserver;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.util.Log;
+
+import com.activeandroid.query.Select;
 
 import java.util.concurrent.ExecutorService;
 
 import example.com.mpdlcamera.Folder.MainActivity;
-import example.com.mpdlcamera.Model.DataItem;
-import example.com.mpdlcamera.SQLite.FileId;
+import example.com.mpdlcamera.Model.LocalModel.Image;
+import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 
 /**
@@ -67,82 +65,21 @@ public class NewFileObserver extends ContentObserver {
     @Override
     public void onChange(boolean selfChange) {
 
-        Log.v("observer","started");
+    }
 
-        settings = PreferenceManager.getDefaultSharedPreferences(context);
+    //get latest task
+    public static Task getTask() {
+        return new Select()
+                .from(Task.class)
+                .orderBy("startDate DESC")
+                .executeSingle();
+    }
 
-        String prefOption = settings.getString("status", "");
-
-        nPrefs = context.getSharedPreferences("myPref", 0);
-        collectionID = nPrefs.getString("collectionID", "");
-
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        String networkStatus = null;
-        if(networkInfo != null) {
-            networkStatus = networkInfo.getTypeName();
-        }
-
-        LatestImage imageLatest = new LatestImage(context);
-        int imageId = imageLatest.getId();
-
-        //file system is not empty
-        if (imageId == -1) {
-            return;
-        }
-
-        DataItem item = imageLatest.getLatestItem();
-
-        if (item == null) {
-            return;
-        } else {
-
-            //Upload the files only when the settings is not "manual" so check for the other two options
-            //  point:
-
-                ConnectivityManager connectivityManager1 = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo networkInfo1 = connectivityManager1.getActiveNetworkInfo();
-                if(networkInfo1 != null) {
-                    networkStatus = networkInfo1.getTypeName();
-                }
-                if (networkStatus != null) {
-                    if (prefOption.equalsIgnoreCase("both") || (prefOption.equalsIgnoreCase("Wifi") && (networkStatus.equalsIgnoreCase("wifi")))) {
-
-                        FileUploader fileUploader = new FileUploader(context, act);
-                        String imageName = item.getFilename();
-                        mPrefs = context.getSharedPreferences("myPref", 0);
-                        String collectionId = mPrefs.getString("collectionID", "");
-
-                        String imageCollectionName = item.getFilename() + collectionId;
-
-                        db = new MySQLiteHelper(context);
-
-                        String fileStatus = db.getFileStatus(imageCollectionName);
-
-                        if (fileStatus.equalsIgnoreCase("not present") || fileStatus.equalsIgnoreCase("failed")) { // check whether the files is already in the database(if its there, it means the file has been uploaded
-
-                            fileUploader.upload(item);
-
-                            //   SharedPreferences filePreferences = context.
-                            String fileNamePlusId = item.getFilename() + collectionID;
-
-                            if (!(db.getFileStatus(fileNamePlusId).equalsIgnoreCase("not present"))) {
-
-                                db.updateFileStatus(fileNamePlusId, "uploaded");
-                                //  FileId fileId = new FileId(fileNamePlusId, "uploaded");
-
-                            } else {
-                                FileId fileId = new FileId(fileNamePlusId, "uploaded");
-                                db.insertFile(fileId);
-
-                            }
-                            // FileId fileId = new FileId(fileNamePlusId,"uploading");
-                            // db.insertFile(fileId);
-
-                        }
-
-                    }
-
-                }
-        }
-} }
+    //get latest image
+    public static Image getImage() {
+        return new Select()
+                .from(Image.class)
+                .orderBy("createTime DESC")
+                .executeSingle();
+    }
+}

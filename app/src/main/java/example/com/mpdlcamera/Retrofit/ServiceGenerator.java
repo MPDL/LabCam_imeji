@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
 
+import example.com.mpdlcamera.Utils.DeviceStatus;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
@@ -60,6 +61,56 @@ public class ServiceGenerator {
                 public void intercept(RequestFacade request) {
                     // create Base64 encodet string
                     String string = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                    request.addHeader("Authorization", string);
+                    request.addHeader("Accept", "application/json");
+                }
+            });
+            // set log level
+            builder.setLogLevel(RestAdapter.LogLevel.FULL).setLog(new RestAdapter.Log() {
+                public void log(String msg) {
+                    Log.i("retrofit", msg);
+                }
+            });
+        }
+
+
+        RestAdapter adapter = builder.build();
+
+        return adapter.create(serviceClass);
+    }
+
+    public static <S> S createService(Class<S> serviceClass, String baseUrl,
+                                      String APIkey) {
+        RestAdapter.Builder builder = new RestAdapter.Builder();
+
+        Gson gson = new GsonBuilder()
+                .serializeNulls()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+
+        // set endpoint url and use OkHTTP as HTTP client
+        //TODO: sometimes there is a base url null error
+        /** add a default url here **/
+        if(baseUrl ==null){
+            baseUrl = DeviceStatus.BASE_URL;
+        }
+
+        builder.setEndpoint(baseUrl)
+                .setConverter(new GsonConverter(gson))
+                .setClient(new OkClient(new OkHttpClient()));
+
+
+        final String key =  APIkey;
+        // execute only when user provide the username and password
+        if (key!=null) {
+            // concatenate username and password with colon for authentication
+
+            builder.setRequestInterceptor(new RequestInterceptor() {
+                @Override
+                public void intercept(RequestFacade request) {
+                    // create Base64 encodet string
+                    String string = "Bearer " + key;
+
                     request.addHeader("Authorization", string);
                     request.addHeader("Accept", "application/json");
                 }

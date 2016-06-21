@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 

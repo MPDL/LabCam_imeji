@@ -5,13 +5,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 
 import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.MetaData;
-import example.com.mpdlcamera.Model.User;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_task_info"
+        android:layout_margin="8dp">
+        <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text=""
+        android:textSize="16dp"
+            android:textColor="@color/black"
+        android:id="@+id/tv_task_name"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@id/tv_task_name"
+            android:text=""
+            android:textSize="15dp"
+            android:textColor="@color/tabUnselect"
+            android:id="@+id/tv_task_collection"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_progress"
+        android:layout_below="@id/layout_task_info">
+
+        <ProgressBar
+            android:id="@+id/firstBar"
+            style="@style/CustomProgressBar"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp" />
+
+        <!--percent-->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="15dp"
+            android:layout_toRightOf="@id/firstBar"
+            android:layout_marginLeft="8dp"
+            android:layout_centerVertical="true"
+            android:id="@+id/tv_percent"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/percent"
+            android:text="%"
+            android:layout_toRightOf="@+id/tv_percent"
+            android:textSize="15dp"
+            android:layout_centerVertical="true"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_error"
+        android:layout_below="@id/layout_task_info">
+
+        <TextView
+            android:id="@+id/tv_error"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="failed"
+            android:textColor="@color/red"
+            android:textSize="14sp"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="16dp" />
+
+        </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_stop_delete"
+        android:layout_centerVertical="true"
+        >
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/task_delete"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="21dp"
+        android:src="@drawable/btn_delete"/>
+
+
+    <CheckBox
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_toLeftOf="@id/task_delete"
+        android:layout_marginRight="16dp"
+        android:background="@xml/checkbox_pause_play"
+        android:id="@+id/checkBox_is_paused"
+        android:button="@null"
+        />
+    </RelativeLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_clear"
+        android:visibility="gone"
+        android:layout_marginRight="16dp"
+        android:text="CLEAR"
+        android:textSize="15dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        />
+</RelativeLayout>

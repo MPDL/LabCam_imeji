@@ -21,7 +21,6 @@ import java.util.List;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
-import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.SQLite.FileId;
 import example.com.mpdlcamera.SQLite.MySQLiteHelper;
 import example.com.mpdlcamera.Utils.DeviceStatus;
@@ -88,7 +87,7 @@ public class FileUploader {
         Log.v(TAG, json);
 
         if(isNetworkAvailable()) {
-            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
+//            RetrofitClient.uploadItem(typedFile, json, callback, username, password);
         }
         else {
             //Toast.makeText(context, "Please Check your Network Connection", Toast.LENGTH_SHORT).show();

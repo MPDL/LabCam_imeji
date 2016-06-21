@@ -2,7 +2,10 @@ package example.com.mpdlcamera.Folder;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.net.Uri;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -13,13 +16,25 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.R;
+import example.com.mpdlcamera.Utils.CustomImageDownaloder;
+import example.com.mpdlcamera.Utils.camPicassoLoader;
 
 /**
  * Created by allen on 06/04/15.
@@ -30,9 +45,24 @@ public class FolderListAdapter extends BaseAdapter {
     private List<ImejiFolder> folderItems;
     private final String LOG_TAG = FolderListAdapter.class.getSimpleName();
 
+    private SharedPreferences mPrefs;
+    private String apiKey;
+
+    private Map<String, String> headers = new HashMap<String,String>() {};
+
     public FolderListAdapter(Activity activity, List<ImejiFolder> folderItems) {
         this.activity = activity;
         this.folderItems = folderItems;
+
+        if(activity==null){
+            return;
+        }
+
+        mPrefs = activity.getSharedPreferences("myPref", 0);
+        apiKey = mPrefs.getString("apiKey","");
+
+        this.headers.put("Authorization","Bearer "+apiKey);
+
     }
 
     @Override
@@ -81,17 +111,37 @@ public class FolderListAdapter extends BaseAdapter {
             // getting item data for the row
             ImejiFolder collection = folderItems.get(position);
             Log.v(LOG_TAG, collection.getTitle());
+//
+            //创建默认的ImageLoader配置参数
+            ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(activity)
+                    .imageDownloader(new CustomImageDownaloder(activity))
+                    .writeDebugLogs() //打印log信息
+                    .build();
 
-            if (collection.getItems() != null) {
-                if (collection.getItems().size() > 0) {
-                    DataItem m = collection.getItems().get(0);
-                    Log.v(LOG_TAG, m.getWebResolutionUrlUrl());
 
-                    Picasso.with(activity)
-                            .load(m.getWebResolutionUrlUrl())
-                            .into(imageView);
-                }
-            }
+            //Initialize ImageLoader with configuration.
+            ImageLoader imageLoader = ImageLoader.getInstance();
+            imageLoader.init(configuration);
+
+
+            //显示图片的配置
+            DisplayImageOptions options = new DisplayImageOptions.Builder()
+//                .showImageOnLoading(R.drawable.progress_image)
+                    .showImageOnFail(R.drawable.error_alert)
+                    .cacheInMemory(true)
+                    .cacheOnDisk(true)
+                    .extraForDownloader(headers)
+                    .bitmapConfig(Bitmap.Config.RGB_565)
+                    .build();
+
+
+            imageLoader.displayImage(collection.getCoverItemUrl(), imageView, options);
+
+//            Picasso.with(activity)
+//                            .load(collection.getCoverItemUrl())
+//                            .into(imageView);
+//                }
+//            }
             title.setText(collection.getTitle());
 
             //title

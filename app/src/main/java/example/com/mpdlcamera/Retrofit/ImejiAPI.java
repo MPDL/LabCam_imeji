@@ -1,19 +1,26 @@
 package example.com.mpdlcamera.Retrofit;
 
+import com.google.gson.JsonObject;
+
 import java.util.List;
 
-import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
+import example.com.mpdlcamera.Model.MessageModel.ItemMessage;
 import example.com.mpdlcamera.Model.User;
 import retrofit.Callback;
 import retrofit.client.Response;
+import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.Multipart;
 import retrofit.http.POST;
 import retrofit.http.Part;
 import retrofit.http.Path;
+import retrofit.http.Query;
 import retrofit.mime.TypedFile;
+import retrofit.mime.TypedString;
 
 /**
  * Created by allen on 27/08/15.
@@ -57,8 +64,13 @@ public interface ImejiAPI {
     List<User> getUserById(@Path("userId") String userId,
                            Callback<Response> callback);
 
+
+    /**
+     * login
+     * @param callback
+     */
     @POST("/login")
-    User basicLogin();
+    void basicLogin(Callback<User> callback);
 
 
     /*
@@ -66,13 +78,28 @@ public interface ImejiAPI {
     */
     //get all collections
     @GET(value = "/collections?size=30")
-    void getCollections(Callback<List<ImejiFolder>> callback);
+    void getCollections(Callback<CollectionMessage> callback);
+
+    @GET(value = "/collections?size=30")
+    void getCollectionMessage(Callback<JsonObject> callback);
+
+    @GET(value = "/collections?size=30")
+    void getGrantedCollectionMessage(@Query("q") String q,Callback<CollectionMessage> callback);
 
     //get all items by collection id
-    @GET("/collections/{id}/items?size=300")
+    @GET("/collections/{id}/items")
     void getCollectionItems(@Path("id") String collectionId,
-                            Callback<List<DataItem>> callback);
+                            @Query("size") int size,
+                            @Query("offset") int offset,
+                            Callback<ItemMessage> callback);
 
+    //get collection by id
+    @GET("/collections/{id}")
+    void getCollectionById (@Path("id") String collectionId,
+                            Callback<ImejiFolder> callback);
 
+    @POST("/collections")
+    void createCollection(@Body JsonObject jsonBody ,
+                          Callback<ImejiFolder> callback) ;
 
 }

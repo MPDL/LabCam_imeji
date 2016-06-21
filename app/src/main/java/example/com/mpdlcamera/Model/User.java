@@ -5,9 +5,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.google.gson.annotations.Expose;
 
-import java.sql.Blob;
-import java.util.ArrayList;
-import java.util.List;
+import example.com.mpdlcamera.Model.MessageModel.Person;
 
 /**
  * Created by allen on 27/08/15.
@@ -15,35 +13,33 @@ import java.util.List;
 
 @Table(name = "User")
 public class User extends Model{
-    @Column(name = "email")
-    private String  email;
-
-    @Column(name = "pass")
-    private String password;
-
-    //@Column(name = "image")
-    private Blob image;
-
-    @Column(name = "familyName")
-    @Expose
-    private String  familyName;
-
-    @Column(name = "givenName")
-    @Expose
-    private String givenName;
-
-    @Column(name = "completeName")
-    @Expose
-    private String completeName;
 
     @Expose
-    private List<Organization> organizations;
+    @Column(name="email")
+    private String email;
 
-    //@Column(name = "collections")
-    private ImejiFolder collections;
+    @Expose
+    @Column(name="quota")
+    private long quota;
 
-    //@Column(name = "items")
-    private ArrayList<DataItem> items;
+    @Expose
+    @Column(name="apiKey")
+    private String apiKey;
+
+    @Expose
+    @Column(name="person")
+    private Person person;
+
+    public User() {
+        super();
+    }
+
+    public User(String email, long quota, String apiKey, Person person) {
+        this.email = email;
+        this.quota = quota;
+        this.apiKey = apiKey;
+        this.person = person;
+    }
 
 
     public String getEmail() {
@@ -54,67 +50,27 @@ public class User extends Model{
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public long getQuota() {
+        return quota;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setQuota(long quota) {
+        this.quota = quota;
     }
 
-    public Blob getImage() {
-        return image;
+    public String getApiKey() {
+        return apiKey;
     }
 
-    public void setImage(Blob image) {
-        this.image = image;
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 
-    public String getFamilyName() {
-        return familyName;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setFamilyName(String familyName) {
-        this.familyName = familyName;
-    }
-
-    public String getGivenName() {
-        return givenName;
-    }
-
-    public void setGivenName(String givenName) {
-        this.givenName = givenName;
-    }
-
-    public String getCompleteName() {
-        return completeName;
-    }
-
-    public void setCompleteName(String completeName) {
-        this.completeName = completeName;
-    }
-
-    public List<Organization> getOrganizations() {
-        return organizations;
-    }
-
-    public void setOrganizations(List<Organization> organizations) {
-        this.organizations = organizations;
-    }
-
-    public ImejiFolder getCollections() {
-        return collections;
-    }
-
-    public void setCollections(ImejiFolder collections) {
-        this.collections = collections;
-    }
-
-    public ArrayList<DataItem> getItems() {
-        return items;
-    }
-
-    public void setItems(ArrayList<DataItem> items) {
-        this.items = items;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 }

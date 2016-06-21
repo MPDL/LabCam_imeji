@@ -16,12 +16,12 @@
         android:title="Other Settings">
         <SwitchPreference
             android:key="LogoutAfterUpload"
-            android:title="@string/lau"
+            android:title="@string/logout_after_upload"
              />
 
         <SwitchPreference
             android:key="RemovePhotosAfterUpload"
-            android:title="@string/rpfd"
+            android:title="@string/remove_after_upload"
              />
 
     </PreferenceCategory>

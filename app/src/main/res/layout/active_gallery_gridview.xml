@@ -16,8 +16,7 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="7dp"
+
             android:orientation="horizontal"
             android:background="@color/primary">
 
@@ -25,8 +24,7 @@
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="fill_parent"
-                android:layout_marginEnd="50dp"
-                android:layout_marginTop="2dp"
+                android:gravity="center_vertical"
                 android:text="@string/title_activity_Images"
                 android:textColor="@color/white"
                 android:textSize="20dp" />
@@ -37,35 +35,16 @@
 
     <FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="0dip">
-        <GridView
-            android:id="@+id/image_gridView"
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/album_detail_recycle_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:listSelector="@drawable/list_selector"
-            android:numColumns="2"
-            android:verticalSpacing="0dp"
-            android:horizontalSpacing="0dp"
-            android:gravity="center"
-            android:choiceMode="multipleChoice"
-            android:stretchMode="columnWidth"/>
-
-        <com.dd.CircularProgressButton
-            android:visibility="gone"
-            android:id="@+id/circularButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_marginTop="1dp"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:cpb_textComplete="@string/Complete"
-            app:cpb_textError="@string/Error"
-            app:cpb_textIdle="@string/Upload"
-            android:layout_gravity="center_horizontal|bottom" />
+            android:gravity="center">
+        </android.support.v7.widget.RecyclerView>
 
     </FrameLayout>
 
