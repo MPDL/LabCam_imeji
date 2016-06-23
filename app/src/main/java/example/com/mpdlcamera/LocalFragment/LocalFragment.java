@@ -260,12 +260,30 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     int num_activate = 0;
 
                     if(stoppedTasks.size()==0){
-                        if(waitingTasks.size()==0){
-                            activeTaskLayout.setVisibility(View.GONE);
-                            Log.e(LOG_TAG, "waitingTasks+stoppedTasks  is null");
-                            return;
-                        }
+                        if(waitingTasks.size()==0) {
 
+//                            Task finishedTask = new Select().from(Task.class).where("userId = ?", userId)
+//                                    .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
+//                                    .orderBy("endDate DESC")
+//                                    .executeSingle();
+
+                            //execute the task
+                            numActiveTextView.setText("0");
+
+                            percentTextView.setText(100+"%");
+                            mCircleProgressBar.setProgress(100);
+
+                            new Handler().postDelayed(new Runnable() {
+
+                                public void run() {
+                                    Log.e(LOG_TAG, "no task  is null");
+                                    activeTaskLayout.setVisibility(View.GONE);
+                                    return;
+
+                                }
+
+                            }, 1000);
+                        }
                         // au task waiting
                         if(waitingTasks.size()==1) {
                             if(waitingTasks.get(0).getUploadMode().equalsIgnoreCase("AU")){
