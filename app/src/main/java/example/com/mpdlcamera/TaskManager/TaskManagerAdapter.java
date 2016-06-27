@@ -21,6 +21,7 @@ import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,6 +62,7 @@ public class TaskManagerAdapter extends BaseAdapter {
     public TaskManagerAdapter(Activity activity, List<Task> taskList, RemoveTaskInterface removeTaskInterface) {
         this.activity = activity;
         this.taskList = taskList;
+
         this.removeTaskInterface = removeTaskInterface;
     }
 

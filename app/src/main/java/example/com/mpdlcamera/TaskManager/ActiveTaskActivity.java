@@ -77,7 +77,13 @@ public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskI
                 if(msg.what==1234){
                     Log.v("~~~", "1234~~~");
 
-                    taskList = DeviceStatus.getUserTasks(userId);
+                    taskList = new Select()
+                            .from(Task.class)
+                            .where("userId = ?", userId)
+                            .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
+                            .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
+                            .execute();
+
                     Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
                     Task auTask = new Task();
                     if(taskList==null){
@@ -97,6 +103,10 @@ public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskI
 //                                    auTask = theTask;
                                 taskIterator.remove();
                             }
+//                            else if(theTask!=null && (theTask.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))||theTask.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED)))){
+//                                taskIterator.remove();
+//                            }
+
 //                                taskList.remove(auTask);
                         }
                     }
@@ -113,7 +123,12 @@ public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskI
 //        View view = inflater.inflate(R.layout.fragment_task, container,false);
         //taskManager listview
         taskManagerListView = (ListView) findViewById(R.id.listView_task);
-        taskList = DeviceStatus.getUserTasks(userId);
+        taskList = new Select()
+                .from(Task.class)
+                .where("userId = ?", userId)
+                .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
+                .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
+                .execute();
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
 
         // auTask only for delete
