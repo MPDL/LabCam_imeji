@@ -613,7 +613,7 @@ public class LoginActivity extends AppCompatActivity {
         public void failure(RetrofitError error) {
 
             if(error.getResponse()==null){
-                Toast.makeText(activity, "network not connected, try later", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, serverURL+ " \\n not response", Toast.LENGTH_LONG).show();
                 return;
             }
 

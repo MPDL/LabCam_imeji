@@ -259,6 +259,35 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     List<Task> stoppedTasks = DeviceStatus.getUserStoppedTasks(userId);
                     int num_activate = 0;
 
+                    num_activate = stoppedTasks.size() + waitingTasks.size();
+
+                    if(num_activate > 0){
+                        Task auTask = DeviceStatus.getAuTask(userId);
+                        if(auTask!=null && String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState()) &&  auTask.getTotalItems()==auTask.getFinishedItems())
+                            num_activate --;
+                    }
+                    if(num_activate == 0)
+                    {
+                        //execute the task
+                        numActiveTextView.setText("0");
+
+                        percentTextView.setText(100+"%");
+                        mCircleProgressBar.setProgress(100);
+
+                        new Handler().postDelayed(new Runnable() {
+
+                            public void run() {
+                                Log.e(LOG_TAG, "no task  is null");
+                                activeTaskLayout.setVisibility(View.GONE);
+                                return;
+
+                            }
+
+                        }, 1000);
+                    }
+
+                    /*
+
                     if(stoppedTasks.size()==0){
                         if(waitingTasks.size()==0) {
 
@@ -299,7 +328,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                             }
                         }else if(waitingTasks.size()>1){
                             Task auTask = DeviceStatus.getAuTask(userId);
-                            if(auTask.getTotalItems()==auTask.getFinishedItems()){
+                            if(String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState())){
                                 num_activate = waitingTasks.size()-1;
                             }else {
                                 num_activate = waitingTasks.size();
@@ -323,7 +352,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                             }
                             Log.e(LOG_TAG, "stopped tasks and waiting tasks");
                         }
-                    }
+                    } */
                     for(Task task:waitingTasks){
                         Log.e(LOG_TAG,"waitingTasks~~~~~~~");
                         Log.e(LOG_TAG,"mode:"+task.getUploadMode());
