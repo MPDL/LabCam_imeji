@@ -1,6 +1,7 @@
 package example.com.mpdlcamera.Settings;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
@@ -43,6 +45,7 @@ import example.com.mpdlcamera.AutoRun.TaskUploadService;
 import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.LocalModel.Image;
+import example.com.mpdlcamera.Model.LocalModel.Settings;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.R;
@@ -88,6 +91,8 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     Handler handler;
     Task task;
 
+    private ProgressDialog pDialog = null;
+
 
 
 
@@ -98,7 +103,45 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             List<ImejiFolder> folderList = new ArrayList<>();
             folderList = collectionMessage.getResults();
 
+            if(folderList.size()==0){
+                // first delete AutoTask
+                new Delete().from(Task.class).where("uploadMode = ?", "AU").execute();
+                // create dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                // Set up the input
+                final EditText input = new EditText(context);
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+                builder.setTitle("Create Collection")
+                        .setMessage("There is no collection available, create one by giving a name")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // create dialog and create collection
+                                pDialog = new ProgressDialog(activity);
+                                pDialog.setMessage("Loading...");
+                                pDialog.show();
+                                if(String.valueOf(input.getText()).equalsIgnoreCase("")){
+                                    Toast.makeText(activity,"canceled create collection",Toast.LENGTH_SHORT).show();
+                                    pDialog.dismiss();
+                                    return;
+                                }
+                                RetrofitClient.createCollection(String.valueOf(input.getText()),"no description yet",createCollection_callback,apiKey);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(R.drawable.error_alert)
+                        .show();
+            }
+
+
             new Delete().from(ImejiFolder.class).execute();
+
+
 
             ActiveAndroid.beginTransaction();
             try {
@@ -153,6 +196,25 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             listView.setAdapter(adapter);
         }
     };
+
+    Callback<ImejiFolder> createCollection_callback = new Callback<ImejiFolder>() {
+        @Override
+        public void success(ImejiFolder imejiFolder, Response response) {
+            Log.v(LOG_TAG, "createCollection_callback success");
+//            isFirstCollection = true;
+
+            pDialog.dismiss();
+            updateFolder();
+            //get collection list
+
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.v(LOG_TAG, error.getMessage());
+        }
+    };
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
