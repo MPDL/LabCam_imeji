@@ -606,17 +606,17 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             }
         } );
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                Intent intent = new Intent();
-                intent.putExtra("isNone", isNone);
-                setResult(INTENT_NONE,intent);
-                finish();
-                break;
-        }
-        return true;
-    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case android.R.id.home:
+//                Intent intent = new Intent();
+//                intent.putExtra("isNone", isNone);
+//                setResult(INTENT_NONE,intent);
+//                finish();
+//                break;
+//        }
+//        return true;
+//    }
 }
