@@ -189,6 +189,12 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
+        //set collection name
+        collectionNameTextView = (TextView) findViewById(R.id.collection_name);
+        Task auTask = DeviceStatus.getAuTask(userId);
+        if(auTask!=null) {
+            collectionNameTextView.setText(auTask.getCollectionName());
+        }
         initInstances();
 
         //choose collection
@@ -940,7 +946,17 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                         .setIcon(R.drawable.error_alert)
                         .show();
             }
-
+//            else {
+//                Task lastAUTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
+//                if(lastAUTask!= null) {
+//                    boolean isfolderExist = false;
+//                    for (ImejiFolder imejiFolder : folderList) {
+//                        if (imejiFolder.getImejiId().equalsIgnoreCase(lastAUTask.getCollectionId())) {
+//                            return;
+//                        }
+//                    }
+//                }
+//            }
         }
 
         @Override

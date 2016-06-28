@@ -674,8 +674,11 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 //        switch (item.getItemId()) {
 //            case android.R.id.home:
 //                Intent intent = new Intent();
-//                intent.putExtra("isNone", isNone);
-//                setResult(INTENT_NONE,intent);
+//                Task auTask = DeviceStatus.getAuTask(userId);
+//                if(auTask==null){
+//                    intent.putExtra("isNone", isNone);
+//                }
+////                setResult(INTENT_NONE,intent);
 //                finish();
 //                break;
 //        }

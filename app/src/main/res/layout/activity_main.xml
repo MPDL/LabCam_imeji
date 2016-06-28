@@ -40,7 +40,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="16dp"
             android:id="@+id/camera_icon"
-            android:src="@drawable/camera_white"/>
+            android:src="@drawable/clickable_camera"/>
 
         </RelativeLayout>
         </android.support.v7.widget.Toolbar>
@@ -251,6 +251,13 @@
                     android:textSize="14sp"
                     android:layout_marginLeft="16dp"/>
 
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/arrow_blue"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"/>
+
                 <!--divider-->
                 <LinearLayout
                     android:layout_width="fill_parent"
@@ -273,7 +280,7 @@
                 android:layout_centerHorizontal="true"
                 android:id="@+id/tv_logout"
                 android:layout_marginBottom="16dp"
-                android:src="@drawable/logout"/>
+                android:src="@drawable/clickable_logout"/>
 
         </RelativeLayout>
 

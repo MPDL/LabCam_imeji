@@ -94,15 +94,18 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
 //
 
 
-        try {
+
+        //isAutoUpload
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
-        if(!settings.isAutoUpload()){
+        // if auto is turned off
+        if (settings == null){
             return;
         }
-        }catch (Exception e){
-            Log.e("CameraEventReceiver","exception, return");
+
+        if(settings!=null && !settings.isAutoUpload()){
             return;
         }
+
 
         Cursor cursor = context.getContentResolver().query(intent.getData(), null, null, null, null);
         cursor.moveToFirst();
