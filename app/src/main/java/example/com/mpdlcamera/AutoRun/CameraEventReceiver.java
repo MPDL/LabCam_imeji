@@ -140,7 +140,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         //taskId
 
 
-        Toast.makeText(context, "New Photo:" + imageName + "is Saved as : -" + imagePath, Toast.LENGTH_LONG).show();
+//        Toast.makeText(context, "New Photo:" + imageName + "is Saved as : -" + imagePath, Toast.LENGTH_LONG).show();
 
         Log.i("CameraEventReceiver", imageName);
         Log.i("CameraEventReceiver",imagePath );

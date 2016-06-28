@@ -166,6 +166,7 @@
         <receiver android:name=".AutoRun.BootBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
 
@@ -180,7 +181,7 @@
             android:enabled="true" >
             <intent-filter>
                 <action android:name="com.android.camera.NEW_PICTURE" />
-
+                <action android:name="android.hardware.action.NEW_PICTURE" />
                 <data android:mimeType="image/*" />
             </intent-filter>
         </receiver>

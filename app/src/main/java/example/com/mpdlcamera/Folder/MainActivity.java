@@ -181,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         //init drawer toggle
         toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         drawerToggle = new ActionBarDrawerToggle(MainActivity.this, drawerLayout, R.string.hello_world, R.string.hello_world);
         drawerLayout.setDrawerListener(drawerToggle);
@@ -408,13 +409,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     // monitor network when Connect
     @Override
     public void OnConnect() {
-        Toast.makeText(this, "network Connect...", Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, "network Connect...", Toast.LENGTH_LONG).show();
     }
 
     // monitor network when DisConnect
     @Override
     public void OnDisConnect() {
-        Toast.makeText(this, "network disconnect...", Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, "network disconnect...", Toast.LENGTH_LONG).show();
 
     }
 
