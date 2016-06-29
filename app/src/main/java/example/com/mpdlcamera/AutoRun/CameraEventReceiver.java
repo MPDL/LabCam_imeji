@@ -106,6 +106,10 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
             return;
         }
 
+        //no auto task
+       if(DeviceStatus.getAuTask(userId)==null){
+           return;
+       }
 
         Cursor cursor = context.getContentResolver().query(intent.getData(), null, null, null, null);
         cursor.moveToFirst();
