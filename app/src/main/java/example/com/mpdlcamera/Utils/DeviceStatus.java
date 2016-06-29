@@ -154,6 +154,7 @@ public class DeviceStatus {
                 .where("userId = ?", userId)
                 .where("state != ?", String.valueOf(state.WAITING))
                 .where("state != ?", String.valueOf(state.STOPPED))
+                .orderBy("endDate DESC")
                 .execute();
     }
 

@@ -270,7 +270,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     }
                     if(num_activate == 0)
                     {
-                        if(!DeviceStatus.twoDateWithinSecounds(DeviceStatus.longToDate(mostRecentTask.getEndDate()), DeviceStatus.longToDate(DeviceStatus.dateNow()))){
+                        if(mostRecentTask!=null && !DeviceStatus.twoDateWithinSecounds(DeviceStatus.longToDate(mostRecentTask.getEndDate()), DeviceStatus.longToDate(DeviceStatus.dateNow()))){
                             activeTaskLayout.setVisibility(View.GONE);
                             return;
                         }

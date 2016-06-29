@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.media.ExifInterface;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -108,6 +109,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
 
         //no auto task
        if(DeviceStatus.getAuTask(userId)==null){
+           Log.e("cameraEvent","can't get auTask");
            return;
        }
 
@@ -175,6 +177,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
             task.setTotalItems(task.getTotalItems() + 1);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
             task.save();
+            Log.e("<>", task.getTotalItems()+"");
 
             Log.v("taskid", DeviceStatus.getAuTask(userId).getTaskId());
             Log.v("taskId", getImage().getTaskId());
