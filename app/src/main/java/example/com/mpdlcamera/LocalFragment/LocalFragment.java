@@ -377,6 +377,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                         if(task.getTotalItems()==0){
                             return;
                         }
+//                        String titleTaskInfo = task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName();
+
                         titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
                         numActiveTextView.setText(num_activate+"");
 

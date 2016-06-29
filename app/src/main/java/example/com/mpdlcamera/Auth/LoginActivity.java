@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -58,6 +59,7 @@ import retrofit.client.Response;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameView, passwordView, serverURLView;
+    private TextView gluonsLabel, othersLabel;
     private TextView newHereView;
     private Button signIn;
     private Button scan;
@@ -85,6 +87,7 @@ public class LoginActivity extends AppCompatActivity {
         if(Key.equalsIgnoreCase("")){
         setContentView(R.layout.layout_login);
         }else {
+            //login
             serverURL = mPrefs.getString("server", "");
             RetrofitClient.setRestServer(serverURL);
             Intent intent = new Intent(activity, MainActivity.class);
@@ -94,6 +97,9 @@ public class LoginActivity extends AppCompatActivity {
         }
         //don't store local images
 //        getLocalFolders();
+
+        gluonsLabel = (TextView) findViewById(R.id.label_gluons);
+        othersLabel = (TextView) findViewById(R.id.label_other);
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
@@ -106,6 +112,34 @@ public class LoginActivity extends AppCompatActivity {
         scan = (Button) findViewById(R.id.qr_scanner);
         //error = (TextView) findViewById(R.id.tv_error);
 
+        gluonsLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //gluonsLabel
+                gluonsLabel.setTextColor(Color.parseColor("#ffffff"));
+                gluonsLabel.setBackground(getResources().getDrawable(R.drawable.round_button));
+                //othersLabel
+                othersLabel.setTextColor(Color.parseColor("#cccccc"));
+                othersLabel.setBackground(null);
+                serverURLView.setVisibility(View.GONE);
+                serverURLView.setText(R.string.url_gluons);
+            }
+        });
+
+        othersLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //gluonsLabel
+                othersLabel.setTextColor(Color.parseColor("#ffffff"));
+                othersLabel.setBackground(getResources().getDrawable(R.drawable.round_button));
+                //othersLabel
+                gluonsLabel.setTextColor(Color.parseColor("#cccccc"));
+                gluonsLabel.setBackground(null);
+                serverURLView.setVisibility(View.VISIBLE);
+                serverURLView.setText("https://spot.mpdl.mpg.de/rest/");
+            }
+        });
+
 
 //        mPrefs = this.getSharedPreferences("myPref", 0);
         usernameView.setText(mPrefs.getString("email", ""));
@@ -117,36 +151,14 @@ public class LoginActivity extends AppCompatActivity {
             serverURL = DeviceStatus.BASE_URL;
         }
 
-        //it is called at layout_login, what about without layout_login?
         RetrofitClient.setRestServer(serverURL);
 
-//        serverURLView.setText(parseServerUrl(serverURL));
         serverURLView.setText(serverURL);
-
-//        passwordView.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-//
-//            @Override
-//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                if (actionId == EditorInfo.IME_ACTION_SEARCH ||
-//                        actionId == EditorInfo.IME_ACTION_DONE ||
-//                        event.getAction() == KeyEvent.ACTION_DOWN &&
-//                                event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-//                    if (!event.isShiftPressed()) {
-//                        // the user is done typing.
-//                        layout_login();
-//                        return true; // consume.
-//                    }
-//                }
-//                return false; // pass on to other listeners.
-//            }
-//        });
 
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 login();
-
             }
         });
 

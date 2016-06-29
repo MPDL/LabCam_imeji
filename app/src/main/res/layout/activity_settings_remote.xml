@@ -69,8 +69,8 @@
         android:layout_width="fill_parent"
         android:layout_height="53dp"
         android:text="save"
-        android:textColor="@color/white"
-        android:background="@color/primary"
+        android:textColor="@drawable/clickable_color_save"
+        android:background="@drawable/clickable_save"
         android:textSize="17dp"
         android:id="@+id/save_collection"
         android:layout_alignParentBottom="true"/>

@@ -300,7 +300,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                     createTask(collectionID);
 
                 } else {
-                    Toast.makeText(context, "collection setting not changed", Toast.LENGTH_LONG).show();
+//                    Toast.makeText(context, "collection setting not changed", Toast.LENGTH_LONG).show();
                 }
             }
         });

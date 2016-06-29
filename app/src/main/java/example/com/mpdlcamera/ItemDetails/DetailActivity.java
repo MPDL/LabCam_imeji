@@ -59,6 +59,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
     private SharedPreferences mPrefs;
     private String username;
     private String userId;
+    private ImageView uploadCurrentImageView =null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +102,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
                     @Override
                     public void onItemLongClick(View view, int position) {
                         if (actionMode == null) {
+                            uploadCurrentImageView.setVisibility(View.GONE);
                             actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
                         }
                     }
@@ -110,7 +112,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
             }
 
             // upload current image
-            ImageView uploadCurrentImageView = (ImageView) findViewById(R.id.icon_upload);
+            uploadCurrentImageView = (ImageView) findViewById(R.id.icon_upload);
 
             // hide upload if it is remote image
             if(isLocalImage){
@@ -204,6 +206,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
     @Override
     public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
         actionMode = null;
+        uploadCurrentImageView.setVisibility(View.VISIBLE);
         positionSet.clear();
         viewPagerAdapter.notifyDataSetChanged();
     }
@@ -324,6 +327,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         if (positionSet.size() == 0) {
             // 如果没有选中任何的item，则退出多选模式
             actionMode.finish();
+            uploadCurrentImageView.setVisibility(View.VISIBLE);
         } else {
             // 设置ActionMode标题
             actionMode.setTitle(positionSet.size() + " selected");

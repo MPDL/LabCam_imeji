@@ -27,18 +27,59 @@
             android:layout_gravity="center_horizontal"
             />
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/label_server"
+                android:padding="3dp"
+                android:layout_marginLeft="6dp"
+                android:text="SERVER:"
+                android:textSize="16sp"
+                android:textColor="#cccccc" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/label_gluons"
+                android:padding="3dp"
+                android:layout_toRightOf="@id/label_server"
+                android:layout_marginLeft="6dp"
+                android:background="@drawable/round_button"
+                android:text="GLUONS"
+                android:textSize="16sp"
+                android:textColor="@color/white"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/label_gluons"
+                android:padding="3dp"
+                android:id="@+id/label_other"
+                android:layout_marginLeft="6dp"
+                android:text="OTHER"
+                android:textSize="16sp"
+                android:textColor="#cccccc" />
+
+        </RelativeLayout>
+        
         <EditText
             android:id="@+id/serverURL"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:text="http://"
             android:textColor="#cccccc"
+            android:textSize="14sp"
             android:inputType="text"
-            android:hint="Server URL"
-            android:textColorHint="#cccccc" />
+            android:textColorHint="#cccccc"
+            android:visibility="gone"/>
 
         <EditText
             android:id="@+id/userName"
+            android:layout_marginTop="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
@@ -74,10 +115,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:padding="10dp"
-            android:background="@color/light_primary"
+            android:background="@drawable/clickable_login"
             android:text="LOGIN"
             android:textSize="15dp"
-            android:textColor="@color/white"
+            android:textColor="@drawable/clickable_color_login"
             />
 
         <TextView
