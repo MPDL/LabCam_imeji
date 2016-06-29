@@ -257,6 +257,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
                     List<Task> waitingTasks = DeviceStatus.getUserWaitingTasks(userId);
                     List<Task> stoppedTasks = DeviceStatus.getUserStoppedTasks(userId);
+                    Task mostRecentTask = DeviceStatus.getLatestFinishedTask(userId);
+
                     int num_activate = 0;
 
                     num_activate = stoppedTasks.size() + waitingTasks.size();
@@ -268,6 +270,10 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     }
                     if(num_activate == 0)
                     {
+                        if(!DeviceStatus.twoDateWithinSecounds(DeviceStatus.longToDate(mostRecentTask.getEndDate()), DeviceStatus.longToDate(DeviceStatus.dateNow()))){
+                            activeTaskLayout.setVisibility(View.GONE);
+                            return;
+                        }
                         //execute the task
                         numActiveTextView.setText("0");
 

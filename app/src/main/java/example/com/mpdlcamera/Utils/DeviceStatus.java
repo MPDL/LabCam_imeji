@@ -112,6 +112,15 @@ public class DeviceStatus {
                 .executeSingle();
     }
 
+    //get latest task (sometimes its not right need to distinguish Au Mu)
+    public static Task getLatestFinishedTask(String userId) {
+        return new Select()
+                .from(Task.class)
+                .where("userId = ?", userId)
+                .orderBy("endDate DESC")
+                .executeSingle();
+    }
+
     //TODO: need to pass user as param
     public static Task getAuTask(String userId) {
         String mode = "AU";
@@ -300,6 +309,25 @@ public class DeviceStatus {
             sdf.setTimeZone(TimeZone.getTimeZone("GMT+02:00"));
             return sdf.format(startDate);
         }
+    }
+
+    /**
+     * twoDateWithin  1  sec
+     * @param startDate
+     * @param endDate
+     * @return
+     */
+    public static boolean twoDateWithinSecounds(Date startDate,Date endDate){
+        if(startDate == null ||endDate == null){
+            return false;
+        }
+        long timeLong = endDate.getTime() - startDate.getTime();
+        if (timeLong<1*1000){
+            return true;
+        }else {
+            return false;
+        }
+
     }
 
 }
