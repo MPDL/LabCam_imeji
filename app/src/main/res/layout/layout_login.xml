@@ -31,22 +31,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/label_server"
-                android:padding="3dp"
-                android:layout_marginLeft="6dp"
-                android:text="SERVER:"
-                android:textSize="16sp"
-                android:textColor="#cccccc" />
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:id="@+id/label_server"-->
+                <!--android:padding="3dp"-->
+                <!--android:layout_marginLeft="6dp"-->
+                <!--android:text="SERVER:"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textColor="#cccccc" />-->
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/label_gluons"
                 android:padding="3dp"
-                android:layout_toRightOf="@id/label_server"
                 android:layout_marginLeft="6dp"
                 android:background="@drawable/round_button"
                 android:text="GLUONS"
@@ -60,7 +59,7 @@
                 android:padding="3dp"
                 android:id="@+id/label_other"
                 android:layout_marginLeft="6dp"
-                android:text="OTHER"
+                android:text="Other Server"
                 android:textSize="16sp"
                 android:textColor="#cccccc" />
 
