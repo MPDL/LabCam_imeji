@@ -169,7 +169,7 @@ public class TaskManagerAdapter extends BaseAdapter {
         RelativeLayout progressLayout = (RelativeLayout) view.findViewById(R.id.layout_progress);
         RelativeLayout toolButtonLayout = (RelativeLayout) view.findViewById(R.id.layout_stop_delete);
         RelativeLayout errorLayout = (RelativeLayout) view.findViewById(R.id.layout_error);
-        Button clearButton = (Button) view.findViewById(R.id.btn_clear);
+//        Button clearButton = (Button) view.findViewById(R.id.btn_clear);
 
 
 
@@ -177,7 +177,7 @@ public class TaskManagerAdapter extends BaseAdapter {
             case AU_WAITING:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.GONE);
-                clearButton.setVisibility(View.GONE);
+//                clearButton.setVisibility(View.GONE);
                 errorLayout.setVisibility(View.GONE);
                 Log.v(TAG,"AU_WAITING");
 
@@ -185,7 +185,7 @@ public class TaskManagerAdapter extends BaseAdapter {
             case AU_UPLOADING:
                 progressLayout.setVisibility(View.VISIBLE);
                 toolButtonLayout.setVisibility(View.VISIBLE);
-                clearButton.setVisibility(View.GONE);
+//                clearButton.setVisibility(View.GONE);
                 errorLayout.setVisibility(View.GONE);
                 Log.v(TAG, "AU_UPLOADING");
 
@@ -193,7 +193,7 @@ public class TaskManagerAdapter extends BaseAdapter {
             case AU_FINISH:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.GONE);
-                clearButton.setVisibility(View.GONE);
+//                clearButton.setVisibility(View.GONE);
                 errorLayout.setVisibility(View.GONE);
                 Log.v(TAG, "AU_FINISH");
 
@@ -201,7 +201,7 @@ public class TaskManagerAdapter extends BaseAdapter {
             case MU_UPLOADING:
                 progressLayout.setVisibility(View.VISIBLE);
                 toolButtonLayout.setVisibility(View.VISIBLE);
-                clearButton.setVisibility(View.GONE);
+//                clearButton.setVisibility(View.GONE);
                 errorLayout.setVisibility(View.GONE);
                 Log.v(TAG, "MU_UPLOADING");
 
@@ -209,13 +209,13 @@ public class TaskManagerAdapter extends BaseAdapter {
             case MU_FINISH:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.GONE);
-                clearButton.setVisibility(View.VISIBLE);
-                clearButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        deleteTask(task, position);
-                    }
-                });
+//                clearButton.setVisibility(View.VISIBLE);
+//                clearButton.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        deleteTask(task, position);
+//                    }
+//                });
                 errorLayout.setVisibility(View.GONE);
                 Log.v(TAG, "MU_FINISH");
                 break;
@@ -223,29 +223,29 @@ public class TaskManagerAdapter extends BaseAdapter {
             case AU_FAILED:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.GONE);
-                clearButton.setVisibility(View.VISIBLE);
+//                clearButton.setVisibility(View.VISIBLE);
                 errorLayout.setVisibility(View.VISIBLE);
                 //error
-                clearButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        deleteTask(task, position);
-                    }
-                });
+//                clearButton.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        deleteTask(task, position);
+//                    }
+//                });
                 Log.v(TAG, "AU_FAILED");
 
                 break;
             case MU_FAILED:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.GONE);
-                clearButton.setVisibility(View.VISIBLE);
+//                clearButton.setVisibility(View.VISIBLE);
                 errorLayout.setVisibility(View.VISIBLE);
-                clearButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        deleteTask(task, position);
-                    }
-                });
+//                clearButton.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        deleteTask(task, position);
+//                    }
+//                });
                 Log.v(TAG, "MU_FAILED");
                 break;
 
