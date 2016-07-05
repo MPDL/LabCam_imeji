@@ -30,6 +30,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.text.Layout;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -147,6 +148,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     //
     private boolean isTaskFragment = false;
 
+    //
+    private RelativeLayout chooseCollectionLayout = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         userId = mPrefs.getString("userId","");
         apiKey = mPrefs.getString("apiKey","");
         serverUrl = mPrefs.getString("server","");
-        serverUrl = DeviceStatus.parseServerUrl(serverUrl);
+//        serverUrl = DeviceStatus.parseServerUrl(serverUrl);
 
 
         try{
@@ -192,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         //set collection name
         collectionNameTextView = (TextView) findViewById(R.id.collection_name);
-        Task auTask = DeviceStatus.getAuTask(userId);
+        Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
         if(auTask!=null) {
             collectionNameTextView.setText(auTask.getCollectionName());
         }
@@ -319,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     public void getLocalCamFolder(){
 
        String path_DCIM = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath();
-       Log.i("DCIM path_DCIM:",path_DCIM);
+       Log.i("DCIM path_DCIM:", path_DCIM);
 
     }
 
@@ -540,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     private void chooseCollection(){
 
         // whole layout onclick
-        RelativeLayout chooseCollectionLayout = (RelativeLayout) findViewById(R.id.layout_choose_collection);
+        chooseCollectionLayout = (RelativeLayout) findViewById(R.id.layout_choose_collection);
         chooseCollectionLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -585,34 +589,50 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         collectionNameTextView = (TextView) findViewById(R.id.collection_name);
 
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
-        if(settings!=null){
-            autoUploadSwitch.setChecked(settings.isAutoUpload());
-            // if auto is on in settings, enable choose collection
-            if(settings.isAutoUpload()){
-                chooseCollectionLabel.setEnabled(true);
-                collectionNameTextView.setEnabled(true);
-                chooseCollectionLabel.setTextColor(getResources().getColor(R.color.dark_text));
-                collectionNameTextView.setTextColor(getResources().getColor(R.color.dark_text));
-            }else {
-                // by default choose collection not enabled
-            }
+        if(settings==null){
+            settings = new Settings();
         }
+        // login set true
+        settings.setIsAutoUpload(true);
+        settings.save();
+        autoUploadSwitch.setChecked(settings.isAutoUpload());
+
+        // if auto is on in settings, enable choose collection
+
+        chooseCollectionLayout.setEnabled(true);
+        chooseCollectionLabel.setTextColor(getResources().getColor(R.color.dark_text));
+        collectionNameTextView.setTextColor(getResources().getColor(R.color.dark_text));
+
+        // auto open choose collection
+
+        Task auTask = DeviceStatus.getAuTask(userId, serverUrl);
+
+        if(auTask==null){
+            // popup
+            Toast.makeText(activity,"Automatic upload is active\n please set a collection",Toast.LENGTH_SHORT).show();
+
+//            Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
+//            startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
+        }else
+            Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
+
+
+//        only for
         autoUploadSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(!autoUploadSwitch.isChecked()){
-                    //on to off
+                    //on to off situation
                     return;
                 }
                 //off to on
-                Task auTask = new Select().from(Task.class).where("uploadMode = ?","AU").executeSingle();
+                Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
 
                 if(auTask==null){
-//                if (isFirstCollection) {
-//                    isFirstCollection = false;
-                    Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
-                    startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
-                }
+                    // popup
+                    Toast.makeText(activity,"Automatic upload is active\n please set a collection",Toast.LENGTH_SHORT).show();
+                }else
+                    Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -630,8 +650,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(true);
                     settings.save();
-                    chooseCollectionLabel.setEnabled(true);
-                    collectionNameTextView.setEnabled(true);
+                    chooseCollectionLayout.setEnabled(true);
                     chooseCollectionLabel.setTextColor(getResources().getColor(R.color.dark_text));
                     collectionNameTextView.setTextColor(getResources().getColor(R.color.dark_text));
 
@@ -640,8 +659,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(false);
                     settings.save();
-                    chooseCollectionLabel.setEnabled(false);
-                    collectionNameTextView.setEnabled(false);
+                    chooseCollectionLayout.setEnabled(false);
                     chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
                     collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
                 }
@@ -700,6 +718,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                                         task.setUserId(userId);
                                         task.setTotalItems(0);
                                         task.setFinishedItems(0);
+                                        task.setSeverName(serverUrl);
 
                                         Long now = new Date().getTime();
                                         task.setStartDate(String.valueOf(now));
@@ -728,7 +747,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                                     mEditor.remove("userId").commit();
                                     mEditor.remove("username").commit();
                                     mEditor.remove("isAlbum").commit();
-
+                                    mEditor.remove("server").commit();
                                     Intent logoutIntent = new Intent(context, LoginActivity.class);
                                     startActivity(logoutIntent);
 
@@ -775,7 +794,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         TextView serverTextView = (TextView) findViewById(R.id.tv_server_url);
         nameTextView.setText(username);
         emailTextView.setText(email);
-        serverTextView.setText(serverUrl);
+        if(serverUrl.length()<25){
+            serverTextView.setText(serverUrl);
+        }else
+            serverTextView.setText(serverUrl.substring(0,25)+"...");
     }
 
 

@@ -517,6 +517,7 @@ public class LoginActivity extends AppCompatActivity {
             task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
+            task.setSeverName(serverURL);
 
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
@@ -541,6 +542,7 @@ public class LoginActivity extends AppCompatActivity {
             task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
+            task.setSeverName(serverURL);
 
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
@@ -612,6 +614,7 @@ public class LoginActivity extends AppCompatActivity {
                     mEditor.putString("userId",user.getPerson().getId()).apply();
                     mEditor.putString("email",user.getEmail()).apply();
                     mEditor.putString("apiKey",user.getApiKey()).apply();
+                    mEditor.putString("server",serverURL).apply();
                 mEditor.commit();
                 if(collectionId!=null&&collectionId!=""){
                      RetrofitClient.getCollectionById(collectionId, callback_collection, user.getApiKey());

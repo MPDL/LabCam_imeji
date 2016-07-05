@@ -125,6 +125,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private SharedPreferences mPrefs;
     private String username;
     private String userId;
+    private String serverName;
 
     //UI flag(timeLine/Album)
     private static TextView dateLabel = null;
@@ -151,6 +152,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         mPrefs = getActivity().getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         userId = mPrefs.getString("userId","");
+        serverName = mPrefs.getString("server","");
+
 
     }
 
@@ -264,7 +267,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     num_activate = stoppedTasks.size() + waitingTasks.size();
 
                     if(num_activate > 0){
-                        Task auTask = DeviceStatus.getAuTask(userId);
+                        Task auTask = DeviceStatus.getAuTask(userId,serverName);
                         if(auTask!=null && String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState()) &&  auTask.getTotalItems()==auTask.getFinishedItems())
                             num_activate --;
                     }

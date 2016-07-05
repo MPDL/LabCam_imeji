@@ -41,7 +41,7 @@
         android:id="@+id/im_qr_scan"
         android:layout_below="@id/toolbar"
         android:background="@drawable/qr_scan"/>
-    
+
         <ListView
             android:layout_width="match_parent"
             android:layout_height="340dp"
@@ -65,15 +65,15 @@
         <!--android:layout_alignParentRight="true"/>-->
 
 
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="53dp"
-        android:text="save"
-        android:textColor="@drawable/clickable_color_save"
-        android:background="@drawable/clickable_save"
-        android:textSize="17dp"
-        android:id="@+id/save_collection"
-        android:layout_alignParentBottom="true"/>
+    <!--<Button-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="53dp"-->
+        <!--android:text="save"-->
+        <!--android:textColor="@drawable/clickable_color_save"-->
+        <!--android:background="@drawable/clickable_save"-->
+        <!--android:textSize="17dp"-->
+        <!--android:id="@+id/save_collection"-->
+        <!--android:layout_alignParentBottom="true"/>-->
 
 
 </RelativeLayout>

@@ -44,9 +44,11 @@ public class SettingsListAdapter extends BaseAdapter {
         this.ie = ie;
         String lastCollectionId ="";
         mPrefs = activity.getSharedPreferences("myPref", 0);
+
         String userId = mPrefs.getString("userId", "");
+        String serverName = mPrefs.getString("server","");
         try{
-            lastCollectionId = DeviceStatus.getAuTask(userId).getCollectionId();
+            lastCollectionId = DeviceStatus.getAuTask(userId,serverName).getCollectionId();
         }
         catch(Exception e){
         }
@@ -104,7 +106,7 @@ public class SettingsListAdapter extends BaseAdapter {
             //checkBox
             if(collection.getImejiId().equals(collectionId)){
                 selectedPosition = position;
-                ie.setCollectionId(selectedPosition);
+                ie.setCollectionId(selectedPosition,true);
                 notifyDataSetChanged();
             }
 
@@ -123,9 +125,6 @@ public class SettingsListAdapter extends BaseAdapter {
         checkBox.setTag(position);
 
 
-
-
-
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -133,23 +132,11 @@ public class SettingsListAdapter extends BaseAdapter {
 
                 selectedPosition = (Integer)view.getTag();
 
-                ie.setCollectionId(selectedPosition);
+                ie.setCollectionId(selectedPosition,false);
                 //onclick place radioButton to selected position
                 collectionId = folderItems.get(selectedPosition).getImejiId();
 
                 notifyDataSetChanged();
-
-                //collectionID and remoteServer
-
-//                SharedPreferences.Editor editor = mPrefs.edit();
-//                editor.putString("collectionID", folderItems.get(selectedPosition).id);
-//                editor.putString("remoteServer", folderItems.get(selectedPosition).getTitle());
-
-//                System.out.println(LOG_TAG + " selectedPosition on click " + selectedPosition);
-//                System.out.println(preferences.getString("collectionID","default") + selectedPosition);
-
-//                editor.apply();
-
 
             }
         });

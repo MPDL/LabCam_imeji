@@ -166,7 +166,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
     }
 
     @Override
-    public void setCollectionId(int Id) {
+    public void setCollectionId(int Id, boolean isSet) {
         collectionId = collectionList.get(Id).getImejiId();
         collectionName = collectionList.get(Id).getTitle();
     }

@@ -196,7 +196,7 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/switch_auto_upload"
                         android:layout_alignParentRight="true"
-                        android:checked="false"
+                        android:checked="true"
                         android:layout_marginRight="10dp" />
                 </RelativeLayout>
             </RelativeLayout>

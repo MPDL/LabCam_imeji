@@ -16,6 +16,7 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -93,6 +94,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
     private ProgressDialog pDialog = null;
 
+    private String serverUrl;
 
 
 
@@ -234,6 +236,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         userId = mPrefs.getString("userId","");
         apiKey = mPrefs.getString("apiKey", "");
         email = mPrefs.getString("email", "");
+        serverUrl = mPrefs.getString("server","");
 
         /** scan QR **/
         Button qrCodeImageView = (Button) findViewById(R.id.im_qr_scan);
@@ -251,7 +254,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         listView.setAdapter(adapter);
 
         //save collection folder
-        saveCollection();
+//        saveCollection();
     }
 
     @Override
@@ -279,33 +282,30 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     private void updateFolder(){
         RetrofitClient.getGrantCollectionMessage(callback, apiKey);
     }
-
-    private void saveCollection(){
-        Button saveButton = (Button) rootView.findViewById(R.id.save_collection);
-        saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //create task if collection is selected
-                if (!collectionID.equals("") && !collectionID.equals(null)) {
-                    Log.i("~collectionID", collectionID);
-
-
-                    /**
-                     * delete all AU Task if finished
-                     * */
-                    DeviceStatus.deleteFinishedAUTasks();
-
-                    /**create Task**/
-                    createTask(collectionID);
-
-                } else {
-//                    Toast.makeText(context, "collection setting not changed", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-    }
+//
+//    private void saveCollection(){
+//
+//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                collectionID = collectionListLocal.get(i).getImejiId();
+//                collectionName = collectionListLocal.get(i).getTitle();
+//                Log.e("<>",i+collectionID+collectionName);
+//                if (!collectionID.equals("") && !collectionID.equals(null)) {
+//                    Log.i("~collectionID", collectionID);
+//
+//                    /**
+//                     * delete all AU Task if finished
+//                     * */
+//                    DeviceStatus.deleteFinishedAUTasks();
+//
+//                    /**create Task**/
+//                    createTask(collectionID);
+//
+//                }
+//            }
+//        });
+//    }
 
     private void createTask(String collectionID){
 
@@ -333,6 +333,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
+            task.setSeverName(serverUrl);
 
 //            String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
@@ -474,9 +475,27 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     }
 
     @Override
-    public void setCollectionId(int Id) {
+    public void setCollectionId(int Id,boolean isSet) {
         collectionID = collectionListLocal.get(Id).getImejiId();
         collectionName = collectionListLocal.get(Id).getTitle();
+
+        // collection not changed
+        if(isSet){
+            return;
+        }
+
+        if (!collectionID.equals("") && !collectionID.equals(null)) {
+            Log.i("~collectionID", collectionID);
+
+            /**
+             * delete all AU Task if finished
+             * */
+            DeviceStatus.deleteFinishedAUTasks();
+
+            /**create Task**/
+            createTask(collectionID);
+
+        }
     }
 
 
@@ -520,6 +539,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     task.setState(String.valueOf(DeviceStatus.state.WAITING));
                                     task.setUserName(username);
                                     task.setUserId(userId);
+                                    task.setSeverName(serverUrl);
 
                                     Long now = new Date().getTime();
                                     task.setStartDate(String.valueOf(now));

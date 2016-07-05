@@ -39,6 +39,7 @@ import example.com.mpdlcamera.Utils.DeviceStatus;
 public class CameraEventReceiver extends BroadcastReceiver implements UploadResultReceiver.Receiver{
 
     private String userId;
+    private String serverName;
     private SharedPreferences mPrefs;
     static CountDownTimer timer =null;
     Toast toast;
@@ -49,6 +50,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
 
         mPrefs = context.getSharedPreferences("myPref", 0);
         userId = mPrefs.getString("userId","");
+        serverName = mPrefs.getString("server","");
 
 //        // customized toast
 //        LinearLayout  layout = new LinearLayout(context);
@@ -108,7 +110,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         }
 
         //no auto task
-       if(DeviceStatus.getAuTask(userId)==null){
+       if(DeviceStatus.getAuTask(userId,serverName)==null){
            Log.e("cameraEvent","can't get auTask");
            return;
        }
@@ -166,7 +168,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
             photo.setCreateTime(createTime);
             photo.setSize(fileSize);
             photo.setState(imageState);
-            photo.setTaskId(DeviceStatus.getAuTask(userId).getTaskId());
+            photo.setTaskId(DeviceStatus.getAuTask(userId,serverName).getTaskId());
             photo.save();
 
             //get current Task id
@@ -179,9 +181,9 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
             task.save();
             Log.e("<>", task.getTotalItems()+"");
 
-            Log.v("taskid", DeviceStatus.getAuTask(userId).getTaskId());
+            Log.v("taskid", DeviceStatus.getAuTask(userId,serverName).getTaskId());
             Log.v("taskId", getImage().getTaskId());
-            Log.v("taskNum", DeviceStatus.getAuTask(userId).getTotalItems() + "");
+            Log.v("taskNum", DeviceStatus.getAuTask(userId,serverName).getTotalItems() + "");
 
             UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
             mReceiver.setReceiver(this);

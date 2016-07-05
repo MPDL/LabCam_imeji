@@ -64,6 +64,7 @@ public class TaskUploadService extends Service{
     private String username;
     private String userId;
     private String apiKey;
+    private String serverName;
     private String collectionID;
     public TypedFile typedFile;
     String json;
@@ -151,10 +152,12 @@ public class TaskUploadService extends Service{
             username = mPrefs.getString("username", "");
             apiKey = mPrefs.getString("apiKey", "");
             userId = mPrefs.getString("userId", "");
+            serverName = mPrefs.getString("server","");
+
 
             //set task
             try{
-                task =  DeviceStatus.getAuTask(userId);
+                task =  DeviceStatus.getAuTask(userId,serverName);
 
                 if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
                     return super.onStartCommand(intent, flags, startId);

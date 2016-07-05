@@ -37,7 +37,7 @@
             android:value="MPDLCam.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="1" />
+            android:value="2" />
 
         <!-- Auth -->
         <activity
