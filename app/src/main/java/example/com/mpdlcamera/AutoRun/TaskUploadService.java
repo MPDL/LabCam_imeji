@@ -318,7 +318,7 @@ public class TaskUploadService extends Service{
         int mNotificationId = 001;
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
 
-        builder.setSmallIcon(R.drawable.icon_app);
+        builder.setSmallIcon(R.drawable.notification);
         builder.setContentTitle("LabCam");
 
         if(("AU").equalsIgnoreCase(task.getUploadMode())){

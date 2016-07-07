@@ -446,7 +446,7 @@ public class ManualUploadThread extends Thread {
     private void notification(){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 
-        builder.setSmallIcon(R.drawable.icon_app);
+        builder.setSmallIcon(R.drawable.notification);
         builder.setContentTitle("LabCam");
 
         String taskInfo = task.getTotalItems()+ " photo(s) uploaded successfully";
