@@ -1,5 +1,7 @@
 package example.com.mpdlcamera.AutoRun;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +12,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -24,14 +27,17 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.LocalAlbum;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
+import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Utils.DeviceStatus;
+import example.com.mpdlcamera.Utils.UiElements.Notification.NotificationID;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -307,6 +313,32 @@ public class TaskUploadService extends Service{
 
     }
 
+    private void notification(){
+        //default ID for the notification (auto)
+        int mNotificationId = 001;
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
+
+        builder.setSmallIcon(R.drawable.icon_app);
+        builder.setContentTitle("LabCam");
+
+        if(("AU").equalsIgnoreCase(task.getUploadMode())){
+            String taskInfo = "Automatic upload success";
+            builder.setContentText(taskInfo);
+        }else{
+            // Sets an ID for the notification
+            mNotificationId = NotificationID.getID();
+            String taskInfo = task.getTotalItems()+ " photo(s) uploaded successfully";
+            builder.setContentText(taskInfo);
+        }
+
+        Intent intent = new Intent(mContext, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(mNotificationId, builder.build());
+    }
+
     //callback
     Callback<DataItem> callback = new Callback<DataItem>() {
         @Override
@@ -381,6 +413,8 @@ public class TaskUploadService extends Service{
                 Log.e(TAG, "getTotalItems:" + task.getTotalItems());
                 Log.e(TAG, "getFinishedItems:" + task.getFinishedItems());
 
+                //push local notification
+                notification();
                 Log.e(TAG, "task finished");
             }
         }

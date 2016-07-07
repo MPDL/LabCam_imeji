@@ -1,9 +1,13 @@
 package example.com.mpdlcamera.AutoRun;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -15,13 +19,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
+import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Utils.DeviceStatus;
+import example.com.mpdlcamera.Utils.UiElements.Notification.NotificationID;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -269,7 +276,8 @@ public class ManualUploadThread extends Thread {
                 handler=new Handler(Looper.getMainLooper());
                 handler.post(new Runnable() {
                     public void run() {
-                        Toast.makeText(context, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                        notification();
+//                        Toast.makeText(context, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
                     }
                 });
                 Log.i(TAG,"task finished");
@@ -430,7 +438,27 @@ public class ManualUploadThread extends Thread {
             task.setState(String.valueOf(DeviceStatus.state.FINISHED));
             task.setEndDate(DeviceStatus.dateNow());
             task.save();
+            notification();
             Log.i(TAG,"task finished");
         }
+    }
+
+    private void notification(){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+
+        builder.setSmallIcon(R.drawable.icon_app);
+        builder.setContentTitle("LabCam");
+
+        String taskInfo = task.getTotalItems()+ " photo(s) uploaded successfully";
+        builder.setContentText(taskInfo);
+
+        Intent intent = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(pendingIntent);
+
+        // Sets an ID for the notification
+        int mNotificationId = NotificationID.getID();
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(mNotificationId, builder.build());
     }
 }
