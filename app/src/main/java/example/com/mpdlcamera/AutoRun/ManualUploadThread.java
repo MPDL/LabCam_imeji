@@ -147,14 +147,17 @@ public class ManualUploadThread extends Thread {
                 Log.e(TAG, "createTime: "+ image.getCreateTime());
                 Log.e(TAG, "==> step 2");
 
-                // TODO:upload image
+                // upload image
                 String jsonPart1 = "\"collectionId\" : \"" +
                         collectionID +
                         "\"";
                 File f = new File(filePath);
+
+                String jsonPart2 = "";
                 if(f.exists() && !f.isDirectory()) {
                     // do something
                     Log.i(TAG,collectionID+": file exist");
+                    jsonPart2 = DeviceStatus.metaDataJson(filePath);
                 }else {
                     Log.i(TAG, "file not exist: " + currentImageId);
                     // delete Image from task
@@ -169,8 +172,9 @@ public class ManualUploadThread extends Thread {
                 }
 
                 typedFile = new TypedFile("multipart/form-data", f);
-                json = "{" + jsonPart1 + "}";
+                json = "{" + jsonPart1 + ", \"metadata\" : "+jsonPart2+"}";
 
+                Log.e(TAG,json);
 
                 Log.e(TAG, "start uploading~ " + filePath);
                 Log.e(TAG, "TO remote :"+collectionID + "from local:"+ filePath);

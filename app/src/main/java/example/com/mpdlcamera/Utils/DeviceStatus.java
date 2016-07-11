@@ -3,6 +3,7 @@ package example.com.mpdlcamera.Utils;
 import android.app.Activity;
 import android.content.Context;
 import android.location.LocationManager;
+import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -17,15 +18,22 @@ import com.activeandroid.query.Select;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+
+import javax.servlet.descriptor.TaglibDescriptor;
 
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
@@ -330,6 +338,78 @@ public class DeviceStatus {
             return false;
         }
 
+    }
+
+    public static String metaDataJson(String imagePath){
+
+        String metaDataJsonStr = null;
+
+        ExifInterface exif = null;
+
+        try {
+            exif = new ExifInterface(imagePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // if exif exist, generate metaDataJson
+        if(exif!=null){
+            String createTime = exif.getAttribute(ExifInterface.TAG_DATETIME);
+            if(createTime!=null) {
+                Log.e(LOG_TAG,createTime);
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
+                try {
+                    Date date = formatter.parse(createTime);
+                    SimpleDateFormat formatterShort = new SimpleDateFormat("yyyy-MM-dd");
+                    createTime = formatterShort.format(date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    createTime = "";
+                }
+            }
+
+            String makeStr = exif.getAttribute(ExifInterface.TAG_MAKE);
+            String modelStr = exif.getAttribute(ExifInterface.TAG_MODEL);
+            int isoSpeedRatings = 0;
+            try{
+                isoSpeedRatings = Integer.parseInt(exif.getAttribute(ExifInterface.TAG_ISO));
+            }
+            catch (Exception e){
+
+            }
+            //TODO: find a solution for ExposureMode
+            String exposureModeStr = exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME);
+            String exposureTimeStr = exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME);
+            float[] latLong = new float[2];
+            if (exif.getLatLong(latLong)) {
+                // latLong[0] holds the Latitude value now.
+                // latLong[1] holds the Longitude value now.
+            }
+            else {
+                // Latitude and Longitude were not included in the Exif data.
+            }
+
+            try {
+                 metaDataJsonStr = new JSONObject()
+                         .put("Creation Date", createTime)
+                         .put("Make", makeStr)
+                         .put("ISO Speed Ratings", isoSpeedRatings)
+                         .put("Model", modelStr)
+                         .put("Exposure Time", exposureTimeStr)
+                         .put("Exposure Mode", exposureModeStr)
+                         .put("Geolocation", new JSONObject()
+                                 .put("name", "")
+                                 .put("longitude", latLong[0])
+                                 .put("latitude", latLong[1]))
+                         .toString();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+        }
+        Log.e(LOG_TAG, metaDataJsonStr);
+        return metaDataJsonStr;
     }
 
 }
