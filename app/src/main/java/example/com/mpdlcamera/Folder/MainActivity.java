@@ -609,7 +609,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         if(auTask==null){
             // popup
-            Toast.makeText(activity,"Automatic upload is active\n please set a collection",Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity,"Automatic upload is active, please set a collection",Toast.LENGTH_SHORT).show();
 
 //            Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
 //            startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);

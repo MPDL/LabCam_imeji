@@ -378,7 +378,7 @@ public class DeviceStatus {
 
             }
             //TODO: find a solution for ExposureMode
-            String exposureModeStr = exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME);
+            String exposureModeStr = exif.getAttribute(ExifInterface.TAG_EXPOSURE_MODE);
             String exposureTimeStr = exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME);
             float[] latLong = new float[2];
             if (exif.getLatLong(latLong)) {

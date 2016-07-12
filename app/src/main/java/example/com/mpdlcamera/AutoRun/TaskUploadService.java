@@ -109,43 +109,6 @@ public class TaskUploadService extends Service{
         super.onCreate();
 
                 Log.v(TAG, "TaskUploadService onCreate!");
-
-//                // prepare auth for upload
-//                mPrefs = this.getSharedPreferences("myPref", 0);
-//                username = mPrefs.getString("username", "");
-//                apiKey = mPrefs.getString("apiKey", "");
-//                userId = mPrefs.getString("userId", "");
-//
-//                //set task
-//                try{
-//                    // AuTask can not be more than 1 (<=1)
-//                    task =  DeviceStatus.getAuTask(userId);
-//                    // set currentTask id
-//                    currentTaskId = task.getTaskId();
-//
-//                    // task already failed
-//                    if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
-//                        return;
-//                    }
-//
-//                    Log.i(TAG, "currentTaskId" + currentTaskId);
-//                    finishedNum = task.getFinishedItems();
-//                    Log.v(TAG,"onCreate getFinishedItems: "+finishedNum);
-//                }
-//                catch (Exception e){
-//                    // no task or exception in query
-//                    Log.v(TAG,"no task or exception in query");
-//                }
-//                // set collectionId
-//                if(task!=null) {
-//                    collectionID = task.getCollectionId();
-//                    Log.v(TAG+"onCreate","collectionID set");
-//                }else{
-//                    Log.v(TAG,"mTask is null, can't get collectionID");
-//                    return;
-//                }
-//                // task exist,then start task
-//                startUpload();
             }
 
     @Override
@@ -256,34 +219,7 @@ public class TaskUploadService extends Service{
                 String filePath = image.getImagePath();
                 // important: set currentImageId, so that in the callback can find it
                 currentImageId = image.getImageId();
-                Log.e(TAG, "---------------------------");
-                Log.e(TAG, "==> step 1");
-                Log.e(TAG, "prepare upload picture");
-                Log.e(TAG, "currentImageId: "+currentImageId);
-                Log.e(TAG, "filePath: "+filePath);
-                Log.e(TAG, "createTime: "+ image.getCreateTime());
-                Log.e(TAG, "==> step 2");
-
-
-                // TODO:upload image
-                String jsonPart1 = "\"collectionId\" : \"" +
-                        collectionID +
-                        "\"";
-
-                typedFile = new TypedFile("multipart/form-data", new File(filePath));
-                json = "{" + jsonPart1 + "}";
-                Log.e(TAG, "start uploading~ " + filePath);
-                Log.e(TAG, "TO remote :"+collectionID + "from local:"+ filePath);
-                Log.e(TAG, "==> step 3");
-
-                // image set state stated
-                image.setState(String.valueOf(DeviceStatus.state.STARTED));
-                Log.e(TAG, "imageName! "+image.getImageName());
-                Log.e(TAG, "status! " + image.getState());
-                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
-                Log.e(TAG, "2imageName! "+image.getImageName());
-                Log.e(TAG, "2status! " + image.getState());
-
+                upload(image);
             }
         }
     }
@@ -294,7 +230,6 @@ public class TaskUploadService extends Service{
         }
 
         // prepare image
-        String imageState = image.getState();
         String filePath = image.getImagePath();
         currentImageId = image.getImageId();
         Log.e(TAG, "upload" + currentImageId);
@@ -304,8 +239,27 @@ public class TaskUploadService extends Service{
                 collectionID +
                 "\"";
 
-        typedFile = new TypedFile("multipart/form-data", new File(filePath));
-        json = "{" + jsonPart1 + "}";
+        String jsonPart2 = "";
+        File f = new File(filePath);
+        if(f.exists() && !f.isDirectory()) {
+            // do something
+            Log.i(TAG,collectionID+": file exist");
+            jsonPart2 = DeviceStatus.metaDataJson(filePath);
+        }else {
+            Log.i(TAG, "file not exist: " + currentImageId);
+            // delete Image from task
+            new Delete()
+                    .from(Image.class)
+                    .where("imageId = ?", currentImageId)
+                    .execute();
+            // continue upload
+//            uploadNext();
+
+            return;
+        }
+
+        typedFile = new TypedFile("multipart/form-data", f);
+        json = "{" + jsonPart1 + ", \"metadata\" : "+jsonPart2+"}";
         Log.v(TAG, "start uploading: " + filePath);
 
         RetrofitClient.uploadItem(typedFile, json, callback, apiKey);

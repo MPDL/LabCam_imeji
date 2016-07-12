@@ -139,48 +139,8 @@ public class ManualUploadThread extends Thread {
                 String filePath = image.getImagePath();
                 // important: set currentImageId, so that in the callback can find it
                 currentImageId = image.getImageId();
-                Log.e(TAG, "---------------------------");
-                Log.e(TAG, "==> step 1");
-                Log.e(TAG, "prepare upload picture");
-                Log.e(TAG, "currentImageId: "+currentImageId);
-                Log.e(TAG, "filePath: "+filePath);
-                Log.e(TAG, "createTime: "+ image.getCreateTime());
-                Log.e(TAG, "==> step 2");
 
-                // upload image
-                String jsonPart1 = "\"collectionId\" : \"" +
-                        collectionID +
-                        "\"";
-                File f = new File(filePath);
-
-                String jsonPart2 = "";
-                if(f.exists() && !f.isDirectory()) {
-                    // do something
-                    Log.i(TAG,collectionID+": file exist");
-                    jsonPart2 = DeviceStatus.metaDataJson(filePath);
-                }else {
-                    Log.i(TAG, "file not exist: " + currentImageId);
-                    // delete Image from task
-                    new Delete()
-                            .from(Image.class)
-                            .where("imageId = ?", currentImageId)
-                            .execute();
-                    // continue unpload
-                    uploadNext();
-
-                    return;
-                }
-
-                typedFile = new TypedFile("multipart/form-data", f);
-                json = "{" + jsonPart1 + ", \"metadata\" : "+jsonPart2+"}";
-
-                Log.e(TAG,json);
-
-                Log.e(TAG, "start uploading~ " + filePath);
-                Log.e(TAG, "TO remote :"+collectionID + "from local:"+ filePath);
-                Log.e(TAG, "==> step 3");
-
-                RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+                upload(image);
 
             }
         }
@@ -203,11 +163,12 @@ public class ManualUploadThread extends Thread {
                 collectionID +
                 "\"";
 
-
+        String jsonPart2 = "";
         File f = new File(filePath);
         if(f.exists() && !f.isDirectory()) {
             // do something
             Log.i(TAG,collectionID+": file exist");
+            jsonPart2 = DeviceStatus.metaDataJson(filePath);
         }else {
             Log.i(TAG, "file not exist: " + currentImageId);
             // delete Image from task
@@ -222,7 +183,7 @@ public class ManualUploadThread extends Thread {
         }
 
         typedFile = new TypedFile("multipart/form-data", f);
-        json = "{" + jsonPart1 + "}";
+        json = "{" + jsonPart1 + ", \"metadata\" : "+jsonPart2+"}";
         Log.v(TAG, "start uploading: " + filePath);
         RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
         image.setState(String.valueOf(DeviceStatus.state.STARTED));
