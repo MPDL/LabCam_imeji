@@ -1,11 +1,13 @@
 package example.com.mpdlcamera.Retrofit;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.ImejiProfile;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.Model.MessageModel.ItemMessage;
 import example.com.mpdlcamera.Model.User;
@@ -133,4 +135,33 @@ public class RetrofitClient {
         imejiAPI.createCollection(jsonObject, callback);
     }
 
+    /** meta data and profile **/
+
+    /**
+     * createProfile
+     * @param jsonStr
+     * @param callback
+     * @param APIkey
+     */
+    public static void createProfile(String jsonStr,
+                                     Callback<ImejiProfile> callback, String APIkey) {
+        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObject = parser.parse(jsonStr).getAsJsonObject();
+        imejiAPI.createProfile(jsonObject, callback);
+    }
+
+    /**
+     * updateCollection
+     * @param collectionId
+     * @param jsonObject
+     * @param callback
+     * @param APIkey
+     */
+    public static void updateCollection(String collectionId,
+                                        JsonObject jsonObject,
+                                     Callback<ImejiFolder> callback, String APIkey) {
+        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
+        imejiAPI.updateCollection(collectionId,jsonObject, callback);
+    }
 }

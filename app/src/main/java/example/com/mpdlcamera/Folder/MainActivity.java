@@ -169,12 +169,12 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 //        serverUrl = DeviceStatus.parseServerUrl(serverUrl);
 
 
-        try{
-        Bundle args = this.getIntent().getExtras();
-        isTaskFragment= args.getBoolean("isTaskFragment", false);}
-        catch (Exception e){
-//            Log.v(LOG_TAG,e.getMessage());
-        }
+//        try{
+//        Bundle args = this.getIntent().getExtras();
+//        isTaskFragment= args.getBoolean("isTaskFragment", false);}
+//        catch (Exception e){
+////            Log.v(LOG_TAG,e.getMessage());
+//        }
 
         /** show alert if no collection available **/
         RetrofitClient.getGrantCollectionMessage(callback, apiKey);
@@ -433,23 +433,23 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(tabAdapter);
-
-        if(isTaskFragment){
-            currentTab = 2;
-        viewPager.setCurrentItem(currentTab);
-        }
+//
+//        if(isTaskFragment){
+//            currentTab = 2;
+//        viewPager.setCurrentItem(currentTab);
+//        }
 
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.getTabAt(0).setCustomView(R.layout.tab_local);
         tabLayout.getTabAt(1).setCustomView(R.layout.tab_imeji);
 //        tabLayout.getTabAt(2).setCustomView(R.layout.tab_upload);
 
-        if(isTaskFragment){
-            TextView taskTextView = (TextView)tabLayout.findViewById(R.id.tabicon_upload);
-            taskTextView.setTextColor(getResources().getColor(R.color.primary));
-            TextView fotoTextView = (TextView)tabLayout.findViewById(R.id.tabicon_local);
-            fotoTextView.setTextColor(getResources().getColor(R.color.tabUnselect));
-        }
+//        if(isTaskFragment){
+//            TextView taskTextView = (TextView)tabLayout.findViewById(R.id.tabicon_upload);
+//            taskTextView.setTextColor(getResources().getColor(R.color.primary));
+//            TextView fotoTextView = (TextView)tabLayout.findViewById(R.id.tabicon_local);
+//            fotoTextView.setTextColor(getResources().getColor(R.color.tabUnselect));
+//        }
 
         //tab style change on page change
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

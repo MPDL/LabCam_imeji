@@ -6,6 +6,7 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
 import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.ImejiProfile;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.Model.MessageModel.ItemMessage;
 import example.com.mpdlcamera.Model.User;
@@ -16,6 +17,7 @@ import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.Multipart;
 import retrofit.http.POST;
+import retrofit.http.PUT;
 import retrofit.http.Part;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -102,4 +104,16 @@ public interface ImejiAPI {
     void createCollection(@Body JsonObject jsonBody ,
                           Callback<ImejiFolder> callback) ;
 
+    /**
+     * uploading
+     */
+
+    @POST("/profiles")
+    void createProfile(@Body JsonObject jsonObject,
+                       Callback<ImejiProfile> callback);
+
+    @PUT("/collections/{id}")
+    void updateCollection(@Path("id") String collectionId,
+            @Body JsonObject jsonObject,
+            Callback<ImejiFolder> callback);
 }

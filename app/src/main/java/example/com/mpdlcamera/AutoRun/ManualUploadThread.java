@@ -13,14 +13,25 @@ import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.squareup.otto.Produce;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import example.com.mpdlcamera.Folder.MainActivity;
 import example.com.mpdlcamera.Model.DataItem;
+import example.com.mpdlcamera.Model.ImejiFolder;
+import example.com.mpdlcamera.Model.ImejiProfile;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.Otto.OttoSingleton;
@@ -66,7 +77,9 @@ public class ManualUploadThread extends Thread {
     private String currentTaskId;
     private String collectionID;
 
-
+    //profile and meta data
+    String getCollectionResponse;
+    String profileId;
 
     public ManualUploadThread(Context context,String currentTaskId) {
         super("ManualUploadThread");
@@ -95,6 +108,9 @@ public class ManualUploadThread extends Thread {
 
             //prepare collectionId
             collectionID =task.getCollectionId();
+
+            /** debug **/
+            getCollectionById();
 
             startUpload();
 
@@ -185,14 +201,279 @@ public class ManualUploadThread extends Thread {
         typedFile = new TypedFile("multipart/form-data", f);
         json = "{" + jsonPart1 + ", \"metadata\" : "+jsonPart2+"}";
         Log.v(TAG, "start uploading: " + filePath);
-        RetrofitClient.uploadItem(typedFile, json, callback, apiKey);
+        RetrofitClient.uploadItem(typedFile, json, callback_upload, apiKey);
         image.setState(String.valueOf(DeviceStatus.state.STARTED));
 
 
     }
 
 
-    Callback<DataItem> callback = new Callback<DataItem>() {
+
+
+    private boolean taskIsStopped (){
+        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+
+        try{
+            if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
+                Log.v(TAG,"taskIsStopped");
+                return true;
+            }else{
+                Log.v(TAG,"task is not stopped");
+                return false;
+            }}catch (Exception e){
+            Log.e(TAG,"taskIsStopped exception");
+            return false;
+        }
+    }
+
+    private void uploadNext(){
+
+        int totalNum = 0;
+        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+
+        if(task==null){
+            return;
+        }
+
+        finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+        List<Image> allImages= new Select().from(Image.class).where("taskId = ?", currentTaskId).execute();
+        totalNum = allImages.size();
+
+        // finishedImages ofc >1
+        if(finishedImages==null) {
+            return;
+        }
+
+        task.setTotalItems(totalNum);
+        task.setFinishedItems(finishedImages.size());
+        task.setEndDate(DeviceStatus.dateNow());
+        task.save();
+
+
+        if (taskIsStopped()) {
+            Log.e(TAG,"task is stopped");
+            return;
+        }else if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+            Log.e(TAG,"task is failed");
+            return;
+        }
+
+        /** move on to next **/
+        int finishedNum = task.getFinishedItems();
+//        totalNum = task.getTotalItems();
+        if(totalNum>finishedNum){
+            // continue anyway
+            Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?",String.valueOf(DeviceStatus.state.STARTED)).where("state != ?",String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
+            if(image!=null){
+                upload(image);
+            }
+        }else {
+            task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+            task.setEndDate(DeviceStatus.dateNow());
+            task.save();
+            notification();
+            Log.i(TAG,"task finished");
+        }
+    }
+
+    private void notification(){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+
+        builder.setSmallIcon(R.drawable.notification);
+        builder.setContentTitle("LabCam");
+
+        String taskInfo = task.getTotalItems()+ " photo(s) uploaded successfully";
+        builder.setContentText(taskInfo);
+
+        Intent intent = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(pendingIntent);
+
+        // Sets an ID for the notification
+        int mNotificationId = NotificationID.getID();
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(mNotificationId, builder.build());
+    }
+
+    //todo: post item with MDs
+
+    /**
+     * retrieve collection by ID
+     */
+    private void getCollectionById(){
+        RetrofitClient.getCollectionById(collectionID,callback_get_collection,apiKey);
+    }
+
+
+    /**
+     * callbacks
+     */
+
+
+    Callback<ImejiFolder> callback_get_collection = new Callback<ImejiFolder>() {
+        @Override
+        public void success(ImejiFolder imejiFolder, Response response) {
+            if(imejiFolder.getProfile().getId()==null){
+                //store response
+                //Try to get response body
+                BufferedReader reader = null;
+                StringBuilder sb = new StringBuilder();
+                try {
+
+                    reader = new BufferedReader(new InputStreamReader(response.getBody().in()));
+
+                    String line;
+
+                    try {
+                        while ((line = reader.readLine()) != null) {
+                            sb.append(line);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                getCollectionResponse = sb.toString();
+                Log.e(TAG,getCollectionResponse);
+
+                //create new profile
+                String collectionTitle = imejiFolder.getTitle();
+                String jsonTitlePart = " \"title\" :"+" \""+ collectionTitle+" \"";
+                String jsonStatementsPart = "\n" +
+                        "      \"statements\": [\n" +
+                        "        {\n" +
+                        "          \"type\": \"http://imeji.org/terms/metadata#date\",\n" +
+                        "          \"labels\": [\n" +
+                        "            {\n" +
+                        "              \"value\": \"Creation Date\",\n" +
+                        "              \"lang\": \"en\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
+                        "          \"labels\": [\n" +
+                        "            {\n" +
+                        "              \"value\": \"Make\",\n" +
+                        "              \"lang\": \"en\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
+                        "          \"labels\": [\n" +
+                        "            {\n" +
+                        "              \"value\": \"Model\",\n" +
+                        "              \"lang\": \"en\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "          \"type\": \"http://imeji.org/terms/metadata#number\",\n" +
+                        "          \"labels\": [\n" +
+                        "            {\n" +
+                        "              \"value\": \"ISO Speed Ratings\",\n" +
+                        "              \"lang\": \"en\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "          \"type\": \"http://imeji.org/terms/metadata#geolocation\",\n" +
+                        "          \"labels\": [\n" +
+                        "            {\n" +
+                        "              \"value\": \"Geolocation\",\n" +
+                        "              \"lang\": \"en\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
+                        "          \"labels\": [\n" +
+                        "            {\n" +
+                        "              \"value\": \"Exposure Mode\",\n" +
+                        "              \"lang\": \"en\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
+                        "          \"labels\": [\n" +
+                        "            {\n" +
+                        "              \"value\": \"Exposure Time\",\n" +
+                        "              \"lang\": \"en\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        }\n" +
+                        "      ]\n";
+
+                String jsonPostProfile = "{" + jsonTitlePart + ","+jsonStatementsPart+"}";
+                RetrofitClient.createProfile(jsonPostProfile,callback_create_profile,apiKey);
+
+                Log.e(TAG,"create new profile");
+            }else {
+                //TODO: retrieve profile by ID
+                Log.e(TAG,"retrieve profile by ID");
+            }
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.e(TAG,"failure in callback_get_collection");
+        }
+    };
+
+    // post profile callback
+    Callback<ImejiProfile> callback_create_profile = new Callback<ImejiProfile>() {
+        @Override
+        public void success(ImejiProfile imejiProfile, Response response) {
+            profileId = imejiProfile.getId();
+            Log.e(TAG,"profileId: "+profileId);
+            //update collection
+            //build update json
+            JsonParser parser = new JsonParser();
+            JsonObject jsonObject = parser.parse(getCollectionResponse).getAsJsonObject();
+            jsonObject.remove("profile");
+            JsonObject jsProfile = new JsonObject();
+                jsProfile.addProperty("id",profileId);
+                jsProfile.addProperty("method", "copy");
+            jsonObject.add("profile",jsProfile);
+
+            Log.e(TAG, "modified json:"+jsonObject.toString());
+
+            RetrofitClient.updateCollection(collectionID,jsonObject, callback_update_collection,apiKey);
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.e(TAG,"profileId: failed");
+            if(error.getResponse()!=null){
+                int responseCode = error.getResponse().getStatus();
+                Log.e(TAG,responseCode+"(error code)");
+                if(responseCode==403){
+                    //TODO: post item with MD ...
+
+                }
+
+            }
+        }
+    };
+
+    Callback<ImejiFolder> callback_update_collection = new Callback<ImejiFolder>() {
+        @Override
+        public void success(ImejiFolder imejiFolder, Response response) {
+            Log.e(TAG,"callback_update_collection success");
+            //TODO : post item with MD
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.e(TAG,"callback_update_collection failed");
+        }
+    };
+
+    Callback<DataItem> callback_upload = new Callback<DataItem>() {
         @Override
         @Produce
         public void success(DataItem dataItem, Response response) {
@@ -342,88 +623,4 @@ public class ManualUploadThread extends Thread {
         }
     };
 
-    private boolean taskIsStopped (){
-        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
-
-        try{
-            if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
-                Log.v(TAG,"taskIsStopped");
-                return true;
-            }else{
-                Log.v(TAG,"task is not stopped");
-                return false;
-            }}catch (Exception e){
-            Log.e(TAG,"taskIsStopped exception");
-            return false;
-        }
-    }
-
-    private void uploadNext(){
-
-        int totalNum = 0;
-        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
-
-        if(task==null){
-            return;
-        }
-
-        finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
-        List<Image> allImages= new Select().from(Image.class).where("taskId = ?", currentTaskId).execute();
-        totalNum = allImages.size();
-
-        // finishedImages ofc >1
-        if(finishedImages==null) {
-            return;
-        }
-
-        task.setTotalItems(totalNum);
-        task.setFinishedItems(finishedImages.size());
-        task.setEndDate(DeviceStatus.dateNow());
-        task.save();
-
-
-        if (taskIsStopped()) {
-            Log.e(TAG,"task is stopped");
-            return;
-        }else if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
-            Log.e(TAG,"task is failed");
-            return;
-        }
-
-        /** move on to next **/
-        int finishedNum = task.getFinishedItems();
-//        totalNum = task.getTotalItems();
-        if(totalNum>finishedNum){
-            // continue anyway
-            Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?",String.valueOf(DeviceStatus.state.STARTED)).where("state != ?",String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
-            if(image!=null){
-                upload(image);
-            }
-        }else {
-            task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-            task.setEndDate(DeviceStatus.dateNow());
-            task.save();
-            notification();
-            Log.i(TAG,"task finished");
-        }
-    }
-
-    private void notification(){
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-
-        builder.setSmallIcon(R.drawable.notification);
-        builder.setContentTitle("LabCam");
-
-        String taskInfo = task.getTotalItems()+ " photo(s) uploaded successfully";
-        builder.setContentText(taskInfo);
-
-        Intent intent = new Intent(context, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(pendingIntent);
-
-        // Sets an ID for the notification
-        int mNotificationId = NotificationID.getID();
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(mNotificationId, builder.build());
-    }
 }

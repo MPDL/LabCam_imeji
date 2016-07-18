@@ -7,17 +7,24 @@ import com.google.gson.annotations.Expose;
  */
 public class ImejiProfile {
     @Expose
-    private String Profileid;
+    private String id;
 
     @Expose
     private String Method;
 
-    public String getProfileid() {
-        return Profileid;
+
+
+    public ImejiProfile(String id, String method) {
+        this.id = id;
+        Method = method;
     }
 
-    public void setProfileid(String profileid) {
-        Profileid = profileid;
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getMethod() {
