@@ -78,6 +78,10 @@ public class TaskUploadService extends Service{
     //get context
     private Context activity = this;
 
+    //check type
+    Boolean[] checkTypeList = {false,false,false,false,false,false,false};
+
+
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with
@@ -244,7 +248,7 @@ public class TaskUploadService extends Service{
         if(f.exists() && !f.isDirectory()) {
             // do something
             Log.i(TAG,collectionID+": file exist");
-            jsonPart2 = DeviceStatus.metaDataJson(filePath);
+            jsonPart2 = DeviceStatus.metaDataJson(filePath,checkTypeList);
         }else {
             Log.i(TAG, "file not exist: " + currentImageId);
             // delete Image from task

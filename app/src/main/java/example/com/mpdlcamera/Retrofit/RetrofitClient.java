@@ -152,6 +152,20 @@ public class RetrofitClient {
         imejiAPI.createProfile(jsonObject, callback);
     }
 
+
+    /**
+     * get Profile
+     * @param profileId
+     * @param callback
+     * @param APIkey
+     */
+    public static void getProfileById(String profileId,
+                                      Callback<MetadataProfileTO> callback, String APIkey){
+        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
+        imejiAPI.getProfileById(profileId,callback);
+    }
+
+
     /**
      * updateCollection
      * @param collectionId
