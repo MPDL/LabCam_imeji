@@ -10,6 +10,7 @@ import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.ImejiProfile;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.Model.MessageModel.ItemMessage;
+import example.com.mpdlcamera.Model.TO.MetadataProfileTO;
 import example.com.mpdlcamera.Model.User;
 import retrofit.Callback;
 import retrofit.client.Response;
@@ -144,7 +145,7 @@ public class RetrofitClient {
      * @param APIkey
      */
     public static void createProfile(String jsonStr,
-                                     Callback<ImejiProfile> callback, String APIkey) {
+                                     Callback<MetadataProfileTO> callback, String APIkey) {
         ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(jsonStr).getAsJsonObject();

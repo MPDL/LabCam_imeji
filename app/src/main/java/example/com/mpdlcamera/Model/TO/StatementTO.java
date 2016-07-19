@@ -1,5 +1,9 @@
 package example.com.mpdlcamera.Model.TO;
 
+import android.support.annotation.Nullable;
+
+import com.google.gson.annotations.Expose;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,24 +14,34 @@ import java.util.List;
 
 public class StatementTO {
 
+    @Expose
     private String id;
 
+    @Expose
     private int pos;
 
-    private URI type;
+    @Expose
+    private String type;
 
-    private List<String> labels = new ArrayList<String>();
+    @Expose
+    private List<LocalizedStringTO> labels = new ArrayList<LocalizedStringTO>();
 
-    private URI vocabulary;
+    @Expose
+    private String vocabulary;
 
+    @Expose
     private List<LiteralConstraintTO> literalConstraints = new ArrayList<LiteralConstraintTO>();
 
+    @Expose
     private String minOccurs;
 
+    @Expose
     private String maxOccurs;
 
+    @Expose
     private String parentStatementId;
 
+    @Expose
     private boolean useInPreview;
 
     public String getId() {
@@ -46,29 +60,29 @@ public class StatementTO {
         this.pos = pos;
     }
 
-    public URI getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(URI type) {
+    public void setType(String type) {
         this.type = type;
     }
 
 
 
-    public List<String> getLabels() {
+    public List<LocalizedStringTO> getLabels() {
         return labels;
     }
 
-    public void setLabels(List<String> labels) {
+    public void setLabels(List<LocalizedStringTO> labels) {
         this.labels = labels;
     }
 
-    public URI getVocabulary() {
+    public String getVocabulary() {
         return vocabulary;
     }
 
-    public void setVocabulary(URI vocabulary) {
+    public void setVocabulary(String vocabulary) {
         this.vocabulary = vocabulary;
     }
 

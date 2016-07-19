@@ -34,6 +34,8 @@ import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.ImejiProfile;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
+import example.com.mpdlcamera.Model.TO.MetadataProfileTO;
+import example.com.mpdlcamera.Model.TO.StatementTO;
 import example.com.mpdlcamera.Otto.OttoSingleton;
 import example.com.mpdlcamera.Otto.UploadEvent;
 import example.com.mpdlcamera.R;
@@ -425,11 +427,19 @@ public class ManualUploadThread extends Thread {
     };
 
     // post profile callback
-    Callback<ImejiProfile> callback_create_profile = new Callback<ImejiProfile>() {
+    Callback<MetadataProfileTO> callback_create_profile = new Callback<MetadataProfileTO>() {
         @Override
-        public void success(ImejiProfile imejiProfile, Response response) {
-            profileId = imejiProfile.getId();
+        public void success(MetadataProfileTO metadataProfileTO, Response response) {
+            profileId = metadataProfileTO.getTitle();
             Log.e(TAG,"profileId: "+profileId);
+
+            List<StatementTO> statementTOList = metadataProfileTO.getStatements();
+            for (StatementTO statementTO: statementTOList) {
+                Log.e(TAG,statementTO.getLabels()+"");
+//                statementTO.getLiteralConstraints()
+                Log.e(TAG,statementTO.getPos()+"");
+                Log.e(TAG,statementTO.getType()+"");
+            }
             //update collection
             //build update json
             JsonParser parser = new JsonParser();
@@ -451,6 +461,29 @@ public class ManualUploadThread extends Thread {
             if(error.getResponse()!=null){
                 int responseCode = error.getResponse().getStatus();
                 Log.e(TAG,responseCode+"(error code)");
+//                //Try to get response body
+//                BufferedReader reader = null;
+//                StringBuilder sb = new StringBuilder();
+//                try {
+//
+//                    reader = new BufferedReader(new InputStreamReader(error.getResponse().getBody().in()));
+//
+//                    String line;
+//
+//                    try {
+//                        while ((line = reader.readLine()) != null) {
+//                            sb.append(line);
+//                        }
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                String errorMassage = sb.toString();
+//                Log.e(TAG,"create profile: "+ errorMassage);
+
                 if(responseCode==403){
                     //TODO: post item with MD ...
 

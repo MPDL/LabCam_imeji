@@ -9,6 +9,7 @@ import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.ImejiProfile;
 import example.com.mpdlcamera.Model.MessageModel.CollectionMessage;
 import example.com.mpdlcamera.Model.MessageModel.ItemMessage;
+import example.com.mpdlcamera.Model.TO.MetadataProfileTO;
 import example.com.mpdlcamera.Model.User;
 import retrofit.Callback;
 import retrofit.client.Response;
@@ -110,7 +111,7 @@ public interface ImejiAPI {
 
     @POST("/profiles")
     void createProfile(@Body JsonObject jsonObject,
-                       Callback<ImejiProfile> callback);
+                       Callback<MetadataProfileTO> callback);
 
     @PUT("/collections/{id}")
     void updateCollection(@Path("id") String collectionId,
