@@ -113,6 +113,10 @@ public interface ImejiAPI {
     void createProfile(@Body JsonObject jsonObject,
                        Callback<MetadataProfileTO> callback);
 
+    @GET("/profiles/{id}")
+    void getProfileById(@Path("id") String profileId,
+                    Callback<MetadataProfileTO> callback);
+
     @PUT("/collections/{id}")
     void updateCollection(@Path("id") String collectionId,
             @Body JsonObject jsonObject,

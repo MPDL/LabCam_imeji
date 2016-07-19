@@ -34,6 +34,7 @@ import example.com.mpdlcamera.Model.ImejiFolder;
 import example.com.mpdlcamera.Model.ImejiProfile;
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
+import example.com.mpdlcamera.Model.TO.LocalizedStringTO;
 import example.com.mpdlcamera.Model.TO.MetadataProfileTO;
 import example.com.mpdlcamera.Model.TO.StatementTO;
 import example.com.mpdlcamera.Otto.OttoSingleton;
@@ -83,6 +84,14 @@ public class ManualUploadThread extends Thread {
     String getCollectionResponse;
     String profileId;
 
+    List<StatementTO> profileStatementTOList;
+    List<StatementTO> collectionProfileStatementTOList;
+
+    //compare labCam template profile
+    String[] labCamTemplateProfileLabels = {"Make", "Modle","ISO Speed Ratings","Creation Date", "Geolocation", "Exposure Mode","Exposure Time"};
+    String[] labCamTemplateProfileTypes ={"text","text","number","date","geolocation","text","text"};
+    Boolean[] checkTypeList = {false,false,false,false,false,false,false};
+
     public ManualUploadThread(Context context,String currentTaskId) {
         super("ManualUploadThread");
         this.context = context;
@@ -113,8 +122,6 @@ public class ManualUploadThread extends Thread {
 
             /** debug **/
             getCollectionById();
-
-            startUpload();
 
         }
 
@@ -186,7 +193,7 @@ public class ManualUploadThread extends Thread {
         if(f.exists() && !f.isDirectory()) {
             // do something
             Log.i(TAG,collectionID+": file exist");
-            jsonPart2 = DeviceStatus.metaDataJson(filePath);
+            jsonPart2 = DeviceStatus.metaDataJson(filePath,checkTypeList);
         }else {
             Log.i(TAG, "file not exist: " + currentImageId);
             // delete Image from task
@@ -416,7 +423,9 @@ public class ManualUploadThread extends Thread {
                 Log.e(TAG,"create new profile");
             }else {
                 //TODO: retrieve profile by ID
-                Log.e(TAG,"retrieve profile by ID");
+                String profileId = imejiFolder.getProfile().getId();
+                RetrofitClient.getProfileById(profileId, callback_get_profile,apiKey);
+
             }
         }
 
@@ -426,20 +435,58 @@ public class ManualUploadThread extends Thread {
         }
     };
 
+    //get profile by profileDd
+    Callback<MetadataProfileTO> callback_get_profile = new Callback<MetadataProfileTO>() {
+        @Override
+        public void success(MetadataProfileTO metadataProfileTO, Response response) {
+
+            Log.e(TAG,"collection profileId: "+metadataProfileTO.getTitle());
+
+            collectionProfileStatementTOList = metadataProfileTO.getStatements();
+            //TODO: compare with our template
+            for( int i = 0; i < labCamTemplateProfileLabels.length; i++)
+            {
+                // "make"
+                for (StatementTO statementTO: collectionProfileStatementTOList) {
+                    if(labCamTemplateProfileLabels[i].equalsIgnoreCase(statementTO.getLabels().get(0).getValue())){
+                        if(statementTO.getType().contains(labCamTemplateProfileTypes[i])){
+                            // type correct
+                            checkTypeList[i]  = true;
+                        }
+                    }
+                }
+            }
+//            print checkTypeList
+//            for(int i = 0; i < checkTypeList.length; i++){
+//                Log.e(TAG,checkTypeList[i] +"");
+//            }
+            startUpload();
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.e(TAG,"get profile failed");
+            if(error.getResponse()!=null){
+                int responseCode = error.getResponse().getStatus();
+                Log.e(TAG,responseCode+"(error code)");
+            }
+        }
+    };
+
     // post profile callback
     Callback<MetadataProfileTO> callback_create_profile = new Callback<MetadataProfileTO>() {
         @Override
         public void success(MetadataProfileTO metadataProfileTO, Response response) {
-            profileId = metadataProfileTO.getTitle();
-            Log.e(TAG,"profileId: "+profileId);
+            profileId = metadataProfileTO.getId();
+            Log.e(TAG,"new profileId: "+profileId);
 
-            List<StatementTO> statementTOList = metadataProfileTO.getStatements();
-            for (StatementTO statementTO: statementTOList) {
-                Log.e(TAG,statementTO.getLabels()+"");
-//                statementTO.getLiteralConstraints()
-                Log.e(TAG,statementTO.getPos()+"");
-                Log.e(TAG,statementTO.getType()+"");
-            }
+            profileStatementTOList = metadataProfileTO.getStatements();
+//            for (StatementTO statementTO: profileStatementTOList) {
+//                Log.e(TAG,statementTO.getLabels()+"");
+////                statementTO.getLiteralConstraints()
+//                Log.e(TAG,statementTO.getPos()+"");
+//                Log.e(TAG,statementTO.getType()+"");
+//            }
             //update collection
             //build update json
             JsonParser parser = new JsonParser();
@@ -461,32 +508,12 @@ public class ManualUploadThread extends Thread {
             if(error.getResponse()!=null){
                 int responseCode = error.getResponse().getStatus();
                 Log.e(TAG,responseCode+"(error code)");
-//                //Try to get response body
-//                BufferedReader reader = null;
-//                StringBuilder sb = new StringBuilder();
-//                try {
-//
-//                    reader = new BufferedReader(new InputStreamReader(error.getResponse().getBody().in()));
-//
-//                    String line;
-//
-//                    try {
-//                        while ((line = reader.readLine()) != null) {
-//                            sb.append(line);
-//                        }
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                String errorMassage = sb.toString();
-//                Log.e(TAG,"create profile: "+ errorMassage);
 
                 if(responseCode==403){
-                    //TODO: post item with MD ...
-
+                    //post item without MD ...
+                    startUpload();
+                }else {
+                    Toast.makeText(context,"failed to create profile",Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -498,6 +525,10 @@ public class ManualUploadThread extends Thread {
         public void success(ImejiFolder imejiFolder, Response response) {
             Log.e(TAG,"callback_update_collection success");
             //TODO : post item with MD
+            for(int i=0; i<checkTypeList.length; i++){
+                checkTypeList[i]= true;
+            }
+            startUpload();
         }
 
         @Override

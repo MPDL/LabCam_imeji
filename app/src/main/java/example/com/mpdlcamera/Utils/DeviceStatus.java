@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.google.gson.JsonObject;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
@@ -340,7 +341,7 @@ public class DeviceStatus {
 
     }
 
-    public static String metaDataJson(String imagePath){
+    public static String metaDataJson(String imagePath, Boolean[] typeList ){
 
         String metaDataJsonStr = null;
 
@@ -390,18 +391,32 @@ public class DeviceStatus {
             }
 
             try {
-                 metaDataJsonStr = new JSONObject()
-                         .put("Creation Date", createTime)
-                         .put("Make", makeStr)
-                         .put("ISO Speed Ratings", isoSpeedRatings)
-                         .put("Model", modelStr)
-                         .put("Exposure Time", exposureTimeStr)
-                         .put("Exposure Mode", exposureModeStr)
-                         .put("Geolocation", new JSONObject()
-                                 .put("name", "")
-                                 .put("longitude", latLong[0])
-                                 .put("latitude", latLong[1]))
-                         .toString();
+                 JSONObject jsonObject = new JSONObject();
+                 if(typeList[0]){
+                     jsonObject.put("Make", makeStr);
+                 }
+                 if(typeList[1]){
+                     jsonObject.put("Model", modelStr);
+                 }
+                 if(typeList[2]){
+                     jsonObject.put("ISO Speed Ratings", isoSpeedRatings);
+                 }
+                 if(typeList[3]){
+                     jsonObject.put("Creation Date", createTime);
+                 }
+                 if(typeList[4]){
+                     jsonObject.put("Geolocation", new JSONObject()
+                             .put("name", "")
+                             .put("longitude", latLong[0])
+                             .put("latitude", latLong[1]));
+                 }
+                 if(typeList[5]){
+                     jsonObject.put("Exposure Mode", exposureModeStr);
+                 }
+                 if(typeList[6]){
+                     jsonObject.put("Exposure Time", exposureTimeStr);
+                 }
+                metaDataJsonStr = jsonObject.toString();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
