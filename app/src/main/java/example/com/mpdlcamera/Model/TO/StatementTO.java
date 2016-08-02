@@ -1,10 +1,7 @@
 package example.com.mpdlcamera.Model.TO;
 
-import android.support.annotation.Nullable;
-
 import com.google.gson.annotations.Expose;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 

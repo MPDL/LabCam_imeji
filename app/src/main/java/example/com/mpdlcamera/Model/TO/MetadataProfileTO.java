@@ -1,7 +1,5 @@
 package example.com.mpdlcamera.Model.TO;
 
-import android.support.annotation.Nullable;
-
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;

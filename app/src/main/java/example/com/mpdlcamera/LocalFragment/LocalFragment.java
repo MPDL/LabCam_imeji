@@ -25,16 +25,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
-
-import com.activeandroid.query.Select;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -61,11 +55,9 @@ import example.com.mpdlcamera.Gallery.SectionedGridView.SimpleAdapter;
 import example.com.mpdlcamera.ItemDetails.DetailActivity;
 import example.com.mpdlcamera.Model.Gallery;
 import example.com.mpdlcamera.Model.LocalModel.Image;
-import example.com.mpdlcamera.Model.LocalModel.Settings;
 import example.com.mpdlcamera.Model.LocalModel.Task;
 import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.TaskManager.ActiveTaskActivity;
-import example.com.mpdlcamera.TaskManager.TaskManagerAdapter;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import example.com.mpdlcamera.Utils.UiElements.CircleProgressBar;
 

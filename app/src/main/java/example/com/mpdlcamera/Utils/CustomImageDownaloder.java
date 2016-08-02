@@ -1,8 +1,6 @@
 package example.com.mpdlcamera.Utils;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 

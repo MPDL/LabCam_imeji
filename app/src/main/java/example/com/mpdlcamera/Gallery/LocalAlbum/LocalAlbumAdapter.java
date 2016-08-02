@@ -24,7 +24,6 @@ import java.util.Set;
 
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.R;
-import example.com.mpdlcamera.Utils.DeviceStatus;
 
 /**
  * Created by yingli on 4/7/16.

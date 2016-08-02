@@ -628,14 +628,14 @@ public class LoginActivity extends AppCompatActivity {
         public void failure(RetrofitError error) {
 
             if(error.getResponse()==null){
-                Toast.makeText(activity, serverURL+ " \\n not response", Toast.LENGTH_LONG).show();
+                Toast.makeText(activity, serverURL+ " please check your wifi connection", Toast.LENGTH_LONG).show();
                 return;
             }
 
             if(error.getResponse().getStatus()==401) {
                 Toast.makeText(activity, "username or password wrong", Toast.LENGTH_SHORT).show();
-            }else {
-                Toast.makeText(activity, "user doesn't exist", Toast.LENGTH_SHORT).show();
+            }else if(error.getResponse().getStatus()==404){
+                Toast.makeText(activity, "server not response", Toast.LENGTH_SHORT).show();
             }
         }
     };

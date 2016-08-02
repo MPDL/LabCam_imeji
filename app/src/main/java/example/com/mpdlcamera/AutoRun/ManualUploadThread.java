@@ -9,7 +9,6 @@ import java.util.List;
 
 import example.com.mpdlcamera.Model.LocalModel.Image;
 import example.com.mpdlcamera.Model.LocalModel.Task;
-import example.com.mpdlcamera.Model.TO.StatementTO;
 import retrofit.mime.TypedFile;
 
 /**

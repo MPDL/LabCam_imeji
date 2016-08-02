@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import example.com.mpdlcamera.Model.DataItem;
-import example.com.mpdlcamera.Model.ImejiFolder;
 
 /**
  * Created by yingli on 4/5/16.
