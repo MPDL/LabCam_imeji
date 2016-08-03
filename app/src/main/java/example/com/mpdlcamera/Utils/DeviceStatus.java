@@ -41,8 +41,8 @@ public class DeviceStatus {
     public static final String collectionID = "0L5yLxP_AphUMtIi";
     public static final String queryKeyword = "MPDLCam";
  //   public static final String BASE_URL= "";
- //   public static final String BASE_URL = "https://qa-gluons.mpdl.mpg.de/imeji/rest/";
-    public static final String BASE_URL = "http://test-gluons.mpdl.mpg.de/imeji/rest/";
+    public static final String BASE_URL = "https://qa-gluons.mpdl.mpg.de/imeji/rest/";
+//    public static final String BASE_URL = "http://test-gluons.mpdl.mpg.de/imeji/rest/";
 
     // Checks whether the device currently has a network connection
     public static boolean isNetworkEnabled(Activity activity) {
@@ -360,7 +360,6 @@ public class DeviceStatus {
                     createTime = "";
                 }
             }
-
             String makeStr = exif.getAttribute(ExifInterface.TAG_MAKE);
             String modelStr = exif.getAttribute(ExifInterface.TAG_MODEL);
             int isoSpeedRatings = 0;
@@ -370,8 +369,11 @@ public class DeviceStatus {
             catch (Exception e){
 
             }
-            //TODO: find a solution for ExposureMode
+
             String exposureModeStr = exif.getAttribute(ExifInterface.TAG_EXPOSURE_MODE);
+            if (exposureModeStr == null) {
+                exposureModeStr = "failed to get exposure mode";
+            }
             String exposureTimeStr = exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME);
             float[] latLong = new float[2];
             if (exif.getLatLong(latLong)) {

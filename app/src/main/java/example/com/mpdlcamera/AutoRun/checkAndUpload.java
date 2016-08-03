@@ -81,7 +81,7 @@ public class checkAndUpload {
     List<StatementTO> collectionProfileStatementTOList;
 
     //compare labCam template profile
-    String[] labCamTemplateProfileLabels = {"Make", "Modle","ISO Speed Ratings","Creation Date", "Geolocation", "Exposure Mode","Exposure Time"};
+    String[] labCamTemplateProfileLabels = {"Make", "Model", "ISO Speed Ratings","Creation Date", "Geolocation", "Exposure Mode","Exposure Time"};
     String[] labCamTemplateProfileTypes ={"text","text","number","date","geolocation","text","text"};
     Boolean[] checkTypeList = {false,false,false,false,false,false,false};
 

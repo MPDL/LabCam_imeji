@@ -136,19 +136,37 @@ public class LoginActivity extends AppCompatActivity {
                 gluonsLabel.setTextColor(Color.parseColor("#cccccc"));
                 gluonsLabel.setBackground(null);
                 serverURLView.setVisibility(View.VISIBLE);
-                serverURLView.setText("https://spot.mpdl.mpg.de/rest/");
+                serverURLView.setText(serverURL);
             }
         });
 
 
 //        mPrefs = this.getSharedPreferences("myPref", 0);
         usernameView.setText(mPrefs.getString("email", ""));
-        //TODO:store password?
 
-        if (!mPrefs.getString("server", "").equals("")) {
+        // store server url
+        if (!mPrefs.getString("server", "").equals("") && !mPrefs.getString("server", "").equals(DeviceStatus.BASE_URL)){
             serverURL = mPrefs.getString("server", "");
+            //gluonsLabel
+            othersLabel.setTextColor(Color.parseColor("#ffffff"));
+            othersLabel.setBackground(getResources().getDrawable(R.drawable.round_button));
+            //othersLabel
+            gluonsLabel.setTextColor(Color.parseColor("#cccccc"));
+            gluonsLabel.setBackground(null);
+            serverURLView.setVisibility(View.VISIBLE);
+            serverURLView.setText(serverURL);
+
         } else {
             serverURL = DeviceStatus.BASE_URL;
+
+            //gluonsLabel
+            gluonsLabel.setTextColor(Color.parseColor("#ffffff"));
+            gluonsLabel.setBackground(getResources().getDrawable(R.drawable.round_button));
+            //othersLabel
+            othersLabel.setTextColor(Color.parseColor("#cccccc"));
+            othersLabel.setBackground(null);
+            serverURLView.setVisibility(View.GONE);
+            serverURLView.setText(R.string.url_gluons);
         }
 
         RetrofitClient.setRestServer(serverURL);
