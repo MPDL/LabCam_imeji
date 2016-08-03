@@ -37,6 +37,7 @@ import example.com.mpdlcamera.R;
 import example.com.mpdlcamera.Retrofit.RetrofitClient;
 import example.com.mpdlcamera.Utils.DeviceStatus;
 import example.com.mpdlcamera.Utils.UiElements.Notification.NotificationID;
+import io.realm.Realm;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -247,7 +248,6 @@ public class checkAndUpload {
         task.setEndDate(DeviceStatus.dateNow());
         task.save();
 
-
         if (taskIsStopped()) {
             Log.e(TAG,"task is stopped");
             return;
@@ -301,7 +301,6 @@ public class checkAndUpload {
         notificationManager.notify(mNotificationId, builder.build());
     }
 
-    //todo: post item with MDs
 
     /**
      * retrieve collection by ID
@@ -531,6 +530,24 @@ public class checkAndUpload {
         @Override
         public void failure(RetrofitError error) {
             Log.e(TAG,"callback_update_collection failed");
+                // TODO: 8/3/16 delete profile by id ; post item without MD
+            RetrofitClient.deleteProfileById(profileId,callback_delete_profile ,apiKey);
+            for(int i=0; i<checkTypeList.length; i++){
+                checkTypeList[i]= false;
+            }
+                startUpload();
+        }
+    };
+
+    Callback<String> callback_delete_profile = new Callback<String>() {
+        @Override
+        public void success(String metadataProfileTO, Response response) {
+            Log.e(TAG,"callback_delete_profile success");
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.e(TAG,"callback_delete_profile failed");
         }
     };
 

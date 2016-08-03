@@ -164,6 +164,17 @@ public class RetrofitClient {
         imejiAPI.getProfileById(profileId,callback);
     }
 
+    /**
+     * delete Profile
+     * @param profileId
+     * @param callback
+     * @param APIkey
+     */
+    public static void deleteProfileById(String profileId,
+                                      Callback<String> callback, String APIkey){
+        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
+        imejiAPI.deleteProfileById(profileId,callback);
+    }
 
     /**
      * updateCollection

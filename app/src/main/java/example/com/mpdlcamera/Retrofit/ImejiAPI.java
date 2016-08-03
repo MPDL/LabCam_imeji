@@ -115,6 +115,11 @@ public interface ImejiAPI {
     void getProfileById(@Path("id") String profileId,
                     Callback<MetadataProfileTO> callback);
 
+    @DELETE("/profiles/{id}")
+    void deleteProfileById(@Path("id") String profileId,
+                           Callback<String> callback);
+
+
     @PUT("/collections/{id}")
     void updateCollection(@Path("id") String collectionId,
             @Body JsonObject jsonObject,
