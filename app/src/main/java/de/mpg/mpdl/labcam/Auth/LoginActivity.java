@@ -139,7 +139,12 @@ public class LoginActivity extends AppCompatActivity {
                 gluonsLabel.setTextColor(Color.parseColor("#cccccc"));
                 gluonsLabel.setBackground(null);
                 serverURLView.setVisibility(View.VISIBLE);
-                serverURLView.setText(serverURL);
+
+                if(serverURL.contains("gluons")){
+                    serverURLView.setText("https://");
+                }else {
+                    serverURLView.setText(serverURL);
+                }
             }
         });
 
