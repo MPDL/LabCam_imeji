@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="example.com.mpdlcamera.ImejiFragment.ImejiFragment">
+    tools:context="de.mpg.mpdl.labcam.ImejiFragment.ImejiFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <ListView
