@@ -454,52 +454,10 @@ public class LoginActivity extends AppCompatActivity {
     boolean isTaskFragment = false;
 
     public void accountLogin(String userId) {
-
-
-        List<Task> taskList = DeviceStatus.getUserTasks(userId);
-        boolean isFinished = true;
-        for(Task task:taskList){
-
-            if(task.getFinishedItems()<task.getTotalItems()){
-                isFinished = false;
-            }
-        }
-            if(!isFinished) {
-
-                new AlertDialog.Builder(this)
-                        .setTitle("Welcome")
-                        .setMessage("There are some uploading tasks not be compeleted last time, you can restart them in your Task Manager")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // continue with delete
-                                isTaskFragment = true;
-
-                                Intent intent = new Intent(activity, MainActivity.class);
-                                intent.putExtra("isTaskFragment",isTaskFragment);
-                                startActivity(intent);
-                                // layout_login out of stack
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
-                                Intent intent = new Intent(activity, MainActivity.class);
-                                intent.putExtra("isTaskFragment",isTaskFragment);
-                                startActivity(intent);
-                                // layout_login out of stack
-                                finish();
-                            }
-                        })
-                        .setIcon(R.drawable.error_alert)
-                        .show();
-            }else if(isFinished){
-                Intent intent = new Intent(activity, MainActivity.class);
-                intent.putExtra("isTaskFragment",isTaskFragment);
-                startActivity(intent);
-                // layout_login out of stack
-                finish();
-            }
+        Intent intent = new Intent(activity, MainActivity.class);
+        startActivity(intent);
+        // layout_login out of stack
+        finish();
     }
 
 

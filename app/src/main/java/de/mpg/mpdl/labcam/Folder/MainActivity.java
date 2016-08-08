@@ -65,6 +65,7 @@ import de.mpg.mpdl.labcam.NetChangeManager.NetWorkStateReceiver;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Settings.RemoteCollectionSettingsActivity;
+import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
 import de.mpg.mpdl.labcam.TaskManager.RecentProcessActivity;
 import de.mpg.mpdl.labcam.Upload.UploadResultReceiver;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
@@ -208,6 +209,38 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         setAutoUpload();
 
         setLogout();
+
+        /**************************************************  check upload not finished task ***************************************************/
+
+        List<Task> taskList = DeviceStatus.getUserTasks(userId);
+        boolean isFinished = true;
+
+        for(Task task:taskList){
+            if(task.getFinishedItems()<task.getTotalItems()){
+                isFinished = false;
+            }
+        }
+
+        if(!isFinished) {
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Welcome")
+                    .setMessage("There are some uploading tasks not be compeleted last time, you can restart them in your Task Manager")
+                    .setPositiveButton("Go into", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(activity, ActiveTaskActivity.class);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("Ignore", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setIcon(R.drawable.error_alert)
+                    .show();
+        }else if(isFinished){
+            //do nothing
+        }
 
     }
 
