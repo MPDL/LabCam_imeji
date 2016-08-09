@@ -532,9 +532,15 @@ public class checkAndUpload {
                 if(responseCode==403){
                     //post item without MD ...
                     startUpload();
+                }else if(responseCode==405){
+                    //post item without MD ...
+                    //method not allowed on spot...
+                    startUpload();
                 }else {
                     Toast.makeText(context,"failed to create profile",Toast.LENGTH_SHORT).show();
                 }
+
+
 
             }
         }
