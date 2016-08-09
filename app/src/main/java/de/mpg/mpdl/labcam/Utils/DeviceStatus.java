@@ -14,10 +14,21 @@ import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.Tag;
+import com.drew.metadata.exif.ExifDescriptorBase;
+import com.drew.metadata.exif.ExifIFD0Directory;
+import com.drew.metadata.exif.ExifSubIFDDescriptor;
+import com.drew.metadata.exif.ExifSubIFDDirectory;
+import com.drew.metadata.exif.GpsDirectory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -337,88 +348,143 @@ public class DeviceStatus {
 
         String metaDataJsonStr = null;
 
-        ExifInterface exif = null;
+        File file = new File(imagePath);
 
         try {
-            exif = new ExifInterface(imagePath);
+            Metadata metadata = ImageMetadataReader.readMetadata(file);
+
+            metaDataJsonStr =  generateJsonStr(metadata, typeList);
+
+            print(metadata);
+        } catch (ImageProcessingException e) {
+            // handle exception
         } catch (IOException e) {
-            e.printStackTrace();
+            // handle exception
         }
 
-        // if exif exist, generate metaDataJson
-        if(exif!=null){
-            String createTime = exif.getAttribute(ExifInterface.TAG_DATETIME);
-            if(createTime!=null) {
-                Log.e(LOG_TAG,createTime);
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-                try {
-                    Date date = formatter.parse(createTime);
-                    SimpleDateFormat formatterShort = new SimpleDateFormat("yyyy-MM-dd");
-                    createTime = formatterShort.format(date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                    createTime = "";
-                }
-            }
-            String makeStr = exif.getAttribute(ExifInterface.TAG_MAKE);
-            String modelStr = exif.getAttribute(ExifInterface.TAG_MODEL);
-            int isoSpeedRatings = 0;
-            try{
-                isoSpeedRatings = Integer.parseInt(exif.getAttribute(ExifInterface.TAG_ISO));
-            }
-            catch (Exception e){
 
-            }
-
-            String exposureModeStr = exif.getAttribute(ExifInterface.TAG_EXPOSURE_MODE);
-            if (exposureModeStr == null) {
-                exposureModeStr = "failed to get exposure mode";
-            }
-            String exposureTimeStr = exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME);
-            float[] latLong = new float[2];
-            if (exif.getLatLong(latLong)) {
-                // latLong[0] holds the Latitude value now.
-                // latLong[1] holds the Longitude value now.
-            }
-            else {
-                // Latitude and Longitude were not included in the Exif data.
-            }
-
-            try {
-                 JSONObject jsonObject = new JSONObject();
-                 if(typeList[0]){
-                     jsonObject.put("Make", makeStr);
-                 }
-                 if(typeList[1]){
-                     jsonObject.put("Model", modelStr);
-                 }
-                 if(typeList[2]){
-                     jsonObject.put("ISO Speed Ratings", isoSpeedRatings);
-                 }
-                 if(typeList[3]){
-                     jsonObject.put("Creation Date", createTime);
-                 }
-                 if(typeList[4]){
-                     jsonObject.put("Geolocation", new JSONObject()
-                             .put("name", "")
-                             .put("longitude", latLong[0])
-                             .put("latitude", latLong[1]));
-                 }
-                 if(typeList[5]){
-                     jsonObject.put("Exposure Mode", exposureModeStr);
-                 }
-                 if(typeList[6]){
-                     jsonObject.put("Exposure Time", exposureTimeStr);
-                 }
-                metaDataJsonStr = jsonObject.toString();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-
-        }
         Log.e(LOG_TAG, metaDataJsonStr);
         return metaDataJsonStr;
     }
 
+
+    /**
+     * generate json string
+     * @param metadata
+     */
+    private static String generateJsonStr(Metadata metadata, Boolean[] typeList){
+
+        String metaDataJsonStr = null;
+
+        // obtain the Exif directory
+        ExifSubIFDDirectory exifSubIFDDirectory
+                = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+
+        ExifIFD0Directory exifIFD0Directory
+                = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+
+        GpsDirectory gpsDirectory
+                = metadata.getFirstDirectoryOfType(GpsDirectory.class);
+
+        String makeStr = exifIFD0Directory.getString(ExifIFD0Directory.TAG_MAKE);
+        String modelStr = exifIFD0Directory.getString(ExifSubIFDDirectory.TAG_MODEL);
+        int ISOSpeedRating = Integer.parseInt(exifSubIFDDirectory.getString(ExifIFD0Directory.TAG_ISO_EQUIVALENT));
+
+        // create date use TAG_DATE
+        String CreationDateStr;
+        Date date = exifIFD0Directory.getDate(ExifIFD0Directory.TAG_DATETIME);
+        SimpleDateFormat formatterShort = new SimpleDateFormat("yyyy-MM-dd");
+        CreationDateStr = formatterShort.format(date);
+
+        String latitudeStr = String.valueOf(gpsDirectory.getGeoLocation().getLatitude());
+        String longitudeStr = String.valueOf(gpsDirectory.getGeoLocation().getLongitude());
+
+        String GPSVersionIDStr = gpsDirectory.getString(gpsDirectory.TAG_VERSION_ID);
+        String SensingMethodStr = exifSubIFDDirectory.getString(ExifSubIFDDirectory.TAG_SENSING_METHOD);
+        String ApertureValueStr = exifSubIFDDirectory.getString(ExifSubIFDDirectory.TAG_APERTURE);
+        String ColorSpaceStr = exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_COLOR_SPACE);
+        String ExposureTimeStr = exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_EXPOSURE_TIME);
+
+        try {
+            JSONObject jsonObject = new JSONObject();
+            if(typeList[0]){
+                jsonObject.put("Make", makeStr);
+            }
+            if(typeList[1]){
+                jsonObject.put("Model", modelStr);
+            }
+            if(typeList[2]){
+                jsonObject.put("ISO Speed Ratings", ISOSpeedRating);
+            }
+            if(typeList[3]){
+                jsonObject.put("Creation Date", CreationDateStr);
+            }
+            if(typeList[4]){
+                jsonObject.put("Geolocation", new JSONObject()
+                        .put("name", "")
+                        .put("longitude", latitudeStr)
+                        .put("latitude", longitudeStr));
+            }if(typeList[5]){
+                jsonObject.put("GPS Version ID", GPSVersionIDStr);
+            }if(typeList[6]){
+                jsonObject.put("Sensing Method", SensingMethodStr);
+            }if(typeList[7]){
+                jsonObject.put("Aperture Value", ApertureValueStr);
+            }if(typeList[8]){
+                jsonObject.put("Color Space", ColorSpaceStr);
+            }
+
+            if(typeList[9]){
+                jsonObject.put("Exposure Time", ExposureTimeStr);
+            }
+            metaDataJsonStr = jsonObject.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return metaDataJsonStr;
+    }
+
+    /**
+     * print metadata
+     * @param metadata
+     */
+    private static void print(Metadata metadata)
+    {
+        System.out.println("-------------------------------------");
+
+        // Iterate over the data and print to System.out
+
+        //
+        // A Metadata object contains multiple Directory objects
+        //
+        for (Directory directory : metadata.getDirectories()) {
+
+            //
+            // Each Directory stores values in Tag objects
+            //
+            for (Tag tag : directory.getTags()) {
+                System.out.println(tag);
+            }
+
+            //
+            // Each Directory may also contain error messages
+            //
+            if (directory.hasErrors()) {
+                for (String error : directory.getErrors()) {
+                    System.err.println("ERROR: " + error);
+                }
+            }
+        }
+    }
+
+    public static void getStatusBarHeight(Context context) {
+        int statusBarHeight1 = -1;
+        //获取status_bar_height资源的ID
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            //根据资源ID获取响应的尺寸值
+            statusBarHeight1 = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        Log.e("WangJ", "状态栏-方法1:" + statusBarHeight1);
+    }
 }

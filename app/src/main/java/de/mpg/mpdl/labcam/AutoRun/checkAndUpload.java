@@ -80,9 +80,9 @@ public class checkAndUpload {
     List<StatementTO> collectionProfileStatementTOList;
 
     //compare labCam template profile
-    String[] labCamTemplateProfileLabels = {"Make", "Model", "ISO Speed Ratings","Creation Date", "Geolocation", "Exposure Mode","Exposure Time"};
-    String[] labCamTemplateProfileTypes ={"text","text","number","date","geolocation","text","text"};
-    Boolean[] checkTypeList = {false,false,false,false,false,false,false};
+    String[] labCamTemplateProfileLabels = {"Make", "Model", "ISO Speed Ratings","Creation Date", "Geolocation","GPS Version ID", "Sensing Method", "Aperture Value", "Color Space", "Exposure Time"};
+    String[] labCamTemplateProfileTypes ={"text","text","number","date","geolocation","text","text","text","text","text"};
+    Boolean[] checkTypeList = {false,false,false,false,false,false,false,false,false,false};
 
     public checkAndUpload(Context context, String currentTaskId) {
         this.context = context;
@@ -396,7 +396,32 @@ public class checkAndUpload {
                         "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
                         "          \"labels\": [\n" +
                         "            {\n" +
-                        "              \"value\": \"Exposure Mode\",\n" +
+                        "              \"value\": \"GPS Version ID\",\n" +
+                        "              \"lang\": \"en\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        },\n" +
+                        "        {\n" +
+                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
+                        "          \"labels\": [\n" +
+                        "            {\n" +
+                        "              \"value\": \"Sensing Method\",\n" +
+                        "              \"lang\": \"en\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        },\n" +                        "        {\n" +
+                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
+                        "          \"labels\": [\n" +
+                        "            {\n" +
+                        "              \"value\": \"Aperture Value\",\n" +
+                        "              \"lang\": \"en\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        },\n" +                        "        {\n" +
+                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
+                        "          \"labels\": [\n" +
+                        "            {\n" +
+                        "              \"value\": \"Color Space\",\n" +
                         "              \"lang\": \"en\"\n" +
                         "            }\n" +
                         "          ]\n" +
@@ -529,7 +554,7 @@ public class checkAndUpload {
         @Override
         public void failure(RetrofitError error) {
             Log.e(TAG,"callback_update_collection failed");
-                // TODO: 8/3/16 delete profile by id ; post item without MD
+            // TODO: 8/3/16 delete profile by id ; post item without MD
             RetrofitClient.deleteProfileById(profileId,callback_delete_profile ,apiKey);
             for(int i=0; i<checkTypeList.length; i++){
                 checkTypeList[i]= false;
