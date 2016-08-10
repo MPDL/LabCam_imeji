@@ -265,11 +265,22 @@ public class checkAndUpload {
                 upload(image);
             }
         }else {
-            task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-            task.setEndDate(DeviceStatus.dateNow());
-            task.save();
-            notification();
-            Log.i(TAG,"task finished");
+            if(task.getUploadMode().equalsIgnoreCase("AU")){
+                /** delete finished tasks before reset Au task **/
+                new Delete().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
+
+                task.setEndDate(DeviceStatus.dateNow());
+                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                task.setTotalItems(0);
+                task.setFinishedItems(0);
+                task.save();
+            }else {
+                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                task.setEndDate(DeviceStatus.dateNow());
+                task.save();
+                notification();
+                Log.i(TAG, "task finished");
+            }
         }
     }
 
@@ -624,17 +635,33 @@ public class checkAndUpload {
                     upload(image);
                 }
             }else {
-                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                task.setEndDate(DeviceStatus.dateNow());
-                task.save();
-                Handler  handler=new Handler(Looper.getMainLooper());
-                handler.post(new Runnable() {
-                    public void run() {
-                        notification();
-//                        Toast.makeText(context, "Uploaded Successfully", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                Log.i(TAG,"task finished");
+
+                if(task.getUploadMode().equalsIgnoreCase("AU")){
+                    /** delete finished tasks before reset Au task **/
+                    new Delete().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
+
+                    task.setEndDate(DeviceStatus.dateNow());
+                    task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                    task.setTotalItems(0);
+                    task.setFinishedItems(0);
+                    task.save();
+                    Handler  handler=new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        public void run() {
+                            notification();
+                        }
+                    });
+                }else{
+                    task.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                    task.setEndDate(DeviceStatus.dateNow());
+                    task.save();
+                    Handler  handler=new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        public void run() {
+                            notification();
+                        }
+                    });
+                }
             }
         }
 

@@ -221,7 +221,7 @@ public class DeviceStatus {
             }
         }
 
-        new Delete().from(Task.class).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
+        new Delete().from(Task.class).where("uploadMode = ?","AU").where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
 
         int num = (new Select()
                 .from(Task.class)
@@ -486,5 +486,35 @@ public class DeviceStatus {
             statusBarHeight1 = context.getResources().getDimensionPixelSize(resourceId);
         }
         Log.e("WangJ", "状态栏-方法1:" + statusBarHeight1);
+
+
+        /**
+         * 获取状态栏高度——方法2
+         * */
+        int statusBarHeight2 = -1;
+        try {
+            Class<?> clazz = Class.forName("com.android.internal.R$dimen");
+            Object object = clazz.newInstance();
+            int height = Integer.parseInt(clazz.getField("status_bar_height")
+                    .get(object).toString());
+            statusBarHeight2 = context.getResources().getDimensionPixelSize(height);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Log.e("WangJ", "状态栏-方法2:" + statusBarHeight2);
+
     }
+
+    /**
+     * px转dp
+     *
+     * @param context 上下文
+     * @param pxValue px值
+     * @return dp值
+     */
+    public static int px2dp(Context context, float pxValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue / scale + 0.5f);
+    }
+
 }

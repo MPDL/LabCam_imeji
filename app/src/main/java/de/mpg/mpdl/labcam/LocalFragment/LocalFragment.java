@@ -380,7 +380,14 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                         }
 //                        String titleTaskInfo = task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName();
 
-                        titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
+
+                        if(task.getUploadMode().equalsIgnoreCase("AU")){
+                            // AU
+                            titleTaskTextView.setText("Automatic upload to" + task.getCollectionName());
+                        }else {
+                            titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
+                        }
+
                         numActiveTextView.setText(num_activate+"");
 
                         int percent = (task.getFinishedItems()*100)/task.getTotalItems();

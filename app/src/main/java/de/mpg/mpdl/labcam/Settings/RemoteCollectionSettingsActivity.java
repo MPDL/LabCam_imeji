@@ -272,30 +272,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     private void updateFolder(){
         RetrofitClient.getGrantCollectionMessage(callback, apiKey);
     }
-//
-//    private void saveCollection(){
-//
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                collectionID = collectionListLocal.get(i).getImejiId();
-//                collectionName = collectionListLocal.get(i).getTitle();
-//                Log.e("<>",i+collectionID+collectionName);
-//                if (!collectionID.equals("") && !collectionID.equals(null)) {
-//                    Log.i("~collectionID", collectionID);
-//
-//                    /**
-//                     * delete all AU Task if finished
-//                     * */
-//                    DeviceStatus.deleteFinishedAUTasks();
-//
-//                    /**create Task**/
-//                    createTask(collectionID);
-//
-//                }
-//            }
-//        });
-//    }
 
     private void createTask(String collectionID){
 
@@ -359,7 +335,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                           Log.e(LOG_TAG,"getState:" +image.getState());
                       }
                       Log.e(LOG_TAG, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-
 
                       // now old task is MU, and stopped
                       latestTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
