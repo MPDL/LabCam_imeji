@@ -622,6 +622,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             settings = new Settings();
         }
         // login set true
+        settings.setUserId(userId);
         settings.setIsAutoUpload(true);
         settings.save();
         autoUploadSwitch.setChecked(settings.isAutoUpload());
