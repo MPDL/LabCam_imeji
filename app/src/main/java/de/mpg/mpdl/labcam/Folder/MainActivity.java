@@ -191,12 +191,33 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
-        //set collection name
+        /**set collection name **/
         collectionNameTextView = (TextView) findViewById(R.id.collection_name);
         Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
         if(auTask!=null) {
-            collectionNameTextView.setText(auTask.getCollectionName());
+            collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
+        }else {
+            // dialog lead new user to choose collection
+            new AlertDialog.Builder(context)
+                    .setTitle("collection not set yet")
+                    .setMessage("Automatic upload is active, please set a Collection")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // TODO: go to set collection
+                            Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
+                            startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // TODO: collection set off
+                            autoUploadSwitch.setChecked(false);
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
         }
+
         initInstances();
 
         //choose collection
@@ -523,6 +544,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         });
 
 
+        //initUI
+        autoUploadSwitch = (Switch) findViewById(R.id.switch_auto_upload);
+        chooseCollectionLabel = (TextView) findViewById(R.id.tv_choose_collection);
+        collectionNameTextView = (TextView) findViewById(R.id.collection_name);
+
     }
 
     /**
@@ -613,9 +639,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     //auto upload switch
     private void setAutoUpload(){
-        autoUploadSwitch = (Switch) findViewById(R.id.switch_auto_upload);
-        chooseCollectionLabel = (TextView) findViewById(R.id.tv_choose_collection);
-        collectionNameTextView = (TextView) findViewById(R.id.collection_name);
 
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
         if(settings==null){
@@ -639,8 +662,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
         if(auTask==null){
             // popup
-            Toast.makeText(activity,"Automatic upload is active, please set a collection",Toast.LENGTH_SHORT).show();
-
+            Toast.makeText(activity,"Automatic upload is active\n please set a collection",Toast.LENGTH_SHORT).show();
+//
 //            Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
 //            startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
         }else
@@ -661,6 +684,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 if(auTask==null){
                     // popup
                     Toast.makeText(activity,"Automatic upload is active\n please set a collection",Toast.LENGTH_SHORT).show();
+                    Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
+                    startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
                 }else
                     Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
             }
@@ -875,11 +900,36 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 }
             }else if(resultCode == RESULT_OK){
 
+                // prepare settings
+                Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+                if(settings==null){
+                    settings = new Settings();
+                }
+
                 Task lastAUTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
+
                 if(lastAUTask!= null){
-                    collectionNameTextView.setText(lastAUTask.getCollectionName());}
+                    Log.e("blabla", lastAUTask.getCollectionName());
+                    collectionNameTextView.setText(lastAUTask.getCollectionName());
+                    autoUploadSwitch.setChecked(true);
+
+                    settings.setUserId(userId);
+                    settings.setIsAutoUpload(true);
+                    settings.save();
+                    chooseCollectionLayout.setEnabled(true);
+                    chooseCollectionLabel.setTextColor(getResources().getColor(R.color.dark_text));
+                    collectionNameTextView.setTextColor(getResources().getColor(R.color.dark_text));
+                }
                 else{
                     collectionNameTextView.setText("none");
+                    autoUploadSwitch.setChecked(false);
+
+                    settings.setUserId(userId);
+                    settings.setIsAutoUpload(false);
+                    settings.save();
+                    chooseCollectionLayout.setEnabled(false);
+                    chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
+                    collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
                 }
             }
         }
