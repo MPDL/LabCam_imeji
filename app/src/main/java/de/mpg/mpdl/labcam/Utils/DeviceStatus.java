@@ -386,24 +386,42 @@ public class DeviceStatus {
         GpsDirectory gpsDirectory
                 = metadata.getFirstDirectoryOfType(GpsDirectory.class);
 
-        String makeStr = exifIFD0Directory.getString(ExifIFD0Directory.TAG_MAKE);
-        String modelStr = exifIFD0Directory.getString(ExifSubIFDDirectory.TAG_MODEL);
-        int ISOSpeedRating = Integer.parseInt(exifSubIFDDirectory.getString(ExifIFD0Directory.TAG_ISO_EQUIVALENT));
 
-        // create date use TAG_DATE
-        String CreationDateStr;
-        Date date = exifIFD0Directory.getDate(ExifIFD0Directory.TAG_DATETIME);
-        SimpleDateFormat formatterShort = new SimpleDateFormat("yyyy-MM-dd");
-        CreationDateStr = formatterShort.format(date);
+        String makeStr = "";
+        String modelStr = "";
+        int ISOSpeedRating = 0;
+        String CreationDateStr = "";
+        String latitudeStr = "";
+        String longitudeStr = "";
+        String GPSVersionIDStr = "";
+        String ExposureTimeStr = "";
+        String SensingMethodStr = "";
+        String ApertureValueStr = "";
+        String ColorSpaceStr = "";
 
-        String latitudeStr = String.valueOf(gpsDirectory.getGeoLocation().getLatitude());
-        String longitudeStr = String.valueOf(gpsDirectory.getGeoLocation().getLongitude());
+        if(exifIFD0Directory!=null){
+            makeStr = exifIFD0Directory.getString(ExifIFD0Directory.TAG_MAKE);
+            modelStr = exifIFD0Directory.getString(ExifIFD0Directory.TAG_MODEL);
+            // create date use TAG_DATE
+            Date date = exifIFD0Directory.getDate(ExifIFD0Directory.TAG_DATETIME);
+            SimpleDateFormat formatterShort = new SimpleDateFormat("yyyy-MM-dd");
+            CreationDateStr = formatterShort.format(date);
+        }
 
-        String GPSVersionIDStr = gpsDirectory.getString(gpsDirectory.TAG_VERSION_ID);
-        String SensingMethodStr = exifSubIFDDirectory.getString(ExifSubIFDDirectory.TAG_SENSING_METHOD);
-        String ApertureValueStr = exifSubIFDDirectory.getString(ExifSubIFDDirectory.TAG_APERTURE);
-        String ColorSpaceStr = exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_COLOR_SPACE);
-        String ExposureTimeStr = exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_EXPOSURE_TIME);
+        if(exifSubIFDDirectory!=null){
+            ISOSpeedRating = Integer.parseInt(exifSubIFDDirectory.getString(ExifIFD0Directory.TAG_ISO_EQUIVALENT));
+            SensingMethodStr = exifSubIFDDirectory.getString(ExifSubIFDDirectory.TAG_SENSING_METHOD);
+            ApertureValueStr = exifSubIFDDirectory.getString(ExifSubIFDDirectory.TAG_APERTURE);
+            ColorSpaceStr = exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_COLOR_SPACE);
+            ExposureTimeStr = exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_EXPOSURE_TIME);
+        }
+
+        if(gpsDirectory!=null) {
+            latitudeStr = String.valueOf(gpsDirectory.getGeoLocation().getLatitude());
+            longitudeStr = String.valueOf(gpsDirectory.getGeoLocation().getLongitude());
+            GPSVersionIDStr = gpsDirectory.getString(gpsDirectory.TAG_VERSION_ID);
+        }
+
 
         try {
             JSONObject jsonObject = new JSONObject();
