@@ -302,7 +302,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             task.setFinishedItems(0);
             task.setSeverName(serverUrl);
 
-//            String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
             task.setStartDate(String.valueOf(now));
 
@@ -416,10 +415,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                         if (!qrCollectionId.equals("") && !qrCollectionId.equals(null)) {
                             Log.i("~qrCollectionId", qrCollectionId);
 
-                            /**
-                             * delete all AU Task if finished
-                             * */
-                            DeviceStatus.deleteFinishedAUTasks();
+                            DeviceStatus.deleteFinishedAUTasks(userId);             //delete all AU Task if finished
                             collectionID = qrCollectionId;
                             /**create Task**/
                             createTask(qrCollectionId);
@@ -453,10 +449,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         if (!collectionID.equals("") && !collectionID.equals(null)) {
             Log.i("~collectionID", collectionID);
 
-            /**
-             * delete all AU Task if finished
-             * */
-            DeviceStatus.deleteFinishedAUTasks();
+            DeviceStatus.deleteFinishedAUTasks(userId);             //delete all AU Task if finished
 
             /**create Task**/
             createTask(collectionID);

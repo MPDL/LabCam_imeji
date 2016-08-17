@@ -45,6 +45,7 @@ import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -173,8 +174,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 ////            Log.v(LOG_TAG,e.getMessage());
 //        }
 
-        /** show alert if no collection available **/
-        RetrofitClient.getGrantCollectionMessage(callback, apiKey);
         getLocalCamFolder();
         // register NetStateObserver
         NetWorkStateReceiver.registerNetStateObserver(this);
@@ -191,32 +190,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
-        /**set collection name **/
-        collectionNameTextView = (TextView) findViewById(R.id.collection_name);
-        Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
-        if(auTask!=null) {
-            collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
-        }else {
-            // dialog lead new user to choose collection
-            new AlertDialog.Builder(context)
-                    .setTitle("collection not set yet")
-                    .setMessage("Automatic upload is active, please set a Collection")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // TODO: go to set collection
-                            Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
-                            startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
-                        }
-                    })
-                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // TODO: collection set off
-                            autoUploadSwitch.setChecked(false);
-                        }
-                    })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-        }
+
+        /** show alert if no collection available **/
+        RetrofitClient.getGrantCollectionMessage(callback, apiKey);
 
         initInstances();
 
@@ -916,6 +892,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(true);
                     settings.save();
+
+                    // UI enable click
                     chooseCollectionLayout.setEnabled(true);
                     chooseCollectionLabel.setTextColor(getResources().getColor(R.color.dark_text));
                     collectionNameTextView.setTextColor(getResources().getColor(R.color.dark_text));
@@ -927,6 +905,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(false);
                     settings.save();
+
+                    // UI disable click
                     chooseCollectionLayout.setEnabled(false);
                     chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
                     collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
@@ -939,12 +919,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     Callback<ImejiFolder> createCollection_callback = new Callback<ImejiFolder>() {
         @Override
         public void success(ImejiFolder imejiFolder, Response response) {
-            Log.v(LOG_TAG, "createCollection_callback success");
-//            isFirstCollection = true;
+            Log.e(LOG_TAG, "createCollection_callback success");
 
-            /** create autoTask(already deleted old one), set text **
+            DeviceStatus.deleteFinishedAUTasks(userId);             //delete all AU Task if finished
 
-            Task task = new Task();
+            Task task = new Task();                                 //new a AU Task
             String uniqueID = UUID.randomUUID().toString();
             task.setTaskId(uniqueID);
             task.setUploadMode("AU");
@@ -953,10 +932,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
             task.setUserName(username);
             task.setUserId(userId);
+            task.setSeverName(serverUrl);
             task.setTotalItems(0);
             task.setFinishedItems(0);
 
-            String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
             Log.v("now", now + "");
             task.setStartDate(String.valueOf(now));
@@ -967,9 +946,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             //set selected collection name text
             collectionNameTextView.setText(imejiFolder.getTitle());
 
+            //switch on
+            autoUploadSwitch.setChecked(true);
 
-
-            **/
+//            **/
 
             // go to fragment
             SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
@@ -978,26 +958,23 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 //            viewPager.setCurrentItem(currentTab);
 
             pDialog.dismiss();
-            // switch
-            autoUploadSwitch.setChecked(false);
 
-            // set setting Auto Upload off
+            // set setting Auto Upload on
             Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
             //init settings
             if (settings == null) {
                 settings = new Settings();
             }
+
+            // setting auto on
             settings.setUserId(userId);
-            settings.setIsAutoUpload(false);
+            settings.setIsAutoUpload(true);
             settings.save();
 
-            // choose collection text disable
-            chooseCollectionLabel = (TextView) findViewById(R.id.tv_choose_collection);
-            collectionNameTextView = (TextView) findViewById(R.id.collection_name);
-            chooseCollectionLabel.setEnabled(false);
-            collectionNameTextView.setEnabled(false);
-            chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
-            collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
+            // UI enable click
+            chooseCollectionLayout.setEnabled(true);
+            chooseCollectionLabel.setTextColor(getResources().getColor(R.color.dark_text));
+            collectionNameTextView.setTextColor(getResources().getColor(R.color.dark_text));
 
         }
 
@@ -1049,17 +1026,35 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                         .setIcon(R.drawable.error_alert)
                         .show();
             }
-//            else {
-//                Task lastAUTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
-//                if(lastAUTask!= null) {
-//                    boolean isfolderExist = false;
-//                    for (ImejiFolder imejiFolder : folderList) {
-//                        if (imejiFolder.getImejiId().equalsIgnoreCase(lastAUTask.getCollectionId())) {
-//                            return;
-//                        }
-//                    }
-//                }
-//            }
+            else {
+                /**set collection name **/
+                collectionNameTextView = (TextView) findViewById(R.id.collection_name);
+                Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
+                if(auTask!=null) {
+                    collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
+                }else {
+                    // dialog lead new user to choose collection
+                    new AlertDialog.Builder(context)
+                            .setTitle("collection not set yet")
+                            .setMessage("Automatic upload is active, please set a Collection")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // go to set collection
+                                    Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
+                                    startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // collection set off
+                                    autoUploadSwitch.setChecked(false);
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                }
+
+            }
         }
 
         @Override

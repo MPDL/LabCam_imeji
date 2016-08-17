@@ -33,19 +33,12 @@ public class TaskUploadService extends Service {
     private String currentImageId;
     private Handler handler = new Handler();
 
-    // Images
-    List<Image> waitingImages = null;
-    List<Image> failedImages = null;
-    List<Image> finishedImages = null;
-
     private SharedPreferences mPrefs;
     private String username;
     private String userId;
     private String apiKey;
     private String serverName;
-    private String collectionID;
-    public TypedFile typedFile;
-    String json;
+ 
 
     //get context
     private Context activity = this;

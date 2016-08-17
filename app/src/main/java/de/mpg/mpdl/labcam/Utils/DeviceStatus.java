@@ -203,12 +203,13 @@ public class DeviceStatus {
     //delete tasks
 
     //delete finished tasks
-    public static void deleteFinishedAUTasks(){
+    public static void deleteFinishedAUTasks(String userId){
 
         // get All au tasks first
         List<Task> finishedTasks = new Select()
                 .from(Task.class)
                 .where("uploadMode = ?","AU")
+                .where("userId = ?", userId)
                 .execute();
 
         // remove unfinished tasks form list

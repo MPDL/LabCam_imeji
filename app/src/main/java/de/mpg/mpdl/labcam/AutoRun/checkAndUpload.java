@@ -111,7 +111,7 @@ public class checkAndUpload {
             //prepare collectionId
             collectionID =task.getCollectionId();
 
-            /** debug **/
+            /** start uploading **/
             getCollectionById();
 
         }
@@ -126,9 +126,12 @@ public class checkAndUpload {
         if(!taskIsStopped()){
 
             /** WAITING, FINISHED **/
-            waitingImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
-            failedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FAILED)).orderBy("RANDOM()").execute();
-            finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+            waitingImages = new Select().from(Image.class)
+                    .where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
+            failedImages = new Select().from(Image.class)
+                    .where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FAILED)).orderBy("RANDOM()").execute();
+            finishedImages = new Select().from(Image.class)
+                    .where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
             task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
 
@@ -149,15 +152,16 @@ public class checkAndUpload {
             task.setFinishedItems(finishedImages.size());
             task.save();
 
-            if (joinList != null && joinList.size() > 0) {
-
-                // look into database, get first image of a task in create time desc order
+            if (joinList != null && joinList.size() > 0) {             // joinList indicate whether task is finished
+                // look into database, get first image of a task in create time asc order
                 // upload begin with the first in list
-                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?",String.valueOf(DeviceStatus.state.STARTED)).where("state != ?",String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
-                String imageState = image.getState();
-                String filePath = image.getImagePath();
-                // important: set currentImageId, so that in the callback can find it
-                currentImageId = image.getImageId();
+                Image image = new Select().from(Image.class)
+                        .where("taskId = ?", currentTaskId)
+                        .where("state != ?",String.valueOf(DeviceStatus.state.STARTED))
+                        .where("state != ?",String.valueOf(DeviceStatus.state.FINISHED))
+                        .orderBy("createTime ASC").executeSingle();
+
+                currentImageId = image.getImageId();  // important: set currentImageId
 
                 upload(image);
 
@@ -165,6 +169,10 @@ public class checkAndUpload {
         }
     }
 
+    /**
+     * upload a image (unit function)
+     * @param image
+     */
     private void upload(Image image){
 
         if(taskIsStopped()){
@@ -233,7 +241,9 @@ public class checkAndUpload {
             return;
         }
 
-        finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
+        finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId)
+                .where("state = ?", String.valueOf(DeviceStatus.state.FINISHED))
+                .orderBy("RANDOM()").execute();
         List<Image> allImages= new Select().from(Image.class).where("taskId = ?", currentTaskId).execute();
         totalNum = allImages.size();
 
@@ -260,7 +270,10 @@ public class checkAndUpload {
 //        totalNum = task.getTotalItems();
         if(totalNum>finishedNum){
             // continue anyway
-            Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?",String.valueOf(DeviceStatus.state.STARTED)).where("state != ?",String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").executeSingle();
+            Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId)
+                    .where("state != ?",String.valueOf(DeviceStatus.state.STARTED))
+                    .where("state != ?",String.valueOf(DeviceStatus.state.FINISHED))
+                    .orderBy("createTime ASC").executeSingle();
             if(image!=null){
                 upload(image);
             }
@@ -279,7 +292,6 @@ public class checkAndUpload {
                 task.setEndDate(DeviceStatus.dateNow());
                 task.save();
                 notification();
-                Log.i(TAG, "task finished");
             }
         }
     }
@@ -630,7 +642,7 @@ public class checkAndUpload {
             int finishedNum = task.getFinishedItems();
             int totalNum = task.getTotalItems();
             if(totalNum>finishedNum){
-                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?",String.valueOf(DeviceStatus.state.FINISHED)).where("state != ?",String.valueOf(DeviceStatus.state.STARTED)).orderBy("RANDOM()").executeSingle();
+                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?",String.valueOf(DeviceStatus.state.FINISHED)).where("state != ?",String.valueOf(DeviceStatus.state.STARTED)).orderBy("createTime ASC").executeSingle();
                 if(image!=null){
                     upload(image);
                 }
