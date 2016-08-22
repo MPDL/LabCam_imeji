@@ -131,10 +131,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                         .show();
             }
 
-
             new Delete().from(ImejiFolder.class).execute();
-
-
 
             ActiveAndroid.beginTransaction();
             try {

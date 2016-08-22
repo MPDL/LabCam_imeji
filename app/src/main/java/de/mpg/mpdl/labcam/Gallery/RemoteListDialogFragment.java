@@ -3,15 +3,18 @@ package de.mpg.mpdl.labcam.Gallery;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -106,6 +109,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                                     return;
                                 }
                                 setMUCollection();
+
                             }
                         }
                 )
@@ -119,11 +123,11 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                         }
                 );
 
-
         //remote folder list
         listView = (ListView) view.findViewById(R.id.settings_remote_listView);
         adapter = new SettingsListAdapter(activity, collectionList,this);
         listView.setAdapter(adapter);
+
 
         //updateFolder
         RetrofitClient.getGrantCollectionMessage(callback, apiKey);
@@ -170,7 +174,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
 
 
     //callbacks
-
+    private ProgressDialog pDialog = null;
     Callback<CollectionMessage> callback = new Callback<CollectionMessage>() {
         @Override
         public void success(CollectionMessage collectionMessage, Response response) {
@@ -180,6 +184,38 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
             List<ImejiFolder> folderList = new ArrayList<>();
             folderList = collectionMessage.getResults();
 
+            if(folderList.size()==0) {
+                // create dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                // Set up the input
+                final EditText input = new EditText(activity);
+                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+                builder.setTitle("Create Collection")
+                        .setMessage("There is no collection available, create one by giving a name")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // create dialog and create collection
+                                pDialog = new ProgressDialog(activity);
+                                pDialog.setMessage("Loading...");
+                                pDialog.show();
+                                if (String.valueOf(input.getText()).equalsIgnoreCase("")) {
+                                    Toast.makeText(activity, "canceled create collection", Toast.LENGTH_SHORT).show();
+                                    pDialog.dismiss();
+                                    return;
+                                }
+                                RetrofitClient.createCollection(String.valueOf(input.getText()), "no description yet", createCollection_callback, apiKey);
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // do nothing
+                            }
+                        })
+                        .setIcon(R.drawable.error_alert)
+                        .show();
+            }
 
 
             ActiveAndroid.beginTransaction();
@@ -227,6 +263,28 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
 //            adapter.notifyDataSetChanged();
             adapter = new SettingsListAdapter(activity, collectionList,ie);
             listView.setAdapter(adapter);
+        }
+    };
+
+    Callback<ImejiFolder> createCollection_callback = new Callback<ImejiFolder>() {
+        @Override
+        public void success(ImejiFolder imejiFolder, Response response) {
+            Log.v(LOG_TAG, "createCollection_callback success");
+//            isFirstCollection = true;
+
+            pDialog.dismiss();
+            // set as MU destination
+            collectionId = imejiFolder.id;
+            setMUCollection();
+
+//            RetrofitClient.getGrantCollectionMessage(callback, apiKey);
+            //get collection list
+
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Log.v(LOG_TAG, error.getMessage());
         }
     };
 
