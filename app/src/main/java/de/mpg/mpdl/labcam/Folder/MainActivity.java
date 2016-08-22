@@ -143,8 +143,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     //activity
     private Context context = this;
 
-    //
-    private boolean isTaskFragment = false;
+    //login with qr
+    boolean isQRLogin = false;
 
     //
     private RelativeLayout chooseCollectionLayout = null;
@@ -166,13 +166,18 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         serverUrl = mPrefs.getString("server","");
 //        serverUrl = DeviceStatus.parseServerUrl(serverUrl);
 
+        try{
+            Bundle args = this.getIntent().getExtras();
+            isQRLogin = args.getBoolean("isQRLogin", false);}   // get isQRLogin from extra
+        catch (Exception e){}
 
-//        try{
-//        Bundle args = this.getIntent().getExtras();
-//        isTaskFragment= args.getBoolean("isTaskFragment", false);}
-//        catch (Exception e){
-////            Log.v(LOG_TAG,e.getMessage());
-//        }
+        if(isQRLogin){ // login with qr code
+            //set switch on
+            //set collection
+            //toast
+        }else { // login in normal
+
+        }
 
         getLocalCamFolder();
         // register NetStateObserver

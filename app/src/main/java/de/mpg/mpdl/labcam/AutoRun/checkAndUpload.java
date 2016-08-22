@@ -310,10 +310,10 @@ public class checkAndUpload {
         builder.setSmallIcon(R.drawable.notification);
         builder.setContentTitle("LabCam");
 
-        if(("AU").equalsIgnoreCase(task.getUploadMode())){
-            String taskInfo = "Automatic upload success";
+        if(("AU_FINISHED").equalsIgnoreCase(task.getUploadMode())){
+            String taskInfo = task.getTotalItems()+ " photo(s) automatically uploaded to "+ task.getCollectionName();
             builder.setContentText(taskInfo);
-        }else{
+        }else if(("MU").equalsIgnoreCase(task.getUploadMode())){
             // Sets an ID for the notification
             mNotificationId = NotificationID.getID();
             String taskInfo = task.getTotalItems()+ " photo(s) uploaded successfully";

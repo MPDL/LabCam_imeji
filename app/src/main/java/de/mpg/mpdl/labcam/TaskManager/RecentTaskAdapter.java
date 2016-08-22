@@ -62,7 +62,7 @@ public class RecentTaskAdapter extends BaseAdapter {
         TextView taskName = (TextView) view.findViewById(R.id.tv_task_name);
 
         if(("AU_FINISHED").equalsIgnoreCase(taskList.get(i).getUploadMode())){
-            String taskInfo = taskList.get(i).getTotalItems()+ " photo(s) automatically upload to "+ taskList.get(i).getCollectionName();
+            String taskInfo = taskList.get(i).getTotalItems()+ " photo(s) automatically uploaded to "+ taskList.get(i).getCollectionName();
             taskName.setText(taskInfo);
         }else if(("MU").equalsIgnoreCase(taskList.get(i).getUploadMode())){
             String taskInfo = taskList.get(i).getTotalItems()+ " selected photo(s) uploaded to "+ taskList.get(i).getCollectionName();

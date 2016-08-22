@@ -241,8 +241,6 @@ public class LoginActivity extends AppCompatActivity {
             // There was an error, focus the first form field with an error.
             focusView.requestFocus();
         } else {
-//                    usernameView.setEnabled(false);
-//                    passwordView.setEnabled(false);
 
             mPrefs = getSharedPreferences("myPref", 0);
             SharedPreferences.Editor mEditor = mPrefs.edit();
@@ -253,7 +251,6 @@ public class LoginActivity extends AppCompatActivity {
             SharedPreferences.Editor ed = preferences.edit();
             ed.putString("Camera", "On");
             ed.commit();
-//                    DeviceStatus.showSnackbar(rootView, "Login Successfully");
             RetrofitClient.login(username,password,callback_login);
         }
 
@@ -453,8 +450,9 @@ public class LoginActivity extends AppCompatActivity {
      */
     boolean isTaskFragment = false;
 
-    public void accountLogin(String userId) {
+    public void accountLogin(String userId, boolean isQRLogin) {
         Intent intent = new Intent(activity, MainActivity.class);
+        intent.putExtra("isQRLogin", isQRLogin);
         startActivity(intent);
         // layout_login out of stack
         finish();
@@ -538,7 +536,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         // QR layout_login
-        accountLogin(userId);
+        accountLogin(userId,true);
     }
 
     /**
@@ -583,9 +581,6 @@ public class LoginActivity extends AppCompatActivity {
     Callback<User> callback_login = new Callback<User>() {
         @Override
         public void success(User user, Response response) {
-            Log.v(LOG_TAG, "Login success");
-            Log.v(LOG_TAG,user.getQuota()+"");
-
             String userCompleteName = "";
             userCompleteName = user.getPerson().getCompleteName();
             if(userCompleteName!="" && userCompleteName!=null){
@@ -600,12 +595,11 @@ public class LoginActivity extends AppCompatActivity {
                     mEditor.putString("apiKey",user.getApiKey()).apply();
                     mEditor.putString("server",serverURL).apply();
                 mEditor.commit();
-                if(collectionId!=null&&collectionId!=""){
-                     RetrofitClient.getCollectionById(collectionId, callback_collection, user.getApiKey());
+                if(collectionId!=null&&collectionId!=""){   // login with qr code
+                    RetrofitClient.getCollectionById(collectionId, callback_collection, user.getApiKey());
                     //create a new task for new selected collection
-                }else { accountLogin(user.getPerson().getId());}
+                }else { accountLogin(user.getPerson().getId(),false);}
             }
-
         }
 
         @Override
