@@ -143,9 +143,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     //activity
     private Context context = this;
 
-    //login with qr
-    boolean isQRLogin = false;
-
+    // flags
+    boolean isQRLogin = false;  //login with qr
+    boolean isLoginCall = true;  //from onCreate callback
     //
     private RelativeLayout chooseCollectionLayout = null;
 
@@ -201,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             setAutoUploadStatus(isQRLogin, true);
             Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
         }else { // normal login
+            isLoginCall = true;
             RetrofitClient.getGrantCollectionMessage(callback, apiKey);  // show alert if no collection available
         }
 
@@ -646,11 +647,12 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 //off to on
                 Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
 
-                if(auTask==null){
-                    // popup
-                    Toast.makeText(activity,"Automatic upload is active\n please set a collection",Toast.LENGTH_SHORT).show();
-                    Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
-                    startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
+                if(auTask==null){  // col wasValue invalid
+
+                    //TODO:
+                    RetrofitClient.getGrantCollectionMessage(callback, apiKey);
+                    isLoginCall = true;
+
                 }else
                     Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
             }
@@ -1049,6 +1051,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 }
             }
             else {  // Col > 1
+
+                if(!isLoginCall){   // callback from switch
+                    Intent settingsIntent = new Intent(context, RemoteCollectionSettingsActivity.class);
+                    startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
+                    return;
+                }
+
                 Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();   // get old settings
 
                 //set collection name
