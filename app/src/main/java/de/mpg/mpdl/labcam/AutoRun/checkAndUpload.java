@@ -22,7 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import de.mpg.mpdl.labcam.Folder.MainActivity;
 import de.mpg.mpdl.labcam.Model.DataItem;
@@ -279,14 +281,17 @@ public class checkAndUpload {
             }
         }else {
             if(task.getUploadMode().equalsIgnoreCase("AU")){
-                /** delete finished tasks before reset Au task **/
-                new Delete().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
 
+                task.setUploadMode("AU_FINISHED");
                 task.setEndDate(DeviceStatus.dateNow());
                 task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                task.setTotalItems(0);
-                task.setFinishedItems(0);
                 task.save();
+
+                Intent uploadIntent = new Intent(context, TaskUploadService.class);
+                context.stopService(uploadIntent);  //stop AU service
+
+                createAUTask(task);  // create new AU task
+
             }else {
                 task.setState(String.valueOf(DeviceStatus.state.FINISHED));
                 task.setEndDate(DeviceStatus.dateNow());
@@ -649,21 +654,26 @@ public class checkAndUpload {
             }else {
 
                 if(task.getUploadMode().equalsIgnoreCase("AU")){
-                    /** delete finished tasks before reset Au task **/
-                    new Delete().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
+//                    /** delete finished tasks before reset Au task **/
+//                    new Delete().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
 
+                    task.setUploadMode("AU_FINISHED");
                     task.setEndDate(DeviceStatus.dateNow());
                     task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                    task.setTotalItems(0);
-                    task.setFinishedItems(0);
                     task.save();
+
+                    Intent uploadIntent = new Intent(context, TaskUploadService.class);
+                    context.stopService(uploadIntent);  //stop AU service
+
+                    createAUTask(task); //create AU task
+
                     Handler  handler=new Handler(Looper.getMainLooper());
                     handler.post(new Runnable() {
                         public void run() {
                             notification();
                         }
                     });
-                }else{
+                }else{ // MU task
                     task.setState(String.valueOf(DeviceStatus.state.FINISHED));
                     task.setEndDate(DeviceStatus.dateNow());
                     task.save();
@@ -770,4 +780,27 @@ public class checkAndUpload {
         }
     };
 
+
+    /** create new autoTask when old task finished **/
+
+    private void createAUTask(Task oldTask){
+        String uniqueID = UUID.randomUUID().toString();
+        Task newAUTask = new Task();
+        newAUTask.setTaskId(uniqueID);
+        newAUTask.setUploadMode("AU");
+        newAUTask.setCollectionId(oldTask.getCollectionId());
+        newAUTask.setCollectionName(oldTask.getCollectionName());
+        newAUTask.setState(String.valueOf(DeviceStatus.state.WAITING));
+        newAUTask.setUserName(oldTask.getUserName());
+        newAUTask.setUserId(oldTask.getUserId());
+        newAUTask.setTotalItems(0);
+        newAUTask.setFinishedItems(0);
+        newAUTask.setSeverName(oldTask.getSeverName());
+
+        Long now = new Date().getTime();
+        newAUTask.setStartDate(String.valueOf(now));
+
+        newAUTask.save();
+
+    }
 }

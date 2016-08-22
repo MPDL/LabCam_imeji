@@ -177,12 +177,15 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
             Log.v("taskId", getImage().getTaskId());
             Log.v("taskNum", DeviceStatus.getAuTask(userId,serverName).getTotalItems() + "");
 
-            UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
-            mReceiver.setReceiver(this);
-            Intent uploadIntent = new Intent(context, TaskUploadService.class);
-            intent.putExtra("receiver", mReceiver);
-            context.startService(uploadIntent);
 
+            // start service when finished item 0, total item 1
+            if(task.getTotalItems()==1 && task.getFinishedItems() == 0) {
+                UploadResultReceiver mReceiver = new UploadResultReceiver(new Handler());
+                mReceiver.setReceiver(this);
+                Intent uploadIntent = new Intent(context, TaskUploadService.class);
+                intent.putExtra("receiver", mReceiver);
+                context.startService(uploadIntent);
+            }
         }catch (Exception e){
             Log.v("CameraEventReceiver","didn't set task");
         }

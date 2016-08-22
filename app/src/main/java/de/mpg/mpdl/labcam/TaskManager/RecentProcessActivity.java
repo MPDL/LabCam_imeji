@@ -44,7 +44,7 @@ public class RecentProcessActivity extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        //taskManager listview
+        //taskManager listView
         recentTaskListView = (ListView) findViewById(R.id.listView_recent_task);
         taskList = DeviceStatus.getRecentTasks(userId);
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
