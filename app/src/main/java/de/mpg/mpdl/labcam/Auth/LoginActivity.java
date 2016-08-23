@@ -537,6 +537,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // QR layout_login
         accountLogin(userId,true);
+        Toast.makeText(activity,"Successfully login with QR code",Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -584,7 +585,6 @@ public class LoginActivity extends AppCompatActivity {
             String userCompleteName = "";
             userCompleteName = user.getPerson().getCompleteName();
             if(userCompleteName!="" && userCompleteName!=null){
-                Toast.makeText(activity,"Welcome "+userCompleteName,Toast.LENGTH_SHORT).show();
                 mPrefs = getSharedPreferences("myPref", 0);
                 SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.putString("username",user.getPerson().getCompleteName()).apply();
@@ -598,7 +598,9 @@ public class LoginActivity extends AppCompatActivity {
                 if(collectionId!=null&&collectionId!=""){   // login with qr code
                     RetrofitClient.getCollectionById(collectionId, callback_collection, user.getApiKey());
                     //create a new task for new selected collection
-                }else { accountLogin(user.getPerson().getId(),false);}
+                }else {
+                    Toast.makeText(activity,"Welcome "+userCompleteName,Toast.LENGTH_SHORT).show();
+                    accountLogin(user.getPerson().getId(),false);}
             }
         }
 
@@ -629,6 +631,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         public void failure(RetrofitError error) {
             Log.v(LOG_TAG,"failed");
+            Toast.makeText(activity,"QR code invalid",Toast.LENGTH_LONG).show();
         }
     };
 }

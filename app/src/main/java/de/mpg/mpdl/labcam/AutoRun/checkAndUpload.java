@@ -215,7 +215,6 @@ public class checkAndUpload {
         typedFile = new TypedFile("multipart/form-data", f);
         json = "{" + jsonPart1 + ", \"metadata\" : "+jsonPart2+"}";
         Log.v(TAG, "start uploading: " + filePath);
-
         RetrofitClient.uploadItem(typedFile, json, callback_upload, apiKey);
         image.setState(String.valueOf(DeviceStatus.state.STARTED));
     }
