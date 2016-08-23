@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             isLoginCall = true;
             RetrofitClient.getGrantCollectionMessage(callback, apiKey);  // show alert if no collection available
         }
-
+        
         setLogout();
 
         /**************************************************  check upload not finished task ***************************************************/
@@ -580,6 +580,10 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
             }
         });
+        Task task = DeviceStatus.getAuTask(userId,serverUrl);
+        if(task.getCollectionName()!=null&&task.getCollectionName()!=""){
+            collectionNameTextView.setText(task.getCollectionName());
+        }
     }
 
     private void checkRecent(){
