@@ -651,14 +651,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 //off to on
                 Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
 
-                if(auTask==null){  // col wasValue invalid
+//                if(auTask==null){  // col wasValue not null
 
-                    //TODO:
-                    RetrofitClient.getGrantCollectionMessage(callback, apiKey);
-                    isLoginCall = true;
-
-                }else
-                    Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
+                RetrofitClient.getGrantCollectionMessage(callback, apiKey);
+                isLoginCall = true;
+//
+//                }else
+//                    Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -1068,15 +1067,21 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 collectionNameTextView = (TextView) findViewById(R.id.collection_name);
                 if(settings!=null && settings.isAutoUpload())  // history AU is on
                 {
-
+                    boolean isValid = false;
                     //col wasValue
                     Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
-                    if(auTask!=null && auTask.getCollectionId() !=null) {   // col wasValue valid
-                        collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
-                        setAutoUploadStatus(false,true);
-                        Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
+                    if(auTask!=null && auTask.getCollectionId() !=null) {   // col wasValue not null
+                        for(int i = 0; i<folderList.size(); i++){           // col wasValue still valid on server
+                            if(auTask.getCollectionId().equalsIgnoreCase(folderList.get(i).id)){
+                                isValid = true;
+                            }
+                            collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
+                            setAutoUploadStatus(false,true);
+                            Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
-                    } else { // col wasValue invalid
+                    if(!isValid){ // col wasValue invalid
                         // dialog lead new user to choose collection
                         new AlertDialog.Builder(context)
                                 .setTitle("collection not set yet")
@@ -1097,9 +1102,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                                 .setIcon(android.R.drawable.ic_dialog_alert)
                                 .show();
                     }
-                }else {                                        // history AU is off or not set
+                }else {   // history AU is off or not set
                     Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
-                    if(auTask!=null) {   // col wasValue valid
+                    if(auTask!=null) {   // col wasValue not null
                         collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
                     }
                         setAutoUploadStatus(false,false);
@@ -1116,3 +1121,4 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         }
     };
 }
+
