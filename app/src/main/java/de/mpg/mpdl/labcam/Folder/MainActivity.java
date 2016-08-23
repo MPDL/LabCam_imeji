@@ -1067,7 +1067,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
                     //col wasValue
                     Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
-                    if(auTask!=null) {   // col wasValue valid
+                    if(auTask!=null && auTask.getCollectionId() !=null) {   // col wasValue valid
                         collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
                         setAutoUploadStatus(false,true);
                         Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
@@ -1102,6 +1102,8 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 }
             }
         }
+
+
 
         @Override
         public void failure(RetrofitError error) {

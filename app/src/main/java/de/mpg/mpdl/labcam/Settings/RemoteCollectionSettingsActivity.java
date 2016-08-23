@@ -318,10 +318,9 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                   if(latestTask.getTotalItems()>latestTask.getFinishedItems())
                   {
                       String oldCollectionName = latestTask.getCollectionName();
-                      // stop latestTask, change mode/name, save
+                      // stop latestTask, change mode/name
                       Intent uploadIntent = new Intent(activity, TaskUploadService.class);
-                      activity.stopService(uploadIntent);
-                      Log.e(LOG_TAG, "stop you service!");
+                      activity.stopService(uploadIntent);      // AU service stopped
 
                       List<Image> allImage = new Select().from(Image.class).execute();
 
@@ -517,8 +516,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     // latest task already stopped
                                     // get remain Images
 
-
-
                                     List<Image> remainImages = null;
                                      remainImages = new Select().from(Image.class)
                                             .where("taskId = ?", latestTask.getTaskId())
@@ -534,8 +531,9 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     }
 
                                     // warning: latestTask is a MU task now
+                                    latestTask.setUploadMode("AU_FINISHED");
                                     latestTask.setTotalItems(latestTask.getTotalItems() - remainImageNum);
-                                    task.setEndDate(DeviceStatus.dateNow());
+                                    latestTask.setEndDate(DeviceStatus.dateNow());
                                     latestTask.setState(String.valueOf(DeviceStatus.state.FINISHED));
                                     latestTask.save();
 
@@ -556,12 +554,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                         ActiveAndroid.endTransaction();
                                     }
 
-//                                    //delete old taskImage
-//                                    new Delete().from(Image.class)
-//                                            .where("taskId = ?", latestTask.getTaskId())
-//                                            .where("state = ?", String.valueOf(DeviceStatus.state.FINISHED))
-//                                            .execute();
-
                                     //create new task
                                     Log.v("collectionID", collectionID);
                                     task = new Task();
@@ -574,6 +566,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     task.setState(String.valueOf(DeviceStatus.state.WAITING));
                                     task.setUserName(username);
                                     task.setUserId(userId);
+                                    task.setSeverName(serverUrl);
 
                                     Long now = new Date().getTime();
                                     task.setStartDate(String.valueOf(now));
@@ -581,16 +574,19 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
                                     task.save();
 
+                                    // start TaskUploadService here
+                                    Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+                                    activity.startService(uploadIntent);
 
-                                    /**
-                                     * latest
-                                     */
+
+
+
 
                                     List<Image> fsfasdfasf = new Select().from(Image.class)
                                             .where("taskId = ?", latestTask.getTaskId())
                                             .execute();
 
-                                    Log.e(LOG_TAG, "now print the latestTask,set!");
+                                    Log.e(LOG_TAG, "now print the old AU Task,set!");
                                     Log.e(LOG_TAG, "first:" + latestTask.getState());
                                     Log.e(LOG_TAG, "getTotalItems:  " + latestTask.getTotalItems());
                                     Log.e(LOG_TAG, "getFinishedItems:  " + latestTask.getFinishedItems());
@@ -604,7 +600,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                             .where("taskId = ?", task.getTaskId())
                                             .execute();
 
-                                    Log.e(LOG_TAG, "now print the task!");
+                                    Log.e(LOG_TAG, "now print new AU task!");
                                     Log.e(LOG_TAG, "first:" + task.getState());
                                     Log.e(LOG_TAG, "getTotalItems:  " + task.getTotalItems());
                                     Log.e(LOG_TAG, "getFinishedItems:  " + task.getFinishedItems());
@@ -615,10 +611,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     }
 
                                     Log.e(LOG_TAG,"+++++++++++++++++++++");
-
-                                    //start service
-                                    Intent uploadIntent = new Intent(activity, TaskUploadService.class);
-                                    startService(uploadIntent);
 
 
                                     Intent intent = new Intent();

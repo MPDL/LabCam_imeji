@@ -11,6 +11,7 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.google.gson.JsonObject;
@@ -214,6 +215,7 @@ public class checkAndUpload {
         typedFile = new TypedFile("multipart/form-data", f);
         json = "{" + jsonPart1 + ", \"metadata\" : "+jsonPart2+"}";
         Log.v(TAG, "start uploading: " + filePath);
+
         RetrofitClient.uploadItem(typedFile, json, callback_upload, apiKey);
         image.setState(String.valueOf(DeviceStatus.state.STARTED));
     }
