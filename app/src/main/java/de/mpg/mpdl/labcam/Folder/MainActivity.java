@@ -581,7 +581,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             }
         });
         Task task = DeviceStatus.getAuTask(userId,serverUrl);
-        if(task.getCollectionName()!=null&&task.getCollectionName()!=""){
+        if(task!=null&&task.getCollectionName()!=null&&task.getCollectionName()!=""){
             collectionNameTextView.setText(task.getCollectionName());
         }
     }

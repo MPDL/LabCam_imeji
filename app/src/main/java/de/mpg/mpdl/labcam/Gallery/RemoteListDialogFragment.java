@@ -123,6 +123,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                         }
                 );
 
+
         //remote folder list
         listView = (ListView) view.findViewById(R.id.settings_remote_listView);
         adapter = new SettingsListAdapter(activity, collectionList,this);
@@ -152,6 +153,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
             Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
             manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
             activity.startService(manualUploadServiceIntent);
+            getDialog().dismiss();
         }
     }
 
@@ -275,6 +277,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
             pDialog.dismiss();
             // set as MU destination
             collectionId = imejiFolder.id;
+            collectionName = imejiFolder.getTitle();
             setMUCollection();
 
 //            RetrofitClient.getGrantCollectionMessage(callback, apiKey);
@@ -338,7 +341,6 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                             collectionId = qrCollectionId;
                             //set and save
                             setMUCollection();
-                            getDialog().dismiss();
 
                         } else {
                             Toast.makeText(getActivity(), "collection setting not changed", Toast.LENGTH_LONG).show();
