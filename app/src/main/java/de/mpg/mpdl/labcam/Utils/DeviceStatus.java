@@ -417,7 +417,7 @@ public class DeviceStatus {
             ExposureTimeStr = exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_EXPOSURE_TIME);
         }
 
-        if(gpsDirectory!=null) {
+        if(gpsDirectory!=null && gpsDirectory.getGeoLocation()!=null ) {
             latitudeStr = String.valueOf(gpsDirectory.getGeoLocation().getLatitude());
             longitudeStr = String.valueOf(gpsDirectory.getGeoLocation().getLongitude());
             GPSVersionIDStr = gpsDirectory.getString(gpsDirectory.TAG_VERSION_ID);

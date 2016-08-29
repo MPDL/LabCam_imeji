@@ -302,13 +302,18 @@ public class checkAndUpload {
         }
     }
 
+
+    private int getNotificationIcon() {
+        boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
+        return useWhiteIcon ? R.drawable.icon_app : R.drawable.notification;
+    }
+
     private void notification(){
 
         //default ID for the notification (auto)
         int mNotificationId = 001;
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-
-        builder.setSmallIcon(R.drawable.notification);
+        builder.setSmallIcon(getNotificationIcon());
         builder.setContentTitle("LabCam");
 
         if(("AU_FINISHED").equalsIgnoreCase(task.getUploadMode())){
