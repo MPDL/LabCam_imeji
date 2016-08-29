@@ -48,6 +48,7 @@ import retrofit.client.Response;
 public class RemoteListDialogFragment extends DialogFragment implements CollectionIdInterface {
 
     private static final String LOG_TAG = RemoteListDialogFragment.class.getSimpleName();
+    private RemoteListDialogFragment remoteListDialogFragment = this;
     private static final int INTENT_QR = 1001;
 
     //user
@@ -213,6 +214,8 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // do nothing
+                                new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
+                                remoteListDialogFragment.dismiss();
                             }
                         })
                         .setIcon(R.drawable.error_alert)

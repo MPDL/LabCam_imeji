@@ -879,7 +879,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 Task lastAUTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
 
                 if(lastAUTask!= null){
-                    Log.e("blabla", lastAUTask.getCollectionName());
                     collectionNameTextView.setText(lastAUTask.getCollectionName());
                     autoUploadSwitch.setChecked(true);
 
@@ -1083,9 +1082,15 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
                     if(!isValid){ // col wasValue invalid
                         // dialog lead new user to choose collection
+
+                        // old collection not valid
+                        Task task = DeviceStatus.getAuTask(userId, serverUrl);
+                        if(task!=null){
+                            task.delete();}
+
                         new AlertDialog.Builder(context)
-                                .setTitle("collection not set yet")
-                                .setMessage("Automatic upload is active, please set a Collection")
+                                .setTitle("old collection not valid")
+                                .setMessage("please set a Collection")
                                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         // go to set collection
