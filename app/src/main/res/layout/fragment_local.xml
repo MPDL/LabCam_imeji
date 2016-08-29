@@ -12,16 +12,6 @@
         android:id="@+id/layout_active_task"
         android:background="@color/grayDivider">
 
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_centerVertical="true"-->
-            <!--android:id="@+id/tv_title_task_info"-->
-            <!--android:layout_marginLeft="16dp"-->
-            <!--android:textSize="14sp"-->
-            <!--android:textColor="@color/lightGrey"-->
-            <!--android:text="" />-->
-
         <ImageView
             android:layout_width="20dp"
             android:layout_height="30dp"
@@ -41,27 +31,33 @@
             android:text=""
             />
 
-        <de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:id="@+id/circleProgressBar"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/im_right_arrow"
-            app:progressbarColor="@color/blue_normal"
-            app:progressBarThickness="4dp"
-            android:layout_marginRight="16dp"
-            />
-
-        <TextView
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/tv_percent"
-            android:layout_toLeftOf="@id/im_right_arrow"
-            android:layout_marginRight="25dp"
+            android:id="@+id/layout_percent"
             android:layout_centerVertical="true"
-            android:text="0%"
-            android:textSize="12sp"
-            />
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/tv_num_active_task">
+            <de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/circleProgressBar"
+                android:layout_centerInParent="true"
+                app:progressbarColor="@color/blue_normal"
+                app:progressBarThickness="4dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_percent"
+                android:layout_centerInParent="true"
+                android:text="0%"
+                android:textSize="12sp"
+                />
+
+        </RelativeLayout>
+
 
         <TextView
             android:layout_width="wrap_content"
@@ -70,7 +66,7 @@
             android:id="@+id/tv_title_task_info"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="16dp"
-            android:layout_toLeftOf="@id/circleProgressBar"
+            android:layout_toLeftOf="@id/layout_percent"
             android:layout_marginRight="8dp"
             android:textSize="14sp"
             android:textColor="@color/lightGrey"
