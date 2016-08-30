@@ -33,13 +33,17 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
+import de.mpg.mpdl.labcam.Utils.UiElements.UploadingItem;
 
 /**
  * Created by allen on 09/04/15.
@@ -47,6 +51,7 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 public class DeviceStatus {
 
     private static final String LOG_TAG = DeviceStatus.class.getSimpleName();
+    public static List<String> uploadingItemPaths = new ArrayList<>();
     public static final String username = "";
     public static final String password = "";
     public static final String collectionID = "0L5yLxP_AphUMtIi";
@@ -64,6 +69,14 @@ public class DeviceStatus {
         } else {
             return false;
         }
+    }
+
+    public static List<String> getUploadingItemPaths() {
+        return uploadingItemPaths;
+    }
+
+    public static void setUploadingItemPaths(List<String> uploadingItemPaths) {
+        DeviceStatus.uploadingItemPaths = uploadingItemPaths;
     }
 
     // Check whether the GPS sensor is activated
@@ -121,6 +134,7 @@ public class DeviceStatus {
         return new Select()
                 .from(Task.class)
                 .orderBy("startDate DESC")
+
                 .executeSingle();
     }
 
@@ -144,6 +158,7 @@ public class DeviceStatus {
                 .orderBy("startDate DESC")
                 .executeSingle();
     }
+
 
     public static List<Task> getTasks(){
         return null;

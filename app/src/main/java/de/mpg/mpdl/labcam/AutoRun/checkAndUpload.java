@@ -39,7 +39,9 @@ import de.mpg.mpdl.labcam.Otto.UploadEvent;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.Utils.Singleton;
 import de.mpg.mpdl.labcam.Utils.UiElements.Notification.NotificationID;
+import de.mpg.mpdl.labcam.Utils.UiElements.UploadingItem;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -53,6 +55,7 @@ import retrofit.mime.TypedFile;
 public class checkAndUpload {
 
     private static final String TAG = checkAndUpload.class.getSimpleName();
+
 
     List<Image> waitingImages = null;
     List<Image> finishedImages = null;
@@ -178,6 +181,8 @@ public class checkAndUpload {
      */
     private void upload(Image image){
 
+        UploadingItem ui = new UploadingItem(image.getImagePath(), false);
+        DeviceStatus.getUploadingItemPaths().add(image.getImagePath());
         if(taskIsStopped()){
             return;
         }
@@ -632,6 +637,8 @@ public class checkAndUpload {
 
             currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
             currentImage.save();
+            if(DeviceStatus.getUploadingItemPaths().size()>0)
+                DeviceStatus.getUploadingItemPaths().remove(currentImage.getImagePath());
 
             finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
@@ -655,7 +662,8 @@ public class checkAndUpload {
             if(totalNum>finishedNum){
                 Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?",String.valueOf(DeviceStatus.state.FINISHED)).where("state != ?",String.valueOf(DeviceStatus.state.STARTED)).orderBy("createTime ASC").executeSingle();
                 if(image!=null){
-                    upload(image);
+                    if(!DeviceStatus.getUploadingItemPaths().contains(image.getImagePath()))
+                        upload(image);
                 }
             }else {
 
@@ -704,6 +712,8 @@ public class checkAndUpload {
             if(currentImage!=null){
                 //do sth
                 currentImage.setState(String.valueOf(DeviceStatus.state.FAILED));
+                if(DeviceStatus.getUploadingItemPaths().size()>0)
+                    DeviceStatus.getUploadingItemPaths().remove(currentImage.getImagePath());
             }else {
                 Log.v(TAG, "currentImage:" + currentImageId + "is null");
                 return;

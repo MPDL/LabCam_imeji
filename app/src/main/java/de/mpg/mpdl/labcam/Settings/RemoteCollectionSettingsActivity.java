@@ -44,6 +44,7 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.Utils.Singleton;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -516,6 +517,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     // latest task already stopped
                                     // get remain Images
 
+
                                     List<Image> remainImages = null;
                                      remainImages = new Select().from(Image.class)
                                             .where("taskId = ?", latestTask.getTaskId())
@@ -529,6 +531,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     if(remainImages!=null){
                                         remainImageNum = remainImages.size();
                                     }
+
 
                                     // warning: latestTask is a MU task now
                                     latestTask.setUploadMode("AU_FINISHED");
@@ -576,6 +579,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
                                     // start TaskUploadService here
                                     Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+
                                     activity.startService(uploadIntent);
 
 

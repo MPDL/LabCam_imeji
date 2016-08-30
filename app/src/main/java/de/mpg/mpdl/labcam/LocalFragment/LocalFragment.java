@@ -316,7 +316,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
                         if(task.getUploadMode().equalsIgnoreCase("AU")){
                             // AU
-                            titleTaskTextView.setText("Automatic upload to" + task.getCollectionName());
+                            titleTaskTextView.setText("Automatic upload to " + task.getCollectionName());
                         }else {
                             titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
                         }
