@@ -14,7 +14,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -110,6 +112,21 @@ public class LoginActivity extends AppCompatActivity {
         usernameView = (EditText) findViewById(R.id.userName);
         passwordView = (EditText) findViewById(R.id.password);
         newHereView = (TextView) findViewById(R.id.tv_new_here);
+
+        passwordView.setImeOptions(EditorInfo.IME_ACTION_SEND);
+        passwordView.setOnEditorActionListener(
+                new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId,
+            KeyEvent event){
+                if (actionId == EditorInfo.IME_ACTION_SEND
+                        || actionId == EditorInfo.IME_ACTION_DONE
+                        || (event != null && KeyEvent.KEYCODE_ENTER == event.getKeyCode()
+                        && KeyEvent.ACTION_DOWN == event.getAction())) {
+                  login();
+                }
+                return false;
+            }
+        });
 
         signIn = (Button) findViewById(R.id.btnSignIn);
         scan = (Button) findViewById(R.id.qr_scanner);
