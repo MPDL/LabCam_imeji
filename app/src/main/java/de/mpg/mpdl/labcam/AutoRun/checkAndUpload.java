@@ -305,7 +305,7 @@ public class checkAndUpload {
 
     private int getNotificationIcon() {
         boolean useWhiteIcon = (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP);
-        return useWhiteIcon ? R.drawable.icon_app : R.drawable.notification;
+        return useWhiteIcon ? R.drawable.glass_notification : R.drawable.notification;
     }
 
     private void notification(){
