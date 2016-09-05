@@ -914,7 +914,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         public void success(ImejiFolder imejiFolder, Response response) {
             Log.e(LOG_TAG, "createCollection_callback success");
 
-            DeviceStatus.deleteFinishedAUTasks(userId);             //delete all AU Task if finished
+            DeviceStatus.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
 
             Task task = new Task();                                 //new a AU Task
             String uniqueID = UUID.randomUUID().toString();
@@ -1013,7 +1013,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             }
             else if(folderList.size()==1){
 
-                DeviceStatus.deleteFinishedAUTasks(userId);             //delete all AU Task if finished
+                DeviceStatus.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
 
                 Task task = new Task();                                 //new a AU Task
                 String uniqueID = UUID.randomUUID().toString();
@@ -1089,8 +1089,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                             task.delete();}
 
                         new AlertDialog.Builder(context)
-                                .setTitle("old collection not valid")
+                                .setTitle("Notice")
                                 .setMessage("please set a Collection")
+                                .setCancelable(false)
                                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         // go to set collection

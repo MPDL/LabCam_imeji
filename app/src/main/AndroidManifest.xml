@@ -127,10 +127,6 @@
                 android:value=".Settings.SettingsActivity" />
         </activity>
         <activity
-            android:name=".Settings.BackUpOptionSettings"
-            android:label="@string/title_backup_activity" >
-        </activity>
-        <activity
             android:name=".Settings.PrefActivity"
             android:parentActivityName=".Settings.BackupSettingsActivity" >
             <meta-data

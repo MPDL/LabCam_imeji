@@ -3,7 +3,6 @@ package de.mpg.mpdl.labcam.Utils;
 import android.app.Activity;
 import android.content.Context;
 import android.location.LocationManager;
-import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
@@ -19,9 +18,7 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
-import com.drew.metadata.exif.ExifDescriptorBase;
 import com.drew.metadata.exif.ExifIFD0Directory;
-import com.drew.metadata.exif.ExifSubIFDDescriptor;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.GpsDirectory;
 
@@ -36,14 +33,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
-import de.mpg.mpdl.labcam.Utils.UiElements.UploadingItem;
 
 /**
  * Created by allen on 09/04/15.
@@ -218,13 +212,14 @@ public class DeviceStatus {
     //delete tasks
 
     //delete finished tasks
-    public static void deleteFinishedAUTasks(String userId){
+    public static void deleteFinishedAUTasks(String userId, String serverName){
 
         // get All au tasks first
         List<Task> finishedTasks = new Select()
                 .from(Task.class)
                 .where("uploadMode = ?","AU")
                 .where("userId = ?", userId)
+                .where("severName = ?", serverName)
                 .execute();
 
         // remove unfinished tasks form list
