@@ -44,7 +44,6 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
-import de.mpg.mpdl.labcam.Utils.Singleton;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;

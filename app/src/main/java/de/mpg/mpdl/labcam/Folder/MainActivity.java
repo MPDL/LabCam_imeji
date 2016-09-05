@@ -146,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
     // flags
     boolean isQRLogin = false;  //login with qr
     boolean isLoginCall = true;  //from onCreate callback
+    boolean isDestroyByCamera = false;   //Camera destroy activity
     //
     private RelativeLayout chooseCollectionLayout = null;
 
@@ -156,7 +157,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         setContentView(R.layout.activity_main);
         Log.v("Main activity", "started");
 
-        //user info
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("isDestroyByCamera")) {
+                isDestroyByCamera = savedInstanceState.getBoolean("isDestroyByCamera");
+            }
+        }
+
+                //user info
         mPrefs = this.getSharedPreferences("myPref", 0);
         email = mPrefs.getString("email", "");
 //        username =  mPrefs.getString("username", "");
@@ -218,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             }
         }
 
-        if(!isFinished) {
+        if(!isDestroyByCamera && !isFinished) {
 
             new AlertDialog.Builder(this)
                     .setTitle("Welcome")
@@ -449,6 +456,13 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // TODO Auto-generated method stub
+
+        outState.putBoolean("isDestroyByCamera", true);
+        super.onSaveInstanceState(outState);
+    }
 
     /**
      * init Fragments
