@@ -217,6 +217,7 @@ public class checkAndUpload {
         Log.v(TAG, "start uploading: " + filePath);
         RetrofitClient.uploadItem(typedFile, json, callback_upload, apiKey);
         image.setState(String.valueOf(DeviceStatus.state.STARTED));
+        image.save();
         Log.e(TAG, "getImageName"+ image.getImageName());
         Log.e(TAG, "getState"+ image.getState());
         Log.v(TAG, "end Uploading: path = " + filePath + "| State = " + image.getState());

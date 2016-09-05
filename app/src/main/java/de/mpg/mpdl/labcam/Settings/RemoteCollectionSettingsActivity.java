@@ -503,6 +503,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
                                     Intent intent = new Intent();
                                     setResult(RESULT_OK, intent);
+
                                     finish();
 
                                 }else if(i == 1){
@@ -618,7 +619,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     }
 
                                     Log.e(LOG_TAG,"+++++++++++++++++++++");
-
 
                                     Intent intent = new Intent();
                                     setResult(RESULT_OK, intent);

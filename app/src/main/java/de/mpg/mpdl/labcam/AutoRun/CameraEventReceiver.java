@@ -44,65 +44,16 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         userId = mPrefs.getString("userId","");
         serverName = mPrefs.getString("server","");
 
-//        // customized toast
-//        LinearLayout  layout = new LinearLayout(context);
-//
-//
-//        TextView  tv =new TextView (context);
-//        // set the TextView properties like color, size etc
-//        tv.setTextColor(Color.RED);
-//        tv.setTextSize(15);
-//
-//        tv.setGravity(Gravity.CENTER_VERTICAL);
-//
-//        // set the text you want to show in  Toast
-//        tv.setText("Automatic upload to "+DeviceStatus.getAuTask(userId).getCollectionName());
-//
-//        ImageView img=new ImageView(context);
-//
-//        // give the drawble resource for the ImageView
-////        img.setImageResource(R.drawable.myimage);
-//
-//        // add both the Views TextView and ImageView in layout
-//        layout.addView(img);
-//        layout.addView(tv);
-//
-//        toast=new Toast(context); //context is object of Context write "this" if you are an Activity
-//        // Set The layout as Toast View
-//        toast.setView(layout);
-//
-//        // Position you toast here toast position is 50 dp from bottom you can give any integral value
-//        toast.setGravity(Gravity.TOP, 0, 50);
-//
-//        timer =new CountDownTimer(20000, 1000)
-//        {
-//            public void onTick(long millisUntilFinished)
-//            {
-//                toast.show();
-//            }
-//            public void onFinish()
-//            {
-//                toast.cancel();
-//            }
-//
-//        }.start();
-//
-
-
-
         //isAutoUpload
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
         // if auto is turned off
         if (settings == null){
+            Log.e("cameraEvent","settings is null");
             return;
-        }
-
-        if(settings!=null && !settings.isAutoUpload()){
+        } else if(!settings.isAutoUpload()){
+            Log.e("cameraEvent","!isAutoUpload");
             return;
-        }
-
-        //no auto task
-       if(DeviceStatus.getAuTask(userId,serverName)==null){
+        } else if(DeviceStatus.getAuTask(userId,serverName)==null){ //no auto task
            Log.e("cameraEvent","can't get auTask");
            return;
        }
