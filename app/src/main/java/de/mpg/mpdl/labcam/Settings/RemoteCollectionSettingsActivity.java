@@ -274,12 +274,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     private void createTask(String collectionID){
 
         // get AU task
-        latestTask = new Select()
-                .from(Task.class)
-                .where("uploadMode = ?","AU")
-                .orderBy("startDate DESC")
-                .executeSingle();
-
+        latestTask = DeviceStatus.getAuTask(userId,serverUrl);
         //   case 1: create first task
         if(latestTask==null){
             Log.v("create Task", "no task in database");
@@ -312,7 +307,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         }else if(!latestTask.getCollectionId().equals(collectionID)) {
 
             // case2: already have auto task
-            if(latestTask!=null){
+
             Log.v("latestTask", latestTask.getCollectionId());
                 // make sure task is not finished
                   if(latestTask.getTotalItems()>latestTask.getFinishedItems())
@@ -344,7 +339,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                       // show dialog
                       dialog(oldCollectionName);
                   }
-            }
+
         }else {
            // save task
             Intent intent = new Intent();
@@ -411,7 +406,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                         if (!qrCollectionId.equals("") && !qrCollectionId.equals(null)) {
                             Log.i("~qrCollectionId", qrCollectionId);
 
-                            DeviceStatus.deleteFinishedAUTasks(userId);             //delete all AU Task if finished
+                            DeviceStatus.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
                             collectionID = qrCollectionId;
                             /**create Task**/
                             createTask(qrCollectionId);
@@ -442,10 +437,10 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             return;
         }
 
-        if (!collectionID.equals("") && !collectionID.equals(null)) {
+        if (!collectionID.equals(null) && !("").equals(collectionID)) {
             Log.i("~collectionID", collectionID);
 
-            DeviceStatus.deleteFinishedAUTasks(userId);             //delete all AU Task if finished
+            DeviceStatus.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
 
             /**create Task**/
             createTask(collectionID);
@@ -523,6 +518,15 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                             .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
                                             .where("state != ?", String.valueOf(DeviceStatus.state.STARTED))
                                             .execute();
+
+                                    for (Image remainImage : remainImages) {
+                                        Log.e(LOG_TAG, "========================================================");
+                                        Log.e(LOG_TAG, "now print remainImages!");
+                                        Log.e(LOG_TAG, "getImageName:  " + remainImage.getImageName());
+                                        Log.e(LOG_TAG, "getState:  " + remainImage.getState());
+                                        Log.e(LOG_TAG, "========================================================");
+
+                                    }
 
                                     // change totalNum of old task
                                     // handle change folder during uploading
