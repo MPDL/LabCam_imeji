@@ -143,10 +143,6 @@
 
         <!-- service -->
         <service
-            android:name=".Folder.UploadService"
-            android:enabled="true" >
-        </service>
-        <service
             android:name=".AutoRun.ManualUploadService"
             android:enabled="true" >
         </service>

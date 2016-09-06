@@ -1,4 +1,4 @@
-package de.mpg.mpdl.labcam.Folder;
+package de.mpg.mpdl.labcam.ImejiFragment;
 
 import android.app.Activity;
 import android.content.Context;

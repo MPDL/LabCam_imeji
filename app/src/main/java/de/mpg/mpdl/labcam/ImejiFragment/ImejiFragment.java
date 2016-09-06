@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
 
-import de.mpg.mpdl.labcam.Folder.FolderListAdapter;
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;
 import de.mpg.mpdl.labcam.ItemDetails.ItemsActivity;
