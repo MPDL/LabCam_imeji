@@ -77,7 +77,7 @@ import retrofit.client.Response;
 /**
  * Created by kiran on 25.08.15.
  */
-public class MainActivity extends AppCompatActivity implements UploadResultReceiver.Receiver,NetChangeObserver {
+public class MainActivity extends AppCompatActivity implements NetChangeObserver {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
     private Activity activity = this;
@@ -417,32 +417,6 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
         }
     }
 
-    @Override
-    public void onReceiveResult(int resultCode, Bundle resultData) {
-        switch (resultCode) {
-            case 0:
-
-                setProgressBarIndeterminateVisibility(true);
-                break;
-            case 1:
-                /* Hide progress & extract result from bundle */
-                setProgressBarIndeterminateVisibility(false);
-
-                mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-                SharedPreferences.Editor e = mPrefs.edit();
-                e.putString("UploadStatus","true");
-                e.commit();
-
-                break;
-            case 2:
-                /* Handle the error */
-                String error = resultData.getString(Intent.EXTRA_TEXT);
-                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
-                break;
-        }
-    }
-
     // monitor network when Connect
     @Override
     public void OnConnect() {
@@ -595,8 +569,9 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
             }
         });
         Task task = DeviceStatus.getAuTask(userId,serverUrl);
-        if(task!=null&&task.getCollectionName()!=null&&task.getCollectionName()!=""){
+        if(task!=null && task.getCollectionName()!=null){
             collectionNameTextView.setText(task.getCollectionName());
+            Log.e(TAG+"1", "collectionNameTextView set to "+ task.getCollectionName());
         }
     }
 
@@ -880,6 +855,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     // set collection name none
                     if(collectionNameTextView!=null){
                         collectionNameTextView.setText("none");
+                        Log.e(TAG+"2", "collectionNameTextView set to none");
                     }
                 }
             }else if(resultCode == RESULT_OK){
@@ -890,10 +866,11 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     settings = new Settings();
                 }
 
-                Task lastAUTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
+                Task lastAUTask = DeviceStatus.getAuTask(userId, serverUrl);
 
                 if(lastAUTask!= null){
                     collectionNameTextView.setText(lastAUTask.getCollectionName());
+                    Log.e(TAG+"2.3", "collectionNameTextView set to "+ lastAUTask.getCollectionName());
                     autoUploadSwitch.setChecked(true);
 
                     settings.setUserId(userId);
@@ -907,6 +884,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 }
                 else{
                     collectionNameTextView.setText("none");
+                    Log.e(TAG+"2.5", "collectionNameTextView set to none");
                     autoUploadSwitch.setChecked(false);
 
                     settings.setUserId(userId);
@@ -952,6 +930,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
 
             //set selected collection name text
             collectionNameTextView.setText(imejiFolder.getTitle());
+            Log.e(TAG+"3", "collectionNameTextView set to "+ imejiFolder.getTitle());
 
             //switch on
             autoUploadSwitch.setChecked(true);
@@ -992,6 +971,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 // first delete AutoTask
                 new Delete().from(Task.class).where("uploadMode = ?", "AU").execute();
                 collectionNameTextView.setText("none");
+                Log.e(TAG+"4", "collectionNameTextView set to none");
                 // create dialog
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 // Set up the input
@@ -1052,6 +1032,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                 //set selected collection name text
                 if(folderList.get(0).getTitle()!=null) {
                     collectionNameTextView.setText(folderList.get(0).getTitle());
+                    Log.e(TAG+"5", "collectionNameTextView set to " +folderList.get(0).getTitle());
                 }
                 //switch on
                 autoUploadSwitch.setChecked(true);
@@ -1089,6 +1070,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                                 isValid = true;
                             }
                             collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
+                            Log.e(TAG+"6", "collectionNameTextView set to " + auTask.getCollectionName());
                             setAutoUploadStatus(false,true);
                             Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
                         }
@@ -1117,6 +1099,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                                     public void onClick(DialogInterface dialog, int which) {
                                         setAutoUploadStatus(false,false); // AU off
                                         collectionNameTextView.setText("none");
+                                        Log.e(TAG+"7", "collectionNameTextView set to none");
                                     }
                                 })
                                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -1126,6 +1109,7 @@ public class MainActivity extends AppCompatActivity implements UploadResultRecei
                     Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
                     if(auTask!=null) {   // col wasValue not null
                         collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
+                        Log.e(TAG+"8", "collectionNameTextView set to "+ auTask.getCollectionName());
                     }
                         setAutoUploadStatus(false,false);
                 }

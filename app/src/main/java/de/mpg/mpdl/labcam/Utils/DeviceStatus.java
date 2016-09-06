@@ -232,11 +232,16 @@ public class DeviceStatus {
             }
         }
 
-        new Delete().from(Task.class).where("uploadMode = ?","AU").where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).execute();
+        new Delete().from(Task.class)
+                .where("uploadMode = ?","AU")
+                .where("state = ?", String.valueOf(DeviceStatus.state.FINISHED))
+                .where("severName = ?", serverName)
+                .execute();
 
         int num = (new Select()
                 .from(Task.class)
                 .execute()).size();
+
         Log.v(LOG_TAG,num +"_finished");
     }
 

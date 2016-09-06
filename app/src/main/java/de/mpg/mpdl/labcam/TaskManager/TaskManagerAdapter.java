@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.activeandroid.query.Delete;
@@ -149,11 +150,8 @@ public class TaskManagerAdapter extends BaseAdapter {
                 phrase = MU_UPLOADING;
             }
         }
-        Log.e("~~~","phrase: "+phrase);
-        Log.e(TAG,task.getTaskId());
-        Log.e(TAG,"finished: "+task.getFinishedItems());
-        Log.e(TAG,"total: "+task.getTotalItems());
 
+        printTaskLog(phrase, task);
 
         //collection error
         if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
@@ -415,10 +413,6 @@ public class TaskManagerAdapter extends BaseAdapter {
                 }
             }
         });
-
-
-
-
         return view;
     }
 
@@ -433,5 +427,40 @@ public class TaskManagerAdapter extends BaseAdapter {
         /** if it is a Au, what to do? */
     }
 
+    private void printTaskLog(int phrase, Task task){
+
+        switch (phrase){
+            case AU_WAITING:
+                Log.i(TAG, "AU_WAITING");
+                break;
+            case AU_UPLOADING:
+                Log.i(TAG, "AU_UPLOADING");
+                break;
+            case AU_FINISH:
+                Log.i(TAG, "AU_FINISH");
+                break;
+
+            case MU_UPLOADING:
+                Log.i(TAG, "MU_UPLOADING");
+                break;
+            case MU_FINISH:
+                Log.i(TAG, "MU_FINISH");
+                break;
+
+            case AU_FAILED:
+                Log.i(TAG, "AU_FAILED");
+                break;
+            case MU_FAILED:
+                Log.i(TAG, "MU_FAILED");
+                break;
+        }
+        Log.i(TAG, "task: id " + task.getTaskId());
+        Log.i(TAG, "finished: "+task.getFinishedItems());
+        Log.i(TAG, "total: "+task.getTotalItems());
+        Log.i(TAG, "getStartDate: "+task.getStartDate());
+        if(phrase == AU_FINISH || phrase == MU_FINISH) {
+            Log.i(TAG, "getEndDate: " + task.getEndDate());
+        }
+    }
 }
 
