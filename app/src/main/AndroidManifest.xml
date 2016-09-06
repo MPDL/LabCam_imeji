@@ -133,13 +133,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Settings.SettingsActivity" />
         </activity>
-        <activity
-            android:name=".Upload.PopupActivity"
-            android:excludeFromRecents="true"
-            android:label="Logout Confirmation"
-            android:launchMode="singleInstance"
-            android:taskAffinity=""
-            android:theme="@android:style/Theme.Dialog" />
 
         <!-- service -->
         <service

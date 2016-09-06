@@ -4,10 +4,12 @@ package de.mpg.mpdl.labcam.Upload;
  * Created by kiran on 28.09.15.
  */
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 
+@SuppressLint("ParcelCreator")
 public class UploadResultReceiver extends ResultReceiver {
     private Receiver mReceiver;
 

@@ -83,7 +83,6 @@ public class LocalAlbumSettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_local_album_settings);
 
-        //CustomAdapter switchAdapter = new CustomAdapter(this, 1);
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
