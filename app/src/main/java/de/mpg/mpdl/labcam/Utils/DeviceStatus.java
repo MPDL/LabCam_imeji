@@ -290,20 +290,21 @@ public class DeviceStatus {
         String ColorSpaceStr = "";
 
         if(exifIFD0Directory!=null){
-            makeStr = exifIFD0Directory.getString(ExifIFD0Directory.TAG_MAKE);
-            modelStr = exifIFD0Directory.getString(ExifIFD0Directory.TAG_MODEL);
+            makeStr = (exifIFD0Directory.getString(ExifIFD0Directory.TAG_MAKE) != null) ? exifIFD0Directory.getString(ExifIFD0Directory.TAG_MAKE) : "";
+            modelStr = (exifIFD0Directory.getString(ExifIFD0Directory.TAG_MODEL)!= null) ? exifIFD0Directory.getString(ExifIFD0Directory.TAG_MODEL) : "";
             // create date use TAG_DATE
             Date date = exifIFD0Directory.getDate(ExifIFD0Directory.TAG_DATETIME);
             SimpleDateFormat formatterShort = new SimpleDateFormat("yyyy-MM-dd");
-            CreationDateStr = formatterShort.format(date);
+            if(date != null)
+                CreationDateStr = formatterShort.format(date);
         }
 
         if(exifSubIFDDirectory!=null){
-            ISOSpeedRating = Integer.parseInt(exifSubIFDDirectory.getString(ExifIFD0Directory.TAG_ISO_EQUIVALENT));
-            SensingMethodStr = exifSubIFDDirectory.getString(ExifSubIFDDirectory.TAG_SENSING_METHOD);
-            ApertureValueStr = exifSubIFDDirectory.getString(ExifSubIFDDirectory.TAG_APERTURE);
-            ColorSpaceStr = exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_COLOR_SPACE);
-            ExposureTimeStr = exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_EXPOSURE_TIME);
+            ISOSpeedRating =  (exifSubIFDDirectory.getString(ExifIFD0Directory.TAG_ISO_EQUIVALENT) !=null) ? Integer.parseInt(exifSubIFDDirectory.getString(ExifIFD0Directory.TAG_ISO_EQUIVALENT)) :-1;
+            SensingMethodStr = (exifSubIFDDirectory.getString(ExifSubIFDDirectory.TAG_SENSING_METHOD) != null ) ? exifSubIFDDirectory.getString(ExifSubIFDDirectory.TAG_SENSING_METHOD) : "";
+            ApertureValueStr = (exifSubIFDDirectory.getString(ExifSubIFDDirectory.TAG_APERTURE) != null ) ? exifSubIFDDirectory.getString(ExifSubIFDDirectory.TAG_APERTURE) : "";
+            ColorSpaceStr = (exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_COLOR_SPACE)  != null) ? exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_COLOR_SPACE) : "";
+            ExposureTimeStr = (exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_EXPOSURE_TIME) != null) ? exifSubIFDDirectory.getString(exifSubIFDDirectory.TAG_EXPOSURE_TIME) : "";
         }
 
         if(gpsDirectory!=null && gpsDirectory.getGeoLocation()!=null ) {
