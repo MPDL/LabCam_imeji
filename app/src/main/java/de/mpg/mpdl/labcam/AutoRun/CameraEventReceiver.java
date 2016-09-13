@@ -22,6 +22,7 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Upload.UploadResultReceiver;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 
 
@@ -53,7 +54,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         } else if(!settings.isAutoUpload()){
             Log.e("cameraEvent","!isAutoUpload");
             return;
-        } else if(DeviceStatus.getAuTask(userId,serverName)==null){ //no auto task
+        } else if(DBConnector.getAuTask(userId,serverName)==null){ //no auto task
            Log.e("cameraEvent","can't get auTask");
            return;
        }
@@ -111,7 +112,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
             photo.setCreateTime(createTime);
             photo.setSize(fileSize);
             photo.setState(imageState);
-            photo.setTaskId(DeviceStatus.getAuTask(userId,serverName).getTaskId());
+            photo.setTaskId(DBConnector.getAuTask(userId,serverName).getTaskId());
             photo.save();
 
             //get current Task id
@@ -124,9 +125,9 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
             task.save();
             Log.e("<>", task.getTotalItems()+"");
 
-            Log.v("taskid", DeviceStatus.getAuTask(userId,serverName).getTaskId());
-            Log.v("taskId", getImage().getTaskId());
-            Log.v("taskNum", DeviceStatus.getAuTask(userId,serverName).getTotalItems() + "");
+            Log.v("taskid", DBConnector.getAuTask(userId,serverName).getTaskId());
+            Log.v("taskId", DBConnector.getImage().getTaskId());
+            Log.v("taskNum", DBConnector.getAuTask(userId,serverName).getTotalItems() + "");
 
 
             // start service when finished item 0, total item 1
@@ -150,11 +151,5 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
 
 
 
-    //get latest image
-    public static Image getImage() {
-        return new Select()
-                .from(Image.class)
-                .orderBy("createTime DESC")
-                .executeSingle();
-    }
+
 }

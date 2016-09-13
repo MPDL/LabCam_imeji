@@ -27,7 +27,7 @@ import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 
 public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskInterface{
 
-    private static final String LOG_TAG = TaskFragment.class.getSimpleName();
+    private static final String LOG_TAG = ActiveTaskActivity.class.getSimpleName();
     private List<Task> taskList;
     private ListView taskManagerListView;
 

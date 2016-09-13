@@ -15,6 +15,7 @@ import java.util.List;
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 
 public class RecentProcessActivity extends AppCompatActivity {
@@ -46,7 +47,7 @@ public class RecentProcessActivity extends AppCompatActivity {
 
         //taskManager listView
         recentTaskListView = (ListView) findViewById(R.id.listView_recent_task);
-        taskList = DeviceStatus.getRecentTasks(userId);
+        taskList = DBConnector.getRecentTasks(userId);
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
 
         recentTaskAdapter = new RecentTaskAdapter(activity,taskList);

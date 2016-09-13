@@ -58,6 +58,7 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar;
 
@@ -243,23 +244,17 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 super.handleMessage(msg);
 
                 if(msg.what==1234){
-//                    taskList = DeviceStatus.getUserActiveTasks(userId);
-//                    if(taskList.size()==0){
-//                        activeTaskLayout.setVisibility(View.GONE);
-//                        return;
-//                    }
-//                    numActiveTextView.setText(taskList.size() + "");
 
-                    List<Task> waitingTasks = DeviceStatus.getUserWaitingTasks(userId);
-                    List<Task> stoppedTasks = DeviceStatus.getUserStoppedTasks(userId);
-                    Task mostRecentTask = DeviceStatus.getLatestFinishedTask(userId);
+                    List<Task> waitingTasks = DBConnector.getUserWaitingTasks(userId, serverName);
+                    List<Task> stoppedTasks = DBConnector.getUserStoppedTasks(userId, serverName);
+                    Task mostRecentTask = DBConnector.getLatestFinishedTask(userId, serverName);
 
                     int num_activate = 0;
 
                     num_activate = stoppedTasks.size() + waitingTasks.size();
 
                     if(num_activate > 0){
-                        Task auTask = DeviceStatus.getAuTask(userId,serverName);
+                        Task auTask = DBConnector.getAuTask(userId,serverName);
                         if(auTask!=null && String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState()) &&  auTask.getTotalItems()==auTask.getFinishedItems())
                             num_activate --;
                     }

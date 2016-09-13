@@ -123,127 +123,6 @@ public class DeviceStatus {
         WAITING, STARTED, STOPPED, INTERRUPTED, FAILED,FINISHED
     }
 
-    //get latest task (sometimes its not right need to distinguish Au Mu)
-    public static Task getTask() {
-        return new Select()
-                .from(Task.class)
-                .orderBy("startDate DESC")
-
-                .executeSingle();
-    }
-
-    //get latest task (sometimes its not right need to distinguish Au Mu)
-    public static Task getLatestFinishedTask(String userId) {
-        return new Select()
-                .from(Task.class)
-                .where("userId = ?", userId)
-                .orderBy("endDate DESC")
-                .executeSingle();
-    }
-
-    //TODO: need to pass user as param
-    public static Task getAuTask(String userId, String serverName) {
-        String mode = "AU";
-        return new Select()
-                .from(Task.class)
-                .where("uploadMode = ?", mode)
-                .where("userId = ?", userId)
-                .where("severName = ?", serverName)
-                .orderBy("startDate DESC")
-                .executeSingle();
-    }
-
-
-    public static List<Task> getTasks(){
-        return null;
-    }
-    //get user tasks
-    public static List<Task> getUserTasks(String userId){
-        return new Select()
-                .from(Task.class)
-                .where("userId = ?",userId)
-                .execute();
-    }
-
-    /**
-     * get User Active Tasks
-     * @param userId
-     * @return
-     */
-    public static List<Task> getRecentTasks(String userId){
-        return new Select()
-                .from(Task.class)
-                .where("userId = ?", userId)
-                .where("state != ?", String.valueOf(state.WAITING))
-                .where("state != ?", String.valueOf(state.STOPPED))
-                .orderBy("endDate DESC")
-                .execute();
-    }
-
-    public static List<Task> getUserStoppedTasks(String userId){
-        return new Select()
-                .from(Task.class)
-                .where("userId = ?", userId)
-                .where("state = ?", String.valueOf(state.STOPPED))
-                .orderBy("startDate DESC")
-                .execute();
-    }
-
-    public static List<Task> getUserWaitingTasks(String userId){
-        return new Select()
-                .from(Task.class)
-                .where("userId = ?", userId)
-                .where("state = ?", String.valueOf(state.WAITING))
-                .orderBy("startDate DESC")
-                .execute();
-    }
-
-
-    //get Image list of a Task
-    public static List<Image> getImagesByTaskId(String taskId){
-        return new Select()
-                .from(Image.class)
-                .where("taskId = ?", taskId)
-                .orderBy("createTime ASC")
-                .execute();
-    }
-
-
-    //delete tasks
-
-    //delete finished tasks
-    public static void deleteFinishedAUTasks(String userId, String serverName){
-
-        // get All au tasks first
-        List<Task> finishedTasks = new Select()
-                .from(Task.class)
-                .where("uploadMode = ?","AU")
-                .where("userId = ?", userId)
-                .where("severName = ?", serverName)
-                .execute();
-
-        // remove unfinished tasks form list
-        for(Task task:finishedTasks){
-            if(task.getFinishedItems() == task.getTotalItems()){
-
-                task.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                task.setEndDate(dateNow());
-                task.save();
-            }
-        }
-
-        new Delete().from(Task.class)
-                .where("uploadMode = ?","AU")
-                .where("state = ?", String.valueOf(DeviceStatus.state.FINISHED))
-                .where("severName = ?", serverName)
-                .execute();
-
-        int num = (new Select()
-                .from(Task.class)
-                .execute()).size();
-
-        Log.v(LOG_TAG,num +"_finished");
-    }
 
     public static String parseServerUrl(String Url){
         // divide string
@@ -478,10 +357,7 @@ public class DeviceStatus {
         return metaDataJsonStr;
     }
 
-    /**
-     * print metadata
-     * @param metadata
-     */
+    // print metadata for function 'metaDataJson'
     private static void print(Metadata metadata)
     {
         System.out.println("-------------------------------------");
@@ -510,45 +386,4 @@ public class DeviceStatus {
             }
         }
     }
-
-    public static void getStatusBarHeight(Context context) {
-        int statusBarHeight1 = -1;
-        //获取status_bar_height资源的ID
-        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            //根据资源ID获取响应的尺寸值
-            statusBarHeight1 = context.getResources().getDimensionPixelSize(resourceId);
-        }
-        Log.e("WangJ", "状态栏-方法1:" + statusBarHeight1);
-
-
-        /**
-         * 获取状态栏高度——方法2
-         * */
-        int statusBarHeight2 = -1;
-        try {
-            Class<?> clazz = Class.forName("com.android.internal.R$dimen");
-            Object object = clazz.newInstance();
-            int height = Integer.parseInt(clazz.getField("status_bar_height")
-                    .get(object).toString());
-            statusBarHeight2 = context.getResources().getDimensionPixelSize(height);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Log.e("WangJ", "状态栏-方法2:" + statusBarHeight2);
-
-    }
-
-    /**
-     * px转dp
-     *
-     * @param context 上下文
-     * @param pxValue px值
-     * @return dp值
-     */
-    public static int px2dp(Context context, float pxValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (pxValue / scale + 0.5f);
-    }
-
 }

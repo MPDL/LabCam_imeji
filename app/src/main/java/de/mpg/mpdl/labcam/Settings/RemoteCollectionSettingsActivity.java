@@ -43,6 +43,7 @@ import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -274,7 +275,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     private void createTask(String collectionID){
 
         // get AU task
-        latestTask = DeviceStatus.getAuTask(userId,serverUrl);
+        latestTask = DBConnector.getAuTask(userId,serverUrl);
         //   case 1: create first task
         if(latestTask==null){
             Log.v("create Task", "no task in database");
@@ -406,7 +407,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                         if (!qrCollectionId.equals("") && !qrCollectionId.equals(null)) {
                             Log.i("~qrCollectionId", qrCollectionId);
 
-                            DeviceStatus.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
+                            DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
                             collectionID = qrCollectionId;
                             /**create Task**/
                             createTask(qrCollectionId);
@@ -440,7 +441,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         if (!collectionID.equals(null) && !("").equals(collectionID)) {
             Log.i("~collectionID", collectionID);
 
-            DeviceStatus.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
+            DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
 
             /**create Task**/
             createTask(collectionID);
@@ -469,33 +470,8 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     // change state of old task
                                     // MU, STOPPED to WAITING
                                     latestTask.setState(String.valueOf(DeviceStatus.state.WAITING));
+                                    latestTask.setUploadMode("AU");
                                     latestTask.save();
-
-                                    // continue upload old task as "MU"
-                                    Intent manualUploadServiceIntent = new Intent(activity, ManualUploadService.class);
-                                    manualUploadServiceIntent.putExtra("currentTaskId", taskId);
-                                    startService(manualUploadServiceIntent);
-
-                                    //create new task
-                                    Log.v("collectionID", collectionID);
-                                    Task task = new Task();
-                                    task.setTotalItems(0);
-                                    task.setFinishedItems(0);
-
-                                    String uniqueID = UUID.randomUUID().toString();
-                                    task.setTaskId(uniqueID);
-                                    task.setUploadMode("AU");
-                                    task.setCollectionId(collectionID);
-                                    task.setState(String.valueOf(DeviceStatus.state.WAITING));
-                                    task.setUserName(username);
-                                    task.setUserId(userId);
-                                    task.setSeverName(serverUrl);
-
-                                    Long now = new Date().getTime();
-                                    task.setStartDate(String.valueOf(now));
-                                    task.setCollectionName(collectionName);
-
-                                    task.save();
 
                                     //start auto upload service
                                     Intent uploadIntent = new Intent(activity, TaskUploadService.class);

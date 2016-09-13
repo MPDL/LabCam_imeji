@@ -20,6 +20,7 @@ import java.util.List;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 
 /**
@@ -48,7 +49,7 @@ public class SettingsListAdapter extends BaseAdapter {
         String userId = mPrefs.getString("userId", "");
         String serverName = mPrefs.getString("server","");
         try{
-            lastCollectionId = DeviceStatus.getAuTask(userId,serverName).getCollectionId();
+            lastCollectionId = DBConnector.getAuTask(userId,serverName).getCollectionId();
         }
         catch(Exception e){
         }

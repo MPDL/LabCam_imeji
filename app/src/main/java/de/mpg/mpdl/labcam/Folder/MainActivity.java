@@ -69,6 +69,7 @@ import de.mpg.mpdl.labcam.Settings.RemoteCollectionSettingsActivity;
 import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
 import de.mpg.mpdl.labcam.TaskManager.RecentProcessActivity;
 import de.mpg.mpdl.labcam.Upload.UploadResultReceiver;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -216,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
         /**************************************************  check upload not finished task ***************************************************/
 
-        List<Task> taskList = DeviceStatus.getUserTasks(userId);
+        List<Task> taskList = DBConnector.getUserTasks(userId, serverUrl);
         boolean isFinished = true;
 
         for(Task task:taskList){
@@ -568,7 +569,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                 startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
             }
         });
-        Task task = DeviceStatus.getAuTask(userId,serverUrl);
+        Task task = DBConnector.getAuTask(userId,serverUrl);
         if(task!=null && task.getCollectionName()!=null){
             collectionNameTextView.setText(task.getCollectionName());
             Log.e(TAG+"1", "collectionNameTextView set to "+ task.getCollectionName());
@@ -638,7 +639,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     return;
                 }
                 //off to on
-                Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
+                Task auTask = DBConnector.getAuTask(userId,serverUrl);
 
 //                if(auTask==null){  // col wasValue not null
 
@@ -690,7 +691,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             @Override
             public void onClick(View view) {
 
-                List<Task> taskList = DeviceStatus.getUserTasks(userId);
+                List<Task> taskList = DBConnector.getUserTasks(userId, serverUrl);
                 boolean isFinished = true;
 
                 for(Task task:taskList){
@@ -866,7 +867,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     settings = new Settings();
                 }
 
-                Task lastAUTask = DeviceStatus.getAuTask(userId, serverUrl);
+                Task lastAUTask = DBConnector.getAuTask(userId, serverUrl);
 
                 if(lastAUTask!= null){
                     collectionNameTextView.setText(lastAUTask.getCollectionName());
@@ -906,7 +907,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         public void success(ImejiFolder imejiFolder, Response response) {
             Log.e(LOG_TAG, "createCollection_callback success");
 
-            DeviceStatus.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
+            DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
 
             Task task = new Task();                                 //new a AU Task
             String uniqueID = UUID.randomUUID().toString();
@@ -1007,7 +1008,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             }
             else if(folderList.size()==1){
 
-                DeviceStatus.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
+                DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
 
                 Task task = new Task();                                 //new a AU Task
                 String uniqueID = UUID.randomUUID().toString();
@@ -1063,7 +1064,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                 {
                     boolean isValid = false;
                     //col wasValue
-                    Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
+                    Task auTask = DBConnector.getAuTask(userId,serverUrl);
                     if(auTask!=null && auTask.getCollectionId() !=null) {   // col wasValue not null
                         for(int i = 0; i<folderList.size(); i++){           // col wasValue still valid on server
                             if(auTask.getCollectionId().equalsIgnoreCase(folderList.get(i).id)){
@@ -1080,7 +1081,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                         // dialog lead new user to choose collection
 
                         // old collection not valid
-                        Task task = DeviceStatus.getAuTask(userId, serverUrl);
+                        Task task = DBConnector.getAuTask(userId, serverUrl);
                         if(task!=null){
                             task.delete();}
 
@@ -1106,7 +1107,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                                 .show();
                     }
                 }else {   // history AU is off or not set
-                    Task auTask = DeviceStatus.getAuTask(userId,serverUrl);
+                    Task auTask = DBConnector.getAuTask(userId,serverUrl);
                     if(auTask!=null) {   // col wasValue not null
                         collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
                         Log.e(TAG+"8", "collectionNameTextView set to "+ auTask.getCollectionName());
