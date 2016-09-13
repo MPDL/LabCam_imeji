@@ -773,6 +773,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         task.setState(String.valueOf(DeviceStatus.state.WAITING));
         task.setUserName(username);
         task.setUserId(userId);
+        task.setSeverName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
         int num = addImages(fileList, task.getTaskId());

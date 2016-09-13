@@ -29,6 +29,8 @@ public class RecentProcessActivity extends AppCompatActivity {
     //user info
     private String userId;
     private SharedPreferences mPrefs;
+    private String serverName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,7 @@ public class RecentProcessActivity extends AppCompatActivity {
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         userId =  mPrefs.getString("userId", "");
+        serverName = mPrefs.getString("server","");
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar_recent_task);
         setSupportActionBar(toolbar);
@@ -46,7 +49,7 @@ public class RecentProcessActivity extends AppCompatActivity {
 
         //taskManager listView
         recentTaskListView = (ListView) findViewById(R.id.listView_recent_task);
-        taskList = DBConnector.getRecentTasks(userId);
+        taskList = DBConnector.getRecentTasks(userId, serverName);
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
 
         recentTaskAdapter = new RecentTaskAdapter(activity,taskList);

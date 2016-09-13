@@ -30,10 +30,11 @@ public class DBConnector {
     }
 
     // Get User Active Tasks
-    public static List<Task> getRecentTasks(String userId){
+    public static List<Task> getRecentTasks(String userId, String serverName){
         return new Select()
                 .from(Task.class)
                 .where("userId = ?", userId)
+                .where("severName = ?", serverName)
                 .where("state != ?", String.valueOf(DeviceStatus.state.WAITING))
                 .where("state != ?", String.valueOf(DeviceStatus.state.STOPPED))
                 .orderBy("endDate DESC")
