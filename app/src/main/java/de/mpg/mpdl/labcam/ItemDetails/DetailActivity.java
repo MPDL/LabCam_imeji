@@ -32,7 +32,6 @@ import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Settings.SettingsActivity;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -149,20 +148,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            Intent showSettingIntent = new Intent(this, SettingsActivity.class);
-            startActivity(showSettingIntent);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
     @Override
     public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
         if (actionMode == null) {

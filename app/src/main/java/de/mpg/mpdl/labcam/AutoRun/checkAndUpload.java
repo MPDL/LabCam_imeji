@@ -38,7 +38,6 @@ import de.mpg.mpdl.labcam.Otto.UploadEvent;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
-
 import de.mpg.mpdl.labcam.Utils.UiElements.Notification.NotificationID;
 import retrofit.Callback;
 import retrofit.RetrofitError;

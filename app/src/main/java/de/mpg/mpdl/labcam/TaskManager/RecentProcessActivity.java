@@ -16,7 +16,6 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 
 public class RecentProcessActivity extends AppCompatActivity {
 

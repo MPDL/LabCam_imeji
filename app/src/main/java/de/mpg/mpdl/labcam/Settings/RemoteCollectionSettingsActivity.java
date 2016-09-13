@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.UUID;
 
 import de.mpg.mpdl.labcam.Auth.QRScannerActivity;
-import de.mpg.mpdl.labcam.AutoRun.ManualUploadService;
 import de.mpg.mpdl.labcam.AutoRun.TaskUploadService;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;

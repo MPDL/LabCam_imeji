@@ -84,8 +84,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private static RelativeLayout activeTaskLayout = null;
     private static TextView percentTextView = null;
 
-    private List<Task> taskList = new ArrayList<>();
-
     android.support.v7.app.ActionBar actionBar;
 
     GridView gridView;
@@ -442,44 +440,38 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     private void addOrRemove(int position) {
         if (positionSet.contains(position)) {
-            // 如果包含，则撤销选择
+            // if contain, remove
             positionSet.remove(position);
         } else {
-            // 如果不包含，则添加
+            // if not contain, add
             positionSet.add(position);
         }
         if (positionSet.size() == 0) {
-            // 如果没有选中任何的item，则退出多选模式
+            // if none is selected, quit choose mode
             Log.e(LOG_TAG, "addOrRemove() is called");
             actionMode.finish();
         } else {
-            // 设置ActionMode标题
+            // set action mode tile
             actionMode.setTitle(positionSet.size() + " selected photos");
-            // 更新列表界面，否则无法显示已选的item
-//            simpleAdapter.notifyDataSetChanged();
-//            mSectionedAdapter.notifyDataSetChanged();
         }
     }
 
 
     private void addOrRemoveAlbum(int position) {
         if (albumPositionSet.contains(position)) {
-            // 如果包含，则撤销选择
+            // if contain, remove
             albumPositionSet.remove(position);
         } else {
-            // 如果不包含，则添加
+            // if not contain, add
             albumPositionSet.add(position);
         }
         if (albumPositionSet.size() == 0) {
-            // 如果没有选中任何的item，则退出多选模式
+            // if none is selected, quit choose mode
             Log.e(LOG_TAG,"addOrRemoveAlbum() is called");
             actionMode.finish();
         } else {
-            // 设置ActionMode标题
+            // set action mode tile
             actionMode.setTitle(albumPositionSet.size() + " selected albums");
-            // 更新列表界面，否则无法显示已选的item
-//            simpleAdapter.notifyDataSetChanged();
-//            mSectionedAdapter.notifyDataSetChanged();
         }
     }
 
@@ -520,12 +512,12 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             public void onItemClick(View view, int position) {
 
                 if (actionMode != null) {
-                    // 如果当前处于多选状态，则进入多选状态的逻辑
-                    // 维护当前已选的position
+                    // muti select mode
+                    // maintain position choosing
                     addOrRemoveAlbum(position);
                     adapter.setPositionSet(albumPositionSet);
                 } else {
-                    // 如果不是多选状态，则进入点击事件的业务逻辑
+                    //  simple click
                     //  show picture
                     //  go to album detail
                     Gallery gallery = (Gallery) adapter.getItem(position);

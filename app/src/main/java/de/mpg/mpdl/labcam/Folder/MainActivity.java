@@ -16,7 +16,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -45,7 +44,6 @@ import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -57,7 +55,6 @@ import de.mpg.mpdl.labcam.AutoRun.TaskUploadService;
 import de.mpg.mpdl.labcam.ImejiFragment.ImejiFragment;
 import de.mpg.mpdl.labcam.LocalFragment.LocalFragment;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
@@ -68,7 +65,6 @@ import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Settings.RemoteCollectionSettingsActivity;
 import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
 import de.mpg.mpdl.labcam.TaskManager.RecentProcessActivity;
-import de.mpg.mpdl.labcam.Upload.UploadResultReceiver;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import retrofit.Callback;
@@ -328,13 +324,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-//        if (id == R.id.action_settings) {
-//            Intent showSettingIntent = new Intent(activity, SettingsActivity.class);
-//            startActivity(showSettingIntent);
-//
-//            return true;
-//        }
-
         if (id == R.id.homeAsUp) {
             drawerLayout.openDrawer(GravityCompat.START);
             return true;
@@ -433,7 +422,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        // TODO Auto-generated method stub
 
         outState.putBoolean("isDestroyByCamera", true);
         super.onSaveInstanceState(outState);
@@ -619,15 +607,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
             collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
         }
-        // auto open choose collection
-
-//        Task auTask = DeviceStatus.getAuTask(userId, serverUrl);
-
-//        if(auTask==null){
-//            // popup
-//            Toast.makeText(activity,"Automatic upload is active\n please set a collection",Toast.LENGTH_SHORT).show();
-//        }else
-//            Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
     }
 
     private void initAutoSwitch(){

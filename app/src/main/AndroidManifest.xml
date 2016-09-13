@@ -93,47 +93,6 @@
                 android:value=".Folder.MainActivity" />
         </activity>
 
-        <!-- for settings -->
-        <activity
-            android:name=".Settings.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".Folder.MainActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Folder.MainActivity" />
-        </activity>
-        <activity
-            android:name=".Settings.BackupSettingsActivity"
-            android:label="@string/title_backup_activity"
-            android:parentActivityName=".Settings.SettingsActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Settings.SettingsActivity" />
-        </activity>
-        <activity
-            android:name=".Settings.LocalAlbumSettingsActivity"
-            android:label="@string/title_activity_local_album"
-            android:parentActivityName=".Settings.SettingsActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Settings.SettingsActivity" />
-        </activity>
-        <activity
-            android:name=".Settings.RemoteCollectionSettingsActivity"
-            android:label="@string/title_activity_remote_collection"
-            android:parentActivityName=".Settings.SettingsActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Settings.SettingsActivity" />
-        </activity>
-        <activity
-            android:name=".Settings.PrefActivity"
-            android:parentActivityName=".Settings.BackupSettingsActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Settings.SettingsActivity" />
-        </activity>
-
         <!-- service -->
         <service
             android:name=".AutoRun.ManualUploadService"
