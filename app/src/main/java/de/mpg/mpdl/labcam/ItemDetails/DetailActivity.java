@@ -303,22 +303,22 @@ public class DetailActivity extends AppCompatActivity implements android.support
     private void addOrRemove(int position) {
 
         if (positionSet.contains(position)) {
-            // 如果包含，则撤销选择
+
             positionSet.remove(position);
         } else {
-            // 如果不包含，则添加
+
             positionSet.add(position);
         }
         if (positionSet.size() == 0) {
-            // 如果没有选中任何的item，则退出多选模式
+
             actionMode.finish();
             uploadCurrentImageView.setVisibility(View.VISIBLE);
         } else {
-            // 设置ActionMode标题
+
             actionMode.setTitle(positionSet.size() + " selected");
-            // 更新列表界面，否则无法显示已选的item
+
             viewPagerAdapter.notifyDataSetChanged();
-//            mSectionedAdapter.notifyDataSetChanged();
+
         }
     }
 
