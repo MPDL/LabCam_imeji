@@ -61,6 +61,12 @@
                 android:value=".Auth.LoginActivity" />
         </activity>
 
+        <!--setting-->
+        <activity
+            android:name=".Settings.RemoteCollectionSettingsActivity"
+            android:label="@string/title_activity_remote_collection">
+        </activity>
+
         <!-- Folders and Items -->
         <activity
             android:name=".Folder.MainActivity"
