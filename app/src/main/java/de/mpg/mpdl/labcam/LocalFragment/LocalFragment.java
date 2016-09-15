@@ -146,6 +146,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         serverName = mPrefs.getString("server","");
 
 
+
     }
 
     @Override
@@ -423,7 +424,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 return false;
         }
     }
-
+    
     @Override
     public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
         actionMode = null;
