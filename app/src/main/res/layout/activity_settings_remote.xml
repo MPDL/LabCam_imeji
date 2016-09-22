@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Settings.RemoteCollectionSettingsActivity"
     android:orientation="vertical">
 
@@ -11,32 +11,69 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
+        app:theme="@style/ToolbarColoredBackArrow"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary">
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="7dp"
             android:orientation="horizontal"
             android:background="@color/primary">
 
             <TextView
                 android:id="@+id/locationText"
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
-                android:layout_marginEnd="50dp"
+                android:layout_height="match_parent"
                 android:text="@string/title_activity_remote_collection"
+                android:gravity="center_vertical"
                 android:textColor="@color/white"
                 android:textSize="20dp" />
 
         </LinearLayout>
     </android.support.v7.widget.Toolbar>
 
+    <Button
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:id="@+id/im_qr_scan"
+        android:layout_below="@id/toolbar"
+        android:background="@drawable/qr_scan"/>
+
         <ListView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="340dp"
             android:choiceMode="singleChoice"
-            android:id="@+id/settings_remote_listView"/>
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:id="@+id/settings_remote_listView"
+            android:layout_below="@id/im_qr_scan"/>
 
-</LinearLayout>
+    <!--<Button-->
+        <!--android:layout_width="80dp"-->
+        <!--android:layout_marginLeft="10dp"-->
+        <!--android:layout_marginRight="10dp"-->
+        <!--android:layout_marginTop="40dp"-->
+        <!--android:layout_height="40dp"-->
+        <!--android:id="@+id/save_collection"-->
+        <!--android:background="@color/primary"-->
+        <!--android:text="save"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:layout_below="@id/settings_remote_listView"-->
+        <!--android:layout_alignParentRight="true"/>-->
+
+
+    <!--<Button-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="53dp"-->
+        <!--android:text="save"-->
+        <!--android:textColor="@drawable/clickable_color_save"-->
+        <!--android:background="@drawable/clickable_save"-->
+        <!--android:textSize="17dp"-->
+        <!--android:id="@+id/save_collection"-->
+        <!--android:layout_alignParentBottom="true"/>-->
+
+
+</RelativeLayout>

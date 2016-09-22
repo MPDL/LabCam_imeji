@@ -14,58 +14,39 @@
         android:id="@+id/list_gallery_cell_thumbnail"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:scaleType="centerCrop"
-        android:background="@drawable/custom_border"/>
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:id="@+id/album_check_mark"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="4dp"
+        android:visibility="gone"
+        android:src="@drawable/btn_check"
+        />
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/cell_bg_gradient"
         android:gravity="bottom"
         android:id="@+id/bottomLayout"
+        android:background="@color/white"
         android:layout_below="@+id/list_gallery_cell_thumbnail">
 
 
         <TextView
             android:id="@+id/list_item_gallery_title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginTop="5dp"
-            android:textColor="@color/white"
-            android:layout_marginStart="10dip"
+            android:gravity="center_vertical"
+            android:textColor="@color/lightGrey"
+            android:layout_marginLeft="10dp"
             android:text="Title"
             android:typeface="sans"
-            android:textSize="16sp"
+            android:textSize="18dp"
             android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/list_item_gallery_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:layout_marginStart="10dip"
-            android:layout_marginBottom="10dp"
-            android:textSize="12sp"
-            android:text="status"
-            android:layout_toRightOf="@+id/list_gallery_cell_thumbnail"
-            />
-
-            <TextView
-            android:id="@+id/list_item_gallery_ucount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:layout_marginStart="10dip"
-            android:layout_marginBottom="10dp"
-            android:textSize="12sp"
-            android:text="0"
-            android:layout_toRightOf="@+id/list_gallery_cell_thumbnail"
-            />
-
     </LinearLayout>
-
-
-
-
 </RelativeLayout>

@@ -12,33 +12,41 @@
         android:layout_height="match_parent"
         android:id="@+id/image_view"
         android:gravity="center"
-        android:scaleType="fitXY"
+        android:scaleType="centerCrop"
         android:layout_gravity="center" />
 
-
-    <Button
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+    <ImageView
+        android:id="@+id/gallery_grid_check_mark"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="4dp"
         android:visibility="gone"
-        android:background="@drawable/cloud"
-        android:id="@+id/cloud"
-        android:layout_margin="4dp"
-        android:layout_gravity="right|top"
-        android:clickable="false"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
+        android:src="@drawable/btn_check"
         />
-    <Button
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:background="@drawable/uploading"
-        android:id="@+id/uploading"
-        android:layout_margin="4dp"
-        android:layout_gravity="right|top"
-        android:clickable="false"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        />
+
+    <!--<Button-->
+        <!--android:layout_width="20dp"-->
+        <!--android:layout_height="20dp"-->
+        <!--android:visibility="gone"-->
+        <!--android:background="@drawable/cloud"-->
+        <!--android:id="@+id/cloud"-->
+        <!--android:layout_margin="4dp"-->
+        <!--android:layout_gravity="right|top"-->
+        <!--android:clickable="false"-->
+        <!--android:scaleType="fitCenter"-->
+        <!--android:adjustViewBounds="true"-->
+        <!--/>-->
+    <!--<Button-->
+        <!--android:layout_width="20dp"-->
+        <!--android:layout_height="20dp"-->
+        <!--android:background="@drawable/uploading"-->
+        <!--android:id="@+id/uploading"-->
+        <!--android:layout_margin="4dp"-->
+        <!--android:layout_gravity="right|top"-->
+        <!--android:clickable="false"-->
+        <!--android:scaleType="fitCenter"-->
+        <!--android:adjustViewBounds="true"-->
+        <!--/>-->
 
 
 </FrameLayout>

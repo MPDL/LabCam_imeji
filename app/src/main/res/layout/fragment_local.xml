@@ -1,0 +1,140 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="de.mpg.mpdl.labcam.LocalFragment.LocalFragment">
+
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="60dp"
+        android:id="@+id/layout_active_task"
+        android:background="@color/grayDivider">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="30dp"
+            android:id="@+id/im_right_arrow"
+            android:src="@drawable/arrow_down"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="16dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_num_active_task"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/im_right_arrow"
+            android:text=""
+            />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/layout_percent"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/tv_num_active_task">
+            <de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/circleProgressBar"
+                android:layout_centerInParent="true"
+                app:progressbarColor="@color/blue_normal"
+                app:progressBarThickness="4dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_percent"
+                android:layout_centerInParent="true"
+                android:text="0%"
+                android:textSize="12sp"
+                />
+
+        </RelativeLayout>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:id="@+id/tv_title_task_info"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="16dp"
+            android:layout_toLeftOf="@id/layout_percent"
+            android:layout_marginRight="8dp"
+            android:textSize="14sp"
+            android:textColor="@color/lightGrey"
+            android:text="" />
+
+    </RelativeLayout>
+
+    <!--label_album-->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_below="@id/layout_active_task"
+        android:gravity="center"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:id="@+id/label_album"
+        android:textColor="@color/no_focus_primary"
+        android:text="Album"
+        android:textSize="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_below="@id/layout_active_task"
+        android:gravity="center"
+        android:layout_toLeftOf="@id/label_album"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:id="@+id/label_or"
+        android:text="|"
+        android:textSize="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_below="@id/layout_active_task"
+        android:gravity="center"
+        android:layout_toLeftOf="@id/label_or"
+        android:id="@+id/label_date"
+        android:text="Date"
+        android:textColor="@color/primary"
+        android:textSize="20dp"/>
+
+
+    <!-- TODO: Update blank fragment layout -->
+
+
+    <GridView
+        android:id="@+id/gallery_gridView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_below="@id/label_date"
+        android:numColumns="2"
+        android:verticalSpacing="0dp"
+        android:horizontalSpacing="0dp"
+        android:gravity="center"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:stretchMode="columnWidth"
+        android:visibility="gone"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/gallery_recycleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/label_date"
+        android:visibility="visible"
+        />
+
+
+</RelativeLayout>
