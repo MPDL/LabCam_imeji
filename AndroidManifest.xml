@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="de.mpg.mpdl.labcam" >
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <!-- device boot -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <application
+        android:name="com.activeandroid.app.Application"
+        android:allowBackup="true"
+        android:backupAgent=".Utils.BackupFileHelper"
+        android:icon="@drawable/icon_app"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:theme="@style/AppTheme.WithoutActionBar" >
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAIA3v4YX2ItNJ9TLtA9JbvxE69ul_QXQzIV-GFzA" />
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="MPDLCam.db" />
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="2" />
+
+        <!-- Auth -->
+        <activity
+            android:name=".Auth.LoginActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Auth.QRScannerActivity"
+            android:label="@string/app_name"
+            android:parentActivityName=".Auth.LoginActivity"
+            android:theme="@style/Theme.AppCompat" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Auth.LoginActivity" />
+        </activity>
+
+        <!--setting-->
+        <activity
+            android:name=".Settings.RemoteCollectionSettingsActivity"
+            android:label="@string/title_activity_remote_collection">
+        </activity>
+
+        <!-- Folders and Items -->
+        <activity
+            android:name=".Folder.MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".ItemDetails.ItemsActivity"
+            android:label="@string/title_item_activity"
+            android:parentActivityName=".Folder.MainActivity"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Folder.MainActivity" />
+        </activity>
+        <activity
+            android:name=".ItemDetails.DetailActivity"
+            android:label="@string/title_item_detail_activity"
+            android:parentActivityName=".ItemDetails.ItemsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ItemDetails.ItemsActivity" />
+        </activity>
+        <activity
+            android:name=".Gallery.LocalImageActivity"
+            android:label="@string/title_local_activity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:screenOrientation="portrait"
+                android:value=".Folder.MainActivity" />
+        </activity>
+
+        <!-- service -->
+        <service
+            android:name=".AutoRun.ManualUploadService"
+            android:enabled="true" >
+        </service>
+
+        <receiver
+            android:name=".NetChangeManager.NetWorkStateReceiver"
+            android:label="NetworkChangeReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".AutoRun.BootBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".AutoRun.AutoRunService" />
+        <service
+            android:name=".AutoRun.TaskUploadService"
+            android:enabled="true" >
+        </service>
+
+        <receiver
+            android:name=".AutoRun.CameraEventReceiver"
+            android:enabled="true" >
+            <intent-filter>
+                <!--<action android:name="com.android.camera.NEW_PICTURE" />-->
+                <action android:name="android.hardware.action.NEW_PICTURE" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </receiver>
+
+        <provider
+            android:name="com.activeandroid.content.ContentProvider"
+            android:authorities="com.activeandroid.content.ContentProvider" />
+
+        <activity android:name=".TaskManager.ActiveTaskActivity" >
+        </activity>
+        <activity android:name=".TaskManager.RecentProcessActivity" >
+        </activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="7cdc167d7ea298797c93aa3fb0dfcc6c8fe3a7e3" />
+    </application>
+
+</manifest>
