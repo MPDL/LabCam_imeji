@@ -222,6 +222,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                         .show();
             }
 
+            new Delete().from(ImejiFolder.class).execute();
 
             ActiveAndroid.beginTransaction();
             try {

@@ -16,6 +16,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Display;
@@ -25,7 +26,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -47,7 +47,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 import de.mpg.mpdl.labcam.AutoRun.dbObserver;
-import de.mpg.mpdl.labcam.Gallery.GalleryListAdapter;
+import de.mpg.mpdl.labcam.Gallery.AlbumRecyclerAdapter;
 import de.mpg.mpdl.labcam.Gallery.LocalImageActivity;
 import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
@@ -86,11 +86,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     android.support.v7.app.ActionBar actionBar;
 
-    GridView gridView;
+    RecyclerView albumRecyclerView;
     RecyclerView recyclerView;
     SharedPreferences preferences;
 
-    GalleryListAdapter adapter;
+    AlbumRecyclerAdapter adapter;
     SectionedGridRecyclerViewAdapter mSectionedAdapter;
     SimpleAdapter simpleAdapter;
 
@@ -105,7 +105,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
      * <imageDate,imagePath> **/
     TreeMap<Long, String> imageList = new TreeMap<Long, String>();
     ArrayList<String> sortedImageNameList;
-
     /**
      *
      * store the imagePathList of each album
@@ -155,7 +154,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_local, container, false);
         // folder gridView
-        gridView = (GridView) rootView.findViewById(R.id.gallery_gridView);
+        albumRecyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_gridView);
+
 
         actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
@@ -192,7 +192,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
                 dateLabel.setTextColor(getResources().getColor(R.color.primary));
                 albumLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
-                gridView.setVisibility(View.GONE);
+                albumRecyclerView.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
             }
         });
@@ -212,7 +212,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
                 dateLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
                 albumLabel.setTextColor(getResources().getColor(R.color.primary));
-                gridView.setVisibility(View.VISIBLE);
+                albumRecyclerView.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
             }
         });
@@ -502,40 +502,44 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private void loadLocalGallery(){
 
         ArrayList<Gallery> imageFolders = new ArrayList<Gallery>();
-        imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
 
-        adapter = new GalleryListAdapter(getActivity(), imageFolders );
+//        imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
+        adapter = new AlbumRecyclerAdapter(getActivity(), imagePathListAllAlbums );
 
-        gridView.setAdapter(adapter);
 
-        adapter.setOnItemClickListener(new GalleryListAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        albumRecyclerView.setLayoutManager(llm);
+        albumRecyclerView.setAdapter(adapter);
 
-                if (actionMode != null) {
-                    // muti select mode
-                    // maintain position choosing
-                    addOrRemoveAlbum(position);
-                    adapter.setPositionSet(albumPositionSet);
-                } else {
-                    //  simple click
-                    //  show picture
-                    //  go to album detail
-                    Gallery gallery = (Gallery) adapter.getItem(position);
-                    Intent galleryImagesIntent = new Intent(getActivity(), LocalImageActivity.class);
-                    galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
-
-                    startActivity(galleryImagesIntent);
-                }
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-                if (actionMode == null) {
-                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(ActionModeCallback);
-                }
-            }
-        });
+//        adapter.setOnItemClickListener(new AlbumRecyclerAdapter.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(View view, int position) {
+//
+//                if (actionMode != null) {
+//                    // muti select mode
+//                    // maintain position choosing
+//                    addOrRemoveAlbum(position);
+//                    adapter.setPositionSet(albumPositionSet);
+//                } else {
+//                    //  simple click
+//                    //  show picture
+//                    //  go to album detail
+//                    Gallery gallery = (Gallery) adapter.getItem(position);
+//                    Intent galleryImagesIntent = new Intent(getActivity(), LocalImageActivity.class);
+//                    galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
+//
+//                    startActivity(galleryImagesIntent);
+//                }
+//            }
+//
+//            @Override
+//            public void onItemLongClick(View view, int position) {
+//                if (actionMode == null) {
+//                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(ActionModeCallback);
+//                }
+//            }
+//        });
     }
 
 
@@ -848,7 +852,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         if(isAlbum) {
             dateLabel.setTextColor(getResources().getColor(R.color.lightGrey));
             albumLabel.setTextColor(getResources().getColor(R.color.primary));
-            gridView.setVisibility(View.VISIBLE);
+            albumRecyclerView.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         }
         super.onResume();

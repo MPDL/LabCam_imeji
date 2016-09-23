@@ -2,9 +2,12 @@ package de.mpg.mpdl.labcam.ImejiFragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -23,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.mpg.mpdl.labcam.ItemDetails.ItemsActivity;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.CustomImageDownaloder;
@@ -30,7 +34,7 @@ import de.mpg.mpdl.labcam.Utils.CustomImageDownaloder;
 /**
  * Created by allen on 06/04/15.
  */
-public class FolderListAdapter extends BaseAdapter {
+public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.FolderListViewHolder>{
     private Activity activity;
     private LayoutInflater inflater;
     private List<ImejiFolder> folderItems;
@@ -57,23 +61,20 @@ public class FolderListAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getCount() {
-        return folderItems.size();
+    public FolderListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        View itemView = LayoutInflater.
+                from(parent.getContext()).
+                inflate(R.layout.folder_list_cell, parent, false);
+
+
+        return new FolderListViewHolder(itemView);
     }
 
     @Override
-    public Object getItem(int location) {
-        return folderItems.get(location);
-    }
+    public void onBindViewHolder(FolderListViewHolder holder, final int position) {
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
+        // displaysize
         WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point size = new Point();
@@ -84,19 +85,14 @@ public class FolderListAdapter extends BaseAdapter {
         if (inflater == null)
             inflater = (LayoutInflater) activity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (convertView == null)
-            convertView = inflater.inflate(R.layout.folder_list_cell, null);
 
-        ImageView imageView = (ImageView) convertView.findViewById(R.id.list_item_cell_thumbnail);
-        TextView title = (TextView) convertView.findViewById(R.id.list_item_cell_title);
-        TextView description = (TextView) convertView.findViewById(R.id.list_item_user);
-        //TextView date = (TextView) convertView.findViewById(R.id.list_item_cell_date);
 
-        if (size.x > size.y) {
-            imageView.getLayoutParams().height = 2 * size.y /3;
-        } else {
-            imageView.getLayoutParams().height = 2 * size.y /3;
-        }
+//
+//        if (size.x > size.y) {
+//            holder.imageView.getLayoutParams().height = 2 * size.y /3;
+//        } else {
+//            holder.imageView.getLayoutParams().height = 2 * size.y /3;
+//        }
 
         if(folderItems.size()>0) {
             // getting item data for the row
@@ -126,25 +122,62 @@ public class FolderListAdapter extends BaseAdapter {
                     .build();
 
 
-            imageLoader.displayImage(collection.getCoverItemUrl(), imageView, options);
+            imageLoader.displayImage(collection.getCoverItemUrl(), holder.imageView, options);
 
 //            Picasso.with(activity)
 //                            .load(collection.getCoverItemUrl())
 //                            .into(imageView);
 //                }
 //            }
-            title.setText(collection.getTitle());
 
             //title
-            title.setText(collection.getTitle());
+            holder.number.setText("");
+
+            //title
+            holder.title.setText(collection.getTitle());
 
             // user
-            description.setText(collection.getDescription());
+            holder.date.setText(collection.getCreatedDate());
+
+            // go to the cell
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ImejiFolder folder = (ImejiFolder) folderItems.get(position);
+
+                    Intent showItemsIntent = new Intent(activity, ItemsActivity.class);
+                    showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
+                    showItemsIntent.putExtra("folderTitle", folder.getTitle());
+                    activity.startActivity(showItemsIntent);
+                }
+            });
 
             // date
             //date.setText(String.valueOf(m.getCreatedDate()).split("\\+")[0]);
         }
-        return convertView;
+
     }
 
+    @Override
+    public int getItemCount() {
+        return folderItems.size();
+    }
+
+    public static class FolderListViewHolder extends RecyclerView.ViewHolder{
+
+        protected ImageView imageView;
+        protected TextView number;
+        protected TextView title;
+        protected TextView date;
+
+
+        public FolderListViewHolder(View itemView) {
+            super(itemView);
+            imageView = (ImageView) itemView.findViewById(R.id.list_item_cell_thumbnail);
+            number = (TextView) itemView.findViewById(R.id.list_item_num);
+            title = (TextView) itemView.findViewById(R.id.list_item_cell_title);
+            date = (TextView) itemView.findViewById(R.id.list_item_date);
+
+        }
+    }
 }

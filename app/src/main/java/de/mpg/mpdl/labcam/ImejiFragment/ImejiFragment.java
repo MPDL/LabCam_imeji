@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -63,7 +65,7 @@ public class ImejiFragment extends Fragment {
 //    private ProgressDialog pDialog;
 
     private FolderListAdapter adapter;
-    private ListView listView;
+    private RecyclerView cardView;
 
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
 
@@ -126,21 +128,26 @@ public class ImejiFragment extends Fragment {
 
 //        loadImejiFolder();
         adapter = new FolderListAdapter(getActivity(), collectionListLocal);
-        listView = (ListView) rootView.findViewById(R.id.folder_listView);
-        listView.setAdapter(adapter);
+        cardView = (RecyclerView) rootView.findViewById(R.id.folder_cardview);
 
-        // Set OnItemClickListener so we can be notified on item clicks
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                ImejiFolder folder = (ImejiFolder) adapter.getItem(position);
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        cardView.setLayoutManager(llm);
 
-                Intent showItemsIntent = new Intent(getActivity(), ItemsActivity.class);
-                showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
-                showItemsIntent.putExtra("folderTitle", folder.getTitle());
-                startActivity(showItemsIntent);
-            }
-        });
+        cardView.setAdapter(adapter);
+
+//        // Set OnItemClickListener so we can be notified on item clicks
+//        cardView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+//                ImejiFolder folder = (ImejiFolder) adapter.getItem(position);
+//
+//                Intent showItemsIntent = new Intent(getActivity(), ItemsActivity.class);
+//                showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
+//                showItemsIntent.putExtra("folderTitle", folder.getTitle());
+//                startActivity(showItemsIntent);
+//            }
+//        });
 
         return rootView;
     }
@@ -324,7 +331,7 @@ public class ImejiFragment extends Fragment {
 
                     adapter.notifyDataSetChanged();
                     adapter = new FolderListAdapter(getActivity(), collectionListLocal);
-                    listView.setAdapter(adapter);
+                    cardView.setAdapter(adapter);
                 }
             }else{
                 Log.e(LOG_TAG, "no items");

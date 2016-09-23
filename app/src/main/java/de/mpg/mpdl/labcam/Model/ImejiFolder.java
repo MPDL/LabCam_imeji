@@ -31,6 +31,9 @@ public class ImejiFolder extends Model {
     @Column(name = "description")
     private String description;
 
+    @Expose
+    @Column(name = "createdDate")
+    private String createdDate;
 
     @Expose
     @Column(name = "modifiedDate")
@@ -114,5 +117,13 @@ public class ImejiFolder extends Model {
 
     public void setModifiedDate(String modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    public String getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(String createdDate) {
+        this.createdDate = createdDate;
     }
 }
