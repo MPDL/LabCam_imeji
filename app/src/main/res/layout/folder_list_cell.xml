@@ -50,18 +50,19 @@
 
                 <TextView
                     android:id="@+id/list_item_cell_title"
-                    android:layout_width="wrap_content"
+                    android:layout_width="400dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="50dp"
                     android:textColor="@color/black"
                     android:layout_marginLeft="16sp"
+                    android:maxLines="2"
                     android:text="Title"
                     android:typeface="sans"
                     android:textSize="40sp"
                     android:textStyle="bold"/>
 
                 <TextView
-                    android:id="@+id/label_date"
+                    android:id="@+id/list_item_author"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/lightGrey"
@@ -69,7 +70,7 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="5dp"
                     android:textSize="24sp"
-                    android:text="Created By" />
+                    android:text="By" />
 
                 <!-- date -->
                 <TextView
@@ -78,9 +79,18 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/lightGrey"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginBottom="5dp"
+                    android:layout_marginBottom="16dp"
                     android:textSize="24sp"
-                    android:text="16.09.2016" />
+                    android:text="" />
+
+                <TextView
+                    android:layout_width="400dp"
+                    android:id="@+id/list_item_description"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/lightGrey"
+                    android:layout_marginLeft="16dp"
+                    android:textSize="20sp"
+                    android:maxLines="3" />
 
             </LinearLayout>
 

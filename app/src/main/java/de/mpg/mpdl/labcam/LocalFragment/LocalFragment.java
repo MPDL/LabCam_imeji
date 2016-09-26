@@ -511,35 +511,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         albumRecyclerView.setLayoutManager(llm);
         albumRecyclerView.setAdapter(adapter);
-
-//        adapter.setOnItemClickListener(new AlbumRecyclerAdapter.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(View view, int position) {
-//
-//                if (actionMode != null) {
-//                    // muti select mode
-//                    // maintain position choosing
-//                    addOrRemoveAlbum(position);
-//                    adapter.setPositionSet(albumPositionSet);
-//                } else {
-//                    //  simple click
-//                    //  show picture
-//                    //  go to album detail
-//                    Gallery gallery = (Gallery) adapter.getItem(position);
-//                    Intent galleryImagesIntent = new Intent(getActivity(), LocalImageActivity.class);
-//                    galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
-//
-//                    startActivity(galleryImagesIntent);
-//                }
-//            }
-//
-//            @Override
-//            public void onItemLongClick(View view, int position) {
-//                if (actionMode == null) {
-//                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(ActionModeCallback);
-//                }
-//            }
-//        });
     }
 
 

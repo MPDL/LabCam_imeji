@@ -22,6 +22,9 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,15 +133,42 @@ public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.Fo
 //                }
 //            }
 
-            //title
+            //number
             holder.number.setText("");
 
             //title
-            holder.title.setText(collection.getTitle());
+            String title = "";
+            if(collection.getTitle().length()>30){
+                title = collection.getTitle().substring(0,30)+"...";
+            }else {
+                title = collection.getTitle();
+            }
+            holder.title.setText(title);
 
-            // user
-            holder.date.setText(collection.getCreatedDate());
+            // date
+            String str = collection.getCreatedDate();
+            if (null != str && str.length() > 0 )
+            {
+                int endIndex = str.lastIndexOf("T");
+                if (endIndex != -1)
+                {
+                    String newstr = str.substring(0, endIndex); // not forgot to put check if(endIndex != -1)
+                    holder.date.setText(newstr);
+                }
+            }
 
+            // description
+            String description = "";
+            if(collection.getDescription().length()>100){
+                description = collection.getDescription().substring(0,100)+"...";
+            }else {
+                description = collection.getDescription();
+            }
+            holder.description.setText(description);
+
+            // author full name
+
+            holder.author.setText("By: " + collection.getCreatedBy().getFullname());
             // go to the cell
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -169,6 +199,8 @@ public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.Fo
         protected TextView number;
         protected TextView title;
         protected TextView date;
+        protected TextView author;
+        protected TextView description;
 
 
         public FolderListViewHolder(View itemView) {
@@ -177,7 +209,8 @@ public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.Fo
             number = (TextView) itemView.findViewById(R.id.list_item_num);
             title = (TextView) itemView.findViewById(R.id.list_item_cell_title);
             date = (TextView) itemView.findViewById(R.id.list_item_date);
-
+            author = (TextView) itemView.findViewById(R.id.list_item_author);
+            description = (TextView) itemView.findViewById(R.id.list_item_description);
         }
     }
 }

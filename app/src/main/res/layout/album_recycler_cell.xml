@@ -76,9 +76,9 @@
         <TextView
             android:layout_width="0dp"
             android:layout_weight="0.33"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/album_tv_1"
-            android:gravity="center_horizontal"
+            android:gravity="center"
 
             android:textColor="@color/white"
             android:textSize="60dp"/>
@@ -88,9 +88,9 @@
             android:layout_width="0dp"
             android:layout_weight="0.33"
             android:layout_marginLeft="8dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/album_tv_2"
-            android:gravity="center_horizontal"
+            android:gravity="center"
 
             android:textColor="@color/white"
             android:textSize="60dp"/>
@@ -99,9 +99,9 @@
             android:layout_width="0dp"
             android:layout_weight="0.33"
             android:layout_marginLeft="8dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/album_tv_3"
-            android:gravity="center_horizontal"
+            android:gravity="center"
 
             android:text=""
             android:textColor="@color/white"
@@ -152,15 +152,15 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:layout_below="@id/layout_first_layer_text"
-
+        android:layout_marginTop="8dp"
         android:id="@+id/layout_second_layer_text"
         android:orientation="horizontal">
         <TextView
             android:layout_width="0dp"
             android:layout_weight="0.33"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/album_tv_4"
-            android:gravity="center_horizontal"
+            android:gravity="center"
 
             android:textColor="@color/white"
             android:textSize="60dp"/>
@@ -170,9 +170,9 @@
             android:layout_width="0dp"
             android:layout_weight="0.33"
             android:layout_marginLeft="8dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/album_tv_5"
-            android:gravity="center_horizontal"
+            android:gravity="center"
 
             android:text=""
             android:textColor="@color/white"
@@ -182,9 +182,9 @@
             android:layout_width="0dp"
             android:layout_weight="0.33"
             android:layout_marginLeft="8dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/album_tv_6"
-            android:gravity="center_horizontal"
+            android:gravity="center"
 
             android:textColor="@color/white"
             android:textSize="60dp"/>

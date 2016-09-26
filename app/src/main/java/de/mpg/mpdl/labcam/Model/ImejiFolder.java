@@ -40,6 +40,10 @@ public class ImejiFolder extends Model {
     private String modifiedDate;
 
     @Expose
+    @Column(name = "createdBy")
+    private CreatedBy createdBy;
+
+    @Expose
     //@Column(name = "contributors")
     private List<Person> contributors;
 
@@ -125,5 +129,13 @@ public class ImejiFolder extends Model {
 
     public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public CreatedBy getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(CreatedBy createdBy) {
+        this.createdBy = createdBy;
     }
 }

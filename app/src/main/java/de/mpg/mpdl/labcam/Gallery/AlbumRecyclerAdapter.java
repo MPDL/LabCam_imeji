@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ShapeDrawable;
 import android.net.Uri;
 import android.preference.PreferenceManager;
@@ -31,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
 import de.mpg.mpdl.labcam.Model.Gallery;
 import de.mpg.mpdl.labcam.R;
 
@@ -52,7 +54,8 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
     private String CollectionId;
     // flag for what?
     boolean flag = false;
-
+    static int album_pic_position;
+    static ArrayList<String> itemPathList = new ArrayList<String>();
     Point size;
 
     // album positionSet
@@ -125,7 +128,7 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
 
         // get current album
 
-        List<ImageView> imageViewList = new ArrayList<>();
+        final List<ImageView> imageViewList = new ArrayList<>();
         imageViewList.add(holder.imageView);
         imageViewList.add(holder.imageView_2);
         imageViewList.add(holder.imageView_3);
@@ -145,6 +148,7 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
         for (int i = 0; i < sizeConstrain; i++) {
             if (i == sizeConstrain - 1) {
                 textViewList.get(i).setText(String.valueOf(gallery.size()) + " >");
+                textViewList.get(i).setBackgroundResource(R.color.black_shadow);
                 imageViewList.get(i).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -156,8 +160,44 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
                     }
                 });
             } else {
-                imageViewList.get(i).setEnabled(false);
-                imageViewList.get(i).setClickable(false);
+                imageViewList.get(i).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        //TODO: go to photo detail
+                        boolean isLocalImage = true;
+                        int image_position = 0;
+                        Intent showDetailIntent = new Intent(activity, DetailActivity.class);
+                        itemPathList.clear();
+                        for (String[] imageStr : gallery) {
+                            itemPathList.add(imageStr[1]);
+                        }
+
+                        switch (view.getId()){
+                            case R.id.album_pic_1:
+                                image_position = 0;
+                                break;
+                            case R.id.album_pic_2:
+                                image_position = 1;
+                                break;
+                            case R.id.album_pic_3:
+                                image_position = 2;
+                                break;
+                            case R.id.album_pic_4:
+                                image_position = 3;
+                                break;
+                            case R.id.album_pic_5:
+                                image_position = 4;
+                                break;
+                        }
+
+                        showDetailIntent.putStringArrayListExtra("itemPathList", itemPathList);
+                        Log.e(LOG_TAG, itemPathList.size()+"");
+                        showDetailIntent.putExtra("positionInList",image_position);
+                        showDetailIntent.putExtra("isLocalImage", isLocalImage);
+                        activity.startActivity(showDetailIntent);
+                    }
+                });
+
             }
         }
 
@@ -180,6 +220,16 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
 
         if (gallery.size() > 0) {
             holder.title.setText(gallery.get(0)[0]);
+            holder.title.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if(getAlbumPath(gallery.get(0)[1])==null)
+                        return;
+                    Intent galleryImagesIntent = new Intent(activity, LocalImageActivity.class);
+                    galleryImagesIntent.putExtra("galleryTitle", getAlbumPath(gallery.get(0)[1]));
+                    activity.startActivity(galleryImagesIntent);
+                }
+            });
         }
 
         if (onItemClickListener != null) {
@@ -268,7 +318,6 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
 
     public void setPositionSet(Set<Integer> positionSet) {
         this.albumPositionSet = positionSet;
-        Log.e("albumPositionSet", positionSet.size() + "");
         notifyDataSetChanged();
     }
 
