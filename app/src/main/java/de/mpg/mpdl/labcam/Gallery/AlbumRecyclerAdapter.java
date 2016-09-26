@@ -2,6 +2,7 @@ package de.mpg.mpdl.labcam.Gallery;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -20,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -90,23 +92,23 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
         display.getSize(size);
 
         if (size.x > size.y) {
-            holder.imageView.getLayoutParams().height = size.x /3;
+            holder.imageView.getLayoutParams().height = size.x / 3;
         } else {
-            holder.itemView.getLayoutParams().height = size.y /3;
+            holder.itemView.getLayoutParams().height = size.y / 3;
         }
 
-        List<String[]> gallery = galleryList.get(position);
+        final List<String[]> gallery = galleryList.get(position);
 
         int sizeConstrain = 6;
-        if(gallery.size()<7){
+        if (gallery.size() < 7) {
             sizeConstrain = gallery.size();
         }
         int pixels;
         final float scale = activity.getResources().getDisplayMetrics().density;
-        if(sizeConstrain<4){
-            pixels = (int) (size.x /3 + 80 * scale + 0.5f);
-        }else {
-            pixels = (int) (size.x * 2/3 + 80 * scale + 0.5f);
+        if (sizeConstrain < 4) {
+            pixels = (int) (size.x / 3 + 80 * scale + 0.5f);
+        } else {
+            pixels = (int) (size.x * 2 / 3 + 80 * scale + 0.5f);
         }
 
         RelativeLayout.LayoutParams re_param = new RelativeLayout.LayoutParams(
@@ -115,10 +117,10 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
         holder.cell.setLayoutParams(re_param);
 
         ViewGroup.LayoutParams li_param = holder.Layout_layer_1.getLayoutParams();
-        li_param.height = size.x/3;
+        li_param.height = size.x / 3;
         holder.Layout_layer_1.setLayoutParams(li_param);
         ViewGroup.LayoutParams li_2_param = holder.Layout_layer_2.getLayoutParams();
-        li_2_param.height = size.x/3;
+        li_2_param.height = size.x / 3;
         holder.Layout_layer_2.setLayoutParams(li_2_param);
 
         // get current album
@@ -139,11 +141,23 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
         textViewList.add(holder.textView_num_5);
         textViewList.add(holder.textView_num_6);
 
-
+        // to the album view
         for (int i = 0; i < sizeConstrain; i++) {
-            if(i == sizeConstrain-1){
-                textViewList.get(i).setText(String.valueOf(gallery.size())+" >");
-            }else {
+            if (i == sizeConstrain - 1) {
+                textViewList.get(i).setText(String.valueOf(gallery.size()) + " >");
+                imageViewList.get(i).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(getAlbumPath(gallery.get(0)[1])==null)
+                            return;
+                        Intent galleryImagesIntent = new Intent(activity, LocalImageActivity.class);
+                        galleryImagesIntent.putExtra("galleryTitle", getAlbumPath(gallery.get(0)[1]));
+                        activity.startActivity(galleryImagesIntent);
+                    }
+                });
+            } else {
+                imageViewList.get(i).setEnabled(false);
+                imageViewList.get(i).setClickable(false);
             }
         }
 
@@ -154,20 +168,21 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
 
             Uri uri = Uri.fromFile(imageFile);
 
-            if(imageFile.exists()) {
+            if (imageFile.exists()) {
                 Picasso.with(activity)
                         .load(uri)
-                        .resize(size.x/3, size.x/3)
+                        .resize(size.x / 3, size.x / 3)
                         .centerCrop()
                         .into(imageViewList.get(i));
             }
         }
-//        String galleryPath = gallery.get(0)[1];
 
 
-//        holder.title.setText(gallery.get(position)[0]);
+        if (gallery.size() > 0) {
+            holder.title.setText(gallery.get(0)[0]);
+        }
 
-        if (onItemClickListener!=null){
+        if (onItemClickListener != null) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -177,16 +192,16 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
             holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    onItemClickListener.onItemLongClick(v,position);
+                    onItemClickListener.onItemLongClick(v, position);
                     return false;
                 }
             });
         }
 
         // checkMark
-        if(albumPositionSet.contains(position)){
+        if (albumPositionSet.contains(position)) {
             holder.checkMark.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             holder.checkMark.setVisibility(View.GONE);
         }
     }
@@ -196,7 +211,7 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
         return galleryList.size();
     }
 
-    public static class AlbumRecyclerViewHolder extends RecyclerView.ViewHolder{
+    public static class AlbumRecyclerViewHolder extends RecyclerView.ViewHolder {
 
         protected ImageView imageView;
         protected ImageView imageView_2;
@@ -218,7 +233,7 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
 
 
         protected ImageView checkMark;
-//        protected TextView number;
+        //        protected TextView number;
         protected TextView title;
 //        protected TextView date;
 
@@ -251,15 +266,27 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
         }
     }
 
-    public void setPositionSet(Set<Integer> positionSet){
+    public void setPositionSet(Set<Integer> positionSet) {
         this.albumPositionSet = positionSet;
-        Log.e("albumPositionSet",positionSet.size()+"");
+        Log.e("albumPositionSet", positionSet.size() + "");
         notifyDataSetChanged();
     }
 
-    public interface OnItemClickListener{
+    public interface OnItemClickListener {
         void onItemClick(View view, int position);
+
         void onItemLongClick(View view, int position);
     }
 
+    private String getAlbumPath(String str) {
+        if(null!=str&&str.length()>0)
+        {
+            int endIndex = str.lastIndexOf("/");
+            if (endIndex != -1) {
+                String newstr = str.substring(0, endIndex); // not forgot to put check if(endIndex != -1)
+                return newstr;
+            }else return null;
+        }else return null;
+
+    }
 }
