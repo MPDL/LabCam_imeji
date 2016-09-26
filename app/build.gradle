@@ -26,6 +26,10 @@ android {
             versionCode 3
         }
     }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
 }
 
 repositories {
