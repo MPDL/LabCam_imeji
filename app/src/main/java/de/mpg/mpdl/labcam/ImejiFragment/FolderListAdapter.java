@@ -105,6 +105,11 @@ public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.Fo
             ImejiFolder collection = folderItems.get(position);
             Log.v(LOG_TAG, collection.getTitle());
 //
+            ViewGroup.LayoutParams layoutParams_im = holder.imageView.getLayoutParams();
+            layoutParams_im.width = size.x*4/10 - 40;
+            layoutParams_im.height = size.x*4/10 - 40;
+            holder.imageView.setLayoutParams(layoutParams_im);
+
             //创建默认的ImageLoader配置参数
             ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(activity)
                     .imageDownloader(new CustomImageDownaloder(activity))

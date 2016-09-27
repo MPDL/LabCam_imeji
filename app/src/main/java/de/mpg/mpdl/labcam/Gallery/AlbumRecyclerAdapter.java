@@ -35,6 +35,8 @@ import java.util.Set;
 import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
 import de.mpg.mpdl.labcam.Model.Gallery;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import me.grantland.widget.AutofitHelper;
 
 /**
  * Created by kiran on 22.10.15.
@@ -147,7 +149,9 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
         // to the album view
         for (int i = 0; i < sizeConstrain; i++) {
             if (i == sizeConstrain - 1) {
+                AutofitHelper.create(textViewList.get(i));
                 textViewList.get(i).setText(String.valueOf(gallery.size()) + " >");
+                textViewList.get(i).setText(" 2003 >");
                 textViewList.get(i).setBackgroundResource(R.color.black_shadow);
                 imageViewList.get(i).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -312,6 +316,7 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
 //            number = (TextView) itemView.findViewById(R.id.list_item_num);
             title = (TextView) itemView.findViewById(R.id.tv_album_title);
 //            date = (TextView) itemView.findViewById(R.id.list_item_date);
+
 
         }
     }

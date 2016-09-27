@@ -32,8 +32,10 @@
                     <TextView
                         android:id="@+id/list_item_cell_title"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="50dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.2"
+                        android:gravity="bottom"
+                        android:paddingBottom="16dp"
                         android:textColor="@color/black"
                         android:layout_marginLeft="16sp"
                         android:maxLines="2"
@@ -45,29 +47,29 @@
                     <TextView
                         android:id="@+id/list_item_author"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.15"
                         android:textColor="@color/lightGrey"
                         android:layout_marginLeft="16dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginBottom="5dp"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:text="By" />
 
                     <!-- date -->
                     <TextView
                         android:id="@+id/list_item_date"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.15"
                         android:textColor="@color/lightGrey"
                         android:layout_marginLeft="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:textSize="20sp"
+                        android:textSize="18sp"
                         android:text="" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:id="@+id/list_item_description"
-                        android:layout_height="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="0.4"
                         android:textColor="@color/lightGrey"
                         android:layout_marginLeft="16dp"
                         android:textSize="14sp"
@@ -81,11 +83,11 @@
                 android:layout_width="0dp"
                 android:layout_weight="0.4"
                 android:layout_height="match_parent"
+                android:gravity="center_vertical"
                 android:orientation="vertical">
                 <ImageView
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.75"
+                    android:layout_height="wrap_content"
                     android:src="@drawable/imeji"
                     android:id="@+id/list_item_cell_thumbnail"
                     android:layout_alignParentRight="true"
@@ -95,11 +97,11 @@
 
                     android:scaleType="centerCrop" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="0.25"/>
+
             </LinearLayout>
+
         </LinearLayout>
+
     </android.support.v7.widget.CardView>
+
 </LinearLayout>

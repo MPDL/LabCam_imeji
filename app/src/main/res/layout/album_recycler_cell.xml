@@ -73,32 +73,35 @@
         android:gravity="center_vertical"
         android:id="@+id/layout_first_layer_text"
         android:orientation="horizontal">
-        <TextView
+        <me.grantland.widget.AutofitTextView
             android:layout_width="0dp"
             android:layout_weight="0.33"
             android:layout_height="match_parent"
             android:id="@+id/album_tv_1"
             android:gravity="center"
+            android:maxLines="1"
 
             android:textColor="@color/white"
             android:textSize="48sp"/>
 
 
-        <TextView
+        <me.grantland.widget.AutofitTextView
             android:layout_width="0dp"
             android:layout_weight="0.33"
             android:layout_marginLeft="8dp"
             android:layout_height="match_parent"
             android:id="@+id/album_tv_2"
             android:gravity="center"
+            android:maxLines="1"
 
             android:textColor="@color/white"
             android:textSize="48sp"/>
 
-        <TextView
+        <me.grantland.widget.AutofitTextView
             android:layout_width="0dp"
             android:layout_weight="0.33"
             android:layout_marginLeft="8dp"
+            android:maxLines="1"
             android:layout_height="match_parent"
             android:id="@+id/album_tv_3"
             android:gravity="center"
@@ -155,36 +158,39 @@
         android:layout_marginTop="8dp"
         android:id="@+id/layout_second_layer_text"
         android:orientation="horizontal">
-        <TextView
+        <me.grantland.widget.AutofitTextView
             android:layout_width="0dp"
             android:layout_weight="0.33"
             android:layout_height="match_parent"
             android:id="@+id/album_tv_4"
             android:gravity="center"
+            android:maxLines="1"
 
             android:textColor="@color/white"
             android:textSize="48sp"/>
 
 
-        <TextView
+        <me.grantland.widget.AutofitTextView
             android:layout_width="0dp"
             android:layout_weight="0.33"
             android:layout_marginLeft="8dp"
             android:layout_height="match_parent"
             android:id="@+id/album_tv_5"
             android:gravity="center"
+            android:maxLines="1"
 
             android:text=""
             android:textColor="@color/white"
             android:textSize="48sp"/>
 
-        <TextView
+        <me.grantland.widget.AutofitTextView
             android:layout_width="0dp"
             android:layout_weight="0.33"
             android:layout_marginLeft="8dp"
             android:layout_height="match_parent"
             android:id="@+id/album_tv_6"
             android:gravity="center"
+            android:maxLines="1"
 
             android:textColor="@color/white"
             android:textSize="48sp"/>
