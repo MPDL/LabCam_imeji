@@ -96,6 +96,9 @@ public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.Fo
 //        } else {
 //            holder.imageView.getLayoutParams().height = 2 * size.y /3;
 //        }
+        ViewGroup.LayoutParams layoutParams =  holder.cardView.getLayoutParams();
+        layoutParams.height =size.y*1/3;
+        holder.cardView.setLayoutParams(layoutParams);
 
         if(folderItems.size()>0) {
             // getting item data for the row
@@ -134,16 +137,17 @@ public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.Fo
 //            }
 
             //number
-            holder.number.setText("");
+//            holder.number.setText("");
 
             //title
-            String title = "";
-            if(collection.getTitle().length()>30){
-                title = collection.getTitle().substring(0,30)+"...";
-            }else {
-                title = collection.getTitle();
-            }
-            holder.title.setText(title);
+            holder.title.setText(collection.getTitle());
+//            String title = "";
+//            if(collection.getTitle().length()>30){
+//                title = collection.getTitle().substring(0,30)+"...";
+//            }else {
+//                title = collection.getTitle();
+//            }
+//            holder.title.setText(title);
 
             // date
             String str = collection.getCreatedDate();
@@ -158,13 +162,14 @@ public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.Fo
             }
 
             // description
-            String description = "";
-            if(collection.getDescription().length()>100){
-                description = collection.getDescription().substring(0,100)+"...";
-            }else {
-                description = collection.getDescription();
-            }
-            holder.description.setText(description);
+            holder.description.setText(collection.getDescription());
+//            String description = "";
+//            if(collection.getDescription().length()>100){
+//                description = collection.getDescription().substring(0,100)+"...";
+//            }else {
+//                description = collection.getDescription();
+//            }
+//            holder.description.setText(description);
 
             // author full name
 
@@ -196,21 +201,23 @@ public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.Fo
     public static class FolderListViewHolder extends RecyclerView.ViewHolder{
 
         protected ImageView imageView;
-        protected TextView number;
+//        protected TextView number;
         protected TextView title;
         protected TextView date;
         protected TextView author;
         protected TextView description;
+        protected CardView cardView;
 
 
         public FolderListViewHolder(View itemView) {
             super(itemView);
             imageView = (ImageView) itemView.findViewById(R.id.list_item_cell_thumbnail);
-            number = (TextView) itemView.findViewById(R.id.list_item_num);
+//            number = (TextView) itemView.findViewById(R.id.list_item_num);
             title = (TextView) itemView.findViewById(R.id.list_item_cell_title);
             date = (TextView) itemView.findViewById(R.id.list_item_date);
             author = (TextView) itemView.findViewById(R.id.list_item_author);
             description = (TextView) itemView.findViewById(R.id.list_item_description);
+            cardView = (CardView) itemView.findViewById(R.id.folderlist_cardview);
         }
     }
 }

@@ -24,7 +24,7 @@
             android:layout_marginLeft="10dp"
             android:text="Title"
             android:typeface="sans"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textStyle="bold"/>
 
     </LinearLayout>
@@ -81,7 +81,7 @@
             android:gravity="center"
 
             android:textColor="@color/white"
-            android:textSize="60dp"/>
+            android:textSize="48sp"/>
 
 
         <TextView
@@ -93,7 +93,7 @@
             android:gravity="center"
 
             android:textColor="@color/white"
-            android:textSize="60dp"/>
+            android:textSize="48sp"/>
 
         <TextView
             android:layout_width="0dp"
@@ -105,7 +105,7 @@
 
             android:text=""
             android:textColor="@color/white"
-            android:textSize="60dp"/>
+            android:textSize="48sp"/>
 
     </LinearLayout>
 
@@ -163,7 +163,7 @@
             android:gravity="center"
 
             android:textColor="@color/white"
-            android:textSize="60dp"/>
+            android:textSize="48sp"/>
 
 
         <TextView
@@ -176,7 +176,7 @@
 
             android:text=""
             android:textColor="@color/white"
-            android:textSize="60dp"/>
+            android:textSize="48sp"/>
 
         <TextView
             android:layout_width="0dp"
@@ -187,7 +187,7 @@
             android:gravity="center"
 
             android:textColor="@color/white"
-            android:textSize="60dp"/>
+            android:textSize="48sp"/>
 
     </LinearLayout>
 
