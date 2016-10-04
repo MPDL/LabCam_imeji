@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         setContentView(R.layout.activity_main);
         Log.v("Main activity", "started");
 
-        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.screenshot);
+        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.screen_shot);
 
         Log.e ("ocr",OCRtextHandler.getText(context, largeIcon));
 
