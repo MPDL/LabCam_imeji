@@ -39,6 +39,10 @@
             android:name="AA_DB_VERSION"
             android:value="2" />
 
+        <!--ocr-->
+        <meta-data android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="ocr"/>
+
         <!-- Auth -->
         <activity
             android:name=".Auth.LoginActivity"

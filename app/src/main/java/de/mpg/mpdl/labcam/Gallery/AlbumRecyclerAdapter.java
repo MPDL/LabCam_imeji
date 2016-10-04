@@ -151,7 +151,6 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
             if (i == sizeConstrain - 1) {
                 AutofitHelper.create(textViewList.get(i));
                 textViewList.get(i).setText(String.valueOf(gallery.size()) + " >");
-                textViewList.get(i).setText(" 2003 >");
                 textViewList.get(i).setBackgroundResource(R.color.black_shadow);
                 imageViewList.get(i).setOnClickListener(new View.OnClickListener() {
                     @Override

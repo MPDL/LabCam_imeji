@@ -72,6 +72,7 @@ dependencies {
     compile 'com.wang.avi:library:1.0.1'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'me.grantland:autofittextview:0.2.0'
+    compile 'com.google.android.gms:play-services-vision:9.4.0+'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.1@aar') {
         transitive = true;
     }

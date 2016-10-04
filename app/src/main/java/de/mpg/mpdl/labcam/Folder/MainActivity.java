@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -67,6 +68,7 @@ import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
 import de.mpg.mpdl.labcam.TaskManager.RecentProcessActivity;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.Utils.OCRtextHandler;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -153,6 +155,10 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 //        setContentView(R.layout.main);
         setContentView(R.layout.activity_main);
         Log.v("Main activity", "started");
+
+        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.screenshot);
+
+        Log.e ("ocr",OCRtextHandler.getText(context, largeIcon));
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey("isDestroyByCamera")) {
