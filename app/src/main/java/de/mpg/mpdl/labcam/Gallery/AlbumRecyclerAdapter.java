@@ -146,10 +146,18 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
         textViewList.add(holder.textView_num_5);
         textViewList.add(holder.textView_num_6);
 
+        // first set everything invisible
+        for (int i = 0; i <6 ; i++ ){
+            textViewList.get(i).setVisibility(View.INVISIBLE);
+            imageViewList.get(i).setVisibility(View.INVISIBLE);
+        }
+
         // to the album view
         for (int i = 0; i < sizeConstrain; i++) {
+            imageViewList.get(i).setVisibility(View.VISIBLE);
             if (i == sizeConstrain - 1) {
                 AutofitHelper.create(textViewList.get(i));
+                textViewList.get(i).setVisibility(View.VISIBLE);
                 textViewList.get(i).setText(String.valueOf(gallery.size()) + " >");
                 textViewList.get(i).setBackgroundResource(R.color.black_shadow);
                 imageViewList.get(i).setOnClickListener(new View.OnClickListener() {
@@ -163,6 +171,8 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
                     }
                 });
             } else {
+                textViewList.get(i).setText("");
+                textViewList.get(i).setVisibility(View.INVISIBLE);
                 imageViewList.get(i).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
