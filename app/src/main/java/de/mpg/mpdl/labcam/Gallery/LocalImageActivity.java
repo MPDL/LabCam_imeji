@@ -4,20 +4,28 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.sch.rfview.AnimRFRecyclerView;
+import com.sch.rfview.decoration.DividerGridItemDecoration;
+import com.sch.rfview.manager.AnimRFGridLayoutManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,11 +52,13 @@ import de.mpg.mpdl.labcam.Utils.ImageFileFilter;
 public class LocalImageActivity extends AppCompatActivity implements android.support.v7.view.ActionMode.Callback {
 
     private ArrayList<String> dataPathList = new ArrayList<String>();
+    private ArrayList<String> datas = new ArrayList<>();
+    private int dataCounter = 0;
 
     public LocalAlbumAdapter localAlbumAdapter;
 
 //    public  ImagesGridAdapter adapter;
-    private RecyclerView recyclerView;
+    private AnimRFRecyclerView recyclerView;
     private View rootView;
     private Activity activity = this;
     private final String LOG_TAG = LocalImageActivity.class.getSimpleName();
@@ -56,6 +66,8 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
     private String username;
     private String userId;
 
+    private View headerView;
+    private View footerView;
 
     //actionMode
     private android.support.v7.view.ActionMode actionMode;
@@ -66,12 +78,17 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
     private Toolbar toolbar;
     private String folderPath;
 
+    private Handler mHandler = new Handler();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.active_gallery_gridview);
 
-        rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+        rootView = findViewById(android.R.id.content);
+        // load more and refresh
+        headerView = LayoutInflater.from(activity).inflate(R.layout.header_view, null);
+        footerView = LayoutInflater.from(activity).inflate(R.layout.footer_view, null);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -79,13 +96,13 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-
         TextView titleView = (TextView) findViewById(R.id.title);
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         userId = mPrefs.getString("userId","");
 
+        //Kiran's title
         Intent intent = activity.getIntent();
         if (intent != null) {
             folderPath = intent.getStringExtra("galleryTitle");
@@ -98,12 +115,6 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
 
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
         Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-        for(int i = 0; i<albums.length ;i++){
-            Log.v("albums",  albums[i]);
-        }
-
-        Log.v("Images",  images.toString());
 
         //final String CompleteCameraFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/" + title;
         File folder = new File(folderPath);
@@ -121,12 +132,48 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
             }
         }
 
-        // replace with album
-        localAlbumAdapter = new LocalAlbumAdapter(activity,dataPathList);
+        for (int i = 0; i < 6; i++) {
+            datas.add(dataPathList.get(i));
+        }
 
-        recyclerView = (RecyclerView) findViewById(R.id.album_detail_recycle_view);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(activity, 2));
+        // replace with album
+        localAlbumAdapter = new LocalAlbumAdapter(activity, datas);
+
+        recyclerView = (AnimRFRecyclerView) findViewById(R.id.album_detail_recycle_view);
+        // 使用重写后的格子布局管理器
+        recyclerView.setLayoutManager(new AnimRFGridLayoutManager(activity, 2));
+        // 设置分割线
+        recyclerView.addItemDecoration(new DividerGridItemDecoration(activity, true));
+//        // 添加头部和脚部，如果不添加就使用默认的头部和脚部
+//        recyclerView.addHeaderView(headerView);
+//        // 设置头部的最大拉伸倍率，默认1.5f，必须写在setHeaderImage()之前
+//        recyclerView.setScaleRatio(1.7f);
+//        // 设置下拉时拉伸的图片，不设置就使用默认的
+//        recyclerView.setHeaderImage((ImageView) headerView.findViewById(R.id.iv_hander));
+        recyclerView.addFootView(footerView);
+        // 设置刷新动画的颜色
+        recyclerView.setColor(Color.BLUE, Color.GREEN);
+        // 设置头部恢复动画的执行时间，默认500毫秒
+        recyclerView.setHeaderImageDurationMillis(300);
+        // 设置拉伸到最高时头部的透明度，默认0.5f
+        recyclerView.setHeaderImageMinAlpha(0.6f);
+        // 设置刷新和加载更多数据的监听，分别在onRefresh()和onLoadMore()方法中执行刷新和加载更多操作
+        recyclerView.setLoadDataListener(new AnimRFRecyclerView.LoadDataListener() {
+            @Override
+            public void onRefresh() {
+                new Thread(new MyRunnable(true)).start();
+
+                Log.e("~~", "onRefresh()");
+            }
+
+            @Override
+            public void onLoadMore() {
+                new Thread(new MyRunnable(false)).start();
+            }
+        });
+
+        recyclerView.setRefreshEnable(false);
+
         recyclerView.setAdapter(localAlbumAdapter);
 
         localAlbumAdapter.setOnItemClickListener(new LocalAlbumAdapter.OnItemClickListener() {
@@ -382,5 +429,73 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
         toolbar.setVisibility(View.VISIBLE);
         localAlbumAdapter.notifyDataSetChanged();
         Log.e(LOG_TAG,"onDestroyActionMode");
+    }
+
+    public void refreshComplete() {
+        recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
+    public void loadMoreComplete() {
+        recyclerView.getAdapter().notifyDataSetChanged();
+    }
+
+    /**
+     * 添加数据
+     */
+    private void addData() {
+        if (datas == null) {
+            datas = new ArrayList<>();
+            dataCounter = 0;
+        }
+        for (int i = 0; i < 6; i++) {
+            if(datas.size()>= dataPathList.size()){
+                return;
+            }
+            datas.add(dataPathList.get(dataCounter+i));
+
+        }
+        dataCounter = datas.size()-1;
+    }
+
+    public void newData() {
+        datas.clear();
+        dataCounter = 0;
+        for (int i = 0; i < 6; i++) {
+            datas.add(dataPathList.get(i));
+        }
+    }
+
+    class MyRunnable implements Runnable {
+
+        boolean isRefresh;
+
+        public MyRunnable(boolean isRefresh) {
+            this.isRefresh = isRefresh;
+        }
+
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (isRefresh) {
+                        newData();
+                        Log.e(LOG_TAG, "refreshComplete:"+datas.size());
+                        refreshComplete();
+                        recyclerView.refreshComplate();
+                    } else {
+                        addData();
+                        Log.e(LOG_TAG, "loadMoreComplete:"+ datas.size());
+                        loadMoreComplete();
+                        recyclerView.loadMoreComplate();
+                    }
+                }
+            });
+        }
     }
 }
