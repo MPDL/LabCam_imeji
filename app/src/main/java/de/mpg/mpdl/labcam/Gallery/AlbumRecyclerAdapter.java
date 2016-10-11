@@ -155,7 +155,7 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
         // to the album view
         for (int i = 0; i < sizeConstrain; i++) {
             imageViewList.get(i).setVisibility(View.VISIBLE);
-            if (i == sizeConstrain - 1) {
+            if (i == 5) {
                 AutofitHelper.create(textViewList.get(i));
                 textViewList.get(i).setVisibility(View.VISIBLE);
                 textViewList.get(i).setText(String.valueOf(gallery.size()) + " >");
