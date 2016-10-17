@@ -118,7 +118,7 @@ public class DeviceStatus {
     }
 
     public enum state{
-        WAITING, STARTED, STOPPED, INTERRUPTED, FAILED,FINISHED
+        WAITING, STARTED, STOPPED, FAILED,FINISHED
     }
 
 

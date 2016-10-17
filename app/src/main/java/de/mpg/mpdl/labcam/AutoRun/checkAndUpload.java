@@ -710,8 +710,14 @@ public class checkAndUpload {
             final Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
 
             if(currentImage!=null){
-                //do sth
+                // image upload failed
                 currentImage.setState(String.valueOf(DeviceStatus.state.FAILED));
+                currentImage.save();
+
+                // task failed
+//                task.setState(String.valueOf(DeviceStatus.state.FAILED));
+//                task.setEndDate(DeviceStatus.dateNow());
+//                task.save();
    //             if(DeviceStatus.getUploadingItemPaths().size()>0)
      //               DeviceStatus.getUploadingItemPaths().remove(currentImage.getImagePath());
             }else {
@@ -767,7 +773,7 @@ public class checkAndUpload {
                                 task.setState(String.valueOf(DeviceStatus.state.FAILED));
                                 task.save();
                                 Log.e(TAG, currentImage.getImageName() + " collectionId not exist, no such folder");
-                                Handler  handler=new Handler(Looper.getMainLooper());
+                                Handler handler=new Handler(Looper.getMainLooper());
                                 handler.post(new Runnable() {
                                     public void run() {
                                         Toast.makeText(context, "remote collectionId not exist, no such folder", Toast.LENGTH_SHORT).show();

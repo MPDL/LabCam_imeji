@@ -219,13 +219,11 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
         /**************************************************  check upload not finished task ***************************************************/
 
-        List<Task> taskList = DBConnector.getUserTasks(userId, serverUrl);
+        List<Task> activeTaskList = DBConnector.getActiveTasks(userId, serverUrl);
         boolean isFinished = true;
 
-        for(Task task:taskList){
-            if(task.getFinishedItems()<task.getTotalItems()){
-                isFinished = false;
-            }
+        if(activeTaskList.size()>0){
+            isFinished = false;
         }
 
         if(!isDestroyByCamera && !isFinished) {

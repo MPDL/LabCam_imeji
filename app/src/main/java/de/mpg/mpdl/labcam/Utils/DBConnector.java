@@ -37,6 +37,7 @@ public class DBConnector {
                 .where("severName = ?", serverName)
                 .where("state != ?", String.valueOf(DeviceStatus.state.WAITING))
                 .where("state != ?", String.valueOf(DeviceStatus.state.STOPPED))
+                .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
                 .orderBy("endDate DESC")
                 .execute();
     }
@@ -83,6 +84,16 @@ public class DBConnector {
                 .execute();
     }
 
+
+    public static List<Task> getActiveTasks(String userId, String serverName){
+        return new Select()
+                .from(Task.class)
+                .where("userId = ?", userId)
+                .where("severName = ?", serverName)
+                .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
+//                .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
+                .execute();
+    }
 
     //delete finished tasks
     public static void deleteFinishedAUTasks(String userId, String serverName){

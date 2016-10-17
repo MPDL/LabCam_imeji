@@ -217,7 +217,7 @@ public class TaskManagerAdapter extends BaseAdapter {
 
             case AU_FAILED:
                 progressLayout.setVisibility(View.GONE);
-                toolButtonLayout.setVisibility(View.GONE);
+                toolButtonLayout.setVisibility(View.VISIBLE);
 //                clearButton.setVisibility(View.VISIBLE);
                 errorLayout.setVisibility(View.VISIBLE);
                 //error
@@ -232,7 +232,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                 break;
             case MU_FAILED:
                 progressLayout.setVisibility(View.GONE);
-                toolButtonLayout.setVisibility(View.GONE);
+                toolButtonLayout.setVisibility(View.VISIBLE);
 //                clearButton.setVisibility(View.VISIBLE);
                 errorLayout.setVisibility(View.VISIBLE);
 //                clearButton.setOnClickListener(new View.OnClickListener() {
@@ -341,8 +341,8 @@ public class TaskManagerAdapter extends BaseAdapter {
         }else if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
             //true is play button, means state now is paused
             isPausedCheckBox.setChecked(true);
-        }else if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
-
+        }else if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+            isPausedCheckBox.setChecked(true);
         }
 
 
