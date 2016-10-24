@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -23,6 +24,7 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
+import com.drew.metadata.exif.ExifThumbnailDirectory;
 import com.drew.metadata.exif.GpsDirectory;
 
 import org.json.JSONException;
@@ -247,17 +249,11 @@ public class DeviceStatus {
 
         File file = new File(imagePath);
 
-        String ocr = "";
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
-        ocr = OCRtextHandler.getText(context, bitmap);
-
 
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(file);
 
-            metaDataJsonStr =  generateJsonStr(metadata, typeList, ocr);
+            metaDataJsonStr =  generateJsonStr(metadata, typeList, context, imagePath);
 
             print(metadata);
         } catch (ImageProcessingException e) {
@@ -276,7 +272,7 @@ public class DeviceStatus {
      * generate json string
      * @param metadata
      */
-    private static String generateJsonStr(Metadata metadata, Boolean[] typeList, String ocr){
+    private static String generateJsonStr(Metadata metadata, Boolean[] typeList, Context context, String imagePath){
 
         String metaDataJsonStr = null;
 
@@ -290,6 +286,10 @@ public class DeviceStatus {
         GpsDirectory gpsDirectory
                 = metadata.getFirstDirectoryOfType(GpsDirectory.class);
 
+        ExifThumbnailDirectory exifThumbnailDirectory
+                = metadata.getFirstDirectoryOfType(ExifThumbnailDirectory.class);
+
+
 
         String makeStr = "";
         String modelStr = "";
@@ -302,6 +302,7 @@ public class DeviceStatus {
         String SensingMethodStr = "";
         String ApertureValueStr = "";
         String ColorSpaceStr = "";
+        int orientation = 0;
 
         if(exifIFD0Directory!=null){
             makeStr = (exifIFD0Directory.getString(ExifIFD0Directory.TAG_MAKE) != null) ? exifIFD0Directory.getString(ExifIFD0Directory.TAG_MAKE) : "";
@@ -326,6 +327,35 @@ public class DeviceStatus {
             longitudeStr = String.valueOf(gpsDirectory.getGeoLocation().getLongitude());
             GPSVersionIDStr = gpsDirectory.getString(gpsDirectory.TAG_VERSION_ID);
         }
+
+        if(exifThumbnailDirectory!=null){
+            String orientationStr = exifThumbnailDirectory.getString(exifThumbnailDirectory.TAG_ORIENTATION);
+            if(orientationStr.contains("90")){
+                orientation = 90;
+            }else if(orientationStr.contains("180")){
+                orientation = 180;
+            }else if(orientationStr.contains("270")){
+                orientation = 270;
+            }else {
+                orientation = 0;
+            }
+
+        }
+
+
+
+        String ocr = "";
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+
+        Matrix matrix = new Matrix();
+        matrix.postRotate(orientation);
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getWidth(),bitmap.getHeight(),true);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap .getWidth(), scaledBitmap .getHeight(), matrix, true);
+
+        ocr = OCRtextHandler.getText(context, rotatedBitmap);
+
 
         try {
             JSONObject jsonObject = new JSONObject();
