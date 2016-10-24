@@ -489,6 +489,26 @@ public class checkAndUpload {
         @Override
         public void failure(RetrofitError error) {
             Log.e(TAG,"failure in callback_get_collection");
+
+            if (error == null || error.getResponse() == null) {
+                if (error.getKind().name().equalsIgnoreCase("NETWORK")) {
+                    Log.e(TAG,"network error");
+                } else {
+                    // error == null, but it is not network error
+                }
+            } else if(error.getResponse().getStatus()== 404) {
+                task.setState(String.valueOf(DeviceStatus.state.FAILED));
+                task.setEndDate(DeviceStatus.dateNow());
+                task.save();
+                Log.e(TAG, collectionID + "collection not found");
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    public void run() {
+                        Toast.makeText(context, "collection not found", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return;
+            }
         }
     };
 
@@ -651,7 +671,7 @@ public class checkAndUpload {
             /** move on to next **/
 
             if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
-                Log.e(TAG,"MU task, stopped");
+                Log.e(TAG,"task, stopped");
                 return;
             }
 
@@ -725,7 +745,7 @@ public class checkAndUpload {
                 return;
             }
 
-            // error kinds: "network", 403, 422, other
+            // error kinds: "network", 403, 422, 404,  other
             if (error == null || error.getResponse() == null) {
                 OttoSingleton.getInstance().post(new UploadEvent(null));
                 if (error.getKind().name().equalsIgnoreCase("NETWORK")) {
@@ -777,6 +797,27 @@ public class checkAndUpload {
                                 handler.post(new Runnable() {
                                     public void run() {
                                         Toast.makeText(context, "remote collectionId not exist, no such folder", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                return;
+                            }catch (Exception e){}
+                        }
+                        break;
+                    case 404:
+                        String jsonBody_404 = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
+                        Log.e("<><>", jsonBody_404);
+                        if (jsonBody_404.contains("Not Found")) {
+                            // set currentImage state finished, print log
+                            Log.e("<><>", "Not Found");
+                            try{
+                                task.setState(String.valueOf(DeviceStatus.state.FAILED));
+                                task.setEndDate(DeviceStatus.dateNow());
+                                task.save();
+                                Log.e(TAG, collectionID + "collection not found");
+                                Handler  handler=new Handler(Looper.getMainLooper());
+                                handler.post(new Runnable() {
+                                    public void run() {
+                                        Toast.makeText(context, "collection not found", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                                 return;

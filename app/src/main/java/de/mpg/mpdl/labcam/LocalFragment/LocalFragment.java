@@ -244,15 +244,18 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
                 if(msg.what==1234){
 
+                    List<Task> activeTasks = DBConnector.getActiveTasks(userId, serverName);
                     List<Task> waitingTasks = DBConnector.getUserWaitingTasks(userId, serverName);
                     List<Task> stoppedTasks = DBConnector.getUserStoppedTasks(userId, serverName);
                     Task mostRecentTask = DBConnector.getLatestFinishedTask(userId, serverName);
 
                     int num_activate = 0;
 
-                    num_activate = stoppedTasks.size() + waitingTasks.size();
+//                    num_activate = stoppedTasks.size() + waitingTasks.size();
+                    num_activate = activeTasks.size();
 
                     if(num_activate > 0){
+                        // remove always waiting auTask
                         Task auTask = DBConnector.getAuTask(userId,serverName);
                         if(auTask!=null && String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState()) &&  auTask.getTotalItems()==auTask.getFinishedItems())
                             num_activate --;
