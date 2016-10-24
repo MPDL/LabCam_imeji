@@ -162,7 +162,9 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             }
         }
 
-                //user info
+
+
+        //user info
         mPrefs = this.getSharedPreferences("myPref", 0);
         email = mPrefs.getString("email", "");
 //        username =  mPrefs.getString("username", "");

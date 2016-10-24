@@ -2,6 +2,8 @@ package de.mpg.mpdl.labcam.Utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -36,6 +38,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+
+import de.mpg.mpdl.labcam.R;
 
 /**
  * Created by allen on 09/04/15.
@@ -237,16 +241,23 @@ public class DeviceStatus {
 
     }
 
-    public static String metaDataJson(String imagePath, Boolean[] typeList ){
+    public static String metaDataJson(String imagePath, Boolean[] typeList, Context context ){
 
         String metaDataJsonStr = null;
 
         File file = new File(imagePath);
 
+        String ocr = "";
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
+        ocr = OCRtextHandler.getText(context, bitmap);
+
+
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(file);
 
-            metaDataJsonStr =  generateJsonStr(metadata, typeList);
+            metaDataJsonStr =  generateJsonStr(metadata, typeList, ocr);
 
             print(metadata);
         } catch (ImageProcessingException e) {
@@ -265,7 +276,7 @@ public class DeviceStatus {
      * generate json string
      * @param metadata
      */
-    private static String generateJsonStr(Metadata metadata, Boolean[] typeList){
+    private static String generateJsonStr(Metadata metadata, Boolean[] typeList, String ocr){
 
         String metaDataJsonStr = null;
 
@@ -316,7 +327,6 @@ public class DeviceStatus {
             GPSVersionIDStr = gpsDirectory.getString(gpsDirectory.TAG_VERSION_ID);
         }
 
-
         try {
             JSONObject jsonObject = new JSONObject();
             if(typeList[0]){
@@ -342,10 +352,11 @@ public class DeviceStatus {
                 jsonObject.put("Sensing Method", SensingMethodStr);
             }if(typeList[7]){
                 jsonObject.put("Aperture Value", ApertureValueStr);
+            }if(1==1){
+                jsonObject.put("ocr", ocr);
             }if(typeList[8]){
                 jsonObject.put("Color Space", ColorSpaceStr);
             }
-
             if(typeList[9]){
                 jsonObject.put("Exposure Time", ExposureTimeStr);
             }

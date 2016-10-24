@@ -197,7 +197,7 @@ public class checkAndUpload {
         if(f.exists() && !f.isDirectory()) {
             // do something
             Log.i(TAG,collectionID+": file exist");
-            jsonPart2 = DeviceStatus.metaDataJson(filePath,checkTypeList);
+            jsonPart2 = DeviceStatus.metaDataJson(filePath, checkTypeList, context);
         }else {
             Log.i(TAG, "file not exist: " + currentImageId);
             // delete Image from task
@@ -451,6 +451,14 @@ public class checkAndUpload {
                         "          \"labels\": [\n" +
                         "            {\n" +
                         "              \"value\": \"Aperture Value\",\n" +
+                        "              \"lang\": \"en\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
+                        "        },\n" +                        "        {\n" +
+                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
+                        "          \"labels\": [\n" +
+                        "            {\n" +
+                        "              \"value\": \"ocr\",\n" +
                         "              \"lang\": \"en\"\n" +
                         "            }\n" +
                         "          ]\n" +
