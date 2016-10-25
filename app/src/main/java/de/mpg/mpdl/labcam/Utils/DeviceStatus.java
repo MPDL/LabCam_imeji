@@ -31,9 +31,12 @@ import com.drew.metadata.exif.GpsDirectory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -368,9 +371,24 @@ public class DeviceStatus {
         }
         Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
 
+        bitmap.recycle();
+        bitmap = null;
+        scaledBitmap.recycle();
+        scaledBitmap = null;
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 5, out);
+        Bitmap decoded = BitmapFactory.decodeStream(new ByteArrayInputStream(out.toByteArray()));
+
+        rotatedBitmap.recycle();
+        rotatedBitmap = null;
+
         Log.e(LOG_TAG, "ocr started");
-        ocr = OCRtextHandler.getText(context, rotatedBitmap);
+        ocr = OCRtextHandler.getText(context, decoded);
         Log.e(LOG_TAG, "ocr finished");
+
+        decoded.recycle();
+        decoded = null;
 
         try {
             JSONObject jsonObject = new JSONObject();
