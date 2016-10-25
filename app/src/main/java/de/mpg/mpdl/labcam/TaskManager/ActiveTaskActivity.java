@@ -144,7 +144,9 @@ public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskI
 
             /** exception **/
             if(task!=null&& settings!=null){
-                if (task.getUploadMode().equalsIgnoreCase("AU") && !settings.isAutoUpload()) {
+                // auto task, autoUpload switch off
+//                if (task.getUploadMode().equalsIgnoreCase("AU") && !settings.isAutoUpload()) {
+                    if (task.getUploadMode().equalsIgnoreCase("AU") && task.getTotalItems()== 0 ) {
                     auTask = task;
                 }
             }

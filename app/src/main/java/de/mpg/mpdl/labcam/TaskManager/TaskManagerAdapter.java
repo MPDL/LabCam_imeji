@@ -150,12 +150,13 @@ public class TaskManagerAdapter extends BaseAdapter {
             }
         }
 
+        Log.e("<><>", phrase+"");
         printTaskLog(phrase, task);
 
         //collection error
         if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
             if(task.getUploadMode().equalsIgnoreCase("AU")){
-            phrase = AU_FAILED;
+                phrase = AU_FAILED;
             }else {
                 phrase = MU_FAILED;
             }

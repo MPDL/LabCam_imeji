@@ -221,7 +221,13 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         boolean isFinished = true;
 
         if(activeTaskList.size()>0){
-            isFinished = false;
+            for (Task task : activeTaskList) {
+                if(task.getUploadMode().equalsIgnoreCase("AU") && task.getTotalItems() == 0){
+                    isFinished = true;
+                }else {
+                    isFinished = false;
+                }
+            }
         }
 
         if(!isDestroyByCamera && !isFinished) {

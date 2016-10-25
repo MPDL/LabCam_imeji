@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -31,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -39,9 +41,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.TimeZone;
 
 import de.mpg.mpdl.labcam.R;
+
+import static android.R.attr.left;
+import static android.R.attr.top;
 
 /**
  * Created by allen on 09/04/15.
@@ -330,14 +336,14 @@ public class DeviceStatus {
 
         if(exifThumbnailDirectory!=null){
             String orientationStr = exifThumbnailDirectory.getString(exifThumbnailDirectory.TAG_ORIENTATION);
-            if(orientationStr.contains("90")){
-                orientation = 90;
-            }else if(orientationStr.contains("180")){
-                orientation = 180;
-            }else if(orientationStr.contains("270")){
-                orientation = 270;
-            }else {
+            if(orientationStr.contains("1")){
                 orientation = 0;
+            }else if(orientationStr.contains("8")){
+                orientation = 90;
+            }else if(orientationStr.contains("3")){
+                orientation = 180;
+            }else if(orientationStr.contains("6")){
+                orientation = 270;
             }
 
         }
@@ -349,13 +355,22 @@ public class DeviceStatus {
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
 
+
         Matrix matrix = new Matrix();
         matrix.postRotate(orientation);
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getWidth(),bitmap.getHeight(),true);
-        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap .getWidth(), scaledBitmap .getHeight(), matrix, true);
 
+        Bitmap scaledBitmap;
+
+        if(orientation == 90 || orientation == 270){
+            scaledBitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getHeight(),bitmap.getWidth(),true);
+        }else {
+            scaledBitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getWidth(),bitmap.getHeight(),true);
+        }
+        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+
+        Log.e(LOG_TAG, "ocr started");
         ocr = OCRtextHandler.getText(context, rotatedBitmap);
-
+        Log.e(LOG_TAG, "ocr finished");
 
         try {
             JSONObject jsonObject = new JSONObject();
@@ -424,6 +439,31 @@ public class DeviceStatus {
                     System.err.println("ERROR: " + error);
                 }
             }
+        }
+    }
+
+     public static String SaveImage(Bitmap finalBitmap) {
+
+        String root = Environment.getExternalStorageDirectory().toString();
+        File myDir = new File(root + "/saved_images");
+        myDir.mkdirs();
+        Random generator = new Random();
+        int n = 10000;
+        n = generator.nextInt(n);
+        String fname = "Image-"+ n +".jpg";
+        File file = new File (myDir, fname);
+        if (file.exists ()) file.delete ();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+            Log.e(LOG_TAG, "rotatedBitmap saved");
+            return root + "/saved_images" + fname;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
