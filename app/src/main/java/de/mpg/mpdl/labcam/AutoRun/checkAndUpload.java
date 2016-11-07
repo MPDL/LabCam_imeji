@@ -83,9 +83,9 @@ public class checkAndUpload {
     List<StatementTO> collectionProfileStatementTOList;
 
     //compare labCam template profile
-    String[] labCamTemplateProfileLabels = {"Make", "Model", "ISO Speed Ratings","Creation Date", "Geolocation","GPS Version ID", "Sensing Method", "Aperture Value", "Color Space", "Exposure Time"};
-    String[] labCamTemplateProfileTypes ={"text","text","number","date","geolocation","text","text","text","text","text"};
-    Boolean[] checkTypeList = {false,false,false,false,false,false,false,false,false,false};
+    String[] labCamTemplateProfileLabels = {"Make", "Model", "ISO Speed Ratings","Creation Date", "Geolocation","GPS Version ID", "Sensing Method", "Aperture Value", "Color Space", "Exposure Time", "OCR"};
+    String[] labCamTemplateProfileTypes ={"text","text","number","date","geolocation","text","text","text","text","text", "text"};
+    Boolean[] checkTypeList = {false,false,false,false,false,false,false,false,false,false,false};
 
     public checkAndUpload(Context context, String currentTaskId) {
         this.context = context;
@@ -458,7 +458,7 @@ public class checkAndUpload {
                         "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
                         "          \"labels\": [\n" +
                         "            {\n" +
-                        "              \"value\": \"ocr\",\n" +
+                        "              \"value\": \"Color Space\",\n" +
                         "              \"lang\": \"en\"\n" +
                         "            }\n" +
                         "          ]\n" +
@@ -466,7 +466,7 @@ public class checkAndUpload {
                         "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
                         "          \"labels\": [\n" +
                         "            {\n" +
-                        "              \"value\": \"Color Space\",\n" +
+                        "              \"value\": \"Exposure Time\",\n" +
                         "              \"lang\": \"en\"\n" +
                         "            }\n" +
                         "          ]\n" +
@@ -475,7 +475,7 @@ public class checkAndUpload {
                         "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
                         "          \"labels\": [\n" +
                         "            {\n" +
-                        "              \"value\": \"Exposure Time\",\n" +
+                        "              \"value\": \"OCR\",\n" +
                         "              \"lang\": \"en\"\n" +
                         "            }\n" +
                         "          ]\n" +
@@ -524,10 +524,12 @@ public class checkAndUpload {
     Callback<MetadataProfileTO> callback_get_profile = new Callback<MetadataProfileTO>() {
         @Override
         public void success(MetadataProfileTO metadataProfileTO, Response response) {
+            Log.e(TAG,"callback_get_profile: ");
 
-            Log.e(TAG,"collection profileId: "+metadataProfileTO.getTitle());
+            Log.e(TAG,"collection profileId: " + metadataProfileTO.getTitle());
 
             collectionProfileStatementTOList = metadataProfileTO.getStatements();
+
             //TODO: compare with our template
             for( int i = 0; i < labCamTemplateProfileLabels.length; i++)
             {

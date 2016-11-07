@@ -341,54 +341,33 @@ public class DeviceStatus {
             String orientationStr = exifThumbnailDirectory.getString(exifThumbnailDirectory.TAG_ORIENTATION);
             if(orientationStr.contains("1")){
                 orientation = 0;
-            }else if(orientationStr.contains("8")){
+            }else if(orientationStr.contains("6")){
                 orientation = 90;
             }else if(orientationStr.contains("3")){
                 orientation = 180;
-            }else if(orientationStr.contains("6")){
+            }else if(orientationStr.contains("8")){
                 orientation = 270;
             }
 
         }
 
+        Log.e(LOG_TAG, "orientation: " + orientation);
 
 
         String ocr = "";
+
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
-
+        Bitmap bitMapOrig = BitmapFactory.decodeFile(imagePath, options);
 
         Matrix matrix = new Matrix();
         matrix.postRotate(orientation);
-
-        Bitmap scaledBitmap;
-
-        if(orientation == 90 || orientation == 270){
-            scaledBitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getHeight(),bitmap.getWidth(),true);
-        }else {
-            scaledBitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getWidth(),bitmap.getHeight(),true);
-        }
-        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-
-        bitmap.recycle();
-        bitmap = null;
-        scaledBitmap.recycle();
-        scaledBitmap = null;
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 5, out);
-        Bitmap decoded = BitmapFactory.decodeStream(new ByteArrayInputStream(out.toByteArray()));
-
-        rotatedBitmap.recycle();
-        rotatedBitmap = null;
-
-        Log.e(LOG_TAG, "ocr started");
-        ocr = OCRtextHandler.getText(context, decoded);
-        Log.e(LOG_TAG, "ocr finished");
-
-        decoded.recycle();
-        decoded = null;
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bitMapOrig, 0, 0, bitMapOrig.getWidth(), bitMapOrig.getHeight(), matrix, true);
+        if(bitMapOrig != rotatedBitmap)
+            bitMapOrig.recycle();
+        bitMapOrig = null;
+        ocr = OCRtextHandler.getText(context, rotatedBitmap);
+        Log.e(LOG_TAG, "ocr: " + ocr);
 
         try {
             JSONObject jsonObject = new JSONObject();
@@ -415,13 +394,13 @@ public class DeviceStatus {
                 jsonObject.put("Sensing Method", SensingMethodStr);
             }if(typeList[7]){
                 jsonObject.put("Aperture Value", ApertureValueStr);
-            }if(1==1){
-                jsonObject.put("ocr", ocr);
             }if(typeList[8]){
                 jsonObject.put("Color Space", ColorSpaceStr);
             }
             if(typeList[9]){
                 jsonObject.put("Exposure Time", ExposureTimeStr);
+            }if(1 == 1){
+                jsonObject.put("OCR", ocr);
             }
             metaDataJsonStr = jsonObject.toString();
         } catch (JSONException e) {
