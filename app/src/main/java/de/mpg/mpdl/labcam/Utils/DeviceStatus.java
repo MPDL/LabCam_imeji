@@ -61,8 +61,6 @@ public class DeviceStatus {
     public static List<String> uploadingItemPaths = new ArrayList<>();
     public static final String username = "";
     public static final String password = "";
-    public static final String collectionID = "0L5yLxP_AphUMtIi";
-    public static final String queryKeyword = "MPDLCam";
  //   public static final String BASE_URL= "";
     public static final String BASE_URL = "https://gluons.mpdl.mpg.de/imeji/rest/";
 //    public static final String BASE_URL = "http://test-gluons.mpdl.mpg.de/imeji/rest/";
