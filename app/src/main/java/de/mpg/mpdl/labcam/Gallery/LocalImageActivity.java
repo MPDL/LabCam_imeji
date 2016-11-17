@@ -134,7 +134,11 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
             }
         }
 
-        for (int i = 0; i < dataPathList.size(); i++) {
+        int size = 6;
+        if(dataPathList.size()<=6){
+            size = dataPathList.size();
+        }
+        for (int i = 0; i < size; i++) {
             datas.add(dataPathList.get(i));
         }
 
