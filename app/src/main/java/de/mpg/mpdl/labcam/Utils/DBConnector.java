@@ -139,4 +139,23 @@ public class DBConnector {
                 .executeSingle();
     }
 
+    // get active Image list
+    public static List<Image> getActiveImages(String taskId) {
+        return new Select()
+                .from(Image.class)
+                .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
+                .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
+                .orderBy("RANDOM()")
+                .execute();
+    }
+
+    public static List<Image> getInactiveImages(String taskId) {
+        return new Select()
+                .from(Image.class)
+                .where("state != ?", String.valueOf(DeviceStatus.state.WAITING))
+                .where("state != ?", String.valueOf(DeviceStatus.state.STARTED))
+                .orderBy("RANDOM()")
+                .execute();
+    }
+
 }

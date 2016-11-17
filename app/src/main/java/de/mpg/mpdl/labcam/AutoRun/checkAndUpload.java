@@ -37,6 +37,7 @@ import de.mpg.mpdl.labcam.Otto.OttoSingleton;
 import de.mpg.mpdl.labcam.Otto.UploadEvent;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.UiElements.Notification.NotificationID;
 import retrofit.Callback;
@@ -56,6 +57,8 @@ public class checkAndUpload {
 
     List<Image> waitingImages = null;
     List<Image> finishedImages = null;
+    List<Image> startedImages = null;
+
     List<Image> failedImages = null;
 
     //  position in waitingImage list
@@ -84,7 +87,7 @@ public class checkAndUpload {
 
     //compare labCam template profile
     String[] labCamTemplateProfileLabels = {"Make", "Model", "ISO Speed Ratings","Creation Date", "Geolocation","GPS Version ID", "Sensing Method", "Aperture Value", "Color Space", "Exposure Time", "OCR"};
-    String[] labCamTemplateProfileTypes ={"text","text","number","date","geolocation","text","text","text","text","text", "text"};
+    String[] labCamTemplateProfileTypes ={"text", "text", "number", "date", "geolocation", "text", "text", "text", "text", "text", "text"};
     Boolean[] checkTypeList = {false,false,false,false,false,false,false,false,false,false,false};
 
     public checkAndUpload(Context context, String currentTaskId) {
@@ -128,7 +131,6 @@ public class checkAndUpload {
         }
         if(!taskIsStopped()){
 
-            /** WAITING, FINISHED **/
             waitingImages = new Select().from(Image.class)
                     .where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
             failedImages = new Select().from(Image.class)
@@ -137,13 +139,16 @@ public class checkAndUpload {
                     .where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
             task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+//            List<Image> activeImages = DBConnector.getActiveImages(currentTaskId);
+//            List<Image> inactiveImages = DBConnector.getInactiveImages(currentTaskId);
+
 
             // joinList is a list join waiting and failed
             List<Image> joinList = new ArrayList<>();
             joinList.addAll(waitingImages);
             joinList.addAll(failedImages);
 
-            // task not exist
+//            // task not exist
             if(finishedImages==null||task==null) {
                 return;
             }
@@ -243,6 +248,7 @@ public class checkAndUpload {
         int totalNum = 0;
         task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
 
+        Log.i(TAG, "get task");
         if(task==null){
             return;
         }
@@ -257,6 +263,8 @@ public class checkAndUpload {
         if(finishedImages==null) {
             return;
         }
+
+        Log.i(TAG, "get finishedImages: " + finishedImages.size());
 
         task.setTotalItems(totalNum);
         task.setFinishedItems(finishedImages.size());
@@ -275,6 +283,7 @@ public class checkAndUpload {
         int finishedNum = task.getFinishedItems();
 //        totalNum = task.getTotalItems();
         if(totalNum>finishedNum){
+            Log.i(TAG, "totalNum: " + totalNum + "finishedNum: "+ finishedNum);
             // continue anyway
             Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId)
                     .where("state != ?",String.valueOf(DeviceStatus.state.STARTED))
@@ -688,7 +697,9 @@ public class checkAndUpload {
             int finishedNum = task.getFinishedItems();
             int totalNum = task.getTotalItems();
             if(totalNum>finishedNum){
-                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state != ?",String.valueOf(DeviceStatus.state.FINISHED)).where("state != ?",String.valueOf(DeviceStatus.state.STARTED)).orderBy("createTime ASC").executeSingle();
+                Image image = new Select().from(Image.class).where("taskId = ?", currentTaskId)
+                        .where("state != ?",String.valueOf(DeviceStatus.state.FINISHED))
+                        .where("state != ?",String.valueOf(DeviceStatus.state.STARTED)).orderBy("createTime ASC").executeSingle();
                 if(image!=null){
                     Log.v(TAG, "find image : path = " + image.getImagePath() + "| State = " + image.getState());
 
@@ -734,9 +745,6 @@ public class checkAndUpload {
         @Override
         public void failure(final RetrofitError error) {
 
-            if (taskIsStopped()) {
-                return;
-            }
             final Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
 
             if(currentImage!=null){
@@ -789,29 +797,29 @@ public class checkAndUpload {
                         String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                         if (jsonBody.contains("already exists")) {
                             // set currentImage state finished, print log
-                            try{
-                                currentImage.setLog(error.getKind().name() + " already exists");
-                                currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                                currentImage.save();
-                                Log.e(TAG, currentImage.getImageName() + "  already exists");
-                            }catch (Exception e){}
-                        }else {
-                            // case: collectionId not exist, Task failed
-                            try {
-                                currentImage.setLog(error.getKind().name() + " collectionId not exist, no such folder");
-                                task.setEndDate(DeviceStatus.dateNow());
-                                task.setState(String.valueOf(DeviceStatus.state.FAILED));
-                                task.save();
-                                Log.e(TAG, currentImage.getImageName() + " collectionId not exist, no such folder");
-                                Handler handler=new Handler(Looper.getMainLooper());
-                                handler.post(new Runnable() {
-                                    public void run() {
-                                        Toast.makeText(context, "remote collectionId not exist, no such folder", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                return;
-                            }catch (Exception e){}
+                            currentImage.setLog(error.getKind().name() + " already exists");
+                            currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                            currentImage.save();
+                            Log.e(TAG, currentImage.getImageName() + "  already exists");
+                            Log.e(TAG, currentImage.getState());
                         }
+//                        else {
+//                            // case: collectionId not exist, Task failed
+//                            try {
+//                                currentImage.setLog(error.getKind().name() + " collectionId not exist, no such folder");
+//                                task.setEndDate(DeviceStatus.dateNow());
+//                                task.setState(String.valueOf(DeviceStatus.state.FAILED));
+//                                task.save();
+//                                Log.e(TAG, currentImage.getImageName() + " collectionId not exist, no such folder");
+//                                Handler handler=new Handler(Looper.getMainLooper());
+//                                handler.post(new Runnable() {
+//                                    public void run() {
+//                                        Toast.makeText(context, "remote collectionId not exist, no such folder", Toast.LENGTH_SHORT).show();
+//                                    }
+//                                });
+//                                return;
+//                            }catch (Exception e){}
+//                        }
                         break;
                     case 404:
                         String jsonBody_404 = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
@@ -848,8 +856,19 @@ public class checkAndUpload {
             currentImage.save();
             Log.v(TAG, String.valueOf(error));
 
-            //TODO: continue upload
+            // continue upload
             uploadNext();
+
+            // for testing
+            List<Image> show_all  = new Select().from(Image.class)
+                    .where("taskId = ?", currentTaskId).orderBy("RANDOM()").execute();
+            for (Image image:show_all
+                 ) {
+                Log.i(TAG, image.getState());
+                Log.i(TAG,  image.getImageName()
+                );
+            }
+
         }
     };
 

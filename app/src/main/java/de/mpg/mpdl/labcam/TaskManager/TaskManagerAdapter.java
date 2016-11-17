@@ -150,8 +150,8 @@ public class TaskManagerAdapter extends BaseAdapter {
             }
         }
 
-        Log.e("<><>", phrase+"");
-        printTaskLog(phrase, task);
+//        Log.e("<><>", phrase+"");
+//        printTaskLog(phrase, task);
 
         //collection error
         if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
@@ -352,7 +352,7 @@ public class TaskManagerAdapter extends BaseAdapter {
             public void onClick(View view) {
                 String currentTaskId = task.getTaskId();
                 if (!isPausedCheckBox.isChecked()) {
-                    // pause clicked
+                    //  button clicked
                     try {
                         Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
                         currentTask.setState(String.valueOf(DeviceStatus.state.WAITING));
@@ -382,7 +382,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                     }
 
                 } else if (isPausedCheckBox.isChecked()) {
-                    // pause button
+                    //  button clicked
                     try {
                         Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
                         currentTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
