@@ -243,101 +243,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 super.handleMessage(msg);
 
                 if(msg.what==1234){
-
-                    List<Task> activeTasks = DBConnector.getActiveTasks(userId, serverName);
-                    List<Task> waitingTasks = DBConnector.getUserWaitingTasks(userId, serverName);
-                    List<Task> stoppedTasks = DBConnector.getUserStoppedTasks(userId, serverName);
-                    Task mostRecentTask = DBConnector.getLatestFinishedTask(userId, serverName);
-
-                    int num_activate = 0;
-
-//                    num_activate = stoppedTasks.size() + waitingTasks.size();
-                    num_activate = activeTasks.size();
-
-                    if(num_activate > 0){
-                        // remove always waiting auTask
-                        Task auTask = DBConnector.getAuTask(userId,serverName);
-                        if(auTask!=null && String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState()) &&  auTask.getTotalItems()==auTask.getFinishedItems())
-                            num_activate --;
-                    }
-                    if(num_activate == 0)
-                    {
-                        if(mostRecentTask!=null && !DeviceStatus.twoDateWithinSecounds(DeviceStatus.longToDate(mostRecentTask.getEndDate()), DeviceStatus.longToDate(DeviceStatus.dateNow()))){
-                            activeTaskLayout.setVisibility(View.GONE);
-                            return;
-                        }
-                        //execute the task
-                        numActiveTextView.setText("0");
-
-                        percentTextView.setText(100+"%");
-                        mCircleProgressBar.setProgress(100);
-
-                        new Handler().postDelayed(new Runnable() {
-
-                            public void run() {
-                                Log.e(LOG_TAG, "no task  is null");
-                                activeTaskLayout.setVisibility(View.GONE);
-                                return;
-
-                            }
-
-                        }, 1000);
-                    }
-
-                    for(Task task:waitingTasks){
-                        Log.e(LOG_TAG,"waitingTasks~~~~~~~");
-                        Log.e(LOG_TAG,"mode:"+task.getUploadMode());
-                        Log.e(LOG_TAG,"state:"+task.getState());
-                        Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
-                        Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
-                    }
-                    for(Task task:stoppedTasks){
-                        Log.e(LOG_TAG,"stoppedTasks~~~~~~~");
-                        Log.e(LOG_TAG,"mode:"+task.getUploadMode());
-                        Log.e(LOG_TAG,"state:"+task.getState());
-                        Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
-                        Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
-                    }
-
-
-                    if(waitingTasks.size()>0){
-                        activeTaskLayout.setVisibility(View.VISIBLE);
-                        Task task = waitingTasks.get(0);
-
-                        //
-                        if(task.getTotalItems()==0){
-                            return;
-                        }
-//                        String titleTaskInfo = task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName();
-
-
-                        if(task.getUploadMode().equalsIgnoreCase("AU")){
-                            // AU
-                            titleTaskTextView.setText("Automatic upload to " + task.getCollectionName());
-                        }else {
-                            titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
-                        }
-
-                        numActiveTextView.setText(num_activate+"");
-
-                        int percent = (task.getFinishedItems()*100)/task.getTotalItems();
-                        percentTextView.setText(percent+"%");
-                        mCircleProgressBar.setProgress(percent);
-                    }else if(stoppedTasks.size()>0){
-                        activeTaskLayout.setVisibility(View.VISIBLE);
-                        Task task = stoppedTasks.get(0);
-
-                        //
-                        if(task.getTotalItems()==0){
-                            return;
-                        }
-                        titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
-                        numActiveTextView.setText(num_activate+"");
-
-                        int percent = (task.getFinishedItems()*100)/task.getTotalItems();
-                        percentTextView.setText(percent+"%");
-                        mCircleProgressBar.setProgress(percent);
-                    }
+                    renderStatusBar();
                 }
 
             }
@@ -350,6 +256,106 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         return rootView;
 
+    }
+
+    private void renderStatusBar(){
+        {
+
+            List<Task> activeTasks = DBConnector.getActiveTasks(userId, serverName);
+            List<Task> waitingTasks = DBConnector.getUserWaitingTasks(userId, serverName);
+            List<Task> stoppedTasks = DBConnector.getUserStoppedTasks(userId, serverName);
+            Task mostRecentTask = DBConnector.getLatestFinishedTask(userId, serverName);
+
+            int num_activate = 0;
+
+//                    num_activate = stoppedTasks.size() + waitingTasks.size();
+            num_activate = activeTasks.size();
+
+            if(num_activate > 0){
+                // remove always waiting auTask
+                Task auTask = DBConnector.getAuTask(userId,serverName);
+                if(auTask!=null && String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState()) &&  auTask.getTotalItems()==auTask.getFinishedItems())
+                    num_activate --;
+            }
+            if(num_activate == 0)
+            {
+                if(mostRecentTask!=null && !DeviceStatus.twoDateWithinSecounds(DeviceStatus.longToDate(mostRecentTask.getEndDate()), DeviceStatus.longToDate(DeviceStatus.dateNow()))){
+                    activeTaskLayout.setVisibility(View.GONE);
+                    return;
+                }
+                //execute the task
+                numActiveTextView.setText("0");
+
+                percentTextView.setText(100+"%");
+                mCircleProgressBar.setProgress(100);
+
+                new Handler().postDelayed(new Runnable() {
+
+                    public void run() {
+                        Log.e(LOG_TAG, "no task  is null");
+                        activeTaskLayout.setVisibility(View.GONE);
+                        return;
+
+                    }
+
+                }, 1000);
+            }
+
+            for(Task task:waitingTasks){
+                Log.e(LOG_TAG,"waitingTasks~~~~~~~");
+                Log.e(LOG_TAG,"mode:"+task.getUploadMode());
+                Log.e(LOG_TAG,"state:"+task.getState());
+                Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
+                Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
+            }
+            for(Task task:stoppedTasks){
+                Log.e(LOG_TAG,"stoppedTasks~~~~~~~");
+                Log.e(LOG_TAG,"mode:"+task.getUploadMode());
+                Log.e(LOG_TAG,"state:"+task.getState());
+                Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
+                Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
+            }
+
+
+            if(waitingTasks.size()>0){
+                activeTaskLayout.setVisibility(View.VISIBLE);
+                Task task = waitingTasks.get(0);
+
+                //
+                if(task.getTotalItems()==0){
+                    return;
+                }
+//                        String titleTaskInfo = task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName();
+
+
+                if(task.getUploadMode().equalsIgnoreCase("AU")){
+                    // AU
+                    titleTaskTextView.setText("Automatic upload to " + task.getCollectionName());
+                }else {
+                    titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
+                }
+
+                numActiveTextView.setText(num_activate+"");
+
+                int percent = (task.getFinishedItems()*100)/task.getTotalItems();
+                percentTextView.setText(percent+"%");
+                mCircleProgressBar.setProgress(percent);
+            }else if(stoppedTasks.size()>0){
+                activeTaskLayout.setVisibility(View.VISIBLE);
+                Task task = stoppedTasks.get(0);
+
+                //
+                if(task.getTotalItems()==0){
+                    return;
+                }
+                titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
+                numActiveTextView.setText(num_activate+"");
+
+                int percent = (task.getFinishedItems()*100)/task.getTotalItems();
+                percentTextView.setText(percent+"%");
+                mCircleProgressBar.setProgress(percent);
+            }
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -829,6 +835,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             albumRecyclerView.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         }
+        renderStatusBar();
         super.onResume();
 
     }
