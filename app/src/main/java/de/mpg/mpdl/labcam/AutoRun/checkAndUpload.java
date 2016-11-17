@@ -803,23 +803,6 @@ public class checkAndUpload {
                             Log.e(TAG, currentImage.getImageName() + "  already exists");
                             Log.e(TAG, currentImage.getState());
                         }
-//                        else {
-//                            // case: collectionId not exist, Task failed
-//                            try {
-//                                currentImage.setLog(error.getKind().name() + " collectionId not exist, no such folder");
-//                                task.setEndDate(DeviceStatus.dateNow());
-//                                task.setState(String.valueOf(DeviceStatus.state.FAILED));
-//                                task.save();
-//                                Log.e(TAG, currentImage.getImageName() + " collectionId not exist, no such folder");
-//                                Handler handler=new Handler(Looper.getMainLooper());
-//                                handler.post(new Runnable() {
-//                                    public void run() {
-//                                        Toast.makeText(context, "remote collectionId not exist, no such folder", Toast.LENGTH_SHORT).show();
-//                                    }
-//                                });
-//                                return;
-//                            }catch (Exception e){}
-//                        }
                         break;
                     case 404:
                         String jsonBody_404 = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());

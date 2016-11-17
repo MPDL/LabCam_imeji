@@ -78,13 +78,13 @@ public interface ImejiAPI {
      *  For collections
     */
     //get all collections
-    @GET(value = "/collections?size=30")
+    @GET(value = "/collections?size=10000")
     void getCollections(Callback<CollectionMessage> callback);
 
-    @GET(value = "/collections?size=30")
+    @GET(value = "/collections?size=10000")
     void getCollectionMessage(Callback<JsonObject> callback);
 
-    @GET(value = "/collections?size=30")
+    @GET(value = "/collections?size=10000")
     void getGrantedCollectionMessage(@Query("q") String q, Callback<CollectionMessage> callback);
 
     //get all items by collection id
