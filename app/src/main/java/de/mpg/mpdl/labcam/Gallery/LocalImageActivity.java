@@ -65,6 +65,7 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
     private SharedPreferences mPrefs;
     private String username;
     private String userId;
+    private String serverURL;
 
     private View headerView;
     private View footerView;
@@ -101,6 +102,7 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         userId = mPrefs.getString("userId","");
+        serverURL = mPrefs.getString("server", "");
 
         //Kiran's title
         Intent intent = activity.getIntent();
@@ -132,7 +134,7 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
             }
         }
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < dataPathList.size(); i++) {
             datas.add(dataPathList.get(i));
         }
 
@@ -306,6 +308,7 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
         task.setTaskId(uniqueID);
         task.setUploadMode("MU");
         task.setState(String.valueOf(DeviceStatus.state.WAITING));
+        task.setSeverName(serverURL);
         task.setUserName(username);
         task.setUserId(userId);
         task.setStartDate(String.valueOf(now));
