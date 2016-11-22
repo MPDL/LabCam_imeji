@@ -2,7 +2,6 @@ package de.mpg.mpdl.labcam.Settings;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,10 +23,6 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,6 +39,8 @@ import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.Utils.QRUtils;
+
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -67,10 +64,9 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     private Toolbar toolbar;
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
 
-    private String collectionID = "";
+    private String collectionId = "";
     private String collectionName;
 
-    private Context context =this;
     private int selectedItem;
     private CollectionIdInterface ie = this;
 
@@ -100,9 +96,9 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                 // first delete AutoTask
                 new Delete().from(Task.class).where("uploadMode = ?", "AU").execute();
                 // create dialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                 // Set up the input
-                final EditText input = new EditText(context);
+                final EditText input = new EditText(activity);
                 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
                 builder.setView(input);
@@ -141,7 +137,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                     Log.v(LOG_TAG, "collection id: " + String.valueOf(folder.id));
 
                     //check if origin AU collection still exist
-                    if(folder.getImejiId() == collectionID){
+                    if(folder.getImejiId() == collectionId){
                         isNone = false;
                     }
 
@@ -169,19 +165,10 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             Log.v(LOG_TAG, error.toString());
             DeviceStatus.showSnackbar(rootView, "update data failed");
 
-            try {
-                collectionListLocal.clear();
-                collectionListLocal = new Select().from(ImejiFolder.class).execute();
-                Log.v(LOG_TAG,collectionListLocal.size()+"");
+            collectionListLocal.clear();
+            collectionListLocal = new Select().from(ImejiFolder.class).execute();
+            Log.v(LOG_TAG,collectionListLocal.size()+"");
 
-            }catch (Exception e){
-                Log.v(LOG_TAG,e.getMessage());
-            }
-//            Log.v(LOG_TAG,collectionListLocal.get(0).getTitle());
-//            Log.v(LOG_TAG, collectionListLocal.get(0).getModifiedDate());
-
-
-//
             adapter = new SettingsListAdapter(activity, collectionListLocal,ie);
             listView.setAdapter(adapter);
         }
@@ -358,69 +345,28 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         }
     }
 
+//    apiKey  LOG_TAG activity userId serverUrl collectionID
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == INTENT_QR) {
 
             if (resultCode == Activity.RESULT_OK) {
-                Bundle bundle = data.getExtras();
-                String QRText = bundle.getString("QRText");
-                Log.v(LOG_TAG, QRText);
-                String APIkey = "";
-                String url = "";
-                try {
-                    JSONObject jsonObject = new JSONObject(QRText);
-                    APIkey = jsonObject.getString("key");
-                    if(!apiKey.equals(APIkey)){
-                        Toast.makeText(activity,"this folder doesn't look like yours",Toast.LENGTH_LONG).show();
-                        return;
-                    }
-                    Log.v("APIkey",APIkey);
-                    url = jsonObject.getString("col");
-                    Log.v("col",url);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
-                    return;
+                String qrCollectionId = QRUtils.processQRCode(data, activity, LOG_TAG, apiKey).getQrCollectionId();
+                /** set choose **/
+                //create task if collection is selected
+                if (qrCollectionId != null && !qrCollectionId.equals("")) {
+                    Log.i("~qrCollectionId", qrCollectionId);
+
+                    DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
+                    collectionId = qrCollectionId;
+                    /**create Task**/
+                    createTask(qrCollectionId);
+
+                } else {
+                    Toast.makeText(activity, "collection setting not changed", Toast.LENGTH_LONG).show();
                 }
-
-
-                try {
-
-                    URL u = new URL(url);
-
-                    String path = u.getPath();
-                    String qrCollectionId = "";
-                    if (path != null) {
-                        try {
-                            qrCollectionId = path.substring(path.lastIndexOf("/") + 1);
-                            Log.i(LOG_TAG,qrCollectionId);
-                        }catch (Exception e){
-                            Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
-                            return;
-                        }
-
-                        /** set choose **/
-                        //create task if collection is selected
-                        if (!qrCollectionId.equals("") && !qrCollectionId.equals(null)) {
-                            Log.i("~qrCollectionId", qrCollectionId);
-
-                            DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
-                            collectionID = qrCollectionId;
-                            /**create Task**/
-                            createTask(qrCollectionId);
-
-                        } else {
-                            Toast.makeText(context, "collection setting not changed", Toast.LENGTH_LONG).show();
-                        }
-
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // User cancelled the photo picking
             }
@@ -429,7 +375,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
     @Override
     public void setCollectionId(int Id,boolean isSet) {
-        collectionID = collectionListLocal.get(Id).getImejiId();
+        collectionId = collectionListLocal.get(Id).getImejiId();
         collectionName = collectionListLocal.get(Id).getTitle();
 
         // collection not changed
@@ -437,13 +383,13 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             return;
         }
 
-        if (!collectionID.equals(null) && !("").equals(collectionID)) {
-            Log.i("~collectionID", collectionID);
+        if (!collectionId.equals(null) && !("").equals(collectionId)) {
+            Log.i("~collectionID", collectionId);
 
             DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
 
             /**create Task**/
-            createTask(collectionID);
+            createTask(collectionId);
 
         }
     }
@@ -452,11 +398,11 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     //checkbox dialog
     private void dialog(String oldCollectionName){
 
-        getCollectionNameById(collectionID);
+        getCollectionNameById(collectionId);
         final String[] arrayCollection = new String[] { oldCollectionName, collectionName };
 
         final AlertDialog alertDialog =
-                new AlertDialog.Builder(context)
+                new AlertDialog.Builder(activity)
                         .setTitle("There are some photos waiting for uploading. Upload them to ")
                         .setSingleChoiceItems(arrayCollection, 0, new DialogInterface.OnClickListener() {
                             @Override
@@ -537,14 +483,14 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     }
 
                                     //create new task
-                                    Log.v("collectionID", collectionID);
+                                    Log.v("collectionID", collectionId);
                                     task = new Task();
                                     task.setTotalItems(remainImages.size());
                                     task.setFinishedItems(0);
 
                                     task.setTaskId(uniqueID);
                                     task.setUploadMode("AU");
-                                    task.setCollectionId(collectionID);
+                                    task.setCollectionId(collectionId);
                                     task.setState(String.valueOf(DeviceStatus.state.WAITING));
                                     task.setUserName(username);
                                     task.setUserId(userId);
@@ -560,10 +506,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     Intent uploadIntent = new Intent(activity, TaskUploadService.class);
 
                                     activity.startService(uploadIntent);
-
-
-
-
 
                                     List<Image> fsfasdfasf = new Select().from(Image.class)
                                             .where("taskId = ?", latestTask.getTaskId())

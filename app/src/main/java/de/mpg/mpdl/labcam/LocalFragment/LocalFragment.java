@@ -514,7 +514,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
 //        imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
         adapter = new AlbumRecyclerAdapter(getActivity(), imagePathListAllAlbums );
-
+        for (List<String[]> imagePathListAllAlbum : imagePathListAllAlbums) {
+            Log.i(LOG_TAG, "gallery size:"+ imagePathListAllAlbum.size());
+        }
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -574,10 +576,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 // existing code, need to rewrite gallery view
                 Gallery album = new Gallery();
                 album.setGalleryName(cur.getString(albumLocation));
+
                 String currentAlbum = cur.getString(albumLocation);
                 if(!albumNames.contains(currentAlbum)) {
                     // new album
-                    folders.add(album); // adapter rewrite later
+                    folders.add(album);
                     albumNames.add(currentAlbum);
 
                     List<String[]> imagePathListForCurrentAlbum = new ArrayList<>();
@@ -593,10 +596,20 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     for (List<String[]> albumList :imagePathListAllAlbums){
                         // if exist, get first imageStrArray, compare
                         if(albumList.get(0)[0].equalsIgnoreCase(currentAlbum)){
-                            String[] imageStrArray = new String[2];
-                            imageStrArray[0] = currentAlbum;
-                            imageStrArray[1] = cur.getString(nameColumn);
-                            albumList.add(imageStrArray);
+                            boolean isDuplicate = false;
+                            for (String[] strings : albumList) {
+                                if (strings[1] == cur.getString(nameColumn)){
+                                    isDuplicate = true;
+                                    break;
+                                }
+                            }
+
+                            if(!isDuplicate) {
+                                String[] imageStrArray = new String[2];
+                                imageStrArray[0] = currentAlbum;
+                                imageStrArray[1] = cur.getString(nameColumn);
+                                albumList.add(imageStrArray);
+                            }
                         }
                     }
                 }
@@ -605,6 +618,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         //try close cursor here
         cur.close();
+
+        imagePathListAllAlbums.size();
+
     }
 
     //load timeLinePicture

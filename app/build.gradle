@@ -9,6 +9,7 @@ buildscript {
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'android-apt'
 
 android {
     signingConfigs {
@@ -77,6 +78,8 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.6.1@aar') {
         transitive = true;
     }
+    compile 'com.jakewharton:butterknife:8.4.0'
+    apt 'com.jakewharton:butterknife-compiler:8.4.0'
     compile files('libs/metadata-extractor-2.9.1.jar')
     compile files('libs/xmpcore-5.1.2.jar')
 }

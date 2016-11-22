@@ -174,10 +174,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         serverUrl = mPrefs.getString("server","");
 //        serverUrl = DeviceStatus.parseServerUrl(serverUrl);
 
-        try{
-            Bundle args = this.getIntent().getExtras();
-            isQRLogin = args.getBoolean("isQRLogin", false);}   // get isQRLogin from extra
-        catch (Exception e){}
+        Bundle args = this.getIntent().getExtras();         // get isQRLogin from extra
+        try {
+            isQRLogin = args.getBoolean("isQRLogin", false);
+        } catch(NullPointerException e) {
+            e.printStackTrace();
+        }
 
         getLocalCamFolder();
         // register NetStateObserver

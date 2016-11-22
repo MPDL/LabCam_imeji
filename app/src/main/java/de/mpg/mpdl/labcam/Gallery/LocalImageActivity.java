@@ -146,24 +146,12 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
         localAlbumAdapter = new LocalAlbumAdapter(activity, datas);
 
         recyclerView = (AnimRFRecyclerView) findViewById(R.id.album_detail_recycle_view);
-        // 使用重写后的格子布局管理器
         recyclerView.setLayoutManager(new AnimRFGridLayoutManager(activity, 2));
-        // 设置分割线
         recyclerView.addItemDecoration(new DividerGridItemDecoration(activity, true));
-//        // 添加头部和脚部，如果不添加就使用默认的头部和脚部
-//        recyclerView.addHeaderView(headerView);
-//        // 设置头部的最大拉伸倍率，默认1.5f，必须写在setHeaderImage()之前
-//        recyclerView.setScaleRatio(1.7f);
-//        // 设置下拉时拉伸的图片，不设置就使用默认的
-//        recyclerView.setHeaderImage((ImageView) headerView.findViewById(R.id.iv_hander));
         recyclerView.addFootView(footerView);
-        // 设置刷新动画的颜色
         recyclerView.setColor(Color.BLUE, Color.GREEN);
-        // 设置头部恢复动画的执行时间，默认500毫秒
         recyclerView.setHeaderImageDurationMillis(300);
-        // 设置拉伸到最高时头部的透明度，默认0.5f
         recyclerView.setHeaderImageMinAlpha(0.6f);
-        // 设置刷新和加载更多数据的监听，分别在onRefresh()和onLoadMore()方法中执行刷新和加载更多操作
         recyclerView.setLoadDataListener(new AnimRFRecyclerView.LoadDataListener() {
             @Override
             public void onRefresh() {
@@ -186,12 +174,9 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
             @Override
             public void onItemClick(View view, int position) {
                 if (actionMode != null) {
-                    // 如果当前处于多选状态，则进入多选状态的逻辑
-                    // 维护当前已选的position
                     addOrRemove(position);
                     localAlbumAdapter.setPositionSet(positionSet);
                 } else {
-                    // 如果不是多选状态，则进入点击事件的业务逻辑
                     //  show picture
                     boolean isLocalImage = true;
                     Intent showDetailIntent = new Intent(activity, DetailActivity.class);
@@ -240,13 +225,10 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
                     positionSet.add(i);
                 }
                 if (positionSet.size() == 0) {
-                    // 如果没有选中任何的item，则退出多选模式
                     Log.e(LOG_TAG, "addOrRemove() is called");
                     actionMode.finish();
                 } else {
-                    // 设置ActionMode标题
                     actionMode.setTitle(positionSet.size() + " selected photos");
-                    // 更新列表界面，否则无法显示已选的item
                 }
                 localAlbumAdapter.setPositionSet(positionSet);
             }
@@ -258,20 +240,15 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
     /** add or remove image in upload task **/
     private void addOrRemove(int position) {
         if (positionSet.contains(position)) {
-            // 如果包含，则撤销选择
             positionSet.remove(position);
         } else {
-            // 如果不包含，则添加
             positionSet.add(position);
         }
         if (positionSet.size() == 0) {
-            // 如果没有选中任何的item，则退出多选模式
             Log.e(LOG_TAG, "addOrRemove() is called");
             actionMode.finish();
         } else {
-            // 设置ActionMode标题
             actionMode.setTitle(positionSet.size() + " selected photos");
-            // 更新列表界面，否则无法显示已选的item
         }
     }
 
@@ -357,26 +334,20 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
             //state
             String imageState = String.valueOf(DeviceStatus.state.WAITING);
 
-            try {
-
-                String imageId = UUID.randomUUID().toString();
-                //store image in local database
-                Image photo = new Image();
-                photo.setImageId(imageId);
-                photo.setImageName(imageName);
-                photo.setImagePath(filePath);
-                photo.setLongitude(longitude);
-                photo.setLatitude(latitude);
-                photo.setCreateTime(createTime);
-                photo.setSize(fileSize);
-                photo.setState(imageState);
-                photo.setTaskId(taskId);
-                photo.save();
-                imageNum = imageNum + 1;
-
-            } catch (Exception e) {
-            }
-
+            String imageId = UUID.randomUUID().toString();
+            //store image in local database
+            Image photo = new Image();
+            photo.setImageId(imageId);
+            photo.setImageName(imageName);
+            photo.setImagePath(filePath);
+            photo.setLongitude(longitude);
+            photo.setLatitude(latitude);
+            photo.setCreateTime(createTime);
+            photo.setSize(fileSize);
+            photo.setState(imageState);
+            photo.setTaskId(taskId);
+            photo.save();
+            imageNum = imageNum + 1;
         }
         return imageNum;
     }

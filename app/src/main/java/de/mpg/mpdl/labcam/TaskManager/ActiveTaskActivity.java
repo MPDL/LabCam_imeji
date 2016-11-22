@@ -180,13 +180,14 @@ public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskI
     }
 
     @Override
-    public void remove(int postion) {
-        try{
-            taskList.remove(postion);
+    public void remove(int position) {
+        try {
+            taskList.remove(position);
             taskManagerAdapter.notifyDataSetChanged();
-        } catch (Exception e){
-            //press too fast
+        }catch (IndexOutOfBoundsException e){
+            e.printStackTrace();
         }
+
     }
 
     @Override

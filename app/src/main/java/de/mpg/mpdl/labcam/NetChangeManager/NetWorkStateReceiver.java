@@ -45,29 +45,25 @@ public class NetWorkStateReceiver extends BroadcastReceiver {
         if(ni!=null && ni.getState()== NetworkInfo.State.CONNECTED) {
             networkAvailable = true;
             notifyObserver();
-            try {
 
-                Task autoTask = new Select().from(Task.class).where("uploadMode = ?", "AU").executeSingle();
+            Task autoTask = new Select().from(Task.class).where("uploadMode = ?", "AU").executeSingle();
 
-                List<Task> ManualTaskList = new Select().from(Task.class).where("uploadMode = ?", "MU").execute();
-                //activate upload services
-                if (autoTask.getUploadMode().equalsIgnoreCase("AU")) {
-                    // start AU TaskUploadService
-                    Intent uploadIntent = new Intent(context, TaskUploadService.class);
-                    Log.e(TAG,"reStart AU after reconnect to internet");
-                    context.startService(uploadIntent);
-                }
+            List<Task> ManualTaskList = new Select().from(Task.class).where("uploadMode = ?", "MU").execute();
+            //activate upload services
+            if (autoTask.getUploadMode().equalsIgnoreCase("AU")) {
+                // start AU TaskUploadService
+                Intent uploadIntent = new Intent(context, TaskUploadService.class);
+                Log.e(TAG,"reStart AU after reconnect to internet");
+                context.startService(uploadIntent);
+            }
 
-                for (Task task : ManualTaskList) {
-                    // start
-                    String currentTaskId = task.getTaskId();
-                    Intent manualUploadServiceIntent = new Intent(context, ManualUploadService.class);
-                    Log.v(TAG,"currentTaskId: "+currentTaskId);
-                    manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
-                    context.startService(manualUploadServiceIntent);
-                }
-            }catch (Exception e){
-                Log.v(TAG,"Exception in activate upload services");
+            for (Task task : ManualTaskList) {
+                // start
+                String currentTaskId = task.getTaskId();
+                Intent manualUploadServiceIntent = new Intent(context, ManualUploadService.class);
+                Log.v(TAG,"currentTaskId: "+currentTaskId);
+                manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
+                context.startService(manualUploadServiceIntent);
             }
 
             Log.i(TAG, "Network " + ni.getTypeName() + " connected");

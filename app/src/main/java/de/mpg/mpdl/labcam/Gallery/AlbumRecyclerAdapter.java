@@ -49,14 +49,6 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
 
     // all albums
     private ArrayList<List<String[]>> galleryList;
-    private LayoutInflater inflater;
-    private ArrayList<Gallery> galleries = new ArrayList<Gallery>();
-    private String localPath;
-    private ArrayList<String> galleriesOne = new ArrayList<>();
-    private String CollectionId;
-    // flag for what?
-    boolean flag = false;
-    static int album_pic_position;
     static ArrayList<String> itemPathList = new ArrayList<String>();
     Point size;
 

@@ -73,7 +73,6 @@ public class RecentTaskAdapter extends BaseAdapter {
 
         long endDate = taskList.get(i).getEndDate();
 
-        Log.e("WTF",endDate+"" );
         String dateAgo = DeviceStatus.twoDateDistance(DeviceStatus.longToDate(endDate), DeviceStatus.longToDate(DeviceStatus.dateNow()));
 
         taskTime.setText(dateAgo);

@@ -29,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -48,6 +49,10 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ImageFileFilter;
+import de.mpg.mpdl.labcam.Utils.QRUtils;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.fabric.sdk.android.Fabric;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -56,13 +61,17 @@ import retrofit.client.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText usernameView, passwordView, serverURLView;
-    private TextView gluonsLabel, othersLabel;
-    private TextView newHereView;
-    private Button signIn;
-    private Button scan;
+    @BindView(R.id.userName) EditText usernameView;
+    @BindView(R.id.password) EditText passwordView;
+    @BindView(R.id.serverURL) EditText serverURLView;
+
+    @BindView(R.id.label_gluons) TextView gluonsLabel;
+    @BindView(R.id.label_other) TextView othersLabel;
+
+    @BindView(R.id.tv_new_here)  TextView newHereView;
+    @BindView(R.id.btnSignIn)  Button signIn;
+    @BindView(R.id.qr_scanner)  Button scan;
     private Activity activity = this;
-    private ImageView animation;
 
     private String username;
     private String password;
@@ -85,7 +94,8 @@ public class LoginActivity extends AppCompatActivity {
 
         // check login states
         if(Key.equalsIgnoreCase("")){
-        setContentView(R.layout.layout_login);
+            setContentView(R.layout.layout_login);
+            ButterKnife.bind(this);
         }else {
             //login
             serverURL = mPrefs.getString("server", "");
@@ -96,16 +106,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // UI elements
-        gluonsLabel = (TextView) findViewById(R.id.label_gluons);
-        othersLabel = (TextView) findViewById(R.id.label_other);
-
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
-
-        serverURLView = (EditText) findViewById(R.id.serverURL);
-        usernameView = (EditText) findViewById(R.id.userName);
-        passwordView = (EditText) findViewById(R.id.password);
-        newHereView = (TextView) findViewById(R.id.tv_new_here);
 
         // use soft keyboard enter to login
         passwordView.setImeOptions(EditorInfo.IME_ACTION_SEND);
@@ -122,10 +123,6 @@ public class LoginActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-        signIn = (Button) findViewById(R.id.btnSignIn);
-        scan = (Button) findViewById(R.id.qr_scanner);
-        //error = (TextView) findViewById(R.id.tv_error);
 
         // gluons server is choosen
         gluonsLabel.setOnClickListener(new View.OnClickListener() {
@@ -269,46 +266,16 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    //    apiKey  LOG_TAG activity userId serverUrl collectionId
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == INTENT_QR) {
 
             if (resultCode == Activity.RESULT_OK) {
-                Bundle bundle = data.getExtras();
-                String QRText = bundle.getString("QRText");
-                Log.v(LOG_TAG, QRText);
-                String APIkey = "";
-                String url = "";
-                try {
-                    JSONObject jsonObject = new JSONObject(QRText);
-                    APIkey = jsonObject.getString("key");
-                    Log.v("APIkey",APIkey);
-                    url = jsonObject.getString("col");
-                    Log.v("col",url);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(activity,"parse qrCode failed, please scan again",Toast.LENGTH_LONG).show();
-                    return;
-                }
 
-
-                try {
-
-                    URL u = new URL(url);
-
-                    String path = u.getPath();
-
-                    if (path != null) {
-                        try {
-                            collectionId = path.substring(path.lastIndexOf("/") + 1);
-                            Log.i(LOG_TAG,collectionId);
-                        }catch (Exception e){
-                            Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
-                            return;
-                        }
-
-                    }
+                    String APIkey = QRUtils.processQRCode(data, activity, LOG_TAG, null).getAPIkey();
+                    collectionId = QRUtils.processQRCode(data, activity, LOG_TAG, null).getQrCollectionId();
 
                     serverURL = serverURLView.getText().toString();
 
@@ -327,11 +294,6 @@ public class LoginActivity extends AppCompatActivity {
                     mEditor.commit();
                     RetrofitClient.apiLogin(APIkey,callback_login);
 
-//                    accountLogin();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // User cancelled the photo picking

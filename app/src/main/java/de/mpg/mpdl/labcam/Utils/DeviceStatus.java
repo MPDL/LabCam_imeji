@@ -33,6 +33,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -264,13 +265,13 @@ public class DeviceStatus {
 
             print(metadata);
         } catch (ImageProcessingException e) {
-            // handle exception
+            e.printStackTrace();
         } catch (IOException e) {
-            // handle exception
+            e.printStackTrace();
         }
 
 
-        Log.e(LOG_TAG, metaDataJsonStr);
+//        Log.e(LOG_TAG, metaDataJsonStr);
         return metaDataJsonStr;
     }
 
@@ -337,7 +338,9 @@ public class DeviceStatus {
 
         if(exifThumbnailDirectory!=null){
             String orientationStr = exifThumbnailDirectory.getString(exifThumbnailDirectory.TAG_ORIENTATION);
-            if(orientationStr.contains("1")){
+            if(orientationStr==null){
+                Log.i(LOG_TAG, "no orientation information");
+            }else if(orientationStr.contains("1")){
                 orientation = 0;
             }else if(orientationStr.contains("6")){
                 orientation = 90;

@@ -230,15 +230,11 @@ public class checkAndUpload {
     private boolean taskIsStopped (){
         task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
 
-        try{
-            if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
-                Log.v(TAG,"taskIsStopped");
-                return true;
-            }else{
-                Log.v(TAG,"task is not stopped");
-                return false;
-            }}catch (Exception e){
-            Log.e(TAG,"taskIsStopped exception");
+        if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
+            Log.v(TAG,"taskIsStopped");
+            return true;
+        }else{
+            Log.v(TAG,"task is not stopped");
             return false;
         }
     }
@@ -752,12 +748,6 @@ public class checkAndUpload {
                 currentImage.setState(String.valueOf(DeviceStatus.state.FAILED));
                 currentImage.save();
 
-                // task failed
-//                task.setState(String.valueOf(DeviceStatus.state.FAILED));
-//                task.setEndDate(DeviceStatus.dateNow());
-//                task.save();
-   //             if(DeviceStatus.getUploadingItemPaths().size()>0)
-     //               DeviceStatus.getUploadingItemPaths().remove(currentImage.getImagePath());
             }else {
                 Log.v(TAG, "currentImage:" + currentImageId + "is null");
                 return;
@@ -779,20 +769,17 @@ public class checkAndUpload {
                 switch (statusCode){
                     case 403:
                         // set TASK state failed, print log
-                        try{
-                            task.setState(String.valueOf(DeviceStatus.state.FAILED));
-                            task.setEndDate(DeviceStatus.dateNow());
-                            task.save();
-                            Log.e(TAG, collectionID + "forbidden");
-                            Handler  handler=new Handler(Looper.getMainLooper());
-                            handler.post(new Runnable() {
-                                public void run() {
-                                    Toast.makeText(context, "Unauthorized to upload", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            return;
-                        }catch (Exception e){}
-                        break;
+                        task.setState(String.valueOf(DeviceStatus.state.FAILED));
+                        task.setEndDate(DeviceStatus.dateNow());
+                        task.save();
+                        Log.e(TAG, collectionID + "forbidden");
+                        Handler handler_403=new Handler(Looper.getMainLooper());
+                        handler_403.post(new Runnable() {
+                            public void run() {
+                                Toast.makeText(context, "Unauthorized to upload", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        return;
                     case 422:
                         String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                         if (jsonBody.contains("already exists")) {
@@ -800,7 +787,7 @@ public class checkAndUpload {
                             currentImage.setLog(error.getKind().name() + " already exists");
                             currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
                             currentImage.save();
-                            Log.e(TAG, currentImage.getImageName() + "  already exists");
+                            Log.e(TAG, currentImage.getImageName() + " already exists");
                             Log.e(TAG, currentImage.getState());
                         }
                         break;
@@ -810,28 +797,26 @@ public class checkAndUpload {
                         if (jsonBody_404.contains("Not Found")) {
                             // set currentImage state finished, print log
                             Log.e("<><>", "Not Found");
-                            try{
-                                task.setState(String.valueOf(DeviceStatus.state.FAILED));
-                                task.setEndDate(DeviceStatus.dateNow());
-                                task.save();
-                                Log.e(TAG, collectionID + "collection not found");
-                                Handler  handler=new Handler(Looper.getMainLooper());
-                                handler.post(new Runnable() {
-                                    public void run() {
-                                        Toast.makeText(context, "collection not found", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                return;
-                            }catch (Exception e){}
+
+                            task.setState(String.valueOf(DeviceStatus.state.FAILED));
+                            task.setEndDate(DeviceStatus.dateNow());
+                            task.save();
+                            Log.e(TAG, collectionID + "collection not found");
+                            Handler  handler=new Handler(Looper.getMainLooper());
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(context, "collection not found", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            return;
                         }
                         break;
                     default:
                         // 400 401 500 ...
                         // set currentImage state finished, print log
-                        try{
-                            currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
-                            currentImage.save();
-                        }catch (Exception e){}
+
+                        currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
+                        currentImage.save();
                         Log.e(TAG, currentImage.getImageName() + "failed, code: "+ statusCode);
                 }
             }
