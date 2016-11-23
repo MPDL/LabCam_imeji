@@ -53,7 +53,7 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
 
     private ArrayList<String> dataPathList = new ArrayList<String>();
     private ArrayList<String> datas = new ArrayList<>();
-    private int dataCounter = 0;
+    private int dataCounter = 6; // initialize this value as 6, in order to correct display items
 
     public LocalAlbumAdapter localAlbumAdapter;
 
@@ -425,19 +425,18 @@ public class LocalImageActivity extends AppCompatActivity implements android.sup
             datas = new ArrayList<>();
             dataCounter = 0;
         }
+
         for (int i = 0; i < 6; i++) {
             if(datas.size()>= dataPathList.size()){
                 return;
             }
-            datas.add(dataPathList.get(dataCounter+i));
-
+            datas.add(dataPathList.get(dataCounter));
+            dataCounter = dataCounter +1;
         }
-        dataCounter = datas.size()-1;
     }
 
     public void newData() {
         datas.clear();
-        dataCounter = 0;
         for (int i = 0; i < 6; i++) {
             datas.add(dataPathList.get(i));
         }
