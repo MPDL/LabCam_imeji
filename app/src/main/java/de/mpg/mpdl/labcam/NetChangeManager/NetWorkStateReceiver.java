@@ -46,14 +46,17 @@ public class NetWorkStateReceiver extends BroadcastReceiver {
             networkAvailable = true;
             notifyObserver();
 
+            // autoTask is null when first install
             Task autoTask = new Select().from(Task.class).where("uploadMode = ?", "AU").executeSingle();
-
+            if(autoTask==null){
+                return;
+            }
             List<Task> ManualTaskList = new Select().from(Task.class).where("uploadMode = ?", "MU").execute();
             //activate upload services
             if (autoTask.getUploadMode().equalsIgnoreCase("AU")) {
                 // start AU TaskUploadService
                 Intent uploadIntent = new Intent(context, TaskUploadService.class);
-                Log.e(TAG,"reStart AU after reconnect to internet");
+                Log.i(TAG,"reStart AU after reconnect to internet");
                 context.startService(uploadIntent);
             }
 
@@ -61,7 +64,7 @@ public class NetWorkStateReceiver extends BroadcastReceiver {
                 // start
                 String currentTaskId = task.getTaskId();
                 Intent manualUploadServiceIntent = new Intent(context, ManualUploadService.class);
-                Log.v(TAG,"currentTaskId: "+currentTaskId);
+                Log.i(TAG,"currentTaskId: "+currentTaskId);
                 manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
                 context.startService(manualUploadServiceIntent);
             }

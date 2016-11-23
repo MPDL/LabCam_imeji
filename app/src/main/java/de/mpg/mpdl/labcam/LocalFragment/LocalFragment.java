@@ -619,7 +619,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         //try close cursor here
         cur.close();
 
-        imagePathListAllAlbums.size();
+//        imagePathListAllAlbums.size();
 
     }
 
