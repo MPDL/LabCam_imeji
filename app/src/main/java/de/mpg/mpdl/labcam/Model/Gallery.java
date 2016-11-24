@@ -17,6 +17,8 @@ public class Gallery {
 
     List<Gallery> items;
 
+    List<String> imagePathList;
+
     Integer count = 0;
 
     public String getGalleryPath() {
@@ -91,6 +93,12 @@ public class Gallery {
         this.count = count;
     }
 
+    public List<String> getImagePathList() {
+        return imagePathList;
+    }
 
+    public void setImagePathList(List<String> imagePathList) {
+        this.imagePathList = imagePathList;
+    }
 }
 

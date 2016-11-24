@@ -277,28 +277,20 @@ public class DetailActivity extends AppCompatActivity implements android.support
 
             //state
             String imageState = String.valueOf(DeviceStatus.state.WAITING);
-
-
-
-            try {
-
-                String imageId = UUID.randomUUID().toString();
-                //store image in local database
-                Image photo = new Image();
-                photo.setImageId(imageId);
-                photo.setImageName(imageName);
-                photo.setImagePath(filePath);
-                photo.setLongitude(longitude);
-                photo.setLatitude(latitude);
-                photo.setCreateTime(createTime);
-                photo.setSize(fileSize);
-                photo.setState(imageState);
-                photo.setTaskId(taskId);
-                photo.save();
-                imageNum = imageNum + 1;
-
-            } catch (Exception e) {
-            }
+            String imageId = UUID.randomUUID().toString();
+            //store image in local database
+            Image photo = new Image();
+            photo.setImageId(imageId);
+            photo.setImageName(imageName);
+            photo.setImagePath(filePath);
+            photo.setLongitude(longitude);
+            photo.setLatitude(latitude);
+            photo.setCreateTime(createTime);
+            photo.setSize(fileSize);
+            photo.setState(imageState);
+            photo.setTaskId(taskId);
+            photo.save();
+            imageNum = imageNum + 1;
 
         }
         return imageNum;

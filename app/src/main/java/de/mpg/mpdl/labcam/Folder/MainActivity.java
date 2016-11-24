@@ -160,7 +160,9 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             }
         }
 
-                //user info
+
+
+        //user info
         mPrefs = this.getSharedPreferences("myPref", 0);
         email = mPrefs.getString("email", "");
 //        username =  mPrefs.getString("username", "");
@@ -170,10 +172,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         serverUrl = mPrefs.getString("server","");
 //        serverUrl = DeviceStatus.parseServerUrl(serverUrl);
 
-        try{
-            Bundle args = this.getIntent().getExtras();
-            isQRLogin = args.getBoolean("isQRLogin", false);}   // get isQRLogin from extra
-        catch (Exception e){}
+        Bundle args = this.getIntent().getExtras();         // get isQRLogin from extra
+        try {
+            isQRLogin = args.getBoolean("isQRLogin", false);
+        } catch(NullPointerException e) {
+            e.printStackTrace();
+        }
 
         getLocalCamFolder();
         // register NetStateObserver
@@ -213,12 +217,16 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
         /**************************************************  check upload not finished task ***************************************************/
 
-        List<Task> taskList = DBConnector.getUserTasks(userId, serverUrl);
+        List<Task> activeTaskList = DBConnector.getActiveTasks(userId, serverUrl);
         boolean isFinished = true;
 
-        for(Task task:taskList){
-            if(task.getFinishedItems()<task.getTotalItems()){
-                isFinished = false;
+        if(activeTaskList.size()>0){
+            for (Task task : activeTaskList) {
+                if(task.getUploadMode().equalsIgnoreCase("AU") && task.getTotalItems() == 0){
+                    isFinished = true;
+                }else {
+                    isFinished = false;
+                }
             }
         }
 

@@ -150,12 +150,13 @@ public class TaskManagerAdapter extends BaseAdapter {
             }
         }
 
-        printTaskLog(phrase, task);
+//        Log.e("<><>", phrase+"");
+//        printTaskLog(phrase, task);
 
         //collection error
         if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
             if(task.getUploadMode().equalsIgnoreCase("AU")){
-            phrase = AU_FAILED;
+                phrase = AU_FAILED;
             }else {
                 phrase = MU_FAILED;
             }
@@ -217,7 +218,7 @@ public class TaskManagerAdapter extends BaseAdapter {
 
             case AU_FAILED:
                 progressLayout.setVisibility(View.GONE);
-                toolButtonLayout.setVisibility(View.GONE);
+                toolButtonLayout.setVisibility(View.VISIBLE);
 //                clearButton.setVisibility(View.VISIBLE);
                 errorLayout.setVisibility(View.VISIBLE);
                 //error
@@ -232,7 +233,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                 break;
             case MU_FAILED:
                 progressLayout.setVisibility(View.GONE);
-                toolButtonLayout.setVisibility(View.GONE);
+                toolButtonLayout.setVisibility(View.VISIBLE);
 //                clearButton.setVisibility(View.VISIBLE);
                 errorLayout.setVisibility(View.VISIBLE);
 //                clearButton.setOnClickListener(new View.OnClickListener() {
@@ -341,8 +342,8 @@ public class TaskManagerAdapter extends BaseAdapter {
         }else if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
             //true is play button, means state now is paused
             isPausedCheckBox.setChecked(true);
-        }else if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FINISHED))){
-
+        }else if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
+            isPausedCheckBox.setChecked(true);
         }
 
 
@@ -351,63 +352,61 @@ public class TaskManagerAdapter extends BaseAdapter {
             public void onClick(View view) {
                 String currentTaskId = task.getTaskId();
                 if (!isPausedCheckBox.isChecked()) {
-                    // pause clicked
-                    try {
-                        Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
-                        currentTask.setState(String.valueOf(DeviceStatus.state.WAITING));
-                        currentTask.save();
-                        Log.v(TAG, "setState: WAITING");
+                    //  button clicked
 
-                        if (currentTask.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
-                            isPausedCheckBox.setChecked(false);
-                        } else {
-                            //true is play button, means state now is paused
-                            isPausedCheckBox.setChecked(true);
-                        }
+                    Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+                    currentTask.setState(String.valueOf(DeviceStatus.state.WAITING));
+                    currentTask.save();
+                    Log.v(TAG, "setState: WAITING");
 
-                        if (currentTask.getUploadMode().equalsIgnoreCase("AU")) {
-                            // start AU TaskUploadService
-                            Log.v(TAG, "start TaskUploadService");
-                            Intent uploadIntent = new Intent(activity, TaskUploadService.class);
-                            activity.startService(uploadIntent);
-                        } else {
-                            // start ManualUploadService
-                            Log.v(TAG, "start manualUploadService");
-                            Intent manualUploadServiceIntent = new Intent(activity, ManualUploadService.class);
-                            manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
-                            activity.startService(manualUploadServiceIntent);
-                        }
-                    } catch (Exception e) {
+                    if (currentTask.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
+                        isPausedCheckBox.setChecked(false);
+                    } else {
+                        //true is play button, means state now is paused
+                        isPausedCheckBox.setChecked(true);
                     }
+
+                    if (currentTask.getUploadMode().equalsIgnoreCase("AU")) {
+                        // start AU TaskUploadService
+                        Log.v(TAG, "start TaskUploadService");
+                        Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+                        activity.startService(uploadIntent);
+                    } else {
+                        // start ManualUploadService
+                        Log.v(TAG, "start manualUploadService");
+                        Intent manualUploadServiceIntent = new Intent(activity, ManualUploadService.class);
+                        manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
+                        activity.startService(manualUploadServiceIntent);
+                    }
+
 
                 } else if (isPausedCheckBox.isChecked()) {
-                    // pause button
-                    try {
-                        Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
-                        currentTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
-                        currentTask.save();
-                        Log.v(TAG, "setState: STOPPED");
+                    //  button clicked
 
-                        if (currentTask.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
-                            isPausedCheckBox.setChecked(false);
-                        } else {
-                            //true is play button, means state now is paused
-                            isPausedCheckBox.setChecked(true);
-                        }
+                    Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+                    currentTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
+                    currentTask.save();
+                    Log.v(TAG, "setState: STOPPED");
 
-                        if (currentTask.getUploadMode().equalsIgnoreCase("AU")) {
-                            // start AU TaskUploadService
-                            Intent uploadIntent = new Intent(activity, TaskUploadService.class);
-//                            uploadIntent.putExtra("isBusy",false);
-                            activity.startService(uploadIntent);
-                        } else {
-                            // start ManualUploadService
-                            Intent manualUploadServiceIntent = new Intent(activity, ManualUploadService.class);
-                            manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
-                            activity.startService(manualUploadServiceIntent);
-                        }
-                    } catch (Exception e) {
+                    if (currentTask.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.WAITING))) {
+                        isPausedCheckBox.setChecked(false);
+                    } else {
+                        //true is play button, means state now is paused
+                        isPausedCheckBox.setChecked(true);
                     }
+
+                    if (currentTask.getUploadMode().equalsIgnoreCase("AU")) {
+                        // start AU TaskUploadService
+                        Intent uploadIntent = new Intent(activity, TaskUploadService.class);
+//                            uploadIntent.putExtra("isBusy",false);
+                        activity.startService(uploadIntent);
+                    } else {
+                        // start ManualUploadService
+                        Intent manualUploadServiceIntent = new Intent(activity, ManualUploadService.class);
+                        manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
+                        activity.startService(manualUploadServiceIntent);
+                    }
+
 
                 }
             }

@@ -11,19 +11,12 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.mpg.mpdl.labcam.Model.LocalModel.Task;
-
 /**
  * Created by yingli on 2/3/16.
  */
 public class ManualUploadService extends Service {
 
     private static final String TAG = ManualUploadService.class.getSimpleName();
-
-    //  position in waitingImage list
-
-
-    Task task;
 
     // pass currentTaskId to service
     private List<String> taskIdList = new ArrayList<>();
@@ -52,27 +45,21 @@ public class ManualUploadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "Service onStartComman");
-
 
         // prepare taskId
         try {
             String currentTaskId = intent.getStringExtra("currentTaskId");
-            if(!taskIdList.contains(currentTaskId)){
-            taskIdList.add(currentTaskId);
+            if(!taskIdList.contains(currentTaskId)) {
+                taskIdList.add(currentTaskId);
             }
-        }catch (Exception e){
-              Log.i(TAG, "e~~~");
+        }catch (NullPointerException e){
+            e.printStackTrace();
         }
 
         for (String taskId:taskIdList){
-
             new ManualUploadThread(activity,taskId).start();
             taskIdList.remove(taskId);
         }
-
-
-
 
         return Service.START_STICKY;
     }

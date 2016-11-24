@@ -2,7 +2,6 @@ package de.mpg.mpdl.labcam.TaskManager;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,7 +72,6 @@ public class RecentTaskAdapter extends BaseAdapter {
 
         long endDate = taskList.get(i).getEndDate();
 
-        Log.e("WTF",endDate+"" );
         String dateAgo = DeviceStatus.twoDateDistance(DeviceStatus.longToDate(endDate), DeviceStatus.longToDate(DeviceStatus.dateNow()));
 
         taskTime.setText(dateAgo);

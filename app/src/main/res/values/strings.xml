@@ -2,7 +2,7 @@
     <string name="app_name">LabCam</string>
 
     <!--url-->
-    <string name="url_gluons">https://qa-gluons.mpdl.mpg.de/imeji/rest/</string>
+    <string name="url_gluons">https://gluons.mpdl.mpg.de/imeji/rest/</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="syncall">Sync All</string>

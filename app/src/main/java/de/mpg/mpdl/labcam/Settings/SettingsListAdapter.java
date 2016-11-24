@@ -47,12 +47,14 @@ public class SettingsListAdapter extends BaseAdapter {
 
         String userId = mPrefs.getString("userId", "");
         String serverName = mPrefs.getString("server","");
-        try{
-            lastCollectionId = DBConnector.getAuTask(userId,serverName).getCollectionId();
+
+        try {
+            lastCollectionId = DBConnector.getAuTask(userId, serverName).getCollectionId();
+        }catch (NullPointerException e){
+            e.printStackTrace();
         }
-        catch(Exception e){
-        }
-        if(lastCollectionId!=null){
+
+        if(lastCollectionId!=null && !lastCollectionId.equalsIgnoreCase("")){
             collectionId = lastCollectionId;}
     }
 

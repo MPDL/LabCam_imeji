@@ -2,6 +2,9 @@ package de.mpg.mpdl.labcam.Utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -18,12 +21,14 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
+import com.drew.metadata.exif.ExifThumbnailDirectory;
 import com.drew.metadata.exif.GpsDirectory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -32,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.TimeZone;
 
 /**
@@ -43,10 +49,8 @@ public class DeviceStatus {
     public static List<String> uploadingItemPaths = new ArrayList<>();
     public static final String username = "";
     public static final String password = "";
-    public static final String collectionID = "0L5yLxP_AphUMtIi";
-    public static final String queryKeyword = "MPDLCam";
  //   public static final String BASE_URL= "";
-    public static final String BASE_URL = "https://qa-gluons.mpdl.mpg.de/imeji/rest/";
+    public static final String BASE_URL = "https://gluons.mpdl.mpg.de/imeji/rest/";
 //    public static final String BASE_URL = "http://test-gluons.mpdl.mpg.de/imeji/rest/";
 
     // Checks whether the device currently has a network connection
@@ -115,7 +119,7 @@ public class DeviceStatus {
     }
 
     public enum state{
-        WAITING, STARTED, STOPPED, INTERRUPTED, FAILED,FINISHED
+        WAITING, STARTED, STOPPED, FAILED,FINISHED
     }
 
 
@@ -234,26 +238,29 @@ public class DeviceStatus {
 
     }
 
-    public static String metaDataJson(String imagePath, Boolean[] typeList ){
+    public static String metaDataJson(String imagePath, Boolean[] typeList, Context context ){
 
         String metaDataJsonStr = null;
 
         File file = new File(imagePath);
 
+
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(file);
 
-            metaDataJsonStr =  generateJsonStr(metadata, typeList);
+            metaDataJsonStr =  generateJsonStr(metadata, typeList, context, imagePath);
 
             print(metadata);
         } catch (ImageProcessingException e) {
-            // handle exception
+            e.printStackTrace();
         } catch (IOException e) {
-            // handle exception
+            e.printStackTrace();
+        } catch (NegativeArraySizeException e){
+            e.printStackTrace();
         }
 
 
-        Log.e(LOG_TAG, metaDataJsonStr);
+//        Log.e(LOG_TAG, metaDataJsonStr);
         return metaDataJsonStr;
     }
 
@@ -262,7 +269,7 @@ public class DeviceStatus {
      * generate json string
      * @param metadata
      */
-    private static String generateJsonStr(Metadata metadata, Boolean[] typeList){
+    private static String generateJsonStr(Metadata metadata, Boolean[] typeList, Context context, String imagePath){
 
         String metaDataJsonStr = null;
 
@@ -276,6 +283,10 @@ public class DeviceStatus {
         GpsDirectory gpsDirectory
                 = metadata.getFirstDirectoryOfType(GpsDirectory.class);
 
+        ExifThumbnailDirectory exifThumbnailDirectory
+                = metadata.getFirstDirectoryOfType(ExifThumbnailDirectory.class);
+
+
 
         String makeStr = "";
         String modelStr = "";
@@ -288,6 +299,7 @@ public class DeviceStatus {
         String SensingMethodStr = "";
         String ApertureValueStr = "";
         String ColorSpaceStr = "";
+        int orientation = 0;
 
         if(exifIFD0Directory!=null){
             makeStr = (exifIFD0Directory.getString(ExifIFD0Directory.TAG_MAKE) != null) ? exifIFD0Directory.getString(ExifIFD0Directory.TAG_MAKE) : "";
@@ -313,6 +325,41 @@ public class DeviceStatus {
             GPSVersionIDStr = gpsDirectory.getString(gpsDirectory.TAG_VERSION_ID);
         }
 
+        if(exifThumbnailDirectory!=null){
+            String orientationStr = exifThumbnailDirectory.getString(exifThumbnailDirectory.TAG_ORIENTATION);
+            if(orientationStr==null){
+                Log.i(LOG_TAG, "no orientation information");
+            }else if(orientationStr.contains("1")){
+                orientation = 0;
+            }else if(orientationStr.contains("6")){
+                orientation = 90;
+            }else if(orientationStr.contains("3")){
+                orientation = 180;
+            }else if(orientationStr.contains("8")){
+                orientation = 270;
+            }
+
+        }
+
+        Log.e(LOG_TAG, "orientation: " + orientation);
+
+
+        String ocr = "";
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bitMapOrig = BitmapFactory.decodeFile(imagePath, options);
+
+        Matrix matrix = new Matrix();
+        matrix.postRotate(orientation);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bitMapOrig, 0, 0, bitMapOrig.getWidth(), bitMapOrig.getHeight(), matrix, true);
+        if(bitMapOrig != rotatedBitmap)
+            bitMapOrig.recycle();
+        bitMapOrig = null;
+
+        // ocr exception
+        ocr = OCRtextHandler.getText(context, rotatedBitmap);
+        Log.e(LOG_TAG, "ocr: " + ocr);
 
         try {
             JSONObject jsonObject = new JSONObject();
@@ -342,9 +389,10 @@ public class DeviceStatus {
             }if(typeList[8]){
                 jsonObject.put("Color Space", ColorSpaceStr);
             }
-
             if(typeList[9]){
                 jsonObject.put("Exposure Time", ExposureTimeStr);
+            }if(1 == 1){
+                jsonObject.put("OCR", ocr);
             }
             metaDataJsonStr = jsonObject.toString();
         } catch (JSONException e) {
@@ -380,6 +428,31 @@ public class DeviceStatus {
                     System.err.println("ERROR: " + error);
                 }
             }
+        }
+    }
+
+     public static String SaveImage(Bitmap finalBitmap) {
+
+        String root = Environment.getExternalStorageDirectory().toString();
+        File myDir = new File(root + "/saved_images");
+        myDir.mkdirs();
+        Random generator = new Random();
+        int n = 10000;
+        n = generator.nextInt(n);
+        String fname = "Image-"+ n +".jpg";
+        File file = new File (myDir, fname);
+        if (file.exists ()) file.delete ();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+            Log.e(LOG_TAG, "rotatedBitmap saved");
+            return root + "/saved_images" + fname;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

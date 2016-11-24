@@ -16,6 +16,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Display;
@@ -25,7 +26,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,12 +46,13 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 import de.mpg.mpdl.labcam.AutoRun.dbObserver;
-import de.mpg.mpdl.labcam.Gallery.GalleryListAdapter;
-import de.mpg.mpdl.labcam.Gallery.LocalImageActivity;
+import de.mpg.mpdl.labcam.Gallery.AlbumRecyclerAdapter;
 import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;
 import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
 import de.mpg.mpdl.labcam.Model.Gallery;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
@@ -86,11 +86,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     android.support.v7.app.ActionBar actionBar;
 
-    GridView gridView;
+    RecyclerView albumRecyclerView;
     RecyclerView recyclerView;
     SharedPreferences preferences;
 
-    GalleryListAdapter adapter;
+    AlbumRecyclerAdapter adapter;
     SectionedGridRecyclerViewAdapter mSectionedAdapter;
     SimpleAdapter simpleAdapter;
 
@@ -105,7 +105,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
      * <imageDate,imagePath> **/
     TreeMap<Long, String> imageList = new TreeMap<Long, String>();
     ArrayList<String> sortedImageNameList;
-
     /**
      *
      * store the imagePathList of each album
@@ -155,7 +154,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_local, container, false);
         // folder gridView
-        gridView = (GridView) rootView.findViewById(R.id.gallery_gridView);
+        albumRecyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_gridView);
+
 
         actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
@@ -192,7 +192,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
                 dateLabel.setTextColor(getResources().getColor(R.color.primary));
                 albumLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
-                gridView.setVisibility(View.GONE);
+                albumRecyclerView.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
             }
         });
@@ -212,7 +212,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
                 dateLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
                 albumLabel.setTextColor(getResources().getColor(R.color.primary));
-                gridView.setVisibility(View.VISIBLE);
+                albumRecyclerView.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
             }
         });
@@ -243,98 +243,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 super.handleMessage(msg);
 
                 if(msg.what==1234){
-
-                    List<Task> waitingTasks = DBConnector.getUserWaitingTasks(userId, serverName);
-                    List<Task> stoppedTasks = DBConnector.getUserStoppedTasks(userId, serverName);
-                    Task mostRecentTask = DBConnector.getLatestFinishedTask(userId, serverName);
-
-                    int num_activate = 0;
-
-                    num_activate = stoppedTasks.size() + waitingTasks.size();
-
-                    if(num_activate > 0){
-                        Task auTask = DBConnector.getAuTask(userId,serverName);
-                        if(auTask!=null && String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState()) &&  auTask.getTotalItems()==auTask.getFinishedItems())
-                            num_activate --;
-                    }
-                    if(num_activate == 0)
-                    {
-                        if(mostRecentTask!=null && !DeviceStatus.twoDateWithinSecounds(DeviceStatus.longToDate(mostRecentTask.getEndDate()), DeviceStatus.longToDate(DeviceStatus.dateNow()))){
-                            activeTaskLayout.setVisibility(View.GONE);
-                            return;
-                        }
-                        //execute the task
-                        numActiveTextView.setText("0");
-
-                        percentTextView.setText(100+"%");
-                        mCircleProgressBar.setProgress(100);
-
-                        new Handler().postDelayed(new Runnable() {
-
-                            public void run() {
-                                Log.e(LOG_TAG, "no task  is null");
-                                activeTaskLayout.setVisibility(View.GONE);
-                                return;
-
-                            }
-
-                        }, 1000);
-                    }
-
-                    for(Task task:waitingTasks){
-                        Log.e(LOG_TAG,"waitingTasks~~~~~~~");
-                        Log.e(LOG_TAG,"mode:"+task.getUploadMode());
-                        Log.e(LOG_TAG,"state:"+task.getState());
-                        Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
-                        Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
-                    }
-                    for(Task task:stoppedTasks){
-                        Log.e(LOG_TAG,"stoppedTasks~~~~~~~");
-                        Log.e(LOG_TAG,"mode:"+task.getUploadMode());
-                        Log.e(LOG_TAG,"state:"+task.getState());
-                        Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
-                        Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
-                    }
-
-
-                    if(waitingTasks.size()>0){
-                        activeTaskLayout.setVisibility(View.VISIBLE);
-                        Task task = waitingTasks.get(0);
-
-                        //
-                        if(task.getTotalItems()==0){
-                            return;
-                        }
-//                        String titleTaskInfo = task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName();
-
-
-                        if(task.getUploadMode().equalsIgnoreCase("AU")){
-                            // AU
-                            titleTaskTextView.setText("Automatic upload to " + task.getCollectionName());
-                        }else {
-                            titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
-                        }
-
-                        numActiveTextView.setText(num_activate+"");
-
-                        int percent = (task.getFinishedItems()*100)/task.getTotalItems();
-                        percentTextView.setText(percent+"%");
-                        mCircleProgressBar.setProgress(percent);
-                    }else if(stoppedTasks.size()>0){
-                        activeTaskLayout.setVisibility(View.VISIBLE);
-                        Task task = stoppedTasks.get(0);
-
-                        //
-                        if(task.getTotalItems()==0){
-                            return;
-                        }
-                        titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
-                        numActiveTextView.setText(num_activate+"");
-
-                        int percent = (task.getFinishedItems()*100)/task.getTotalItems();
-                        percentTextView.setText(percent+"%");
-                        mCircleProgressBar.setProgress(percent);
-                    }
+                    renderStatusBar();
                 }
 
             }
@@ -347,6 +256,105 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         return rootView;
 
+    }
+
+    private void renderStatusBar(){
+        {
+
+            List<Task> activeTasks = DBConnector.getActiveTasks(userId, serverName);  // not finished
+            List<Task> waitingTasks = DBConnector.getUserWaitingTasks(userId, serverName); // waiting
+            List<Task> stoppedTasks = DBConnector.getUserStoppedTasks(userId, serverName); // stopped
+            Task mostRecentTask = DBConnector.getLatestFinishedTask(userId, serverName);  // last task
+
+            int num_activate = 0;
+
+            num_activate = activeTasks.size();  // waiting, stop, failed tasks
+
+            if(num_activate > 0){
+                // remove always waiting auTask
+                Task auTask = DBConnector.getAuTask(userId,serverName);
+                if(auTask!=null && String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState()) &&  auTask.getTotalItems()==auTask.getFinishedItems())
+                    num_activate --;
+            }
+            if(num_activate == 0)
+            {
+                if(mostRecentTask!=null && !DeviceStatus.twoDateWithinSecounds(DeviceStatus.longToDate(mostRecentTask.getEndDate()), DeviceStatus.longToDate(DeviceStatus.dateNow()))){
+                    activeTaskLayout.setVisibility(View.GONE);
+                    return;
+                }
+                //execute the task
+                numActiveTextView.setText("0");
+
+                percentTextView.setText(100+"%");
+                mCircleProgressBar.setProgress(100);
+
+                new Handler().postDelayed(new Runnable() {
+
+                    public void run() {
+                        Log.e(LOG_TAG, "no task  is null");
+                        activeTaskLayout.setVisibility(View.GONE);
+                        return;
+
+                    }
+
+                }, 1000);
+            }
+
+            for(Task task:waitingTasks){
+                Log.e(LOG_TAG,"waitingTasks~~~~~~~");
+                Log.e(LOG_TAG,"mode:"+task.getUploadMode());
+                Log.e(LOG_TAG,"state:"+task.getState());
+                Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
+                Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
+            }
+            for(Task task:stoppedTasks){
+                Log.e(LOG_TAG,"stoppedTasks~~~~~~~");
+                Log.e(LOG_TAG,"mode:"+task.getUploadMode());
+                Log.e(LOG_TAG,"state:"+task.getState());
+                Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
+                Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
+            }
+
+
+            if(waitingTasks.size()>0){
+                activeTaskLayout.setVisibility(View.VISIBLE);
+                Task task = waitingTasks.get(0);
+
+                //
+                if(task.getTotalItems()==0){
+                    return;
+                }
+//                        String titleTaskInfo = task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName();
+
+
+                if(task.getUploadMode().equalsIgnoreCase("AU")){
+                    // AU
+                    titleTaskTextView.setText("Automatic upload to " + task.getCollectionName());
+                }else {
+                    titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
+                }
+
+                numActiveTextView.setText(num_activate+"");
+
+                int percent = (task.getFinishedItems()*100)/task.getTotalItems();
+                percentTextView.setText(percent+"%");
+                mCircleProgressBar.setProgress(percent);
+            }else if(stoppedTasks.size()>0){
+                activeTaskLayout.setVisibility(View.VISIBLE);
+                Task task = stoppedTasks.get(0);
+
+                //
+                if(task.getTotalItems()==0){
+                    return;
+                }
+                titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
+                numActiveTextView.setText(num_activate+"");
+
+                int percent = (task.getFinishedItems()*100)/task.getTotalItems();
+                percentTextView.setText(percent+"%");
+                mCircleProgressBar.setProgress(percent);
+            }
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -389,7 +397,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         switch (item.getItemId()) {
             case R.id.item_upload_local:
 
-                Log.v(LOG_TAG, "upload");
+                Log.i(LOG_TAG, "upload");
 
                 if(positionSet.size()!=0) {
                     Log.v(LOG_TAG, " "+positionSet.size());
@@ -419,6 +427,14 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     imagePathListForAlbumTask.clear();
                 }
                 mode.finish();
+                return true;
+            case R.id.item_microphone_local:
+                Log.i(LOG_TAG, "microphone");
+                showVoiceDialog("bla");
+                return true;
+            case R.id.item_notes_local:
+                Log.i(LOG_TAG, "notes");
+                showNoteDialog("bla");
                 return true;
             default:
                 return false;
@@ -502,40 +518,17 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private void loadLocalGallery(){
 
         ArrayList<Gallery> imageFolders = new ArrayList<Gallery>();
-        imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
 
-        adapter = new GalleryListAdapter(getActivity(), imageFolders );
+//        imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
+        adapter = new AlbumRecyclerAdapter(getActivity(), imagePathListAllAlbums );
+        for (List<String[]> imagePathListAllAlbum : imagePathListAllAlbums) {
+            Log.i(LOG_TAG, "gallery size:"+ imagePathListAllAlbum.size());
+        }
 
-        gridView.setAdapter(adapter);
-
-        adapter.setOnItemClickListener(new GalleryListAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-
-                if (actionMode != null) {
-                    // muti select mode
-                    // maintain position choosing
-                    addOrRemoveAlbum(position);
-                    adapter.setPositionSet(albumPositionSet);
-                } else {
-                    //  simple click
-                    //  show picture
-                    //  go to album detail
-                    Gallery gallery = (Gallery) adapter.getItem(position);
-                    Intent galleryImagesIntent = new Intent(getActivity(), LocalImageActivity.class);
-                    galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
-
-                    startActivity(galleryImagesIntent);
-                }
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-                if (actionMode == null) {
-                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(ActionModeCallback);
-                }
-            }
-        });
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        albumRecyclerView.setLayoutManager(llm);
+        albumRecyclerView.setAdapter(adapter);
     }
 
 
@@ -590,10 +583,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 // existing code, need to rewrite gallery view
                 Gallery album = new Gallery();
                 album.setGalleryName(cur.getString(albumLocation));
+
                 String currentAlbum = cur.getString(albumLocation);
                 if(!albumNames.contains(currentAlbum)) {
                     // new album
-                    folders.add(album); // adapter rewrite later
+                    folders.add(album);
                     albumNames.add(currentAlbum);
 
                     List<String[]> imagePathListForCurrentAlbum = new ArrayList<>();
@@ -609,10 +603,20 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     for (List<String[]> albumList :imagePathListAllAlbums){
                         // if exist, get first imageStrArray, compare
                         if(albumList.get(0)[0].equalsIgnoreCase(currentAlbum)){
-                            String[] imageStrArray = new String[2];
-                            imageStrArray[0] = currentAlbum;
-                            imageStrArray[1] = cur.getString(nameColumn);
-                            albumList.add(imageStrArray);
+                            boolean isDuplicate = false;
+                            for (String[] strings : albumList) {
+                                if (strings[1] == cur.getString(nameColumn)){
+                                    isDuplicate = true;
+                                    break;
+                                }
+                            }
+
+                            if(!isDuplicate) {
+                                String[] imageStrArray = new String[2];
+                                imageStrArray[0] = currentAlbum;
+                                imageStrArray[1] = cur.getString(nameColumn);
+                                albumList.add(imageStrArray);
+                            }
                         }
                     }
                 }
@@ -621,6 +625,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         //try close cursor here
         cur.close();
+
+//        imagePathListAllAlbums.size();
+
     }
 
     //load timeLinePicture
@@ -748,10 +755,10 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private void uploadList(List<String> fileList) {
         String currentTaskId = createTask(fileList);
 
-        newInstance(currentTaskId).show(getActivity().getFragmentManager(), "remoteListDialog");
+        remoteListNewInstance(currentTaskId).show(getActivity().getFragmentManager(), "remoteListDialog");
     }
 
-    public static RemoteListDialogFragment newInstance(String taskId)
+    public static RemoteListDialogFragment remoteListNewInstance(String taskId)
     {
         RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
         Bundle args = new Bundle();
@@ -835,6 +842,34 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         return imageNum;
     }
 
+    /**** take notes ****/
+    public static NoteDialogFragment noteDialogNewInstance(String taskId)
+    {
+        NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("taskId", taskId);
+        noteDialogFragment.setArguments(args);
+        return noteDialogFragment;
+    }
+
+    public void showNoteDialog(String str){
+        noteDialogNewInstance(str).show(getActivity().getFragmentManager(), "noteDialogFragment");
+    }
+
+    /**** record voice ****/
+    public static MicrophoneDialogFragment voiceDialogNewInstance(String taskId)
+    {
+        MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("taskId", taskId);
+        microphoneDialogFragment.setArguments(args);
+        return microphoneDialogFragment;
+    }
+
+    public void showVoiceDialog(String str){
+        voiceDialogNewInstance(str).show(getActivity().getFragmentManager(), "voiceDialogFragment");
+    }
+
     @Override
     public void onResume() {
         resolver.registerContentObserver(uri, true, dbObserver);
@@ -848,9 +883,10 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         if(isAlbum) {
             dateLabel.setTextColor(getResources().getColor(R.color.lightGrey));
             albumLabel.setTextColor(getResources().getColor(R.color.primary));
-            gridView.setVisibility(View.VISIBLE);
+            albumRecyclerView.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         }
+        renderStatusBar();
         super.onResume();
 
     }

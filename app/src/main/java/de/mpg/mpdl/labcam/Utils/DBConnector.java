@@ -37,6 +37,7 @@ public class DBConnector {
                 .where("severName = ?", serverName)
                 .where("state != ?", String.valueOf(DeviceStatus.state.WAITING))
                 .where("state != ?", String.valueOf(DeviceStatus.state.STOPPED))
+                .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
                 .orderBy("endDate DESC")
                 .execute();
     }
@@ -84,6 +85,16 @@ public class DBConnector {
     }
 
 
+    public static List<Task> getActiveTasks(String userId, String serverName){
+        return new Select()
+                .from(Task.class)
+                .where("userId = ?", userId)
+                .where("severName = ?", serverName)
+                .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
+//                .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
+                .execute();
+    }
+
     //delete finished tasks
     public static void deleteFinishedAUTasks(String userId, String serverName){
 
@@ -126,6 +137,25 @@ public class DBConnector {
                 .from(Image.class)
                 .orderBy("createTime DESC")
                 .executeSingle();
+    }
+
+    // get active Image list
+    public static List<Image> getActiveImages(String taskId) {
+        return new Select()
+                .from(Image.class)
+                .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
+                .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
+                .orderBy("RANDOM()")
+                .execute();
+    }
+
+    public static List<Image> getInactiveImages(String taskId) {
+        return new Select()
+                .from(Image.class)
+                .where("state != ?", String.valueOf(DeviceStatus.state.WAITING))
+                .where("state != ?", String.valueOf(DeviceStatus.state.STARTED))
+                .orderBy("RANDOM()")
+                .execute();
     }
 
 }

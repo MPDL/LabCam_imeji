@@ -8,7 +8,7 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimaryDark">#1565C0</item>
+        <item name="colorPrimaryDark">#013138</item>
         <item name="colorAccent">#006f7b</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -21,6 +21,8 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
+
 
     <style name="AnimationPopup">
         <item name="@android:windowEnterAnimation">@anim/popup_open</item>

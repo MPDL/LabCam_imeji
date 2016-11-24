@@ -77,7 +77,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
 
         this.setCancelable(false);
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.fragment_dialog_remote_list, null);
+        View view = inflater.inflate(R.layout.dialog_fragment_remote_list, null);
         activity = this.getActivity();
         currentTaskId = getArguments().getString("taskId");
 
@@ -222,6 +222,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                         .show();
             }
 
+            new Delete().from(ImejiFolder.class).execute();
 
             ActiveAndroid.beginTransaction();
             try {

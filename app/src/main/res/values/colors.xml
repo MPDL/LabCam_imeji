@@ -3,6 +3,7 @@
     <color name="view_bg">#b20e0f</color>
     <color name="white">#ffffff</color>
     <color name="black">#f8000000</color>
+    <color name="black_shadow">#80000000</color>
     <color name="btn_bg">#3e4a56</color>
     <color name="green">#ff12ff15</color>
     <color name="blue">#ff76a2ff</color>

@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,39 +15,30 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.eclipse.jetty.util.MultiMap;
 import org.eclipse.jetty.util.UrlEncoded;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.File;
 import java.net.URL;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import de.mpg.mpdl.labcam.Folder.MainActivity;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.Model.LocalModel.LocalAlbum;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.User;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
-import de.mpg.mpdl.labcam.Utils.ImageFileFilter;
+import de.mpg.mpdl.labcam.Utils.QRUtils;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -57,13 +46,17 @@ import retrofit.client.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText usernameView, passwordView, serverURLView;
-    private TextView gluonsLabel, othersLabel;
-    private TextView newHereView;
-    private Button signIn;
-    private Button scan;
+    @BindView(R.id.userName) EditText usernameView;
+    @BindView(R.id.password) EditText passwordView;
+    @BindView(R.id.serverURL) EditText serverURLView;
+
+    @BindView(R.id.label_gluons) TextView gluonsLabel;
+    @BindView(R.id.label_other) TextView othersLabel;
+
+    @BindView(R.id.tv_new_here)  TextView newHereView;
+    @BindView(R.id.btnSignIn)  Button signIn;
+    @BindView(R.id.qr_scanner)  Button scan;
     private Activity activity = this;
-    private ImageView animation;
 
     private String username;
     private String password;
@@ -83,8 +76,10 @@ public class LoginActivity extends AppCompatActivity {
         mPrefs = getSharedPreferences("myPref", 0);
         String Key = mPrefs.getString("apiKey", "");
 
+        // check login states
         if(Key.equalsIgnoreCase("")){
-        setContentView(R.layout.layout_login);
+            setContentView(R.layout.layout_login);
+            ButterKnife.bind(this);
         }else {
             //login
             serverURL = mPrefs.getString("server", "");
@@ -94,19 +89,10 @@ public class LoginActivity extends AppCompatActivity {
             finish();
             return;
         }
-        //don't store local images
-//        getLocalFolders();
-
-        gluonsLabel = (TextView) findViewById(R.id.label_gluons);
-        othersLabel = (TextView) findViewById(R.id.label_other);
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
-        serverURLView = (EditText) findViewById(R.id.serverURL);
-        usernameView = (EditText) findViewById(R.id.userName);
-        passwordView = (EditText) findViewById(R.id.password);
-        newHereView = (TextView) findViewById(R.id.tv_new_here);
-
+        // use soft keyboard enter to login
         passwordView.setImeOptions(EditorInfo.IME_ACTION_SEND);
         passwordView.setOnEditorActionListener(
                 new TextView.OnEditorActionListener() {
@@ -122,10 +108,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        signIn = (Button) findViewById(R.id.btnSignIn);
-        scan = (Button) findViewById(R.id.qr_scanner);
-        //error = (TextView) findViewById(R.id.tv_error);
-
+        // gluons server is choosen
         gluonsLabel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -140,6 +123,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // other server is choosen
         othersLabel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -159,11 +143,10 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
-//        mPrefs = this.getSharedPreferences("myPref", 0);
+        // last user
         usernameView.setText(mPrefs.getString("email", ""));
 
-        // store server url
+        // store server url in sharedPreference
         if (!mPrefs.getString("server", "").equals("") && !mPrefs.getString("server", "").equals(DeviceStatus.BASE_URL)){
             serverURL = mPrefs.getString("server", "");
             //gluonsLabel
@@ -175,7 +158,7 @@ public class LoginActivity extends AppCompatActivity {
             serverURLView.setVisibility(View.VISIBLE);
             serverURLView.setText(serverURL);
 
-        } else {
+        } else { // BASE_URL as serverURL
             serverURL = DeviceStatus.BASE_URL;
 
             //gluonsLabel
@@ -267,52 +250,21 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    //    apiKey  LOG_TAG activity userId serverUrl collectionId
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == INTENT_QR) {
 
             if (resultCode == Activity.RESULT_OK) {
-                Bundle bundle = data.getExtras();
-                String QRText = bundle.getString("QRText");
-                Log.v(LOG_TAG, QRText);
-                String APIkey = "";
-                String url = "";
-                try {
-                    JSONObject jsonObject = new JSONObject(QRText);
-                    APIkey = jsonObject.getString("key");
-                    Log.v("APIkey",APIkey);
-                    url = jsonObject.getString("col");
-                    Log.v("col",url);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(activity,"parse qrCode failed, please scan again",Toast.LENGTH_LONG).show();
-                    return;
-                }
 
-
-                try {
-
-                    URL u = new URL(url);
-
-                    String path = u.getPath();
-
-                    if (path != null) {
-                        try {
-                            collectionId = path.substring(path.lastIndexOf("/") + 1);
-                            Log.i(LOG_TAG,collectionId);
-                        }catch (Exception e){
-                            Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
-                            return;
-                        }
-
-                    }
+                    String APIkey = QRUtils.processQRCode(data, activity, LOG_TAG, null).getAPIkey();
+                    collectionId = QRUtils.processQRCode(data, activity, LOG_TAG, null).getQrCollectionId();
 
                     serverURL = serverURLView.getText().toString();
 
                     /** parse server url **/
 
-//                RetrofitClient.setRestServer(parseServerUrl(serverURL));
                     RetrofitClient.setRestServer(serverURL);
 
                     Log.v(LOG_TAG,serverURL);
@@ -326,127 +278,12 @@ public class LoginActivity extends AppCompatActivity {
                     mEditor.commit();
                     RetrofitClient.apiLogin(APIkey,callback_login);
 
-//                    accountLogin();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // User cancelled the photo picking
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    public void getLocalFolders(){
-        String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME,MediaStore.Images.Media.DATA};
-        Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-        final ArrayList<String> localImageFolders = new ArrayList<String>();
-
-        final HashMap<String,String> albumFolders = new HashMap<String, String>();
-
-        Cursor cur = getContentResolver().query(images, albums, null, null, null);
-
-        if (cur.moveToFirst()) {
-            String album;
-            String filePath;
-            int albumLocation = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-            int path = cur.getColumnIndex(MediaStore.Images.Media.DATA);
-
-            do {
-                //name of the local folder
-                album = cur.getString(albumLocation);
-//                Log.i("folderName",album);
-
-                //image file path
-                filePath = cur.getString(path);
-//                Log.i("filePath",filePath);
-
-                //folder path for files
-                File file = new File(filePath);
-                String directory = file.getParent();
-//                Log.i("directory", directory);
-//                SharedPreferences.Editor editor = preferencesFiles.edit();
-//                editor.putString(album, directory);
-//                editor.commit();
-
-                if(!albumFolders.containsKey(album))
-                albumFolders.put(album,directory);
-
-            } while (cur.moveToNext());
-            for(int i=0;i<localImageFolders.size();i++){
-            Log.i("localImageFolders", "Folder" + i+": "+localImageFolders.get(i));}
-            
-            Iterator it = albumFolders.entrySet().iterator();
-
-
-            while ((it.hasNext())) {
-                String folderPath;
-                String folderName;
-                Map.Entry pair = (Map.Entry)it.next();
-                //folderPath
-                folderPath = pair.getValue().toString();
-                folderName = pair.getKey().toString();
-
-                Log.i("folderPath",folderPath);
-                Log.i("folderName",folderName);
-
-                File folder = new File(folderPath);
-                //listing all the files
-                File[] folderFiles = folder.listFiles();
-
-                ActiveAndroid.beginTransaction();
-                try {
-                    for (File imageFile : folderFiles) {
-//                        Log.i("file", imageFile.toURI().toString());
-
-                        //only "jpg", "png", "gif","jpeg" accepted
-                        if (new ImageFileFilter(imageFile).accept(imageFile)) {
-                            Image image = new Image();
-                            //set ImageId as path
-                            // FIXME: 1/13/16 change model if needed
-                            image.setImageId(imageFile.getAbsolutePath());
-                            image.save();
-                        }
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-                }finally {
-                    ActiveAndroid.endTransaction();
-                }
-                it.remove();
-
-                //print out table
-//                List<Image> imageList = getImages(folderName);
-//                for (int i =0;i<imageList.size();i++){
-//
-//                    Image image = imageList.get(i);
-//                    Log.i("Images",": "+image.getImageId());
-//
-//                }
-            }
-
-            //save album to LocalAlbum table
-            ActiveAndroid.beginTransaction();
-            try {
-                while (it.hasNext()){
-                    Map.Entry pair = (Map.Entry)it.next();
-                    System.out.println(pair.getKey() + " = " + pair.getValue());
-                    LocalAlbum localAlbum = new LocalAlbum();
-                    localAlbum.setAlbumName(pair.getKey().toString());
-                    localAlbum.setAlbumDirectory(pair.getValue().toString());
-                    localAlbum.save();
-                    it.remove();
-                }
-                ActiveAndroid.setTransactionSuccessful();
-            }
-            finally {
-                ActiveAndroid.endTransaction();
-            }
-//            Log.i("~~~", getRandom().getAlbumName());
-
-        }
     }
 
     /**
@@ -608,10 +445,13 @@ public class LoginActivity extends AppCompatActivity {
                 mEditor.commit();
                 if(collectionId!=null&&collectionId!=""){   // login with qr code
                     RetrofitClient.getCollectionById(collectionId, callback_collection, user.getApiKey());
+
                     //create a new task for new selected collection
                 }else {
                     Toast.makeText(activity,"Welcome "+userCompleteName,Toast.LENGTH_SHORT).show();
-                    accountLogin(user.getPerson().getId(),false);}
+                    accountLogin(user.getPerson().getId(),false);
+                }
+
             }
         }
 
@@ -627,6 +467,7 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(activity, "username or password wrong", Toast.LENGTH_SHORT).show();
             }else if(error.getResponse().getStatus()==404){
                 Toast.makeText(activity, "server not response", Toast.LENGTH_SHORT).show();
+
             }
         }
     };
@@ -637,12 +478,13 @@ public class LoginActivity extends AppCompatActivity {
             Log.v(LOG_TAG,"success");
             collectionName = imejiFolder.getTitle();
             createTask();
+            collectionId = null;
         }
 
         @Override
         public void failure(RetrofitError error) {
             Log.v(LOG_TAG,"failed");
-            Toast.makeText(activity,"QR code invalid",Toast.LENGTH_LONG).show();
+            Toast.makeText(activity,"The collectionId in QR code is not valid",Toast.LENGTH_LONG).show();
         }
     };
 }

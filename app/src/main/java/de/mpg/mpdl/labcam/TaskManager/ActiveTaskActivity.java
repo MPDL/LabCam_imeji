@@ -23,7 +23,7 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 
 public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskInterface{
 
@@ -39,6 +39,7 @@ public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskI
 
     //user info
     private String userId;
+    private String serverUrl;
     private SharedPreferences mPrefs;
 
     private TaskManagerAdapter taskManagerAdapter;
@@ -65,6 +66,7 @@ public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskI
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         userId =  mPrefs.getString("userId", "");
+        serverUrl = mPrefs.getString("server","");
 
 
         /** handler observer **/
@@ -76,12 +78,7 @@ public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskI
                 if(msg.what==1234){
                     Log.v("~~~", "1234~~~");
 
-                    taskList = new Select()
-                            .from(Task.class)
-                            .where("userId = ?", userId)
-                            .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
-                            .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
-                            .execute();
+                    taskList = DBConnector.getActiveTasks(userId, serverUrl);
 
                     Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
                     Task auTask = new Task();
@@ -122,12 +119,9 @@ public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskI
 //        View view = inflater.inflate(R.layout.fragment_task, container,false);
         //taskManager listview
         taskManagerListView = (ListView) findViewById(R.id.listView_task);
-        taskList = new Select()
-                .from(Task.class)
-                .where("userId = ?", userId)
-                .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
-                .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
-                .execute();
+
+        taskList = DBConnector.getActiveTasks(userId, serverUrl);
+
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
 
         // auTask only for delete
@@ -149,7 +143,9 @@ public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskI
 
             /** exception **/
             if(task!=null&& settings!=null){
-                if (task.getUploadMode().equalsIgnoreCase("AU") && !settings.isAutoUpload()) {
+                // auto task, autoUpload switch off
+//                if (task.getUploadMode().equalsIgnoreCase("AU") && !settings.isAutoUpload()) {
+                    if (task.getUploadMode().equalsIgnoreCase("AU") && task.getTotalItems()== 0 ) {
                     auTask = task;
                 }
             }
@@ -182,13 +178,14 @@ public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskI
     }
 
     @Override
-    public void remove(int postion) {
-        try{
-            taskList.remove(postion);
+    public void remove(int position) {
+        try {
+            taskList.remove(position);
             taskManagerAdapter.notifyDataSetChanged();
-        } catch (Exception e){
-            //press too fast
+        }catch (IndexOutOfBoundsException e){
+            e.printStackTrace();
         }
+
     }
 
     @Override
