@@ -263,15 +263,14 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private void renderStatusBar(){
         {
 
-            List<Task> activeTasks = DBConnector.getActiveTasks(userId, serverName);
-            List<Task> waitingTasks = DBConnector.getUserWaitingTasks(userId, serverName);
-            List<Task> stoppedTasks = DBConnector.getUserStoppedTasks(userId, serverName);
-            Task mostRecentTask = DBConnector.getLatestFinishedTask(userId, serverName);
+            List<Task> activeTasks = DBConnector.getActiveTasks(userId, serverName);  // not finished
+            List<Task> waitingTasks = DBConnector.getUserWaitingTasks(userId, serverName); // waiting
+            List<Task> stoppedTasks = DBConnector.getUserStoppedTasks(userId, serverName); // stopped
+            Task mostRecentTask = DBConnector.getLatestFinishedTask(userId, serverName);  // last task
 
             int num_activate = 0;
 
-//                    num_activate = stoppedTasks.size() + waitingTasks.size();
-            num_activate = activeTasks.size();
+            num_activate = activeTasks.size();  // waiting, stop, failed tasks
 
             if(num_activate > 0){
                 // remove always waiting auTask

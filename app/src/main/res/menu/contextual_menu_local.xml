@@ -8,6 +8,7 @@
         android:showAsAction="ifRoom"
         android:title="Notes"
         android:titleCondensed="Notes"
+        android:visible="false"
         tools:ignore="AppCompatResource">
     </item>
 
@@ -17,6 +18,7 @@
         android:showAsAction="ifRoom"
         android:title="Microphone"
         android:titleCondensed="Microphone"
+        android:visible="false"
         tools:ignore="AppCompatResource">
     </item>
 
