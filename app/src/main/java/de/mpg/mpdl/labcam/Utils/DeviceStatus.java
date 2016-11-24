@@ -268,6 +268,8 @@ public class DeviceStatus {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (NegativeArraySizeException e){
+            e.printStackTrace();
         }
 
 
@@ -367,6 +369,8 @@ public class DeviceStatus {
         if(bitMapOrig != rotatedBitmap)
             bitMapOrig.recycle();
         bitMapOrig = null;
+
+        // ocr exception
         ocr = OCRtextHandler.getText(context, rotatedBitmap);
         Log.e(LOG_TAG, "ocr: " + ocr);
 

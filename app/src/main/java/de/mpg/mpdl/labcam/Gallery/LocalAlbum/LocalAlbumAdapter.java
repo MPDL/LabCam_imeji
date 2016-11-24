@@ -80,7 +80,6 @@ public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.Vi
         //prepare data
         Point size = getPoint();
         String filePath = galleryItems.get(position);
-        Image image = new Select().from(Image.class).where("imagePath = ?",filePath).executeSingle();
 
         // show mark when selected
         if (positionSet.contains(position)) {

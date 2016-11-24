@@ -1,19 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--<item-->
-        <!--android:id="@+id/item_delete_local"-->
-        <!--android:icon="@android:drawable/ic_menu_delete"-->
-        <!--android:showAsAction="ifRoom|withText"-->
-        <!--android:title="Delete"-->
-        <!--android:titleCondensed="Delete"-->
-        <!--tools:ignore="AppCompatResource">-->
-    <!--</item>-->
+
+    <item
+        android:id="@+id/item_notes_local"
+        android:icon="@drawable/note_icon"
+        android:showAsAction="ifRoom"
+        android:title="Notes"
+        android:titleCondensed="Notes"
+        tools:ignore="AppCompatResource">
+    </item>
+
+    <item
+        android:id="@+id/item_microphone_local"
+        android:icon="@drawable/microphone_icon"
+        android:showAsAction="ifRoom"
+        android:title="Microphone"
+        android:titleCondensed="Microphone"
+        tools:ignore="AppCompatResource">
+    </item>
 
     <item
         android:id="@+id/item_upload_local"
         android:icon="@android:drawable/ic_menu_upload"
-        android:showAsAction="ifRoom|withText"
+        android:showAsAction="ifRoom"
         android:title="Upload"
         android:titleCondensed="Upload"
         tools:ignore="AppCompatResource">

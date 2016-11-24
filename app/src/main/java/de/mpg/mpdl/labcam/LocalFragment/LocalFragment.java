@@ -53,6 +53,8 @@ import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;
 import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
 import de.mpg.mpdl.labcam.Model.Gallery;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
@@ -398,7 +400,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         switch (item.getItemId()) {
             case R.id.item_upload_local:
 
-                Log.v(LOG_TAG, "upload");
+                Log.i(LOG_TAG, "upload");
 
                 if(positionSet.size()!=0) {
                     Log.v(LOG_TAG, " "+positionSet.size());
@@ -428,6 +430,14 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     imagePathListForAlbumTask.clear();
                 }
                 mode.finish();
+                return true;
+            case R.id.item_microphone_local:
+                Log.i(LOG_TAG, "microphone");
+                showVoiceDialog("bla");
+                return true;
+            case R.id.item_notes_local:
+                Log.i(LOG_TAG, "notes");
+                showNoteDialog("bla");
                 return true;
             default:
                 return false;
@@ -748,10 +758,10 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private void uploadList(List<String> fileList) {
         String currentTaskId = createTask(fileList);
 
-        newInstance(currentTaskId).show(getActivity().getFragmentManager(), "remoteListDialog");
+        remoteListNewInstance(currentTaskId).show(getActivity().getFragmentManager(), "remoteListDialog");
     }
 
-    public static RemoteListDialogFragment newInstance(String taskId)
+    public static RemoteListDialogFragment remoteListNewInstance(String taskId)
     {
         RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
         Bundle args = new Bundle();
@@ -833,6 +843,34 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 imageNum = imageNum + 1;
         }
         return imageNum;
+    }
+
+    /**** take notes ****/
+    public static NoteDialogFragment noteDialogNewInstance(String taskId)
+    {
+        NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("taskId", taskId);
+        noteDialogFragment.setArguments(args);
+        return noteDialogFragment;
+    }
+
+    public void showNoteDialog(String str){
+        noteDialogNewInstance(str).show(getActivity().getFragmentManager(), "noteDialogFragment");
+    }
+
+    /**** record voice ****/
+    public static MicrophoneDialogFragment voiceDialogNewInstance(String taskId)
+    {
+        MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("taskId", taskId);
+        microphoneDialogFragment.setArguments(args);
+        return microphoneDialogFragment;
+    }
+
+    public void showVoiceDialog(String str){
+        voiceDialogNewInstance(str).show(getActivity().getFragmentManager(), "voiceDialogFragment");
     }
 
     @Override

@@ -96,10 +96,14 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
 
         final List<String[]> gallery = galleryList.get(position);
 
+        // display first 6 photos in an album
+        // if album size less than 6, display differently
         int sizeConstrain = 6;
         if (gallery.size() < 7) {
             sizeConstrain = gallery.size();
         }
+
+        // 3 images a row
         int pixels;
         final float scale = activity.getResources().getDisplayMetrics().density;
         if (sizeConstrain < 4) {
@@ -147,10 +151,10 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
         // to the album view
         for (int i = 0; i < sizeConstrain; i++) {
             imageViewList.get(i).setVisibility(View.VISIBLE);
-            if (i == 5) {
+            if (i == 5 && gallery.size() != 6) { // if <=6 photo, no shadow on 6th photo; if >6, remain photos number begins with 2
                 AutofitHelper.create(textViewList.get(i));
                 textViewList.get(i).setVisibility(View.VISIBLE);
-                textViewList.get(i).setText(String.valueOf(gallery.size()) + " >");
+                textViewList.get(i).setText(String.valueOf(gallery.size()-5) + " >");
                 textViewList.get(i).setBackgroundResource(R.color.black_shadow);
                 imageViewList.get(i).setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -168,7 +172,7 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
                 imageViewList.get(i).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        //TODO: go to photo detail
+                        // go to photo detail
                         boolean isLocalImage = true;
                         int image_position = 0;
                         Intent showDetailIntent = new Intent(activity, DetailActivity.class);

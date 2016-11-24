@@ -22,7 +22,6 @@ import de.mpg.mpdl.labcam.R;
  * Created by yingli on 2/23/16.
  */
 public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleViewHolder> {
-    private static final int COUNT = 100;
 
     private final Context mContext;
     private final List<String> mItems;
@@ -99,15 +98,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     public void remove(String str){
         mItems.remove(str);
         notifyDataSetChanged();
-    }
-
-    public void removeItem(int position) {
-        mItems.remove(position);
-        notifyItemRemoved(position);
-    }
-
-    public String getItem(int pos){
-        return mItems.get(pos);
     }
 
     @Override
