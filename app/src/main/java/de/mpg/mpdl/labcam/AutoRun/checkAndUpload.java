@@ -788,6 +788,17 @@ public class checkAndUpload {
                             currentImage.save();
                             Log.e(TAG, currentImage.getImageName() + " already exists");
                             Log.e(TAG, currentImage.getState());
+                        }else if(jsonBody.contains("Invalid collection")){
+                            task.setState(String.valueOf(DeviceStatus.state.FAILED));
+                            task.setEndDate(DeviceStatus.dateNow());
+                            task.save();
+                            Handler handler_422=new Handler(Looper.getMainLooper());
+                            handler_422.post(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(context, "Invalid collection", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            return;
                         }
                         break;
                     case 404:
