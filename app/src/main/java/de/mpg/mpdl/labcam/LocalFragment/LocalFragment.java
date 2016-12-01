@@ -12,6 +12,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -57,6 +59,7 @@ import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogF
 import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
 import de.mpg.mpdl.labcam.Model.Gallery;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.Model.LocalModel.ImageGroup;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
@@ -398,45 +401,19 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_upload_local:
-
                 Log.i(LOG_TAG, "upload");
-
-                if(positionSet.size()!=0) {
-                    Log.v(LOG_TAG, " "+positionSet.size());
-                    List uploadPathList = new ArrayList();
-                    for (Integer i : positionSet) {
-                        uploadPathList.add(sortedImageNameList.get(i));
-                    }
-
-                    if (uploadPathList != null) {
-                        uploadList(uploadPathList);
-                    }
-                    uploadPathList.clear();
-
-                }else if(albumPositionSet.size()!=0){
-                    Toast.makeText(getActivity(),"albums upload",Toast.LENGTH_SHORT).show();
-                    // upload albums
-                    List<String> imagePathListForAlbumTask = new ArrayList<>();
-                    // add selected albums
-                    for (Integer i: albumPositionSet){
-                        // add path by album
-                            for(String[] imageStrArray: imagePathListAllAlbums.get(i)){
-                            imagePathListForAlbumTask.add(imageStrArray[1]);
-                        }
-                    }
-                    Log.e(LOG_TAG,"imagePathListForAlbumTask: " +imagePathListForAlbumTask.size());
-                    uploadList(imagePathListForAlbumTask);
-                    imagePathListForAlbumTask.clear();
-                }
+                batchOperation(R.id.item_upload_local);
                 mode.finish();
                 return true;
             case R.id.item_microphone_local:
                 Log.i(LOG_TAG, "microphone");
-                showVoiceDialog("bla");
+                batchOperation(R.id.item_microphone_local);
+                mode.finish();
                 return true;
             case R.id.item_notes_local:
                 Log.i(LOG_TAG, "notes");
-                showNoteDialog("bla");
+                batchOperation(R.id.item_notes_local);
+                mode.finish();
                 return true;
             default:
                 return false;
@@ -786,7 +763,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         task.setSeverName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
-        int num = addImages(fileList, task.getTaskId());
+        int num = addImages(fileList, task.getTaskId()).size();
         task.setTotalItems(num);
         task.save();
         Log.v(LOG_TAG,"MU task"+task.getTaskId() );
@@ -795,17 +772,22 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         return task.getTaskId();
     }
 
-    private int addImages(List<String> fileList,String taskId){
+    private static List<Image> addImages(List<String> fileList,String taskId){
 
-        int imageNum = 0;
+        List<Image> imageList = new ArrayList<>();
+
         for (String filePath: fileList) {
             File file = new File(filePath);
             File imageFile = file.getAbsoluteFile();
             String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
+            Image image = DBConnector.getImageByPath(filePath);
+            if(image!=null){  // image already exist
+                imageList.add(image);
+                continue;
+            }
 
             //imageSize
             String fileSize = String.valueOf(file.length() / 1024);
-
 
             ExifInterface exif = null;
             try {
@@ -826,50 +808,55 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
             //state
             String imageState = String.valueOf(DeviceStatus.state.WAITING);
-                String imageId = UUID.randomUUID().toString();
-                //store image in local database
-                Image photo = new Image();
-                photo.setImageId(imageId);
-                photo.setImageName(imageName);
-                photo.setImagePath(filePath);
-                photo.setLongitude(longitude);
-                photo.setLatitude(latitude);
-                photo.setCreateTime(createTime);
-                photo.setSize(fileSize);
-                photo.setState(imageState);
-                photo.setTaskId(taskId);
-                photo.save();
-                imageNum = imageNum + 1;
+            String imageId = UUID.randomUUID().toString();
+            //store image in local database
+            Image photo = new Image();
+            photo.setImageId(imageId);
+            photo.setImageName(imageName);
+            photo.setImagePath(filePath);
+            photo.setLongitude(longitude);
+            photo.setLatitude(latitude);
+            photo.setCreateTime(createTime);
+            photo.setSize(fileSize);
+            photo.setState(imageState);
+            photo.setTaskId(taskId);
+            photo.save();
+            imageList.add(photo);
         }
-        return imageNum;
+        return imageList;
     }
 
     /**** take notes ****/
-    public static NoteDialogFragment noteDialogNewInstance(String taskId)
+    public static NoteDialogFragment noteDialogNewInstance(ArrayList<String> imagePathList)
     {
         NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
         Bundle args = new Bundle();
-        args.putString("taskId", taskId);
+
+        // pass imagePathList as a parcel
+        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
+        Log.d("LY", "size: "+imagePathList.size());
+
         noteDialogFragment.setArguments(args);
+        args.putParcelable("imageList", imageGroup);
         return noteDialogFragment;
     }
 
-    public void showNoteDialog(String str){
-        noteDialogNewInstance(str).show(getActivity().getFragmentManager(), "noteDialogFragment");
+    public void showNoteDialog(ArrayList<String> imagePathList){
+        noteDialogNewInstance(imagePathList).show(getActivity().getFragmentManager(), "noteDialogFragment");
     }
 
     /**** record voice ****/
-    public static MicrophoneDialogFragment voiceDialogNewInstance(String taskId)
+    public static MicrophoneDialogFragment voiceDialogNewInstance(ArrayList<String> imagePathList)
     {
         MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
         Bundle args = new Bundle();
-        args.putString("taskId", taskId);
+        args.putStringArrayList("imagePathList", imagePathList);
         microphoneDialogFragment.setArguments(args);
         return microphoneDialogFragment;
     }
 
-    public void showVoiceDialog(String str){
-        voiceDialogNewInstance(str).show(getActivity().getFragmentManager(), "voiceDialogFragment");
+    public void showVoiceDialog(ArrayList<String> imagePathList){
+        voiceDialogNewInstance(imagePathList).show(getActivity().getFragmentManager(), "voiceDialogFragment");
     }
 
     @Override
@@ -913,4 +900,56 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         super.onPause();
 
     }
+
+    private void batchOperation(int operationType){
+        if(positionSet.size()!=0) {
+            Log.v(LOG_TAG, " "+positionSet.size());
+            ArrayList imagePathList = new ArrayList();
+            for (Integer i : positionSet) {
+                imagePathList.add(sortedImageNameList.get(i));
+            }
+
+            if (imagePathList != null) {
+                switch (operationType){
+                    case R.id.item_upload_local:
+                        uploadList(imagePathList);
+                        break;
+                    case R.id.item_microphone_local:
+                        showVoiceDialog(imagePathList);
+                        break;
+                    case R.id.item_notes_local:
+                        showNoteDialog(imagePathList);
+                        break;
+                }
+            }
+            imagePathList.clear();
+
+        }else if(albumPositionSet.size()!=0){
+            Toast.makeText(getActivity(),"albums upload",Toast.LENGTH_SHORT).show();
+            // upload albums
+            ArrayList<String> imagePathListForAlbumTask = new ArrayList<>();
+            // add selected albums
+            for (Integer i: albumPositionSet){
+                // add path by album
+                for(String[] imageStrArray: imagePathListAllAlbums.get(i)){
+                    imagePathListForAlbumTask.add(imageStrArray[1]);
+                }
+            }
+            if (imagePathListForAlbumTask != null) {
+                switch (operationType){
+                    case R.id.item_upload_local:
+                        uploadList(imagePathListForAlbumTask);
+                        break;
+                    case R.id.item_microphone_local:
+                        showVoiceDialog(imagePathListForAlbumTask);
+                        break;
+                    case R.id.item_notes_local:
+                        showNoteDialog(imagePathListForAlbumTask);
+                        break;
+                }
+            }
+            imagePathListForAlbumTask.clear();
+        }
+    }
+
 }

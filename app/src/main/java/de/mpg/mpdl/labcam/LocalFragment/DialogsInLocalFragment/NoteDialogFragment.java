@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Display;
@@ -13,13 +14,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.Model.LocalModel.ImageGroup;
+import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by yingli on 11/24/16.
  */
 
 public class NoteDialogFragment extends DialogFragment {
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
@@ -28,6 +37,13 @@ public class NoteDialogFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.dialog_fragment_note, null);
         Activity activity = this.getActivity();
 
+        // get imageList
+        ImageGroup imageGroup = (ImageGroup)getArguments().getParcelable("imageList");
+        final List<String> imagePathList = imageGroup.getImageList();
+        Log.d("LY", "size: "+ imagePathList.size());
+        Log.d("LY", "id: "+ imageGroup.getBatchId());
+
+        // display dialog window size
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -40,27 +56,44 @@ public class NoteDialogFragment extends DialogFragment {
         else
             squareWidth = width/2;
 
+
+        // edit notes
+        final EditText editText= (EditText)view.findViewById(R.id.note_edit_text);
+        editText.setHeight(3*squareWidth/4);    // push pos,neg button to the bottom
+
+
         // builder
         AlertDialog.Builder builder=  new  AlertDialog.Builder(getActivity())
                 .setTitle("Create a new text note：")
                 .setPositiveButton("SAVE",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                // save note
+                                Log.d("LY", "save clicked");
+                                String noteContentStr = editText.getText().toString();
+                                Note note = new Note();
+                                // TODO: 11/28/16 discuss if noteId, noteName is needed
+                                note.setNoteContent(noteContentStr);
+                                note.save();
+                                Log.d("LY", "note saved");
 
-
+                                // update image, set note
+                                for (String imagePath : imagePathList) {
+                                    Image image = DBConnector.getImageByPath(imagePath);
+                                    image.setNote(note);
+                                    image.save();
+                                    Log.d("LY", image.getNote().getNoteContent());
+                                }
                             }
                         }
                 )
                 .setNegativeButton("CANCEL",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                // do nothing
                             }
                         }
                 );
-
-        // edit notes
-        EditText editText= (EditText)view.findViewById(R.id.note_edit_text);
-        editText.setHeight(3*squareWidth/4);    // push pos,neg button to the bottom
 
         builder.setView(view);
         AlertDialog alertDialog = builder.create();

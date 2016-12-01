@@ -54,7 +54,9 @@ public class Image extends Model {
     @Column(name = "logs")
     private String log;
 
+    private Note note;
 
+    private Voice voice;
 
 
 
@@ -63,18 +65,20 @@ public class Image extends Model {
     }
 
 
-    public Image(String imageId, String taskId, String imageName, String state, String errorLeverl, String imagePath, String size, String createTime, String latitude, String longitude, String log) {
+    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, Note note, Voice voice) {
         this.imageId = imageId;
         this.taskId = taskId;
         this.imageName = imageName;
         this.state = state;
-        this.errorLevel = errorLeverl;
+        this.errorLevel = errorLevel;
         this.imagePath = imagePath;
         this.size = size;
         this.createTime = createTime;
         this.latitude = latitude;
         this.longitude = longitude;
         this.log = log;
+        this.note = note;
+        this.voice = voice;
     }
 
     public String getImageId() {
@@ -163,5 +167,21 @@ public class Image extends Model {
 
     public void setLog(String log) {
         this.log = log;
+    }
+
+    public Note getNote() {
+        return note;
+    }
+
+    public void setNote(Note note) {
+        this.note = note;
+    }
+
+    public Voice getVoice() {
+        return voice;
+    }
+
+    public void setVoice(Voice voice) {
+        this.voice = voice;
     }
 }

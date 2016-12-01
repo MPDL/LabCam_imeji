@@ -14,6 +14,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
+    <!--AUDIO -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"></uses-permission>
+
     <!-- device boot -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -37,7 +40,7 @@
             android:value="MPDLCam.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="2" />
+            android:value="3" />
 
         <!--ocr-->
         <meta-data android:name="com.google.android.gms.vision.DEPENDENCIES"
