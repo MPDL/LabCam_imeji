@@ -38,10 +38,16 @@ public class NoteDialogFragment extends DialogFragment {
         Activity activity = this.getActivity();
 
         // get imageList
-        ImageGroup imageGroup = (ImageGroup)getArguments().getParcelable("imageList");
-        final List<String> imagePathList = imageGroup.getImageList();
-        Log.d("LY", "size: "+ imagePathList.size());
-        Log.d("LY", "id: "+ imageGroup.getBatchId());
+//        ImageGroup imageGroup = (ImageGroup)getArguments().getParcelable("imageList");
+//        final List<String> imagePathList = imageGroup.getImageList();
+
+        Bundle bundle = getArguments();
+        final String[] imagePathArray = bundle.getStringArray("imagePathArray");
+        for (String s : imagePathArray) {
+            Log.d("sss", s);
+
+        }
+//        Log.d("LY", "id: "+ imageGroup.getBatchId());
 
         // display dialog window size
         Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -78,11 +84,15 @@ public class NoteDialogFragment extends DialogFragment {
                                 Log.d("LY", "note saved");
 
                                 // update image, set note
-                                for (String imagePath : imagePathList) {
+                                for (String imagePath : imagePathArray) {
                                     Image image = DBConnector.getImageByPath(imagePath);
+                                    if(image!=null){
                                     image.setNote(note);
                                     image.save();
                                     Log.d("LY", image.getNote().getNoteContent());
+                                    }else {
+                                        Log.d("LY", imagePath);
+                                    }
                                 }
                             }
                         }

@@ -835,9 +835,19 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         // pass imagePathList as a parcel
         ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
         Log.d("LY", "size: "+imagePathList.size());
+        addImages(imagePathList, "");
+
+        String[] imagePathArray = new String[imagePathList.size()];
+        for(int i=0; i<imagePathList.size(); i++){
+            imagePathArray[i] = imagePathList.get(i);
+        }
 
         noteDialogFragment.setArguments(args);
         args.putParcelable("imageList", imageGroup);
+        args.putStringArrayList("imagePathList", imagePathList);
+        ArrayList<String> imageList2 = args.getStringArrayList("imagePathList");
+        Log.d(LOG_TAG, "size: "+imageList2.size());
+        args.putStringArray("imagePathArray", imagePathArray);
         return noteDialogFragment;
     }
 
@@ -849,8 +859,14 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     public static MicrophoneDialogFragment voiceDialogNewInstance(ArrayList<String> imagePathList)
     {
         MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
+
+        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
+        Log.d("LY", "size: "+imagePathList.size());
+
         Bundle args = new Bundle();
         args.putStringArrayList("imagePathList", imagePathList);
+        args.putParcelable("imageList", imageGroup);
+
         microphoneDialogFragment.setArguments(args);
         return microphoneDialogFragment;
     }

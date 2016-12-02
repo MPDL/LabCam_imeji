@@ -40,6 +40,7 @@ public class MicrophoneDialogFragment extends DialogFragment{
     private int output_formats[] = { MediaRecorder.OutputFormat.MPEG_4, MediaRecorder.OutputFormat.THREE_GPP };
     private String file_exts[] = { AUDIO_RECORDER_FILE_EXT_MP4, AUDIO_RECORDER_FILE_EXT_3GP };
 
+    private String fileFullName = null;
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
@@ -68,14 +69,24 @@ public class MicrophoneDialogFragment extends DialogFragment{
                 .setPositiveButton("SAVE",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                Toast.makeText(activity, getFilename(),Toast.LENGTH_LONG).show();
-
+                                Toast.makeText(activity, fileFullName,Toast.LENGTH_LONG).show();
+                                
                             }
                         }
                 )
                 .setNegativeButton("CANCEL",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+
+                                if(fileFullName == null){
+                                    Toast.makeText(activity, "Please long press the button to take record.",Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
+                                File file = new File(fileFullName);
+                                if(file.exists()){
+                                    file.delete();   // delete record
+                                }
                             }
                         }
                 );
@@ -128,11 +139,12 @@ public class MicrophoneDialogFragment extends DialogFragment{
     }
 
     private void startRecording(){
+        fileFullName = getFilename();  // pick a file name
         recorder = new MediaRecorder();
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         recorder.setOutputFormat(output_formats[currentFormat]);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        recorder.setOutputFile(getFilename());
+        recorder.setOutputFile(fileFullName);
         recorder.setOnErrorListener(errorListener);
         recorder.setOnInfoListener(infoListener);
 
