@@ -120,15 +120,34 @@
             android:textColor="@drawable/clickable_color_login"
             />
 
-        <TextView
+
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tv_new_here"
-            android:gravity="right"
-            android:layout_marginTop="10dp"
-            android:text="New here?"
-            android:textSize="14sp"
-            />
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/tv_register"
+                android:gravity="left"
+                android:layout_marginTop="10dp"
+                android:text="Register"
+                android:textSize="14sp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/tv_new_here"
+                android:gravity="right"
+                android:layout_marginTop="10dp"
+                android:text="New here?"
+                android:textSize="14sp"
+                />
+        </LinearLayout>
 
         <Button
             android:layout_width="50dp"

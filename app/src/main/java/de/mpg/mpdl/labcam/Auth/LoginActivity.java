@@ -54,6 +54,7 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.label_other) TextView othersLabel;
 
     @BindView(R.id.tv_new_here)  TextView newHereView;
+    @BindView(R.id.tv_register) TextView newRegister;
     @BindView(R.id.btnSignIn)  Button signIn;
     @BindView(R.id.qr_scanner)  Button scan;
     private Activity activity = this;
@@ -197,6 +198,15 @@ public class LoginActivity extends AppCompatActivity {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://labcam.mpdl.mpg.de/"));
                 startActivity(browserIntent);
             }
+        });
+
+        newRegister.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://gluons.mpdl.mpg.de/static/gluons-preregister/preregister.html"));
+                startActivity(browserIntent);
+            }
+
         });
 
     }
