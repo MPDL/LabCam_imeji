@@ -12,7 +12,7 @@ android {
         applicationId "de.mpg.mpdl.labcam"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 5
+        versionCode 6
         versionName "2.0"
     }
     buildTypes {
@@ -24,7 +24,7 @@ android {
     productFlavors {
         free {
             signingConfig signingConfigs.freeConfig
-            versionCode 5
+            versionCode 6
         }
     }
     lintOptions {
