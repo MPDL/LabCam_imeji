@@ -13,7 +13,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:background="@android:color/transparent"
-        android:hint="Speak now, then hit 'save' or 'cancel' when you are finished"/>
+        android:hint="Long press the button to record your voice"/>
 
     <TextView
             android:layout_width="match_parent"
@@ -29,6 +29,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:id="@+id/im_microphone_record"
-        android:background="@drawable/microphone_button_round"/>
+        android:background="@xml/microphone_long_press_button"/>
 
 </LinearLayout>

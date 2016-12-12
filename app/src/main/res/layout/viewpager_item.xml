@@ -3,13 +3,14 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--image contents-->
     <ImageView
         android:id="@+id/detail_image"
         android:src="@drawable/imeji"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent"/>
 
+    <!--check mark-->
     <ImageView
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -19,5 +20,34 @@
         android:id="@+id/viewpager_check_mark"
         android:visibility="gone"
         android:src="@drawable/btn_check"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginBottom="32dp"
+        android:layout_alignParentBottom="true">
+
+        <!--notes-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_notes_detail"
+            android:textColor="@color/white"/>
+
+        <!--voice panel-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/layout_voice_panel">
+
+
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
 
 </RelativeLayout>
