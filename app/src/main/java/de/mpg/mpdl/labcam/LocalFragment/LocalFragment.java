@@ -46,7 +46,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,7 +54,6 @@ import java.util.UUID;
 
 import de.mpg.mpdl.labcam.AutoRun.dbObserver;
 import de.mpg.mpdl.labcam.Gallery.AlbumRecyclerAdapter;
-import de.mpg.mpdl.labcam.Gallery.LocalImageActivity;
 import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;

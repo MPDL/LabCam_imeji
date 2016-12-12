@@ -3,14 +3,8 @@ package de.mpg.mpdl.labcam.Gallery;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.ShapeDrawable;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Display;
@@ -22,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -33,9 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
-import de.mpg.mpdl.labcam.Model.Gallery;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import me.grantland.widget.AutofitHelper;
 
 /**

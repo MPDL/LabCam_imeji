@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.activeandroid.query.Select;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -22,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.R;
 
 /**

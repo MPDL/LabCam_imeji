@@ -1,7 +1,6 @@
 package de.mpg.mpdl.labcam.ImejiFragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -10,15 +9,12 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
@@ -35,7 +31,6 @@ import java.util.TreeMap;
 
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;
-import de.mpg.mpdl.labcam.ItemDetails.ItemsActivity;
 import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;

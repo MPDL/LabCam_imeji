@@ -15,45 +15,30 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
-import com.crashlytics.android.Crashlytics;
 
 import org.eclipse.jetty.util.MultiMap;
 import org.eclipse.jetty.util.UrlEncoded;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import de.mpg.mpdl.labcam.Folder.MainActivity;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.Model.LocalModel.LocalAlbum;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.User;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
-import de.mpg.mpdl.labcam.Utils.ImageFileFilter;
 import de.mpg.mpdl.labcam.Utils.QRUtils;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import io.fabric.sdk.android.Fabric;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -69,6 +54,7 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.label_other) TextView othersLabel;
 
     @BindView(R.id.tv_new_here)  TextView newHereView;
+    @BindView(R.id.tv_register) TextView newRegister;
     @BindView(R.id.btnSignIn)  Button signIn;
     @BindView(R.id.qr_scanner)  Button scan;
     private Activity activity = this;
@@ -87,7 +73,6 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
 
         mPrefs = getSharedPreferences("myPref", 0);
         String Key = mPrefs.getString("apiKey", "");
@@ -213,6 +198,15 @@ public class LoginActivity extends AppCompatActivity {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://labcam.mpdl.mpg.de/"));
                 startActivity(browserIntent);
             }
+        });
+
+        newRegister.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://gluons.mpdl.mpg.de/static/gluons-preregister/preregister.html"));
+                startActivity(browserIntent);
+            }
+
         });
 
     }

@@ -40,7 +40,6 @@ import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.QRUtils;
-
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;

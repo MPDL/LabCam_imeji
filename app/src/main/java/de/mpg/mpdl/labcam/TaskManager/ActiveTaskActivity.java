@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.activeandroid.query.Select;
 
@@ -25,7 +24,6 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 
 public class ActiveTaskActivity extends AppCompatActivity implements RemoveTaskInterface{
 

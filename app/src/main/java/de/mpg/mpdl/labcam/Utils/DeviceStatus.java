@@ -4,18 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
 import android.support.design.widget.Snackbar;
-import android.text.TextPaint;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.drew.imaging.ImageMetadataReader;
@@ -31,13 +27,9 @@ import com.drew.metadata.exif.GpsDirectory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,11 +39,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
-
-import de.mpg.mpdl.labcam.R;
-
-import static android.R.attr.left;
-import static android.R.attr.top;
 
 /**
  * Created by allen on 09/04/15.
