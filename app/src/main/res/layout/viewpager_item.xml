@@ -33,16 +33,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/tv_notes_detail"
-            android:textColor="@color/white"/>
+            android:textColor="@color/white"
+                android:visibility="gone"/>
 
         <!--voice panel-->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/layout_voice_panel">
+            android:id="@+id/layout_voice_panel"
+            android:layout_below="@id/tv_notes_detail"
+            android:visibility="gone">
 
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/btn_voice_play"
+                android:src="@drawable/btn_play"/>
 
-
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/btn_voice_delete"
+                android:layout_toRightOf="@id/btn_voice_play"
+                android:src="@drawable/btn_delete"/>
 
         </RelativeLayout>
 

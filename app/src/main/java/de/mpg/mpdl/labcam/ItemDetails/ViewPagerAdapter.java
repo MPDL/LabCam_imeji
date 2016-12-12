@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -19,7 +20,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.camPicassoLoader;
 
 /**
@@ -113,6 +116,24 @@ public class ViewPagerAdapter extends PagerAdapter {
                     onItemClickListener.onItemClick(v, position);
                 }
             });
+        }
+
+        // get Image object
+        Image image = DBConnector.getImageByPath(imagePathList.get(position));
+        if(image != null){
+            TextView noteTextView = (TextView) itemView.findViewById(R.id.tv_notes_detail);
+            RelativeLayout voicePanelLayout = (RelativeLayout) itemView.findViewById(R.id.layout_voice_panel);
+
+            if(image.getNote()!=null){      // show notes
+
+                noteTextView.setVisibility(View.VISIBLE);
+                noteTextView.setText(image.getNote().getNoteContent());
+            }else noteTextView.setVisibility(View.GONE);
+
+            if(image.getVoice()!=null){     // show voice
+
+                voicePanelLayout.setVisibility(View.VISIBLE);
+            }else voicePanelLayout.setVisibility(View.GONE);
         }
 
         ((ViewPager) container).addView(itemView);
