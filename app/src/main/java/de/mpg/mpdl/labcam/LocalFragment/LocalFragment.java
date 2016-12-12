@@ -180,9 +180,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         //set header recycleView adapter
         loadTimeLinePicture();
 
-
-
-
         //switch
         dateLabel = (TextView) rootView.findViewById(R.id.label_date);
         albumLabel = (TextView) rootView.findViewById(R.id.label_album);
@@ -835,7 +832,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     public static NoteDialogFragment noteDialogNewInstance(ArrayList<String> imagePathList)
     {
         NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
-        Bundle args = new Bundle();
 
         Log.d("LY", "size: "+imagePathList.size());
         List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
@@ -845,8 +841,10 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             imagePathArray[i] = imagePathList.get(i);
         }
 
-        noteDialogFragment.setArguments(args);    // pass imagePathArray to NoteDialogFragment
+        Bundle args = new Bundle();
+
         args.putStringArray("imagePathArray", imagePathArray);
+        noteDialogFragment.setArguments(args);    // pass imagePathArray to NoteDialogFragment
         return noteDialogFragment;
     }
 
@@ -861,11 +859,16 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
 //        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
         Log.d("LY", "size: "+imagePathList.size());
+        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
+
+        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
+        for(int i=0; i<imagePathList.size(); i++){
+            imagePathArray[i] = imagePathList.get(i);
+        }
 
         Bundle args = new Bundle();
-        args.putStringArrayList("imagePathList", imagePathList);
-//        args.putParcelable("imageList", imageGroup);
 
+        args.putStringArray("imagePathArray", imagePathArray);
         microphoneDialogFragment.setArguments(args);
         return microphoneDialogFragment;
     }

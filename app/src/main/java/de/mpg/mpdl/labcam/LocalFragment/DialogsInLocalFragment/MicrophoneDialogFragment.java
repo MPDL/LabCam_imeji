@@ -1,13 +1,18 @@
 package de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Display;
@@ -20,7 +25,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.Model.LocalModel.Note;
+import de.mpg.mpdl.labcam.Model.LocalModel.Voice;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.Utils.ToastUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +59,12 @@ public class MicrophoneDialogFragment extends DialogFragment{
         View view = inflater.inflate(R.layout.dialog_fragment_microphone, null);
         final Activity activity = this.getActivity();
 
+        Bundle bundle = getArguments();
+        final String[] imagePathArray = bundle.getStringArray("imagePathArray");
+        for (String s : imagePathArray) {
+            Log.d("sss", s);
+        }
+
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -69,8 +85,29 @@ public class MicrophoneDialogFragment extends DialogFragment{
                 .setPositiveButton("SAVE",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                Toast.makeText(activity, fileFullName,Toast.LENGTH_LONG).show();
-                                
+                                // save note
+                                Log.d("LY", "save clicked");
+                                if(fileFullName==null)
+                                {
+                                    return;
+                                }
+
+                                Voice voice = new Voice();
+                                voice.setVoicePath(fileFullName);
+                                voice.save();
+                                Log.d("LY", "voice saved");
+
+                                // update image, set voice
+                                for (String imagePath : imagePathArray) {
+                                    Image image = DBConnector.getImageByPath(imagePath);
+                                    if(image!=null){
+                                        image.setVoice(voice);
+                                        image.save();
+                                        Log.d("LY", image.getVoice().getVoicePath());
+                                    }else {
+                                        Log.d("LY", imagePath);
+                                    }
+                                }
                             }
                         }
                 )
@@ -95,10 +132,15 @@ public class MicrophoneDialogFragment extends DialogFragment{
 //        TextView textView = (TextView) view.findViewById(R.id.text_view_voice_hint);
 //        textView.setHeight(squareWidth/5);
 
+        checkPermission();
+
         // record voice
         Button voiceImageView = (Button)view.findViewById(R.id.im_microphone_record);  // record icon
         voiceImageView.getLayoutParams().height = squareWidth/3;
         voiceImageView.getLayoutParams().width = squareWidth/3;
+
+        // record name
+        final TextView voiceTextView = (TextView) view.findViewById(R.id.text_view_voice_file_name); // record name
 
         voiceImageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -111,7 +153,14 @@ public class MicrophoneDialogFragment extends DialogFragment{
                     case MotionEvent.ACTION_UP:
                         Log.d(LOG_TAG, "stop Recording");
                         stopRecording();
-
+                        v.setVisibility(View.INVISIBLE);
+                        v.setClickable(false);
+                        v.setEnabled(false);
+                        voiceTextView.setVisibility(View.VISIBLE);
+                        if(fileFullName.contains("/")){
+                            String[] filename = fileFullName.split("/");
+                            voiceTextView.setText(filename[filename.length-1]);
+                        }else voiceTextView.setText(fileFullName);
                         break;
                 }
                 return false;
@@ -180,5 +229,50 @@ public class MicrophoneDialogFragment extends DialogFragment{
 
             recorder = null;
         }
+    }
+
+    /***********************************   permissions   ****************************************/
+
+    private static final int CHECK_PERMISSION = 1;
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void requestPermission() {
+        requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, CHECK_PERMISSION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CHECK_PERMISSION && grantResults.length >= 2) {
+            int firstGrantResult = grantResults[0];
+            int secondGrantResult = grantResults[1];
+            boolean granted = (firstGrantResult == PackageManager.PERMISSION_GRANTED) && (secondGrantResult == PackageManager.PERMISSION_GRANTED);
+            Log.i("permission", "onRequestPermissionsResult granted=" + granted);
+
+            if(granted) {
+//                startRecording();
+            }else{
+                getDialog().dismiss();
+                ToastUtil.showShortToast(getActivity(), "please grant RECORD_AUDIO and WRITE_EXTERNAL_STORAGE permissions");
+            }
+        }
+    }
+
+    /**
+     * Open image intent
+     */
+    private void checkPermission() {
+        // check permission for android > 6.0
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.RECORD_AUDIO)
+                    != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED ) {
+                requestPermission();
+
+                return;
+            }
+        }
+        // have permission, then pass
     }
 }

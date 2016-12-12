@@ -44,7 +44,6 @@ public class NoteDialogFragment extends DialogFragment {
         final String[] imagePathArray = bundle.getStringArray("imagePathArray");
         for (String s : imagePathArray) {
             Log.d("sss", s);
-
         }
 //        Log.d("LY", "id: "+ imageGroup.getBatchId());
 

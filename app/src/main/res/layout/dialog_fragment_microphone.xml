@@ -15,6 +15,15 @@
         android:background="@android:color/transparent"
         android:hint="Speak now, then hit 'save' or 'cancel' when you are finished"/>
 
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/text_view_voice_file_name"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:visibility="invisible"
+            android:text=""/>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
