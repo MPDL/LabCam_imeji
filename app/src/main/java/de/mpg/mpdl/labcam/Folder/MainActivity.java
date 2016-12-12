@@ -1,5 +1,7 @@
 package de.mpg.mpdl.labcam.Folder;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
@@ -14,6 +16,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -69,6 +72,8 @@ import de.mpg.mpdl.labcam.TaskManager.RecentProcessActivity;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.OCRtextHandler;
+import de.mpg.mpdl.labcam.Utils.ToastUtil;
+
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -321,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         cameraImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dispatchTakePictureIntent();
+                checkPermission();
             }
         });
         return super.onCreateOptionsMenu(menu);
@@ -890,6 +895,51 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         }
 
     }
+
+    /***********************************   permission   ****************************************/
+
+    private static final int CHECK_PERMISSION = 1;
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void requestCameraPermission() {
+        requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, CHECK_PERMISSION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CHECK_PERMISSION && grantResults.length >= 2) {
+            int firstGrantResult = grantResults[0];
+            int secondGrantResult = grantResults[1];
+            boolean granted = (firstGrantResult == PackageManager.PERMISSION_GRANTED) && (secondGrantResult == PackageManager.PERMISSION_GRANTED);
+            Log.i("permission", "onRequestPermissionsResult granted=" + granted);
+
+            if(granted) {
+                dispatchTakePictureIntent();
+            }else{
+                ToastUtil.showShortToast(this, "please grant CAMERA and WRITE_EXTERNAL_STORAGE permissions");
+            }
+        }
+    }
+
+    /**
+     * Open image intent
+     */
+    private void checkPermission() {
+        // check permission for android > 6.0
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!(checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)||
+                    !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+                requestCameraPermission();
+
+                return;
+            }
+        }
+
+        dispatchTakePictureIntent();
+    }
+
+    /**********************************     callbacks     *****************************************/
 
     Callback<ImejiFolder> createCollection_callback = new Callback<ImejiFolder>() {
         @Override

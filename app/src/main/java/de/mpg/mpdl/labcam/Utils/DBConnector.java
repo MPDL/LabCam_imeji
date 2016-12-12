@@ -8,7 +8,6 @@ import com.activeandroid.query.Select;
 import java.util.List;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.Model.LocalModel.ImageGroup;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 
 /**

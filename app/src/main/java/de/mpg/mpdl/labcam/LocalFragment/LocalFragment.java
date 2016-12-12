@@ -1,20 +1,25 @@
 package de.mpg.mpdl.labcam.LocalFragment;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -59,12 +64,12 @@ import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogF
 import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
 import de.mpg.mpdl.labcam.Model.Gallery;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.Model.LocalModel.ImageGroup;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar;
 
 /**
@@ -167,7 +172,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         renderTimeLine();
 
         //prepare local gallery image data
-        prepareData();
+        checkPermission();    // check SD permission first
 
         //set grid adapter
         loadLocalGallery();
@@ -772,7 +777,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         return task.getTaskId();
     }
 
-    private static List<Image> addImages(List<String> fileList,String taskId){
+    private static List<Image> addImages(List<String> fileList, String taskId){
 
         List<Image> imageList = new ArrayList<>();
 
@@ -832,21 +837,15 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
         Bundle args = new Bundle();
 
-        // pass imagePathList as a parcel
-        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
         Log.d("LY", "size: "+imagePathList.size());
-        addImages(imagePathList, "");
+        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
 
-        String[] imagePathArray = new String[imagePathList.size()];
+        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
         for(int i=0; i<imagePathList.size(); i++){
             imagePathArray[i] = imagePathList.get(i);
         }
 
-        noteDialogFragment.setArguments(args);
-        args.putParcelable("imageList", imageGroup);
-        args.putStringArrayList("imagePathList", imagePathList);
-        ArrayList<String> imageList2 = args.getStringArrayList("imagePathList");
-        Log.d(LOG_TAG, "size: "+imageList2.size());
+        noteDialogFragment.setArguments(args);    // pass imagePathArray to NoteDialogFragment
         args.putStringArray("imagePathArray", imagePathArray);
         return noteDialogFragment;
     }
@@ -860,12 +859,12 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     {
         MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
 
-        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
+//        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
         Log.d("LY", "size: "+imagePathList.size());
 
         Bundle args = new Bundle();
         args.putStringArrayList("imagePathList", imagePathList);
-        args.putParcelable("imageList", imageGroup);
+//        args.putParcelable("imageList", imageGroup);
 
         microphoneDialogFragment.setArguments(args);
         return microphoneDialogFragment;
@@ -908,7 +907,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     public void onPause() {
         resolver.unregisterContentObserver(dbObserver);
 
-        prepareData();
+//        prepareData();
+        checkPermission();
 //        loadTimeLinePicture();
         simpleAdapter.notifyDataSetChanged();
         mSectionedAdapter.notifyDataSetChanged();
@@ -966,6 +966,50 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             }
             imagePathListForAlbumTask.clear();
         }
+    }
+
+    /***********************************   permissions   ****************************************/
+
+    private static final int CHECK_PERMISSION = 1;
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void requestCameraPermission() {
+        requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, CHECK_PERMISSION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CHECK_PERMISSION && grantResults.length >= 2) {
+            int firstGrantResult = grantResults[0];
+            int secondGrantResult = grantResults[1];
+            boolean granted = (firstGrantResult == PackageManager.PERMISSION_GRANTED) && (secondGrantResult == PackageManager.PERMISSION_GRANTED);
+            Log.i("permission", "onRequestPermissionsResult granted=" + granted);
+
+            if(granted) {
+                prepareData();
+            }else{
+                ToastUtil.showShortToast(getActivity(), "please grant CAMERA and WRITE_EXTERNAL_STORAGE permissions");
+            }
+        }
+    }
+
+    /**
+     * Open image intent
+     */
+    private void checkPermission() {
+        // check permission for android > 6.0
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED ) {
+                requestCameraPermission();
+
+                return;
+            }
+        }
+        prepareData();
     }
 
 }

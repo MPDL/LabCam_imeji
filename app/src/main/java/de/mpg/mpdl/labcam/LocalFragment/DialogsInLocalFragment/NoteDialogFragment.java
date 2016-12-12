@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.EditText;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.Model.LocalModel.ImageGroup;
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
@@ -78,7 +77,6 @@ public class NoteDialogFragment extends DialogFragment {
                                 Log.d("LY", "save clicked");
                                 String noteContentStr = editText.getText().toString();
                                 Note note = new Note();
-                                // TODO: 11/28/16 discuss if noteId, noteName is needed
                                 note.setNoteContent(noteContentStr);
                                 note.save();
                                 Log.d("LY", "note saved");
