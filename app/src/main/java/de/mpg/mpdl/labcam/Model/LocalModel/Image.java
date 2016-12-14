@@ -54,8 +54,12 @@ public class Image extends Model {
     @Column(name = "logs")
     private String log;
 
-    private Note note;
+    @Expose
+    @Column(name = "noteId")
+    private String noteId;
 
+    @Expose
+    @Column(name = "voice")
     private Voice voice;
 
 
@@ -64,8 +68,7 @@ public class Image extends Model {
         super();
     }
 
-
-    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, Note note, Voice voice) {
+    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, String noteId, Voice voice) {
         this.imageId = imageId;
         this.taskId = taskId;
         this.imageName = imageName;
@@ -77,7 +80,7 @@ public class Image extends Model {
         this.latitude = latitude;
         this.longitude = longitude;
         this.log = log;
-        this.note = note;
+        this.noteId = noteId;
         this.voice = voice;
     }
 
@@ -169,12 +172,20 @@ public class Image extends Model {
         this.log = log;
     }
 
-    public Note getNote() {
-        return note;
+    public String getErrorLevel() {
+        return errorLevel;
     }
 
-    public void setNote(Note note) {
-        this.note = note;
+    public void setErrorLevel(String errorLevel) {
+        this.errorLevel = errorLevel;
+    }
+
+    public String getNoteId() {
+        return noteId;
+    }
+
+    public void setNoteId(String noteId) {
+        this.noteId = noteId;
     }
 
     public Voice getVoice() {

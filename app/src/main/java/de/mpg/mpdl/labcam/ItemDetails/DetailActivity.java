@@ -317,7 +317,4 @@ public class DetailActivity extends AppCompatActivity implements android.support
 
         }
     }
-
-
-
 }

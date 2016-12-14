@@ -164,7 +164,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         // folder gridView
         albumRecyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_gridView);
 
-
         actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
         renderTimeLine();

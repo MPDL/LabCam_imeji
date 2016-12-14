@@ -21,17 +21,22 @@ public class Voice extends Model {
     private String voiceName;
 
     @Expose
+    @Column(name = "createTime")
+    private String createTime;
+
+    @Expose
     @Column(name = "voiceId")
     private String voiceId;
 
-    public Voice(String voicePath, String voiceName, String voiceId) {
-        this.voicePath = voicePath;
-        this.voiceName = voiceName;
-        this.voiceId = voiceId;
-    }
-
     public Voice() {
         super();
+    }
+
+    public Voice(String voicePath, String voiceName, String createTime, String voiceId) {
+        this.voicePath = voicePath;
+        this.voiceName = voiceName;
+        this.createTime = createTime;
+        this.voiceId = voiceId;
     }
 
     public String getVoicePath() {
@@ -48,6 +53,14 @@ public class Voice extends Model {
 
     public void setVoiceName(String voiceName) {
         this.voiceName = voiceName;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 
     public String getVoiceId() {

@@ -2,6 +2,7 @@ package de.mpg.mpdl.labcam.ItemDetails;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -9,20 +10,28 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.activeandroid.query.Delete;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.Model.LocalModel.Note;
+import de.mpg.mpdl.labcam.Model.LocalModel.Task;
+import de.mpg.mpdl.labcam.Model.LocalModel.Voice;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.Utils.camPicassoLoader;
 
 /**
@@ -75,6 +84,7 @@ public class ViewPagerAdapter extends PagerAdapter {
 
         imageView = (ImageView) itemView.findViewById(R.id.detail_image);
 
+        // voice panel
 
         //check mark
         ImageView checkMark = (ImageView) itemView.findViewById(R.id.viewpager_check_mark);
@@ -118,23 +128,7 @@ public class ViewPagerAdapter extends PagerAdapter {
             });
         }
 
-        // get Image object
-        Image image = DBConnector.getImageByPath(imagePathList.get(position));
-        if(image != null){
-            TextView noteTextView = (TextView) itemView.findViewById(R.id.tv_notes_detail);
-            RelativeLayout voicePanelLayout = (RelativeLayout) itemView.findViewById(R.id.layout_voice_panel);
-
-            if(image.getNote()!=null){      // show notes
-
-                noteTextView.setVisibility(View.VISIBLE);
-                noteTextView.setText(image.getNote().getNoteContent());
-            }else noteTextView.setVisibility(View.GONE);
-
-            if(image.getVoice()!=null){     // show voice
-
-                voicePanelLayout.setVisibility(View.VISIBLE);
-            }else voicePanelLayout.setVisibility(View.GONE);
-        }
+        initImageInfoLayout(itemView, position);  // init notes and voice
 
         ((ViewPager) container).addView(itemView);
         return itemView;
@@ -155,4 +149,96 @@ public class ViewPagerAdapter extends PagerAdapter {
         void onItemClick(View view, int position);
         void onItemLongClick(View view, int position);
     }
+
+
+    // ui VoicePanel
+
+    private void initImageInfoLayout(View itemView, int position){
+        // get Image object
+        Image image = DBConnector.getImageByPath(imagePathList.get(position));
+        if(image != null){
+            TextView noteTextView = (TextView) itemView.findViewById(R.id.tv_notes_detail);
+            RelativeLayout voicePanelLayout = (RelativeLayout) itemView.findViewById(R.id.layout_voice_panel);
+
+            if(image.getNoteId()!=null){      // show notes
+                noteTextView.setVisibility(View.VISIBLE);
+                noteTextView.setText(DBConnector.getNoteById(image.getNoteId()).getNoteContent());
+            }else noteTextView.setVisibility(View.GONE);
+
+            if(image.getVoice()!=null){     // show voice
+                initVoicePanel(itemView, image, position, voicePanelLayout);  // init player
+                voicePanelLayout.setVisibility(View.VISIBLE);
+            }else voicePanelLayout.setVisibility(View.GONE);
+        }else {
+            ToastUtil.showLongToast(context, imagePathList.get(position) + "   NOT FOUND");
+        }
+    }
+
+    private void initVoicePanel(View itemView, final Image image, int position, final View voicePanelLayout){
+
+        final MediaPlayer mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(image.getVoice().getVoicePath());
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        final ImageButton pauseButton = (ImageButton) itemView.findViewById(R.id.btn_pause_voice);
+        final ImageButton rewindButton = (ImageButton) itemView.findViewById(R.id.btn_rewind_voice);
+        final ImageButton deleteButton = (ImageButton) itemView.findViewById(R.id.btn_delete_voice);
+        final ImageButton resetButton = (ImageButton) itemView.findViewById(R.id.btn_reset_voice);
+
+        pauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToastUtil.showLongToast(context, "Pausing sound");
+                mediaPlayer.pause();
+
+                pauseButton.setEnabled(false);
+                rewindButton.setEnabled(true);
+            }
+        });
+
+        rewindButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToastUtil.showLongToast(context, "Playing sound");
+                mediaPlayer.start();
+
+                pauseButton.setEnabled(true);
+                rewindButton.setEnabled(false);
+            }
+        });
+
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToastUtil.showLongToast(context, "Reseting sound");
+                try {
+                    mediaPlayer.setDataSource(image.getVoice().getVoicePath());
+                    mediaPlayer.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                pauseButton.setEnabled(true);
+                rewindButton.setEnabled(true);
+            }
+        });
+
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToastUtil.showLongToast(context, "Deleting sound");
+                voicePanelLayout.setVisibility(View.GONE);
+                image.setVoice(null);  // set image voice to null, not really delete voice here
+                image.save();          // todo: think about when and where to delete Voice and voice file (not here)
+            }
+        });
+    }
+
+
 }

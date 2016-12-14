@@ -25,6 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
         android:layout_marginBottom="32dp"
         android:layout_alignParentBottom="true">
 
@@ -33,8 +34,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/tv_notes_detail"
+            android:minLines="3"
             android:textColor="@color/white"
-                android:visibility="gone"/>
+            android:visibility="gone"/>
 
         <!--voice panel-->
         <RelativeLayout
@@ -44,18 +46,37 @@
             android:layout_below="@id/tv_notes_detail"
             android:visibility="gone">
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:id="@+id/btn_voice_play"
-                android:src="@drawable/btn_play"/>
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_pause_voice"
+                android:background="@drawable/voice_pause_white"
+                android:layout_alignParentBottom="true"/>
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:id="@+id/btn_voice_delete"
-                android:layout_toRightOf="@id/btn_voice_play"
-                android:src="@drawable/btn_delete"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_rewind_voice"
+                android:background="@drawable/voice_play_arrow_white"
+                android:layout_toRightOf="@+id/btn_pause_voice"
+                android:layout_alignParentBottom="true"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_reset_voice"
+                android:background="@drawable/voice_stop_white"
+                android:layout_toRightOf="@+id/btn_rewind_voice"
+                android:layout_alignParentBottom="true"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_delete_voice"
+                android:background="@drawable/voice_delete_forever_white"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"/>
 
         </RelativeLayout>
 

@@ -34,6 +34,8 @@ import de.mpg.mpdl.labcam.Utils.ToastUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by yingli on 11/24/16.
@@ -94,6 +96,7 @@ public class MicrophoneDialogFragment extends DialogFragment{
 
                                 Voice voice = new Voice();
                                 voice.setVoicePath(fileFullName);
+                                voice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
                                 voice.save();
                                 Log.d("LY", "voice saved");
 
@@ -184,7 +187,9 @@ public class MicrophoneDialogFragment extends DialogFragment{
             file.mkdirs();
         }
 
-        return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + file_exts[currentFormat]);
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
+        return (file.getAbsolutePath() + "/" + timeStamp + file_exts[currentFormat]);
     }
 
     private void startRecording(){

@@ -12,11 +12,42 @@
         android:layout_margin="4dp"/>
 
     <ImageView
-        android:id="@+id/header_grid_check_mark"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="4dp"
-        android:visibility="gone"
-        android:src="@drawable/btn_check"
-        />
+            android:id="@+id/header_grid_check_mark"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            android:src="@drawable/btn_check"/>
+
+    <!--note voice check mark-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="4dp"
+        android:background="@color/black_shadow">
+
+        <ImageView
+            android:id="@+id/header_grid_note"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="4dp"
+            android:visibility="invisible"
+            android:src="@drawable/note_icon"/>
+
+        <ImageView
+            android:id="@+id/header_grid_voice"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="4dp"
+            android:layout_toRightOf="@id/header_grid_note"
+            android:visibility="invisible"
+            android:src="@drawable/microphone_icon"/>
+
+
+    </RelativeLayout>
+
+
 </RelativeLayout>

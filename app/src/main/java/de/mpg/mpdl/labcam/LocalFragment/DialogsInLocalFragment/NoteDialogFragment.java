@@ -14,10 +14,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import com.activeandroid.query.Select;
+
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * Created by yingli on 11/24/16.
@@ -65,24 +71,33 @@ public class NoteDialogFragment extends DialogFragment {
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 // save note
-                                Log.d("LY", "save clicked");
                                 String noteContentStr = editText.getText().toString();
-                                Note note = new Note();
-                                note.setNoteContent(noteContentStr);
-                                note.save();
-                                Log.d("LY", "note saved");
 
                                 // update image, set note
                                 for (String imagePath : imagePathArray) {
                                     Image image = DBConnector.getImageByPath(imagePath);
                                     if(image!=null){
-                                    image.setNote(note);
-                                    image.save();
-                                    Log.d("LY", image.getNote().getNoteContent());
+                                        Note note;
+                                        if(image.getNoteId()!=null){
+                                            note = DBConnector.getNoteById(image.getNoteId());
+                                            note.setNoteContent(noteContentStr);
+                                            note.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+                                            note.save();
+                                        }else {
+                                            note = new Note();
+                                            note.setNoteId(UUID.randomUUID().toString());
+                                            note.setNoteContent(noteContentStr);
+                                            note.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+                                            note.save();
+                                        }
+                                        image.setNoteId(note.getNoteId());
+                                        image.save();
                                     }else {
                                         // TODO: 12/12/16 error message
                                     }
                                 }
+                                // log notes size
+                               Log.e("NOTES_SIZE", "size" + new Select().from(Note.class).execute().size());
                             }
                         }
                 )

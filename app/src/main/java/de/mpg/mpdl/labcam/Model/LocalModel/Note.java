@@ -20,9 +20,14 @@ public class Note extends Model{
     @Column(name = "noteContent")
     String noteContent;
 
-    public Note(String noteId, String noteName, String noteContent) {
+    @Expose
+    @Column(name = "createTime")
+    String createTime;
+
+    public Note(String noteId, String noteContent, String createTime) {
         this.noteId = noteId;
         this.noteContent = noteContent;
+        this.createTime = createTime;
     }
 
     public Note() {
@@ -43,5 +48,13 @@ public class Note extends Model{
 
     public void setNoteContent(String noteContent) {
         this.noteContent = noteContent;
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
     }
 }

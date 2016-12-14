@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -16,7 +18,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.Utils.ToastUtil;
 
 /**
  * Created by yingli on 2/23/16.
@@ -31,7 +36,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     //remember selected positions
     public Set<Integer> positionSet = new HashSet<>();
 
-
     private OnItemClickListener onItemClickListener;
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -41,11 +45,17 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     public static class SimpleViewHolder extends RecyclerView.ViewHolder {
         public final ImageView imageView;
         public final ImageView checkMark;
+        public final ImageView noteImageView;
+        public final ImageView voiceImageView;
+        public final RelativeLayout relativeLayout;
 
         public SimpleViewHolder(View view) {
             super(view);
             imageView = (ImageView) view.findViewById(R.id.header_grid_image);
             checkMark = (ImageView) view.findViewById(R.id.header_grid_check_mark);
+            noteImageView = (ImageView) view.findViewById(R.id.header_grid_note);
+            voiceImageView = (ImageView) view.findViewById(R.id.header_grid_voice);
+            relativeLayout = (RelativeLayout) view.findViewById(R.id.layout_bottom);
         }
     }
 
@@ -63,6 +73,22 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     @Override
     public void onBindViewHolder(SimpleViewHolder holder, final int position) {
         String filePath = mItems.get(position);
+
+        Image image = DBConnector.getImageByPath(filePath);
+        if(image != null){
+            holder.relativeLayout.setVisibility(View.VISIBLE);
+            if(image.getNoteId()!=null){      // show notes
+                holder.noteImageView.setVisibility(View.VISIBLE);
+            }else holder.noteImageView.setVisibility(View.INVISIBLE);
+
+            if(image.getVoice()!=null){     // show voice
+                holder.voiceImageView.setVisibility(View.VISIBLE);
+            }else holder.voiceImageView.setVisibility(View.INVISIBLE);
+        }else {
+            ToastUtil.showLongToast(mContext, filePath + "   NOT FOUND");
+            holder.relativeLayout.setVisibility(View.INVISIBLE);
+        }
+
         Uri uri = Uri.fromFile(new File(filePath));
 
         Picasso.with(mContext)
@@ -76,7 +102,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
         }else {
             holder.checkMark.setVisibility(View.GONE);
         }
-
 
         if (onItemClickListener!=null){
             holder.itemView.setOnClickListener(new View.OnClickListener() {
