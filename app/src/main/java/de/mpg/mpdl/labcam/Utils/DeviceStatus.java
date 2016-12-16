@@ -391,7 +391,7 @@ public class DeviceStatus {
             }
             if(typeList[9]){
                 jsonObject.put("Exposure Time", ExposureTimeStr);
-            }if(1 == 1){
+            }if(typeList[10]){
                 jsonObject.put("OCR", ocr);
             }
             metaDataJsonStr = jsonObject.toString();
