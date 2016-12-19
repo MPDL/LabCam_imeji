@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 
@@ -24,6 +26,7 @@ public class RecentProcessActivity extends AppCompatActivity {
 
     //ui elements
     private static ListView recentTaskListView;
+    private static TextView norecentTaskView;
     List<Task> taskList =new ArrayList<>();
 
     //user info
@@ -48,16 +51,24 @@ public class RecentProcessActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //taskManager listView
-        recentTaskListView = (ListView) findViewById(R.id.listView_recent_task);
         taskList = DBConnector.getRecentTasks(userId, serverName);
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
 
-        recentTaskAdapter = new RecentTaskAdapter(activity,taskList);
+        norecentTaskView = (TextView) findViewById(R.id.tv_no_recent_task);
+        recentTaskListView = (ListView) findViewById(R.id.listView_recent_task);
+        recentTaskAdapter = new RecentTaskAdapter(activity, taskList);
         recentTaskAdapter.notifyDataSetChanged();
         recentTaskListView.setAdapter(recentTaskAdapter);
 
+        //Display either "no recent upload" or the listview of uploaded tasks
+        if(taskList.size() == 0) {
+            norecentTaskView.setVisibility(View.VISIBLE);
+            recentTaskListView.setVisibility(View.GONE);
+        }else {
+            norecentTaskView.setVisibility(View.GONE);
+            recentTaskListView.setVisibility(View.VISIBLE);
+        }
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
