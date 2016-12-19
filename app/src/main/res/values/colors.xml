@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="view_bg">#b20e0f</color>
+    <color name="white_shadow">#f8ffffff</color>
     <color name="white">#ffffff</color>
     <color name="black">#f8000000</color>
     <color name="black_shadow">#80000000</color>

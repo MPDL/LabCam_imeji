@@ -85,7 +85,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
                 holder.voiceImageView.setVisibility(View.VISIBLE);
             }else holder.voiceImageView.setVisibility(View.INVISIBLE);
         }else {
-            ToastUtil.showLongToast(mContext, filePath + "   NOT FOUND");
             holder.relativeLayout.setVisibility(View.INVISIBLE);
         }
 

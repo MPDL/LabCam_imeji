@@ -29,21 +29,68 @@
         android:layout_marginBottom="32dp"
         android:layout_alignParentBottom="true">
 
-        <!--notes-->
-        <TextView
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tv_notes_detail"
-            android:minLines="3"
-            android:textColor="@color/white"
-            android:visibility="gone"/>
+            android:id="@+id/layout_note_panel"
+            android:visibility="gone">
+
+            <!--notes-->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_notes_detail"
+                android:minLines="3"
+                android:textColor="@color/white"
+                android:visibility="gone"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/et_notes_detail"
+                android:minLines="3"
+                android:textColor="@color/white"
+                android:visibility="gone"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/layout_edit_note_button"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:background="@color/white_shadow"
+                android:layout_below="@+id/et_notes_detail"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="48dp"
+                    android:text="CANCEL"
+                    android:id="@+id/tv_cancel_edit_note"
+                    android:textColor="@color/primary"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="48dp"
+                    android:layout_alignParentRight="true"
+                    android:text="SAVE"
+                    android:id="@+id/tv_save_edit_note"
+                    android:textColor="@color/primary"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
 
         <!--voice panel-->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/layout_voice_panel"
-            android:layout_below="@id/tv_notes_detail"
+            android:layout_below="@id/layout_note_panel"
             android:visibility="gone">
 
             <ImageButton

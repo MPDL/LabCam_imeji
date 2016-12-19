@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -21,6 +22,8 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -157,22 +160,70 @@ public class ViewPagerAdapter extends PagerAdapter {
         // get Image object
         Image image = DBConnector.getImageByPath(imagePathList.get(position));
         if(image != null){
-            TextView noteTextView = (TextView) itemView.findViewById(R.id.tv_notes_detail);
+            RelativeLayout notePanelLayout = (RelativeLayout) itemView.findViewById(R.id.layout_note_panel);
             RelativeLayout voicePanelLayout = (RelativeLayout) itemView.findViewById(R.id.layout_voice_panel);
 
             if(image.getNoteId()!=null){      // show notes
-                noteTextView.setVisibility(View.VISIBLE);
-                noteTextView.setText(DBConnector.getNoteById(image.getNoteId()).getNoteContent());
-            }else noteTextView.setVisibility(View.GONE);
+                initNotePanel(itemView, image, notePanelLayout);
+
+            }else notePanelLayout.setVisibility(View.GONE);
 
             if(image.getVoiceId()!=null){     // show voice
-                initVoicePanel(itemView, image, position, voicePanelLayout);  // init player
+                initVoicePanel(itemView, image, voicePanelLayout);  // init player
                 voicePanelLayout.setVisibility(View.VISIBLE);
             }else voicePanelLayout.setVisibility(View.GONE);
         }
     }
 
-    private void initVoicePanel(View itemView, final Image image, int position, final View voicePanelLayout){
+    private void initNotePanel(View itemView, final Image image, final View notePanelLayout){
+        final RelativeLayout editNoteButtonLayout = (RelativeLayout) itemView.findViewById(R.id.layout_edit_note_button);
+        final TextView noteTextView = (TextView) itemView.findViewById(R.id.tv_notes_detail);
+        final TextView noteEditText = (EditText) itemView.findViewById(R.id.note_edit_text);
+        final TextView cancelTextView = (TextView) itemView.findViewById(R.id.tv_cancel_edit_note);
+        final TextView saveTextView = (TextView) itemView.findViewById(R.id.tv_save_edit_note);
+
+        noteTextView.setVisibility(View.VISIBLE);
+        noteTextView.setText(DBConnector.getNoteById(image.getNoteId()).getNoteContent());
+
+        cancelTextView.setOnClickListener(new View.OnClickListener() {  //
+            @Override
+            public void onClick(View v) {
+                // do nothing
+            }
+        });
+
+        saveTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Note note = DBConnector.getNoteById(image.getNoteId());  // get note
+                note.setNoteContent(String.valueOf(noteEditText.getText()));  // edit note
+                note.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+                note.save();  // save note
+                editNoteButtonLayout.setVisibility(View.GONE);
+                noteEditText.setVisibility(View.GONE);
+
+                noteEditText.setText(note.getNoteContent());
+                noteTextView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        noteTextView.setOnClickListener(new View.OnClickListener() {  // click to edit note
+            @Override
+            public void onClick(View v) {
+                noteTextView.setVisibility(View.GONE);
+
+                noteEditText.setText(DBConnector.getNoteById(image.getNoteId()).getNoteContent());
+                noteEditText.setVisibility(View.VISIBLE);
+
+                editNoteButtonLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+    }
+
+    /** voice panel **/
+    private void initVoicePanel(View itemView, final Image image, final View voicePanelLayout){
 
         final MediaPlayer mediaPlayer = new MediaPlayer();
 
