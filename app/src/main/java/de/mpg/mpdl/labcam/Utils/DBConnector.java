@@ -10,6 +10,7 @@ import java.util.List;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
+import de.mpg.mpdl.labcam.Model.LocalModel.Voice;
 
 /**
  * Created by yingli on 9/13/16.
@@ -171,6 +172,14 @@ public class DBConnector {
         return new Select()
                 .from(Note.class)
                 .where("noteId = ?", noteId)
+                .executeSingle();
+    }
+
+    /*****  Voice  ******/
+    public static Voice getVoiceById(String voiceId) {
+        return new Select()
+                .from(Voice.class)
+                .where("voiceId = ?", voiceId)
                 .executeSingle();
     }
 

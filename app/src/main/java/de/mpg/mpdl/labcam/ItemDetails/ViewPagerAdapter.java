@@ -165,20 +165,19 @@ public class ViewPagerAdapter extends PagerAdapter {
                 noteTextView.setText(DBConnector.getNoteById(image.getNoteId()).getNoteContent());
             }else noteTextView.setVisibility(View.GONE);
 
-            if(image.getVoice()!=null){     // show voice
+            if(image.getVoiceId()!=null){     // show voice
                 initVoicePanel(itemView, image, position, voicePanelLayout);  // init player
                 voicePanelLayout.setVisibility(View.VISIBLE);
             }else voicePanelLayout.setVisibility(View.GONE);
-        }else {
-            ToastUtil.showLongToast(context, imagePathList.get(position) + "   NOT FOUND");
         }
     }
 
     private void initVoicePanel(View itemView, final Image image, int position, final View voicePanelLayout){
 
         final MediaPlayer mediaPlayer = new MediaPlayer();
+
         try {
-            mediaPlayer.setDataSource(image.getVoice().getVoicePath());
+            mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId()).getVoicePath());
             mediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
@@ -217,7 +216,8 @@ public class ViewPagerAdapter extends PagerAdapter {
             public void onClick(View v) {
                 ToastUtil.showLongToast(context, "Reseting sound");
                 try {
-                    mediaPlayer.setDataSource(image.getVoice().getVoicePath());
+                    mediaPlayer.reset();
+                    mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId()).getVoicePath());
                     mediaPlayer.prepare();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -234,7 +234,7 @@ public class ViewPagerAdapter extends PagerAdapter {
             public void onClick(View v) {
                 ToastUtil.showLongToast(context, "Deleting sound");
                 voicePanelLayout.setVisibility(View.GONE);
-                image.setVoice(null);  // set image voice to null, not really delete voice here
+                image.setVoiceId(null);  // set image voice to null, not really delete voice here
                 image.save();          // todo: think about when and where to delete Voice and voice file (not here)
             }
         });

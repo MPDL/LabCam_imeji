@@ -59,16 +59,15 @@ public class Image extends Model {
     private String noteId;
 
     @Expose
-    @Column(name = "voice")
-    private Voice voice;
-
+    @Column(name = "voiceId")
+    private String voiceId;
 
 
     public Image() {
         super();
     }
 
-    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, String noteId, Voice voice) {
+    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, String noteId, String voiceId) {
         this.imageId = imageId;
         this.taskId = taskId;
         this.imageName = imageName;
@@ -81,7 +80,7 @@ public class Image extends Model {
         this.longitude = longitude;
         this.log = log;
         this.noteId = noteId;
-        this.voice = voice;
+        this.voiceId = voiceId;
     }
 
     public String getImageId() {
@@ -188,11 +187,11 @@ public class Image extends Model {
         this.noteId = noteId;
     }
 
-    public Voice getVoice() {
-        return voice;
+    public String getVoiceId() {
+        return voiceId;
     }
 
-    public void setVoice(Voice voice) {
-        this.voice = voice;
+    public void setVoiceId(String voiceId) {
+        this.voiceId = voiceId;
     }
 }

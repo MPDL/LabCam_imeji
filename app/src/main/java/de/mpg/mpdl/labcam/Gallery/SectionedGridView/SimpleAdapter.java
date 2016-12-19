@@ -81,7 +81,7 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
                 holder.noteImageView.setVisibility(View.VISIBLE);
             }else holder.noteImageView.setVisibility(View.INVISIBLE);
 
-            if(image.getVoice()!=null){     // show voice
+            if(image.getVoiceId()!=null){     // show voice
                 holder.voiceImageView.setVisibility(View.VISIBLE);
             }else holder.voiceImageView.setVisibility(View.INVISIBLE);
         }else {

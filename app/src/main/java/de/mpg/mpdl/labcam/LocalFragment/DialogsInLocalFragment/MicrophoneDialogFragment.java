@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Created by yingli on 11/24/16.
@@ -58,7 +59,7 @@ public class MicrophoneDialogFragment extends DialogFragment{
 
         this.setCancelable(false);
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.dialog_fragment_microphone, null);
+        final View view = inflater.inflate(R.layout.dialog_fragment_microphone, null);
         final Activity activity = this.getActivity();
 
         Bundle bundle = getArguments();
@@ -94,21 +95,34 @@ public class MicrophoneDialogFragment extends DialogFragment{
                                     return;
                                 }
 
-                                Voice voice = new Voice();
-                                voice.setVoicePath(fileFullName);
-                                voice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-                                voice.save();
+                                Voice newVoice = new Voice();
+                                newVoice.setVoiceId(UUID.randomUUID().toString());
+                                newVoice.setVoicePath(fileFullName);
+                                newVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+                                newVoice.save();
                                 Log.d("LY", "voice saved");
 
                                 // update image, set voice
+                                boolean deleteVoice = true;
                                 for (String imagePath : imagePathArray) {
                                     Image image = DBConnector.getImageByPath(imagePath);
                                     if(image!=null){
-                                        image.setVoice(voice);
-                                        image.save();
-                                        Log.d("LY", image.getVoice().getVoicePath());
-                                    }else {
-                                        Log.d("LY", imagePath);
+                                        if(image.getVoiceId()!=null){
+                                            Voice oldVoice = DBConnector.getVoiceById(image.getVoiceId());
+                                            oldVoice.setVoicePath(fileFullName);
+                                            oldVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+                                            oldVoice.save();
+                                        } else {
+                                            image.setVoiceId(newVoice.getVoiceId());
+                                            image.save();
+                                            deleteVoice = false;
+                                        }
+
+                                    }
+
+                                    // delete new note
+                                    if(deleteVoice){
+                                        newVoice.delete();
                                     }
                                 }
                             }
