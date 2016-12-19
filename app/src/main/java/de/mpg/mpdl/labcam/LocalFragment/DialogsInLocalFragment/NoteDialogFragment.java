@@ -73,25 +73,29 @@ public class NoteDialogFragment extends DialogFragment {
                                 // save note
                                 String noteContentStr = editText.getText().toString();
 
+                                Note newNote = new Note();
+                                newNote.setNoteId(UUID.randomUUID().toString());
+                                newNote.setNoteContent(noteContentStr);
+                                newNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+                                newNote.save();
+
                                 // update image, set note
                                 for (String imagePath : imagePathArray) {
                                     Image image = DBConnector.getImageByPath(imagePath);
                                     if(image!=null){
-                                        Note note;
+
                                         if(image.getNoteId()!=null){
-                                            note = DBConnector.getNoteById(image.getNoteId());
-                                            note.setNoteContent(noteContentStr);
-                                            note.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-                                            note.save();
+                                            Note oldNote = DBConnector.getNoteById(image.getNoteId());
+                                            oldNote.setNoteContent(noteContentStr);
+                                            oldNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+                                            oldNote.save();
+                                            image.setNoteId(oldNote.getNoteId());
+                                            image.save();
                                         }else {
-                                            note = new Note();
-                                            note.setNoteId(UUID.randomUUID().toString());
-                                            note.setNoteContent(noteContentStr);
-                                            note.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-                                            note.save();
+                                            image.setNoteId(newNote.getNoteId()); // set noteId as newNote
+                                            image.save();
                                         }
-                                        image.setNoteId(note.getNoteId());
-                                        image.save();
+
                                     }else {
                                         // TODO: 12/12/16 error message
                                     }
