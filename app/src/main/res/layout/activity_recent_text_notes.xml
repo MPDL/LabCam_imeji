@@ -24,7 +24,7 @@
                 android:layout_height="fill_parent"
                 android:gravity="center_vertical"
                 android:layout_marginEnd="50dp"
-                android:text="@string/recent_uploads"
+                android:text="@string/recent_text_note"
                 android:textColor="@color/white"
                 android:textSize="20dp" />
 
@@ -35,16 +35,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/listView_recent_task" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="15dp"
-        android:text="No photos recently uploaded"
-        android:textSize="16dp"
-        android:textColor="@color/black"
-        android:id="@+id/tv_no_recent_task"/>
 
 </LinearLayout>
 
