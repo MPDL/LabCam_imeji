@@ -1,5 +1,6 @@
 package de.mpg.mpdl.labcam.ItemDetails;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.media.MediaPlayer;
@@ -192,6 +193,7 @@ public class ViewPagerAdapter extends PagerAdapter {
             @Override
             public void onClick(View v) {
                 // do nothing
+                ((Activity)context).finish();
             }
         });
 

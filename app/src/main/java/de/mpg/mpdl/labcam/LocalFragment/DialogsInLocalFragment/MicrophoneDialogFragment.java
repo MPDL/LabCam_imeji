@@ -128,7 +128,7 @@ public class MicrophoneDialogFragment extends DialogFragment{
 //                                    if(deleteVoice){
 //                                        newVoice.delete();
 //                                    }
-                                    DBConnector.batchEditNote(selectedImageList, fileFullName);
+                                    DBConnector.batchEditVoice(selectedImageList, fileFullName);
                                 }
                             }
                         }

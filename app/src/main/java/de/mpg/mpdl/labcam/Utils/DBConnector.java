@@ -271,14 +271,22 @@ public class DBConnector {
     public static void batchEditVoice(List<Image> imageList, String voicePath){
         List<VoiceSort> voiceSortList= new ArrayList<VoiceSort>();
 
-        /** create noteSortList **/
+        /** batch operation on voice **/
+        Voice newVoice = new Voice();  //PREPARE(CREATE) new VOICE
+        newVoice.setVoiceId(UUID.randomUUID().toString());
+        newVoice.setVoicePath(voicePath);
+        newVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+        newVoice.save();
+
+        boolean deleteVoice = true;
+        /** create voiceSortList **/
         for (Image image : imageList) {  // every selected image
 
             int voiceSortImageListCount = 0;
             for (VoiceSort voiceSort : voiceSortList) {   // search in noteSort
 
-                if(voiceSort.getVoiceId()==null  // first time edit, noteId is null
-                        || voiceSort.getVoiceId().equalsIgnoreCase(image.getNoteId())){ // noteId found exist in noteSort
+                if(voiceSort.getVoiceId().equalsIgnoreCase("noID") // first time edit, noteId is null
+                        || voiceSort.getVoiceId().equalsIgnoreCase(image.getVoiceId())){ // noteId found exist in noteSort
                     List<Image> voiceSortImageList = voiceSort.getImageList();
                     voiceSortImageList.add(image);               // add image to noteSortImageList
                     voiceSort.setImageList(voiceSortImageList);
@@ -288,43 +296,40 @@ public class DBConnector {
                 }
             }
 
-            if(voiceSortImageListCount == voiceSortList.size()){  // NoteSort not exist
+            if((image.getVoiceId() == null)
+                    ||voiceSortImageListCount == voiceSortList.size()){  // NoteSort not exist
                 VoiceSort newVoiceSort = new VoiceSort();             // create NoteSort
                 List<Image> voiceSortImageList = new ArrayList<>();
-                newVoiceSort.setVoiceId(image.getVoiceId());
+                if(image.getVoiceId()==null){
+                    newVoiceSort.setVoiceId("noID");
+                }else newVoiceSort.setVoiceId(image.getVoiceId());
                 voiceSortImageList.add(image);                      // add sortImageList
                 newVoiceSort.setImageList(voiceSortImageList);
                 voiceSortList.add(newVoiceSort);
             }
         }
 
-        /** batch operation on notes **/
-        Voice newVoice = new Voice();  //PREPARE(CREATE) new NOTE
-        newVoice.setVoiceId(UUID.randomUUID().toString());
-        newVoice.setVoicePath(voicePath);
-        newVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-        newVoice.save();
-
-        boolean deleteNote = true;
+        /**** new voiceSort ****/
         for (VoiceSort voiceSort : voiceSortList) {
-            String noteId = (voiceSort.getVoiceId()!=null)?voiceSort.getVoiceId():"null";
-            Log.d(LOG_TAG, noteId);
+            String voiceId = (voiceSort.getVoiceId()!=null)?voiceSort.getVoiceId():"null";
+            Log.d(LOG_TAG, voiceId);
             Log.d(LOG_TAG, voiceSort.getImageList().size()+"");
-            if(voiceSort.getVoiceId()!=null && getImageByVoice(voiceSort.getVoiceId()).size() == voiceSort.getImageList().size()){    //UPDATE
+            if(!voiceSort.getVoiceId().equalsIgnoreCase("null") && getImageByVoice(voiceSort.getVoiceId()).size() == voiceSort.getImageList().size()){    //UPDATE
                 Voice updateVoice = getVoiceById(voiceSort.getVoiceId());
                 updateVoice.setVoicePath(voicePath);
                 updateVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
                 updateVoice.save();
-            }else { // case 1: new NOTE; case 2:
-                // BIND NOTE
+            }else { // case 1: new VOICE; case 2:
+                // BIND VOICE
                 for (Image image : voiceSort.getImageList()) {
-                    image.setVoiceId(voiceSort.getVoiceId());
+                    image.setVoiceId(newVoice.getVoiceId());
                     image.save();
-                    deleteNote = false;
+                    deleteVoice = false;
                 }
             }
         }
-        if(deleteNote){
+
+        if(deleteVoice){
             newVoice.delete();
         }
 
