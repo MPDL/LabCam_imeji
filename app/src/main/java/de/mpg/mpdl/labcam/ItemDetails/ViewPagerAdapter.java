@@ -170,7 +170,7 @@ public class ViewPagerAdapter extends PagerAdapter {
             }else notePanelLayout.setVisibility(View.GONE);
 
             if(image.getVoiceId()!=null){     // show voice
-                initVoicePanel(itemView, image, voicePanelLayout);  // init player
+                initVoicePanel(itemView, image, voicePanelLayout, position);  // init player
                 voicePanelLayout.setVisibility(View.VISIBLE);
             }else voicePanelLayout.setVisibility(View.GONE);
         }
@@ -226,7 +226,7 @@ public class ViewPagerAdapter extends PagerAdapter {
     }
 
     /** voice panel **/
-    private void initVoicePanel(View itemView, final Image image, final View voicePanelLayout){
+    private void initVoicePanel(View itemView, final Image image, final View voicePanelLayout, final int position){
 
         final MediaPlayer mediaPlayer = new MediaPlayer();
 
@@ -288,11 +288,19 @@ public class ViewPagerAdapter extends PagerAdapter {
             public void onClick(View v) {
                 ToastUtil.showLongToast(context, "Deleting sound");
                 voicePanelLayout.setVisibility(View.GONE);
-                image.setVoiceId(null);  // set image voice to null, not really delete voice here
-                image.save();          // todo: think about when and where to delete Voice and voice file (not here)
+                deleteVoice(DBConnector.getVoiceById(image.getVoiceId()), position);
             }
         });
     }
 
+    private void deleteVoice(Voice voice, int position){
+        for (Image image : DBConnector.getImageByVoice(voice.getVoiceId())) {
+            image.setVoiceId(null);
+            image.save();
+        }
+        voice.delete();
+        imagePathList.remove(position);
+        notifyDataSetChanged();
+    }
 
 }
