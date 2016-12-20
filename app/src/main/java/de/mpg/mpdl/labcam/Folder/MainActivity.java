@@ -69,6 +69,7 @@ import de.mpg.mpdl.labcam.Settings.RemoteCollectionSettingsActivity;
 import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
 import de.mpg.mpdl.labcam.TaskManager.RecentProcessActivity;
 import de.mpg.mpdl.labcam.TaskManager.RecentNoteActivity;
+import de.mpg.mpdl.labcam.TaskManager.RecentVoiceActivity;
 
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
@@ -208,7 +209,9 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
         checkRecent();
 
-        checkRecentText();
+        checkRecentNote();
+
+        checkRecentVoice();
 
         setUserInfoText();
 
@@ -594,13 +597,24 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
     }
 
-    private void checkRecentText(){
-        RelativeLayout chooseRecentTextLayout = (RelativeLayout) findViewById(R.id.layout_recent_text_notes);
-        chooseRecentTextLayout.setOnClickListener(new View.OnClickListener() {
+    private void checkRecentNote(){
+        RelativeLayout chooseRecentNoteLayout = (RelativeLayout) findViewById(R.id.layout_recent_text_notes);
+        chooseRecentNoteLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent recentTextIntent = new Intent(context, RecentNoteActivity.class);
-                startActivity(recentTextIntent);
+                Intent recentNoteIntent = new Intent(context, RecentNoteActivity.class);
+                startActivity(recentNoteIntent);
+            }
+        });
+    }
+
+    private void checkRecentVoice(){
+        RelativeLayout chooseRecentVoiceLayout = (RelativeLayout) findViewById(R.id.layout_recent_voice_notes);
+        chooseRecentVoiceLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent recentVoiceIntent = new Intent(context, RecentVoiceActivity.class);
+                startActivity(recentVoiceIntent);
             }
         });
     }

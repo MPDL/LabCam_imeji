@@ -184,7 +184,9 @@ public class ViewPagerAdapter extends PagerAdapter {
         final TextView saveTextView = (TextView) itemView.findViewById(R.id.tv_save_edit_note);
 
         noteTextView.setVisibility(View.VISIBLE);
-        noteTextView.setText(DBConnector.getNoteById(image.getNoteId()).getNoteContent());
+        if(image.getNoteId()==null){
+            noteTextView.setVisibility(View.GONE);
+        }else noteTextView.setText(DBConnector.getNoteById(image.getNoteId()).getNoteContent());
 
         cancelTextView.setOnClickListener(new View.OnClickListener() {  //
             @Override
