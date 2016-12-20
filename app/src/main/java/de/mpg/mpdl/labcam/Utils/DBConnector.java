@@ -5,7 +5,13 @@ import android.util.Log;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
@@ -167,6 +173,13 @@ public class DBConnector {
                 .executeSingle();
     }
 
+    public static List<Image> getImageByNoteId(String noteId) {
+        return new Select()
+                .from(Image.class)
+                .where("noteId = ?", noteId)
+                .execute();
+    }
+
     /*****  Note  ******/
     public static Note getNoteById(String noteId) {
         return new Select()
@@ -183,4 +196,74 @@ public class DBConnector {
                 .executeSingle();
     }
 
+
+    public static void batchEditNote(List<Image> imageList, String noteContent){
+        List<NoteSort> noteSortList= new ArrayList<NoteSort>();
+        HashMap<String,List<String>> frequencyMap = new HashMap<String,List<String>>();
+
+        for (Image image : imageList) {  // every selected image
+
+            int noteSortImageListCount = 0;
+            for (NoteSort noteSort : noteSortList) {   // search in noteSort
+                if(noteSort.getNoteId().equalsIgnoreCase(image.getNoteId())){ // noteId found exist in noteSort
+                    List<Image> noteSortImageList = noteSort.getImageList();
+                    noteSortImageList.add(image);               // add image to noteSortImageList
+
+                    noteSort.setImageList(noteSortImageList);
+                    break;
+                }else {
+                    noteSortImageListCount += 1;   // not this noteSort
+                }
+            }
+
+            if(noteSortImageListCount == noteSortList.size()){  // noteId not exist
+                NoteSort newNoteSort = new NoteSort();             // create NoteSort
+                List<Image> noteSortImageList = new ArrayList<>();
+                noteSortImageList.add(image);                      // add sortImageList
+                newNoteSort.setImageList(noteSortImageList);
+                noteSortList.add(newNoteSort);
+            }
+
+        }
+
+    }
+
+    private static class NoteSort{
+        String noteId;
+        List<Image> imageList;
+        String imageCount;
+
+        public NoteSort() {
+        }
+
+        public NoteSort(String noteId, List<Image> imageList, String imageCount) {
+            this.noteId = noteId;
+            this.imageList = imageList;
+            this.imageCount = imageCount;
+        }
+
+        public String getNoteId() {
+            return noteId;
+        }
+
+        public void setNoteId(String noteId) {
+            this.noteId = noteId;
+        }
+
+        public String getImageCount() {
+            return imageCount;
+        }
+
+        public void setImageCount(String imageCount) {
+            this.imageCount = imageCount;
+        }
+
+        public List<Image> getImageList() {
+            return imageList;
+        }
+
+        public void setImageList(List<Image> imageList) {
+            this.imageList = imageList;
+        }
+    }
 }
