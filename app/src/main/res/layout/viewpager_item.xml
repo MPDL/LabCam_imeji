@@ -37,22 +37,6 @@
             android:visibility="gone">
 
             <!--notes-->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_notes_detail"
-                android:minLines="3"
-                android:textColor="@color/white"
-                android:visibility="gone"/>
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/et_notes_detail"
-                android:minLines="3"
-                android:textColor="@color/white"
-                android:visibility="gone"/>
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -60,7 +44,6 @@
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 android:background="@color/white_shadow"
-                android:layout_above="@+id/et_notes_detail"
                 android:visibility="gone">
 
                 <TextView
@@ -81,6 +64,26 @@
                     android:textColor="@color/primary"/>
 
             </RelativeLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_notes_detail"
+                android:minLines="3"
+                android:textColor="@color/white"
+                android:layout_marginTop="20dp"
+                android:layout_below="@id/layout_edit_note_button"
+                android:visibility="gone"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/et_notes_detail"
+                android:minLines="3"
+                android:textColor="@color/white"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"/>
+
 
         </RelativeLayout>
 
