@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.activeandroid.query.Select;
 
 import java.util.List;
-import android.util.Log;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
@@ -22,11 +21,11 @@ import de.mpg.mpdl.labcam.R;
  */
 
 
-public class RecentTextActivity extends AppCompatActivity {
+public class RecentNoteActivity extends AppCompatActivity {
 
     Activity activity = this;
-    RecentTextAdapter recentTextAdapter = null;
-    private static final String TAG = "RecentTextActivity";
+    RecentNoteAdapter recentNoteAdapter = null;
+    private static final String TAG = "RecentNoteActivity";
 
     //ui elements
     private static ListView recentTextListView;
@@ -56,9 +55,9 @@ public class RecentTextActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         norecentTextView = (TextView) findViewById(R.id.tv_no_recent_text);
         recentTextListView = (ListView) findViewById(R.id.listView_recent_text_notes);
-        recentTextAdapter = new RecentTextAdapter(activity, noteList);
-        recentTextAdapter.notifyDataSetChanged();
-        recentTextListView.setAdapter(recentTextAdapter);
+        recentNoteAdapter = new RecentNoteAdapter(activity, noteList);
+        recentNoteAdapter.notifyDataSetChanged();
+        recentTextListView.setAdapter(recentNoteAdapter);
 
         //Display either "no recent upload" or the listview of uploaded tasks
         if(noteList.size() == 0) {

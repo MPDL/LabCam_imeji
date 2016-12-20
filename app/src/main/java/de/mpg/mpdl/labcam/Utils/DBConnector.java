@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
@@ -180,6 +181,13 @@ public class DBConnector {
                 .execute();
     }
 
+    public static List<Image> getImageByVoice(String voiceId) {
+        return new Select()
+                .from(Image.class)
+                .where("voiceId = ?", voiceId)
+                .execute();
+    }
+
     /*****  Note  ******/
     public static Note getNoteById(String noteId) {
         return new Select()
@@ -199,16 +207,17 @@ public class DBConnector {
 
     public static void batchEditNote(List<Image> imageList, String noteContent){
         List<NoteSort> noteSortList= new ArrayList<NoteSort>();
-        HashMap<String,List<String>> frequencyMap = new HashMap<String,List<String>>();
 
+        /** create noteSortList **/
         for (Image image : imageList) {  // every selected image
 
             int noteSortImageListCount = 0;
             for (NoteSort noteSort : noteSortList) {   // search in noteSort
-                if(noteSort.getNoteId().equalsIgnoreCase(image.getNoteId())){ // noteId found exist in noteSort
+
+                if(noteSort.getNoteId()==null  // first time edit, noteId is null
+                        || noteSort.getNoteId().equalsIgnoreCase(image.getNoteId())){ // noteId found exist in noteSort
                     List<Image> noteSortImageList = noteSort.getImageList();
                     noteSortImageList.add(image);               // add image to noteSortImageList
-
                     noteSort.setImageList(noteSortImageList);
                     break;
                 }else {
@@ -216,15 +225,109 @@ public class DBConnector {
                 }
             }
 
-            if(noteSortImageListCount == noteSortList.size()){  // noteId not exist
+            if(noteSortImageListCount == noteSortList.size()){  // NoteSort not exist
                 NoteSort newNoteSort = new NoteSort();             // create NoteSort
                 List<Image> noteSortImageList = new ArrayList<>();
+                newNoteSort.setNoteId(image.getNoteId());
                 noteSortImageList.add(image);                      // add sortImageList
                 newNoteSort.setImageList(noteSortImageList);
                 noteSortList.add(newNoteSort);
             }
-
         }
+
+        /** batch operation on notes **/
+        Note newNote = new Note();  //PREPARE(CREATE) new NOTE
+        newNote.setNoteId(UUID.randomUUID().toString());
+        newNote.setNoteContent(noteContent);
+        newNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+        newNote.save();
+
+        boolean deleteNote = true;
+        for (NoteSort noteSort : noteSortList) {
+            String noteId = (noteSort.getNoteId()!=null)?noteSort.getNoteId():"null";
+            Log.d(LOG_TAG, noteId);
+            Log.d(LOG_TAG, noteSort.getImageList().size()+"");
+            if(noteSort.getNoteId()!=null && getImageByNoteId(noteSort.getNoteId()).size() == noteSort.getImageList().size()){    //UPDATE
+                Note updateNote = getNoteById(noteSort.getNoteId());
+                updateNote.setNoteContent(noteContent);
+                updateNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+                updateNote.save();
+            }else { // case 1: new NOTE; case 2:
+                // BIND NOTE
+                for (Image image : noteSort.getImageList()) {
+                    image.setNoteId(newNote.getNoteId());
+                    image.save();
+                    deleteNote = false;
+                }
+            }
+        }
+        if(deleteNote){
+            newNote.delete();
+        }
+
+
+    }
+
+    public static void batchEditVoice(List<Image> imageList, String voicePath){
+        List<VoiceSort> voiceSortList= new ArrayList<VoiceSort>();
+
+        /** create noteSortList **/
+        for (Image image : imageList) {  // every selected image
+
+            int voiceSortImageListCount = 0;
+            for (VoiceSort voiceSort : voiceSortList) {   // search in noteSort
+
+                if(voiceSort.getVoiceId()==null  // first time edit, noteId is null
+                        || voiceSort.getVoiceId().equalsIgnoreCase(image.getNoteId())){ // noteId found exist in noteSort
+                    List<Image> voiceSortImageList = voiceSort.getImageList();
+                    voiceSortImageList.add(image);               // add image to noteSortImageList
+                    voiceSort.setImageList(voiceSortImageList);
+                    break;
+                }else {
+                    voiceSortImageListCount += 1;   // not this noteSort
+                }
+            }
+
+            if(voiceSortImageListCount == voiceSortList.size()){  // NoteSort not exist
+                VoiceSort newVoiceSort = new VoiceSort();             // create NoteSort
+                List<Image> voiceSortImageList = new ArrayList<>();
+                newVoiceSort.setVoiceId(image.getVoiceId());
+                voiceSortImageList.add(image);                      // add sortImageList
+                newVoiceSort.setImageList(voiceSortImageList);
+                voiceSortList.add(newVoiceSort);
+            }
+        }
+
+        /** batch operation on notes **/
+        Voice newVoice = new Voice();  //PREPARE(CREATE) new NOTE
+        newVoice.setVoiceId(UUID.randomUUID().toString());
+        newVoice.setVoicePath(voicePath);
+        newVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+        newVoice.save();
+
+        boolean deleteNote = true;
+        for (VoiceSort voiceSort : voiceSortList) {
+            String noteId = (voiceSort.getVoiceId()!=null)?voiceSort.getVoiceId():"null";
+            Log.d(LOG_TAG, noteId);
+            Log.d(LOG_TAG, voiceSort.getImageList().size()+"");
+            if(voiceSort.getVoiceId()!=null && getImageByVoice(voiceSort.getVoiceId()).size() == voiceSort.getImageList().size()){    //UPDATE
+                Voice updateVoice = getVoiceById(voiceSort.getVoiceId());
+                updateVoice.setVoicePath(voicePath);
+                updateVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+                updateVoice.save();
+            }else { // case 1: new NOTE; case 2:
+                // BIND NOTE
+                for (Image image : voiceSort.getImageList()) {
+                    image.setVoiceId(voiceSort.getVoiceId());
+                    image.save();
+                    deleteNote = false;
+                }
+            }
+        }
+        if(deleteNote){
+            newVoice.delete();
+        }
+
 
     }
 
@@ -256,6 +359,36 @@ public class DBConnector {
 
         public void setImageCount(String imageCount) {
             this.imageCount = imageCount;
+        }
+
+        public List<Image> getImageList() {
+            return imageList;
+        }
+
+        public void setImageList(List<Image> imageList) {
+            this.imageList = imageList;
+        }
+    }
+
+
+    private static class VoiceSort {
+        String voiceId;
+        List<Image> imageList;
+
+        public VoiceSort() {
+        }
+
+        public VoiceSort(String voiceId, List<Image> imageList) {
+            this.voiceId = voiceId;
+            this.imageList = imageList;
+        }
+
+        public String getVoiceId() {
+            return voiceId;
+        }
+
+        public void setVoiceId(String voiceId) {
+            this.voiceId = voiceId;
         }
 
         public List<Image> getImageList() {

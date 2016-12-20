@@ -60,7 +60,7 @@
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 android:background="@color/white_shadow"
-                android:layout_below="@+id/et_notes_detail"
+                android:layout_above="@+id/et_notes_detail"
                 android:visibility="gone">
 
                 <TextView

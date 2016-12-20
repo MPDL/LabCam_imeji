@@ -75,7 +75,7 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
         String filePath = mItems.get(position);
 
         Image image = DBConnector.getImageByPath(filePath);
-        if(image != null){
+        if(image!=null && (image.getNoteId()!=null || image.getVoiceId()!=null)){
             holder.relativeLayout.setVisibility(View.VISIBLE);
             if(image.getNoteId()!=null){      // show notes
                 holder.noteImageView.setVisibility(View.VISIBLE);

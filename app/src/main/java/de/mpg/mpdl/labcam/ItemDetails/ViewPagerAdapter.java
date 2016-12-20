@@ -23,6 +23,7 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -165,7 +166,7 @@ public class ViewPagerAdapter extends PagerAdapter {
 
             if(image.getNoteId()!=null){      // show notes
                 initNotePanel(itemView, image, notePanelLayout);
-
+                notePanelLayout.setVisibility(View.VISIBLE);
             }else notePanelLayout.setVisibility(View.GONE);
 
             if(image.getVoiceId()!=null){     // show voice
@@ -178,7 +179,7 @@ public class ViewPagerAdapter extends PagerAdapter {
     private void initNotePanel(View itemView, final Image image, final View notePanelLayout){
         final RelativeLayout editNoteButtonLayout = (RelativeLayout) itemView.findViewById(R.id.layout_edit_note_button);
         final TextView noteTextView = (TextView) itemView.findViewById(R.id.tv_notes_detail);
-        final TextView noteEditText = (EditText) itemView.findViewById(R.id.note_edit_text);
+        final EditText noteEditText = (EditText) itemView.findViewById(R.id.et_notes_detail);
         final TextView cancelTextView = (TextView) itemView.findViewById(R.id.tv_cancel_edit_note);
         final TextView saveTextView = (TextView) itemView.findViewById(R.id.tv_save_edit_note);
 
@@ -195,15 +196,15 @@ public class ViewPagerAdapter extends PagerAdapter {
         saveTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                List<Image> selectedImageList = new ArrayList<Image>(); // selected ImageList
+                selectedImageList.add(image);
 
-                Note note = DBConnector.getNoteById(image.getNoteId());  // get note
-                note.setNoteContent(String.valueOf(noteEditText.getText()));  // edit note
-                note.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-                note.save();  // save note
+                DBConnector.batchEditNote(selectedImageList, String.valueOf(noteEditText.getText()));
+
                 editNoteButtonLayout.setVisibility(View.GONE);
                 noteEditText.setVisibility(View.GONE);
 
-                noteEditText.setText(note.getNoteContent());
+                noteTextView.setText(noteEditText.getText());
                 noteTextView.setVisibility(View.VISIBLE);
             }
         });

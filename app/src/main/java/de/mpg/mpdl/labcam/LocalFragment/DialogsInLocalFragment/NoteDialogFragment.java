@@ -22,7 +22,9 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -73,33 +75,31 @@ public class NoteDialogFragment extends DialogFragment {
                                 // save note
                                 String noteContentStr = editText.getText().toString();
 
-                                Note newNote = new Note();
-                                newNote.setNoteId(UUID.randomUUID().toString());
-                                newNote.setNoteContent(noteContentStr);
-                                newNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-                                newNote.save();
-
                                 // update image, set note
-                                boolean deleteNote = true;
+//                                boolean deleteNote = true;
+                                List<Image> selectedImageList = new ArrayList<Image>(); // selected ImageList
                                 for (String imagePath : imagePathArray) {
                                     Image image = DBConnector.getImageByPath(imagePath);
                                     if(image!=null){
-                                        if(image.getNoteId()!=null){
-                                            Note oldNote = DBConnector.getNoteById(image.getNoteId());
-                                            oldNote.setNoteContent(noteContentStr);
-                                            oldNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-                                            oldNote.save();
-                                        }else {
-                                            image.setNoteId(newNote.getNoteId()); // set noteId as newNote
-                                            image.save();
-                                            deleteNote = false;
-                                        }
+                                        selectedImageList.add(image);   // add image to imageList
+//                                        if(image.getNoteId()!=null){
+//                                            Note oldNote = DBConnector.getNoteById(image.getNoteId());
+//                                            oldNote.setNoteContent(noteContentStr);
+//                                            oldNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+//                                            oldNote.save();
+//                                        }else {
+//                                            image.setNoteId(newNote.getNoteId()); // set noteId as newNote
+//                                            image.save();
+//                                            deleteNote = false;
+//                                        }
                                     }
                                     // delete new note
-                                    if(deleteNote){
-                                        newNote.delete();
-                                    }
+//                                    if(deleteNote){
+//                                        newNote.delete();
+//                                    }
                                 }
+
+                                DBConnector.batchEditNote(selectedImageList, noteContentStr);
                                 // log notes size
                                Log.e("NOTES_SIZE", "size" + new Select().from(Note.class).execute().size());
                             }
@@ -108,7 +108,6 @@ public class NoteDialogFragment extends DialogFragment {
                 .setNegativeButton("CANCEL",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                // do nothing
                             }
                         }
                 );

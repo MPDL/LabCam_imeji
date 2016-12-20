@@ -152,7 +152,7 @@
         </activity>
         <activity android:name=".TaskManager.RecentProcessActivity" >
         </activity>
-        <activity android:name=".TaskManager.RecentTextActivity" >
+        <activity android:name=".TaskManager.RecentNoteActivity" >
         </activity>
     </application>
 

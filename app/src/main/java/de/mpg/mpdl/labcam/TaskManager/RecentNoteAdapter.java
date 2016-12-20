@@ -6,19 +6,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
 
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 
 /**
  * Created by Yunqing on 19.12.16.
  */
 
 
-public class RecentTextAdapter extends BaseAdapter {
+public class RecentNoteAdapter extends BaseAdapter {
 
     private LayoutInflater inflater;
 
@@ -26,7 +29,7 @@ public class RecentTextAdapter extends BaseAdapter {
     private List<Note> noteList;
 
 
-    public RecentTextAdapter(Activity activity, List<Note> noteList) {
+    public RecentNoteAdapter(Activity activity, List<Note> noteList) {
         this.activity = activity;
         this.noteList = noteList;
     }
@@ -48,7 +51,7 @@ public class RecentTextAdapter extends BaseAdapter {
 
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
+    public View getView(final int i, View view, ViewGroup viewGroup) {
 
         if (inflater == null)
             inflater = (LayoutInflater) activity
@@ -68,7 +71,25 @@ public class RecentTextAdapter extends BaseAdapter {
 
         taskTime.setText(endDate);
 
+        // DELETE NOTE
+        ImageView deleteNoteButton = (ImageView) view.findViewById(R.id.btn_delete);
+        deleteNoteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteNote(noteList.get(i));
+            }
+        });
+
         return view;
 
+    }
+
+    private void deleteNote(Note note){
+        for (Image image : DBConnector.getImageByNoteId(note.getNoteId())) {
+            image.setNoteId(null);
+        }
+        note.delete();
+        noteList.remove(note);
+        notifyDataSetChanged();
     }
 }

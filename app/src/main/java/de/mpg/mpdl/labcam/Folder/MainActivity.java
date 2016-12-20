@@ -68,13 +68,10 @@ import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Settings.RemoteCollectionSettingsActivity;
 import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
 import de.mpg.mpdl.labcam.TaskManager.RecentProcessActivity;
-import de.mpg.mpdl.labcam.TaskManager.RecentTextActivity;
-import de.mpg.mpdl.labcam.TaskManager.RecentTextActivity;
-import de.mpg.mpdl.labcam.TaskManager.RecentTextAdapter;
+import de.mpg.mpdl.labcam.TaskManager.RecentNoteActivity;
 
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
-import de.mpg.mpdl.labcam.Utils.OCRtextHandler;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 
 import retrofit.Callback;
@@ -602,7 +599,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         chooseRecentTextLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent recentTextIntent = new Intent(context, RecentTextActivity.class);
+                Intent recentTextIntent = new Intent(context, RecentNoteActivity.class);
                 startActivity(recentTextIntent);
             }
         });

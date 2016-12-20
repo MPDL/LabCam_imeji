@@ -35,7 +35,9 @@ import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -95,35 +97,38 @@ public class MicrophoneDialogFragment extends DialogFragment{
                                     return;
                                 }
 
-                                Voice newVoice = new Voice();
-                                newVoice.setVoiceId(UUID.randomUUID().toString());
-                                newVoice.setVoicePath(fileFullName);
-                                newVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-                                newVoice.save();
-                                Log.d("LY", "voice saved");
+//                                Voice newVoice = new Voice();
+//                                newVoice.setVoiceId(UUID.randomUUID().toString());
+//                                newVoice.setVoicePath(fileFullName);
+//                                newVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+//                                newVoice.save();
+//                                Log.d("LY", "voice saved");
 
                                 // update image, set voice
-                                boolean deleteVoice = true;
+//                                boolean deleteVoice = true;
+                                List<Image> selectedImageList = new ArrayList<Image>(); // selected ImageList
                                 for (String imagePath : imagePathArray) {
                                     Image image = DBConnector.getImageByPath(imagePath);
                                     if(image!=null){
-                                        if(image.getVoiceId()!=null){
-                                            Voice oldVoice = DBConnector.getVoiceById(image.getVoiceId());
-                                            oldVoice.setVoicePath(fileFullName);
-                                            oldVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-                                            oldVoice.save();
-                                        } else {
-                                            image.setVoiceId(newVoice.getVoiceId());
-                                            image.save();
-                                            deleteVoice = false;
-                                        }
+                                        selectedImageList.add(image);   // add image to imageList
+//                                        if(image.getVoiceId()!=null){
+//                                            Voice oldVoice = DBConnector.getVoiceById(image.getVoiceId());
+//                                            oldVoice.setVoicePath(fileFullName);
+//                                            oldVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+//                                            oldVoice.save();
+//                                        } else {
+//                                            image.setVoiceId(newVoice.getVoiceId());
+//                                            image.save();
+//                                            deleteVoice = false;
+//                                        }
 
                                     }
 
                                     // delete new note
-                                    if(deleteVoice){
-                                        newVoice.delete();
-                                    }
+//                                    if(deleteVoice){
+//                                        newVoice.delete();
+//                                    }
+                                    DBConnector.batchEditNote(selectedImageList, fileFullName);
                                 }
                             }
                         }
