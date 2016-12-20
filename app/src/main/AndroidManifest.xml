@@ -154,6 +154,8 @@
         </activity>
         <activity android:name=".TaskManager.RecentTextActivity" >
         </activity>
+        <activity android:name=".TaskManager.RecentVoiceActivity" >
+        </activity>
     </application>
 
 </manifest>
