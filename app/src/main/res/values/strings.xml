@@ -53,6 +53,8 @@
     <string name="recent_voice_notes">RECENT VOICE NOTES</string>
     <string name="recent_text_note">Recent Text Notes</string>
     <string name="recent_voice_note">Recent Voice Notes</string>
+    <string name="no_photos">No photos recently uploaded</string>
+    <string name="no_texts">There are no recent text notes</string>
 
 
 </resources>

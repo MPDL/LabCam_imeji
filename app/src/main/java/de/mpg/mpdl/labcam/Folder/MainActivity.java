@@ -68,6 +68,10 @@ import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Settings.RemoteCollectionSettingsActivity;
 import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
 import de.mpg.mpdl.labcam.TaskManager.RecentProcessActivity;
+import de.mpg.mpdl.labcam.TaskManager.RecentTextActivity;
+import de.mpg.mpdl.labcam.TaskManager.RecentTextActivity;
+import de.mpg.mpdl.labcam.TaskManager.RecentTextAdapter;
+
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.OCRtextHandler;
@@ -206,6 +210,8 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         chooseCollection();
 
         checkRecent();
+
+        checkRecentText();
 
         setUserInfoText();
 
@@ -585,6 +591,19 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             public void onClick(View view) {
                 Intent recentIntent = new Intent(context, RecentProcessActivity.class);
                 startActivity(recentIntent);
+            }
+        });
+
+
+    }
+
+    private void checkRecentText(){
+        RelativeLayout chooseRecentTextLayout = (RelativeLayout) findViewById(R.id.layout_recent_text_notes);
+        chooseRecentTextLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent recentTextIntent = new Intent(context, RecentTextActivity.class);
+                startActivity(recentTextIntent);
             }
         });
     }

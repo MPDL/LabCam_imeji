@@ -152,6 +152,8 @@
         </activity>
         <activity android:name=".TaskManager.RecentProcessActivity" >
         </activity>
+        <activity android:name=".TaskManager.RecentTextActivity" >
+        </activity>
     </application>
 
 </manifest>

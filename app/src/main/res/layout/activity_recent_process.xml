@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginLeft="15dp"
-        android:text="No photos recently uploaded"
+        android:text="@string/no_photos"
         android:textSize="16dp"
         android:textColor="@color/black"
         android:id="@+id/tv_no_recent_task"/>
