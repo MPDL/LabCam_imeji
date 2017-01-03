@@ -51,6 +51,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.NavigableMap;
+import java.util.Iterator;
+
 
 import de.mpg.mpdl.labcam.AutoRun.dbObserver;
 import de.mpg.mpdl.labcam.Gallery.AlbumRecyclerAdapter;
@@ -496,13 +499,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private void loadLocalGallery(){
 
         ArrayList<Gallery> imageFolders = new ArrayList<Gallery>();
-
+        Log.i("imagePathListAllAlbums",""+imagePathListAllAlbums);
 //        imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
         adapter = new AlbumRecyclerAdapter(getActivity(), imagePathListAllAlbums );
-        for (List<String[]> imagePathListAllAlbum : imagePathListAllAlbums) {
-            Log.i(LOG_TAG, "gallery size:"+ imagePathListAllAlbum.size());
-        }
-
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         albumRecyclerView.setLayoutManager(llm);
@@ -513,6 +512,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private void prepareData(){
         folders.clear();
         imagePathListAllAlbums.clear();
+
+        TreeMap<Long, String> tempImageList = new TreeMap<Long, String>();
+
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME
                 ,MediaStore.Images.Media.DATA
                 , MediaStore.Images.Media.DATE_TAKEN
@@ -542,12 +544,31 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
              * imagePathListForEachAlbum is created for each album to store image path
              */
             List<String> albumNames = new ArrayList<>();
-//            HashMap<String,String> imagePathListForEachAlbum = new HashMap<>();
-            do {
+            Map<Long, Integer> valueMap = new HashMap<>();
+
+            // create a tree-map in order to sort the picture according to the taken date
+            int tempcounter= 0;
+
+            do{
+                tempImageList.put(cur.getLong(dateColumn),cur.getString(nameColumn) );
+                valueMap.put(cur.getLong(dateColumn),tempcounter);
+                tempcounter ++;
+            }while (cur.moveToNext());
+                tempcounter --;
+
+            // reversed order, so that the picture in the album view will be shown in the most recent order
+            NavigableMap reverseTempImageList=tempImageList.descendingMap();
+            Set set = reverseTempImageList.entrySet();
+            Iterator Iterator = set.iterator();
+
+            while(Iterator.hasNext()) {
+                Map.Entry me = (Map.Entry)Iterator.next();
+
+                cur.moveToPosition(valueMap.get(Long.valueOf(""+me.getKey())));
+
                 /** for timeline view **/
                 //get all image and date
                 Long imageDate =  cur.getLong(dateColumn);
-//                Date d = new Date(imageDate);
                 String imagePath = cur.getString(nameColumn);
                 imageList.put(imageDate,imagePath);
 
@@ -598,13 +619,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                         }
                     }
                 }
-            } while (cur.moveToNext());
+            }
         }
 
         //try close cursor here
         cur.close();
-
-//        imagePathListAllAlbums.size();
 
     }
 
@@ -626,7 +645,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             String dateStr = dt.format(d);
             dateAseList.add(dateStr);
             ImageNameList.add(entry.getValue());
-//            Log.v(LOG_TAG,dateStr+" -> "+entry.getValue());
         }
 
 
@@ -638,8 +656,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         for(int i=ImageNameList.size()-1;i>=0;i--){
             sortedImageNameList.add(ImageNameList.get(i));
         }
-
-        Log.e(LOG_TAG,sortedImageNameList.size()+"");
 
          simpleAdapter = new SimpleAdapter(getActivity(),sortedImageNameList);
         if(positionSet!=null){
