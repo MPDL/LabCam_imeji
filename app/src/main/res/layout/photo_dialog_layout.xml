@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/photo_dialog_marginglr"
+                android:paddingRight="@dimen/photo_dialog_marginglr"
+                android:background="@color/transparent"
+    >
+
+    <RelativeLayout
+        android:id="@+id/top"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:padding="1dp"
+        android:background="@drawable/dialog_round_bg"
+        >
+
+        <Button
+            android:id="@+id/positiveButton"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/photo_dialog_height"
+            android:layout_gravity="center"
+            android:background="@color/white"
+            android:text="@string/photo_album"
+            android:textColor="@color/C1"
+            android:textSize="@dimen/t5"
+            />
+
+        <View
+            android:id="@+id/line_two"
+            style="@style/custom_line_h_style"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/positiveButton"
+            />
+
+        <Button
+            android:id="@+id/negativeButton"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/photo_dialog_height"
+            android:layout_below="@+id/line_two"
+            android:layout_gravity="center"
+            android:background="@color/white"
+            android:text="@string/camera"
+            android:textColor="@color/C1"
+            android:textSize="@dimen/t5"
+            />
+
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/photo_dialog_height"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/top"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center"
+        android:background="@drawable/dialog_round_bg"
+        android:text="@string/cancel"
+        android:textColor="@color/C1"
+        android:textSize="@dimen/t5"
+        />
+
+</RelativeLayout>

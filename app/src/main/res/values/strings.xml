@@ -58,4 +58,14 @@
     <string name="no_voice">There are no recent voice notes</string>
 
 
+    <!-- btn text-->
+    <string name="camera">camera</string>
+    <string name="cancel">cancel</string>
+    <string name="photo_album">Album</string>
+    <string name="exception_no_sd_permission">no SD card permission</string>
+    <string name="exception_no_gif_head">gif head not allowed</string>
+    <string name="exception_no_photo_permission">no camera permission</string>
+    <string name="exception_no_fine_location">no GPS permission</string>
+
+
 </resources>
