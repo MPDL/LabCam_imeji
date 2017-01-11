@@ -99,7 +99,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     RecyclerView albumRecyclerView;
     RecyclerView recyclerView;
-    SharedPreferences preferences;
 
     AlbumRecyclerAdapter adapter;
     SectionedGridRecyclerViewAdapter mSectionedAdapter;
@@ -107,15 +106,15 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
 
-    //
-    final ArrayList<Gallery> folders = new ArrayList<Gallery>();
 
     /**
-     * imageList store all images date and path
      * treeMap auto sort it by date (prepare data for timeline view)
      * <imageDate,imagePath> **/
-    TreeMap<Long, String> imageList = new TreeMap<Long, String>();
+
     ArrayList<String> sortedImageNameList;
+
+    TreeMap<Long, String> imageNameList = new TreeMap<>();
+
     /**
      *
      * store the imagePathList of each album
@@ -498,9 +497,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
      */
     private void loadLocalGallery(){
 
-        ArrayList<Gallery> imageFolders = new ArrayList<Gallery>();
-        Log.i("imagePathListAllAlbums",""+imagePathListAllAlbums);
-//        imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
         adapter = new AlbumRecyclerAdapter(getActivity(), imagePathListAllAlbums );
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -510,33 +506,37 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
 
     private void prepareData(){
-        folders.clear();
-        imagePathListAllAlbums.clear();
 
-        TreeMap<Long, String> tempImageList = new TreeMap<Long, String>();
+        // create a cursor to retrieve information for all pictures
+        imagePathListAllAlbums.clear();
+        imageNameList.clear();
+
+
+        List<String> albumNameArrayList = new ArrayList<>();
+        List<String> imageNameArrayList = new ArrayList<>();
+        List<Integer> DescendingOrderMapping = new ArrayList<>();
 
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME
                 ,MediaStore.Images.Media.DATA
                 , MediaStore.Images.Media.DATE_TAKEN
 
         };
+
+        String sorting =  MediaStore.Images.Media.DATE_TAKEN + " DESC";
         Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        preferences = getActivity().getSharedPreferences("folder", Context.MODE_PRIVATE);
+        Cursor cur = getActivity().getContentResolver().query(images, albums,null,null,sorting);
 
-        Cursor cur = getActivity().getContentResolver().query(images, albums,null,null,null);
 
-        imageList.clear();
+        //loop over the cursor, find all unique albums
         /*
             Listing out all the image folders(Galleries) in the file system.
          */
         if (cur.moveToFirst()) {
 
-            int albumLocation = cur.getColumnIndex(MediaStore.Images.
+            int albumNameColumn = cur.getColumnIndex(MediaStore.Images.
                     Media.BUCKET_DISPLAY_NAME);
-            int nameColumn = cur.getColumnIndex(
+            int fileNameColumn = cur.getColumnIndex(
                     MediaStore.Images.Media.DATA);
-            int dateColumn = cur.getColumnIndex(
-                    MediaStore.Images.Media.DATE_TAKEN);
 
             /**
              * albumName store the albumName of last image
@@ -544,85 +544,48 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
              * imagePathListForEachAlbum is created for each album to store image path
              */
             List<String> albumNames = new ArrayList<>();
-            Map<Long, Integer> valueMap = new HashMap<>();
 
-            // create a tree-map in order to sort the picture according to the taken date
-            int tempcounter= 0;
+            String tempFileName;
+            String tempAlbumName;
 
+            imageNameList.clear();
+            imageNameArrayList.clear();
+            albumNameArrayList.clear();
             do{
-                tempImageList.put(cur.getLong(dateColumn),cur.getString(nameColumn) );
-                valueMap.put(cur.getLong(dateColumn),tempcounter);
-                tempcounter ++;
+                tempFileName = cur.getString(fileNameColumn);
+                tempAlbumName = cur.getString(albumNameColumn);
+                imageNameArrayList.add(tempFileName);
+                albumNameArrayList.add(tempAlbumName);
+
             }while (cur.moveToNext());
-                tempcounter --;
 
-            // reversed order, so that the picture in the album view will be shown in the most recent order
-            NavigableMap reverseTempImageList=tempImageList.descendingMap();
-            Set set = reverseTempImageList.entrySet();
-            Iterator Iterator = set.iterator();
-
-            while(Iterator.hasNext()) {
-                Map.Entry me = (Map.Entry)Iterator.next();
-
-                cur.moveToPosition(valueMap.get(Long.valueOf(""+me.getKey())));
-
-                /** for timeline view **/
-                //get all image and date
-                Long imageDate =  cur.getLong(dateColumn);
-                String imagePath = cur.getString(nameColumn);
-                imageList.put(imageDate,imagePath);
-
-                /** for gallery view **/
-                /**
-                 * imagePathListByAlbum
-                 * create List<String> imagePathList for each Album
-                 * need to be same order with folder
-                 */
-
-                // existing code, need to rewrite gallery view
-                Gallery album = new Gallery();
-                album.setGalleryName(cur.getString(albumLocation));
-
-                String currentAlbum = cur.getString(albumLocation);
-                if(!albumNames.contains(currentAlbum)) {
-                    // new album
-                    folders.add(album);
-                    albumNames.add(currentAlbum);
-
+            albumNames.clear();
+            // check unique albums and initialize the structure of imagePathListAllAlbums
+            for (int i = 0; i < albumNameArrayList.size(); i++ ){
+                tempAlbumName = albumNameArrayList.get(i);
+                if(!albumNames.contains(tempAlbumName)) {
+                    albumNames.add(tempAlbumName);
                     List<String[]> imagePathListForCurrentAlbum = new ArrayList<>();
-                    // add picture to current album
-                    String[] imageStrArray = new String[2];
-                    imageStrArray[0] = currentAlbum;
-                    imageStrArray[1] = cur.getString(nameColumn);
-                    imagePathListForCurrentAlbum.add(imageStrArray);
                     // add current album hash map
                     imagePathListAllAlbums.add(imagePathListForCurrentAlbum);
+                }
+            }
 
-                }else {
-                    for (List<String[]> albumList :imagePathListAllAlbums){
-                        // if exist, get first imageStrArray, compare
-                        if(albumList.get(0)[0].equalsIgnoreCase(currentAlbum)){
-                            boolean isDuplicate = false;
-                            for (String[] strings : albumList) {
-                                if (strings[1] == cur.getString(nameColumn)){
-                                    isDuplicate = true;
-                                    break;
-                                }
-                            }
-
-                            if(!isDuplicate) {
-                                String[] imageStrArray = new String[2];
-                                imageStrArray[0] = currentAlbum;
-                                imageStrArray[1] = cur.getString(nameColumn);
-                                albumList.add(imageStrArray);
-                            }
-                        }
+            // searching for every album the corresponding index of files in the XXXArrayList
+            for (int j = 0; j < albumNameArrayList.size(); j++ ){
+                tempAlbumName = albumNameArrayList.get(j);
+                for (int i = 0; i < albumNames.size() ; i++) {
+                    if (albumNames.get(i).equalsIgnoreCase(tempAlbumName)) {
+                        String[] imageStrArray = new String[2];
+                        imageStrArray[0] = tempAlbumName;
+                        imageStrArray[1] = imageNameArrayList.get(j);
+                        imagePathListAllAlbums.get(i).add(imageStrArray);
+                        break;
                     }
                 }
             }
         }
 
-        //try close cursor here
         cur.close();
 
     }
@@ -635,11 +598,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         sortedImageNameList = new ArrayList<>();
         sortedImageNameList.clear();
         // sectionMap key is the date, value is the picture number
-        List<String> dateAseList = new ArrayList<String>();
-        List<String> dateList = new ArrayList<String>();
+        List<String> dateAseList = new ArrayList<>();
+        List<String> dateList = new ArrayList<>();
         HashMap<String,Integer> sectionMap = new HashMap<String,Integer>();
 
-        for(Map.Entry<Long,String> entry: imageList.entrySet()){
+        for(Map.Entry<Long,String> entry: imageNameList.entrySet()){
             Date d = new Date(entry.getKey());
             SimpleDateFormat dt = new SimpleDateFormat(" dd.MM.yyyy");
             String dateStr = dt.format(d);
