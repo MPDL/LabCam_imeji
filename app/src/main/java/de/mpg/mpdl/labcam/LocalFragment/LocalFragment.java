@@ -861,9 +861,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     public void onPause() {
         resolver.unregisterContentObserver(dbObserver);
 
-//        prepareData();
+        prepareData();
         checkPermission();
-//        loadTimeLinePicture();
+        loadTimeLinePicture();
         simpleAdapter.notifyDataSetChanged();
         mSectionedAdapter.notifyDataSetChanged();
 
