@@ -3,7 +3,6 @@ package de.mpg.mpdl.labcam.LocalFragment;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,8 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -44,15 +41,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.NavigableMap;
-import java.util.Iterator;
 
 
 import de.mpg.mpdl.labcam.AutoRun.dbObserver;
@@ -63,7 +56,6 @@ import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;
 import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
 import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
 import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
-import de.mpg.mpdl.labcam.Model.Gallery;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
@@ -98,7 +90,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     android.support.v7.app.ActionBar actionBar;
 
     RecyclerView albumRecyclerView;
-    RecyclerView recyclerView;
+    RecyclerView dateRecyclerView;
 
     AlbumRecyclerAdapter adapter;
     SectionedGridRecyclerViewAdapter mSectionedAdapter;
@@ -202,7 +194,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 dateLabel.setTextColor(getResources().getColor(R.color.primary));
                 albumLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
                 albumRecyclerView.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
+                dateRecyclerView.setVisibility(View.VISIBLE);
             }
         });
 
@@ -222,7 +214,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 dateLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
                 albumLabel.setTextColor(getResources().getColor(R.color.primary));
                 albumRecyclerView.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
+                dateRecyclerView.setVisibility(View.GONE);
             }
         });
 
@@ -548,6 +540,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
             imageNameArrayList.clear();
             albumNameArrayList.clear();
+            imageDateArrayList.clear();
             do{
                 imageNameArrayList.add(cur.getString(fileNameColumn));
                 albumNameArrayList.add(cur.getString(albumNameColumn));
@@ -626,11 +619,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         //Add your adapter to the sectionAdapter
         SectionedGridRecyclerViewAdapter.Section[] dummy = new SectionedGridRecyclerViewAdapter.Section[sections.size()];
         mSectionedAdapter = new
-                SectionedGridRecyclerViewAdapter(getActivity(),R.layout.header_grid_section,R.id.section_text,recyclerView,simpleAdapter);
+                SectionedGridRecyclerViewAdapter(getActivity(),R.layout.header_grid_section,R.id.section_text, dateRecyclerView,simpleAdapter);
         mSectionedAdapter.setSections(sections.toArray(dummy));
 
         //Apply this adapter to the RecyclerView
-        recyclerView.setAdapter(mSectionedAdapter);
+        dateRecyclerView.setAdapter(mSectionedAdapter);
 
 
         simpleAdapter.setOnItemClickListener(new SimpleAdapter.OnItemClickListener() {
@@ -675,9 +668,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         spanCount = width/235;
 
         // timeline recycleView
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_recycleView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
+        dateRecyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_recycleView);
+        dateRecyclerView.setHasFixedSize(true);
+        dateRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
     }
 
     /**upload methods**/
@@ -842,7 +835,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             dateLabel.setTextColor(getResources().getColor(R.color.lightGrey));
             albumLabel.setTextColor(getResources().getColor(R.color.primary));
             albumRecyclerView.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
+            dateRecyclerView.setVisibility(View.GONE);
         }
         renderStatusBar();
         super.onResume();
