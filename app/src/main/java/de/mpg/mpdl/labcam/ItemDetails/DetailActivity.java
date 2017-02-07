@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +30,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
@@ -172,18 +175,18 @@ public class DetailActivity extends AppCompatActivity implements android.support
     public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_upload_local:
-                Log.v(LOG_TAG, "upload");
-
-                Log.v(LOG_TAG, " "+positionSet.size());
-                List uploadPathList = new ArrayList();
-                for(Integer i:positionSet){
-                    uploadPathList.add(itemPathList.get(i));
-                }
-
-                if(uploadPathList != null) {
-                    uploadList(uploadPathList);
-                }
-                uploadPathList.clear();
+                Log.i(LOG_TAG, "upload");
+                batchOperation(R.id.item_upload_local);
+                mode.finish();
+                return true;
+            case R.id.item_microphone_local:
+                Log.i(LOG_TAG, "microphone");
+                batchOperation(R.id.item_microphone_local);
+                mode.finish();
+                return true;
+            case R.id.item_notes_local:
+                Log.i(LOG_TAG, "notes");
+                batchOperation(R.id.item_notes_local);
                 mode.finish();
                 return true;
             default:
@@ -246,7 +249,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         return task.getTaskId();
     }
 
-    private int addImages(List<String> fileList,String taskId){
+    private static int addImages(List<String> fileList,String taskId){
 
         int imageNum = 0;
         for (String filePath: fileList) {
@@ -316,5 +319,77 @@ public class DetailActivity extends AppCompatActivity implements android.support
             viewPagerAdapter.notifyDataSetChanged();
 
         }
+    }
+
+    private void batchOperation(int operationType){
+        if(positionSet.size()!=0) {
+            Log.v(LOG_TAG, " "+positionSet.size());
+            List imagePathList = new ArrayList();
+            for (Integer i : positionSet) {
+                imagePathList.add(itemPathList.get(i));
+            }
+
+            if (imagePathList != null) {
+                switch (operationType){
+                    case R.id.item_upload_local:
+                        uploadList(imagePathList);
+                        break;
+                    case R.id.item_microphone_local:
+                        showVoiceDialog(imagePathList);
+                        break;
+                    case R.id.item_notes_local:
+                        showNoteDialog(imagePathList);
+                        break;
+                }
+            }
+            imagePathList.clear();
+        }
+    }
+    public void showVoiceDialog(List<String> imagePathList){
+        voiceDialogNewInstance(imagePathList).show(this.getFragmentManager(), "voiceDialogFragment");
+    }
+
+
+    /**** record voice ****/
+    public static MicrophoneDialogFragment voiceDialogNewInstance(List<String> imagePathList)
+    {
+        MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
+
+//        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
+        Log.d("LY", "size: "+imagePathList.size());
+
+        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
+        for(int i=0; i<imagePathList.size(); i++){
+            imagePathArray[i] = imagePathList.get(i);
+        }
+
+        Bundle args = new Bundle();
+
+        args.putStringArray("imagePathArray", imagePathArray);
+        microphoneDialogFragment.setArguments(args);
+        return microphoneDialogFragment;
+    }
+
+    public void showNoteDialog(List<String> imagePathList){
+        noteDialogNewInstance(imagePathList).show(this.getFragmentManager(),"noteDialogFragment");
+    }
+
+    /**** take notes ****/
+    public static NoteDialogFragment noteDialogNewInstance(List<String> imagePathList)
+    {
+        NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
+
+        Log.d("LY", "size: "+imagePathList.size());
+
+        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
+        for(int i=0; i<imagePathList.size(); i++){
+            imagePathArray[i] = imagePathList.get(i);
+        }
+
+        Bundle args = new Bundle();
+
+        args.putStringArray("imagePathArray", imagePathArray);
+        noteDialogFragment.setArguments(args);    // pass imagePathArray to NoteDialogFragment
+        return noteDialogFragment;
     }
 }

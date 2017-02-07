@@ -3,7 +3,6 @@ package de.mpg.mpdl.labcam.LocalFragment;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,8 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -44,15 +41,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.NavigableMap;
-import java.util.Iterator;
 
 
 import de.mpg.mpdl.labcam.AutoRun.dbObserver;
@@ -63,7 +56,6 @@ import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;
 import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
 import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
 import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
-import de.mpg.mpdl.labcam.Model.Gallery;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
@@ -98,8 +90,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     android.support.v7.app.ActionBar actionBar;
 
     RecyclerView albumRecyclerView;
-    RecyclerView recyclerView;
-    SharedPreferences preferences;
+    RecyclerView dateRecyclerView;
 
     AlbumRecyclerAdapter adapter;
     SectionedGridRecyclerViewAdapter mSectionedAdapter;
@@ -107,20 +98,23 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
 
-    //
-    final ArrayList<Gallery> folders = new ArrayList<Gallery>();
 
     /**
-     * imageList store all images date and path
      * treeMap auto sort it by date (prepare data for timeline view)
      * <imageDate,imagePath> **/
-    TreeMap<Long, String> imageList = new TreeMap<Long, String>();
+
     ArrayList<String> sortedImageNameList;
+
+    TreeMap<Long, String> imageNameList = new TreeMap<>();
+
     /**
      *
      * store the imagePathList of each album
      */
     ArrayList<List<String[]>> imagePathListAllAlbums = new ArrayList<>();
+    List<String> albumNameArrayList = new ArrayList<>();
+    List<String> imageNameArrayList = new ArrayList<>();
+    List<Long> imageDateArrayList = new ArrayList<>();
 
     //user info
     private SharedPreferences mPrefs;
@@ -200,7 +194,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 dateLabel.setTextColor(getResources().getColor(R.color.primary));
                 albumLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
                 albumRecyclerView.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
+                dateRecyclerView.setVisibility(View.VISIBLE);
             }
         });
 
@@ -220,7 +214,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 dateLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
                 albumLabel.setTextColor(getResources().getColor(R.color.primary));
                 albumRecyclerView.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
+                dateRecyclerView.setVisibility(View.GONE);
             }
         });
 
@@ -498,9 +492,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
      */
     private void loadLocalGallery(){
 
-        ArrayList<Gallery> imageFolders = new ArrayList<Gallery>();
-        Log.i("imagePathListAllAlbums",""+imagePathListAllAlbums);
-//        imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
         adapter = new AlbumRecyclerAdapter(getActivity(), imagePathListAllAlbums );
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -510,32 +501,32 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
 
     private void prepareData(){
-        folders.clear();
-        imagePathListAllAlbums.clear();
 
-        TreeMap<Long, String> tempImageList = new TreeMap<Long, String>();
+        // create a cursor to retrieve information for all pictures
+        imagePathListAllAlbums.clear();
 
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME
                 ,MediaStore.Images.Media.DATA
                 , MediaStore.Images.Media.DATE_TAKEN
 
         };
+
+        String sorting =  MediaStore.Images.Media.DATE_TAKEN + " DESC";
         Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        preferences = getActivity().getSharedPreferences("folder", Context.MODE_PRIVATE);
+        Cursor cur = getActivity().getContentResolver().query(images, albums,null,null,sorting);
 
-        Cursor cur = getActivity().getContentResolver().query(images, albums,null,null,null);
 
-        imageList.clear();
+        //loop over the cursor, find all unique albums
         /*
             Listing out all the image folders(Galleries) in the file system.
          */
         if (cur.moveToFirst()) {
 
-            int albumLocation = cur.getColumnIndex(MediaStore.Images.
+            int albumNameColumn = cur.getColumnIndex(MediaStore.Images.
                     Media.BUCKET_DISPLAY_NAME);
-            int nameColumn = cur.getColumnIndex(
+            int fileNameColumn = cur.getColumnIndex(
                     MediaStore.Images.Media.DATA);
-            int dateColumn = cur.getColumnIndex(
+            int fileDateColumn = cur.getColumnIndex(
                     MediaStore.Images.Media.DATE_TAKEN);
 
             /**
@@ -544,117 +535,61 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
              * imagePathListForEachAlbum is created for each album to store image path
              */
             List<String> albumNames = new ArrayList<>();
-            Map<Long, Integer> valueMap = new HashMap<>();
 
-            // create a tree-map in order to sort the picture according to the taken date
-            int tempcounter= 0;
+            String tempAlbumName;
 
+            imageNameArrayList.clear();
+            albumNameArrayList.clear();
+            imageDateArrayList.clear();
             do{
-                tempImageList.put(cur.getLong(dateColumn),cur.getString(nameColumn) );
-                valueMap.put(cur.getLong(dateColumn),tempcounter);
-                tempcounter ++;
+                imageNameArrayList.add(cur.getString(fileNameColumn));
+                albumNameArrayList.add(cur.getString(albumNameColumn));
+                imageDateArrayList.add(cur.getLong(fileDateColumn));
             }while (cur.moveToNext());
-                tempcounter --;
 
-            // reversed order, so that the picture in the album view will be shown in the most recent order
-            NavigableMap reverseTempImageList=tempImageList.descendingMap();
-            Set set = reverseTempImageList.entrySet();
-            Iterator Iterator = set.iterator();
-
-            while(Iterator.hasNext()) {
-                Map.Entry me = (Map.Entry)Iterator.next();
-
-                cur.moveToPosition(valueMap.get(Long.valueOf(""+me.getKey())));
-
-                /** for timeline view **/
-                //get all image and date
-                Long imageDate =  cur.getLong(dateColumn);
-                String imagePath = cur.getString(nameColumn);
-                imageList.put(imageDate,imagePath);
-
-                /** for gallery view **/
-                /**
-                 * imagePathListByAlbum
-                 * create List<String> imagePathList for each Album
-                 * need to be same order with folder
-                 */
-
-                // existing code, need to rewrite gallery view
-                Gallery album = new Gallery();
-                album.setGalleryName(cur.getString(albumLocation));
-
-                String currentAlbum = cur.getString(albumLocation);
-                if(!albumNames.contains(currentAlbum)) {
-                    // new album
-                    folders.add(album);
-                    albumNames.add(currentAlbum);
-
+            albumNames.clear();
+            // check unique albums and initialize the structure of imagePathListAllAlbums
+            for (int i = 0; i < albumNameArrayList.size(); i++ ){
+                tempAlbumName = albumNameArrayList.get(i);
+                if(!albumNames.contains(tempAlbumName)) {
+                    albumNames.add(tempAlbumName);
                     List<String[]> imagePathListForCurrentAlbum = new ArrayList<>();
-                    // add picture to current album
-                    String[] imageStrArray = new String[2];
-                    imageStrArray[0] = currentAlbum;
-                    imageStrArray[1] = cur.getString(nameColumn);
-                    imagePathListForCurrentAlbum.add(imageStrArray);
                     // add current album hash map
                     imagePathListAllAlbums.add(imagePathListForCurrentAlbum);
+                }
+            }
 
-                }else {
-                    for (List<String[]> albumList :imagePathListAllAlbums){
-                        // if exist, get first imageStrArray, compare
-                        if(albumList.get(0)[0].equalsIgnoreCase(currentAlbum)){
-                            boolean isDuplicate = false;
-                            for (String[] strings : albumList) {
-                                if (strings[1] == cur.getString(nameColumn)){
-                                    isDuplicate = true;
-                                    break;
-                                }
-                            }
-
-                            if(!isDuplicate) {
-                                String[] imageStrArray = new String[2];
-                                imageStrArray[0] = currentAlbum;
-                                imageStrArray[1] = cur.getString(nameColumn);
-                                albumList.add(imageStrArray);
-                            }
-                        }
+            // searching for every album the corresponding index of files in the XXXArrayList
+            for (int j = 0; j < albumNameArrayList.size(); j++ ){
+                tempAlbumName = albumNameArrayList.get(j);
+                for (int i = 0; i < albumNames.size() ; i++) {
+                    if (albumNames.get(i).equalsIgnoreCase(tempAlbumName)) {
+                        String[] imageStrArray = new String[2];
+                        imageStrArray[0] = tempAlbumName;
+                        imageStrArray[1] = imageNameArrayList.get(j);
+                        imagePathListAllAlbums.get(i).add(imageStrArray);
+                        break;
                     }
                 }
             }
         }
-
-        //try close cursor here
         cur.close();
-
     }
 
     //load timeLinePicture
     private void loadTimeLinePicture(){
         // Your RecyclerView.Adapter
-        // sortedImageNameList is imagePath list
-        ArrayList<String> ImageNameList = new ArrayList<>();
         sortedImageNameList = new ArrayList<>();
         sortedImageNameList.clear();
         // sectionMap key is the date, value is the picture number
-        List<String> dateAseList = new ArrayList<String>();
-        List<String> dateList = new ArrayList<String>();
-        HashMap<String,Integer> sectionMap = new HashMap<String,Integer>();
+        List<String> dateList = new ArrayList<>();
 
-        for(Map.Entry<Long,String> entry: imageList.entrySet()){
-            Date d = new Date(entry.getKey());
+        for (int i = 0; i < imageNameArrayList.size(); i++){
+            Date d = new Date(imageDateArrayList.get(i));
             SimpleDateFormat dt = new SimpleDateFormat(" dd.MM.yyyy");
             String dateStr = dt.format(d);
-            dateAseList.add(dateStr);
-            ImageNameList.add(entry.getValue());
-        }
-
-
-        // treeMap order is ASE, need DSE, so reverse
-        for(int i=dateAseList.size()-1;i>=0;i--){
-                dateList.add(dateAseList.get(i));
-        }
-
-        for(int i=ImageNameList.size()-1;i>=0;i--){
-            sortedImageNameList.add(ImageNameList.get(i));
+            dateList.add(dateStr);
+            sortedImageNameList.add(imageNameArrayList.get(i));
         }
 
          simpleAdapter = new SimpleAdapter(getActivity(),sortedImageNameList);
@@ -662,16 +597,12 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             simpleAdapter.setPositionSet(positionSet);
         }
 
-
         //This is the code to provide a sectioned grid
-        List<SectionedGridRecyclerViewAdapter.Section> sections =
-                new ArrayList<SectionedGridRecyclerViewAdapter.Section>();
-
+        List<SectionedGridRecyclerViewAdapter.Section> sections = new ArrayList<>();
 
         // section init
         String preStr = "";
         int count = 0;
-//        int imgPosition = 0;
         for(String dateStr:dateList){
             // count is img position
             if(preStr.equalsIgnoreCase(dateStr)){
@@ -688,11 +619,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         //Add your adapter to the sectionAdapter
         SectionedGridRecyclerViewAdapter.Section[] dummy = new SectionedGridRecyclerViewAdapter.Section[sections.size()];
         mSectionedAdapter = new
-                SectionedGridRecyclerViewAdapter(getActivity(),R.layout.header_grid_section,R.id.section_text,recyclerView,simpleAdapter);
+                SectionedGridRecyclerViewAdapter(getActivity(),R.layout.header_grid_section,R.id.section_text, dateRecyclerView,simpleAdapter);
         mSectionedAdapter.setSections(sections.toArray(dummy));
 
         //Apply this adapter to the RecyclerView
-        recyclerView.setAdapter(mSectionedAdapter);
+        dateRecyclerView.setAdapter(mSectionedAdapter);
 
 
         simpleAdapter.setOnItemClickListener(new SimpleAdapter.OnItemClickListener() {
@@ -737,9 +668,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         spanCount = width/235;
 
         // timeline recycleView
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_recycleView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
+        dateRecyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_recycleView);
+        dateRecyclerView.setHasFixedSize(true);
+        dateRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
     }
 
     /**upload methods**/
@@ -904,7 +835,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             dateLabel.setTextColor(getResources().getColor(R.color.lightGrey));
             albumLabel.setTextColor(getResources().getColor(R.color.primary));
             albumRecyclerView.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
+            dateRecyclerView.setVisibility(View.GONE);
         }
         renderStatusBar();
         super.onResume();
@@ -923,9 +854,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     public void onPause() {
         resolver.unregisterContentObserver(dbObserver);
 
-//        prepareData();
+        prepareData();
         checkPermission();
-//        loadTimeLinePicture();
+        loadTimeLinePicture();
         simpleAdapter.notifyDataSetChanged();
         mSectionedAdapter.notifyDataSetChanged();
 

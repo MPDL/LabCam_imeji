@@ -99,9 +99,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final int PICK_COLLECTION_REQUEST = 1997;
-    // flag
-    // no collection selected before
-//    private boolean isFirstCollection = false;
 
     private String email;
     private String username;
@@ -168,10 +165,8 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             }
         }
 
-
-
         //user info
-        mPrefs = this.getSharedPreferences("myPref", 0);
+        mPrefs = this.getSharedPreferences("myPref", MODE_PRIVATE);
         email = mPrefs.getString("email", "");
 //        username =  mPrefs.getString("username", "");
         username = mPrefs.getString("familyName","")+" "+mPrefs.getString("givenName","");
@@ -219,7 +214,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
         if(isQRLogin) { // login with qr
             setAutoUploadStatus(isQRLogin, true);
-            Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
         }else { // normal login
             isLoginCall = true;
             RetrofitClient.getGrantCollectionMessage(callback, apiKey);  // show alert if no collection available
@@ -262,7 +256,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         }else if(isFinished){
             //do nothing
         }
-
     }
 
     @Override
@@ -516,9 +509,9 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             }
         });
 
-
         //initUI
         autoUploadSwitch = (Switch) findViewById(R.id.switch_auto_upload);
+        Log.i("autoUploadSwitch",""+autoUploadSwitch.isChecked());
         chooseCollectionLabel = (TextView) findViewById(R.id.tv_choose_collection);
         collectionNameTextView = (TextView) findViewById(R.id.collection_name);
 
@@ -645,7 +638,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             settings.setUserId(userId);
             settings.setIsAutoUpload(false);
             settings.save();
-            autoUploadSwitch.setChecked(false);
+            autoUploadSwitch.setChecked(settings.isAutoUpload());
 
             chooseCollectionLayout.setEnabled(false);
             chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
@@ -662,17 +655,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     return;
                 }
                 //off to on
-                Task auTask = DBConnector.getAuTask(userId,serverUrl);
-
-//                if(auTask==null){  // col wasValue not null
-
                 RetrofitClient.getGrantCollectionMessage(callback, apiKey);
                 isLoginCall = true;
-//
-//                }else
-//                    Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
+
             }
         });
+
 
         autoUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -702,8 +690,22 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
                 }
                 Log.e(LOG_TAG, settings.isAutoUpload() + "");
+
+                // pop up to display switch on/off the automatic upload option
+                if(compoundButton.isChecked()) {
+                    Toast.makeText(activity,"Automatic upload is active!",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(activity,"Automatic upload is inactive!",Toast.LENGTH_SHORT).show();
+                }
             }
+
+
         });
+
+        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();   // get old settings
+        if(settings!=null && settings.isAutoUpload()){
+            Toast.makeText(activity,"Automatic upload is active!",Toast.LENGTH_SHORT).show();
+        }
     }
 
     //logout
@@ -895,7 +897,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                 if(lastAUTask!= null){
                     collectionNameTextView.setText(lastAUTask.getCollectionName());
                     Log.e(TAG+"2.3", "collectionNameTextView set to "+ lastAUTask.getCollectionName());
-                    autoUploadSwitch.setChecked(true);
+
+                    if(settings.isAutoUpload()){
+                        autoUploadSwitch.setChecked(true);
+                    }else{
+                        autoUploadSwitch.setChecked(false);
+                    }
 
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(true);
@@ -909,7 +916,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                 else{
                     collectionNameTextView.setText("none");
                     Log.e(TAG+"2.5", "collectionNameTextView set to none");
-                    autoUploadSwitch.setChecked(false);
+
+                    if(settings.isAutoUpload()){
+                        autoUploadSwitch.setChecked(true);
+                    }else{
+                        autoUploadSwitch.setChecked(false);
+                    }
 
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(false);
@@ -1001,9 +1013,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             collectionNameTextView.setText(imejiFolder.getTitle());
             Log.e(TAG+"3", "collectionNameTextView set to "+ imejiFolder.getTitle());
 
-            //switch on
-            autoUploadSwitch.setChecked(true);
-
             // go to fragment
             SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
             viewPager.setAdapter(tabAdapter);
@@ -1013,10 +1022,19 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             pDialog.dismiss();
             Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();   // get old settings
 
+            //switch on
+            //check the previous status of automatic upload
+            Log.i("autoUploadSwitch", ""+autoUploadSwitch.isChecked());
+
+            if(settings.isAutoUpload()) {
+                autoUploadSwitch.setChecked(true);
+            }else{
+                autoUploadSwitch.setChecked(false);
+            }
+
             if(settings!=null && settings.isAutoUpload())  // history AU is on
             {
                 setAutoUploadStatus(false,true);
-                Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
             }else {                                        // history AU is off or not set
                 setAutoUploadStatus(false,false);
             }
@@ -1103,15 +1121,20 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     collectionNameTextView.setText(folderList.get(0).getTitle());
                     Log.e(TAG+"5", "collectionNameTextView set to " +folderList.get(0).getTitle());
                 }
-                //switch on
-                autoUploadSwitch.setChecked(true);
+
 
                 Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();   // get old settings
+
+                //switch on
+                if(settings.isAutoUpload()){
+                    autoUploadSwitch.setChecked(true);
+                }else{
+                    autoUploadSwitch.setChecked(false);
+                }
 
                 if(settings!=null && settings.isAutoUpload())  // history AU is on
                 {
                     setAutoUploadStatus(false,true);
-                    Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
                 }else {                                        // history AU is off or not set
                     setAutoUploadStatus(false,false);
                 }
@@ -1141,7 +1164,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                             collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
                             Log.e(TAG+"6", "collectionNameTextView set to " + auTask.getCollectionName());
                             setAutoUploadStatus(false,true);
-                            Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
                         }
                     }
 
