@@ -47,8 +47,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-
-
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -61,17 +59,14 @@
                 android:orientation="horizontal"
                 android:id="@+id/fake_toolbar">
 
-                <!-- The Scrollable View here               -->
+                <!-- The Scrollable View here -->
                 <android.support.design.widget.TabLayout
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     android:id="@+id/tabLayout"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content" />
 
-
             </LinearLayout>
-
-            <!--android:background="@drawable/bottom_bg"-->
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewPager"
@@ -111,7 +106,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/layout_upload_option"
-                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:layout_marginTop="30dp">
 
                 <TextView
@@ -362,5 +357,4 @@
         </ScrollView>
     </android.support.design.widget.NavigationView>
 
-    <!--app:menu="@menu/navigation_drawer_items"-->
 </android.support.v4.widget.DrawerLayout>

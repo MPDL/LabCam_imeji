@@ -20,9 +20,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -74,6 +74,7 @@ import de.mpg.mpdl.labcam.TaskManager.RecentVoiceActivity;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
+import de.mpg.mpdl.labcam.code.common.adapter.TitleFragmentPagerAdapter;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -140,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
     //new ui
     TabLayout tabLayout;
+
     ViewPager viewPager;
 
     //activity
@@ -208,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
         checkRecentVoice();
 
-//        setUserInfoText();    // exception in
+        setUserInfoText();    // exception in
 
         initAutoSwitch();
 
@@ -266,10 +268,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
     @Override
     public void onResume(){
         super.onResume();
-        SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(tabAdapter);
-        viewPager.setOffscreenPageLimit(1);
-        viewPager.setCurrentItem(currentTab);
 
         //set selected collection name
         collectionNameTextView = (TextView) findViewById(R.id.collection_name);
@@ -444,70 +442,21 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
      * init Fragments
      */
     private void initInstances() {
-        // Setup tabs
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
-        SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(tabAdapter);
-//
-//        if(isTaskFragment){
-//            currentTab = 2;
-//        viewPager.setCurrentItem(currentTab);
-//        }
 
+        List<Fragment> fragments = new ArrayList<Fragment>(2);
+        fragments.add(new LocalFragment());
+        fragments.add(new ImejiFragment());
+
+        TitleFragmentPagerAdapter adapter = new TitleFragmentPagerAdapter(getSupportFragmentManager(), fragments, this);
+        viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(adapter.getCount());
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(0).setCustomView(R.layout.tab_local);
-        tabLayout.getTabAt(1).setCustomView(R.layout.tab_imeji);
-//        tabLayout.getTabAt(2).setCustomView(R.layout.tab_upload);
-
-//        if(isTaskFragment){
-//            TextView taskTextView = (TextView)tabLayout.findViewById(R.id.tabicon_upload);
-//            taskTextView.setTextColor(getResources().getColor(R.color.primary));
-//            TextView fotoTextView = (TextView)tabLayout.findViewById(R.id.tabicon_local);
-//            fotoTextView.setTextColor(getResources().getColor(R.color.tabUnselect));
-//        }
-
-        //tab style change on page change
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            float scale = getResources().getDisplayMetrics().density;
-            int selectedIndex = -1;
-
-
-            //tab Icon and Text id in layout files
-            int[] backgroundIconId = {R.id.tabicon_local, R.id.tabicon_imeji, R.id.tabicon_upload};
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                //if the tab is not the selected one, set its text and icon style as inactive
-
-                if (0 != position && 0 != selectedIndex) {
-                    TextView iconText0 = (TextView) tabLayout.findViewById(backgroundIconId[0]);
-                    iconText0.setTextColor(getResources().getColor(R.color.tabUnselect));
-                }
-                if (1 != position && 1 != selectedIndex) {
-                    TextView iconText1 = (TextView) tabLayout.findViewById(backgroundIconId[1]);
-                    iconText1.setTextColor(getResources().getColor(R.color.tabUnselect));
-                }
-//                if (2 != position && 2 != selectedIndex) {
-//                    TextView iconText2 = (TextView) tabLayout.findViewById(backgroundIconId[2]);
-//                    iconText2.setTextColor(getResources().getColor(R.color.tabUnselect));
-//                }
-
-                //background icon
-                TextView iconText = (TextView) tabLayout.findViewById(backgroundIconId[position]);
-                iconText.setTextColor(getResources().getColor(R.color.primary));
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
+        for (int i = 0; i < adapter.getCount(); i++) {
+            tabLayout.getTabAt(i).setCustomView(adapter.getTabView(i));
+        }
+        setCurrentItem(0);
 
         //initUI
         autoUploadSwitch = (Switch) findViewById(R.id.switch_auto_upload);
@@ -517,45 +466,8 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-
-        @Override
-        public int getCount() {
-                return 2;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-
-            android.support.v4.app.Fragment fragment;
-
-            //try with exception
-            switch (position) {
-                case 0:
-                    fragment = new LocalFragment();
-                    return fragment;
-                case 1:
-                    fragment = new ImejiFragment();
-                    return fragment;
-                default:
-                    return new LocalFragment();
-            }
-
-        }
-
-        @Override
-        public int getItemPosition(Object object) {
-            return POSITION_NONE;
-        }
+    public void setCurrentItem(int index) {
+        viewPager.setCurrentItem(index);
     }
 
     //choose collection
@@ -829,9 +741,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
     //set user info textView(name email)
     private void setUserInfoText(){
-        TextView nameTextView = (TextView) findViewById(R.id.tv_username);
-        TextView emailTextView = (TextView) findViewById(R.id.tv_user_email);
-        TextView serverTextView = (TextView) findViewById(R.id.tv_server_url);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation);
+        View headerLayout = navigationView.getHeaderView(0);
+
+        TextView nameTextView = (TextView) headerLayout.findViewById(R.id.tv_username);
+        TextView emailTextView = (TextView) headerLayout.findViewById(R.id.tv_user_email);
+        TextView serverTextView = (TextView) headerLayout.findViewById(R.id.tv_server_url);
         nameTextView.setText(username);
         emailTextView.setText(email);
         if(serverUrl.length()<25){
@@ -1014,8 +929,8 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             Log.e(TAG+"3", "collectionNameTextView set to "+ imejiFolder.getTitle());
 
             // go to fragment
-            SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
-            viewPager.setAdapter(tabAdapter);
+//            SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
+//            viewPager.setAdapter(tabAdapter);
 //            currentTab = 0;
 //            viewPager.setCurrentItem(currentTab);
 

@@ -67,5 +67,8 @@
     <string name="exception_no_photo_permission">no camera permission</string>
     <string name="exception_no_fine_location">no GPS permission</string>
 
+    <string name="tab_local">LOCAL</string>
+    <string name="tab_server">SERVER</string>
+
 
 </resources>

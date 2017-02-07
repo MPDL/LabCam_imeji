@@ -31,8 +31,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     private final Context mContext;
     private final List<String> mItems;
 
-    private LayoutInflater inflater;
-
     //remember selected positions
     public Set<Integer> positionSet = new HashSet<>();
 
@@ -62,7 +60,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     public SimpleAdapter(Context context,List<String> galleryItems) {
         mContext = context;
         mItems = galleryItems;
-        inflater = LayoutInflater.from(context);
     }
 
     public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
