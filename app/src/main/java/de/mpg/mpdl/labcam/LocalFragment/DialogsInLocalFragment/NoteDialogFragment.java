@@ -75,28 +75,12 @@ public class NoteDialogFragment extends DialogFragment {
                                 // save note
                                 String noteContentStr = editText.getText().toString();
 
-                                // update image, set note
-//                                boolean deleteNote = true;
                                 List<Image> selectedImageList = new ArrayList<Image>(); // selected ImageList
                                 for (String imagePath : imagePathArray) {
                                     Image image = DBConnector.getImageByPath(imagePath);
                                     if(image!=null){
                                         selectedImageList.add(image);   // add image to imageList
-//                                        if(image.getNoteId()!=null){
-//                                            Note oldNote = DBConnector.getNoteById(image.getNoteId());
-//                                            oldNote.setNoteContent(noteContentStr);
-//                                            oldNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-//                                            oldNote.save();
-//                                        }else {
-//                                            image.setNoteId(newNote.getNoteId()); // set noteId as newNote
-//                                            image.save();
-//                                            deleteNote = false;
-//                                        }
                                     }
-                                    // delete new note
-//                                    if(deleteNote){
-//                                        newNote.delete();
-//                                    }
                                 }
 
                                 DBConnector.batchEditNote(selectedImageList, noteContentStr);

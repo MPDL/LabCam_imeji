@@ -82,7 +82,8 @@ public class RecentVoiceAdapter extends BaseAdapter {
             e.printStackTrace();
             return;
         }
-
+        TextView createTimeTextView = (TextView) itemView.findViewById(R.id.voice_list_cell_text);
+        createTimeTextView.setText(voice.getCreateTime());
         final ImageButton pauseButton = (ImageButton) itemView.findViewById(R.id.btn_pause_voice_cell);
         final ImageButton rewindButton = (ImageButton) itemView.findViewById(R.id.btn_rewind_voice_cell);
         final ImageButton deleteButton = (ImageButton) itemView.findViewById(R.id.btn_delete_voice_cell);
