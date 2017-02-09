@@ -35,6 +35,7 @@ import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragmen
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -240,7 +241,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         task.setSeverName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
-        int num = addImages(fileList, task.getTaskId());
+        int num = addImages(fileList, task.getTaskId()).size();
         task.setTotalItems(num);
         task.save();
         Log.v(LOG_TAG,"MU task"+task.getTaskId() );
@@ -249,17 +250,22 @@ public class DetailActivity extends AppCompatActivity implements android.support
         return task.getTaskId();
     }
 
-    private static int addImages(List<String> fileList,String taskId){
+    private static List<Image> addImages(List<String> fileList, String taskId){
 
-        int imageNum = 0;
+        List<Image> imageList = new ArrayList<>();
+
         for (String filePath: fileList) {
             File file = new File(filePath);
             File imageFile = file.getAbsoluteFile();
             String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
+            Image image = DBConnector.getImageByPath(filePath);
+            if(image!=null){  // image already exist
+                imageList.add(image);
+                continue;
+            }
 
             //imageSize
             String fileSize = String.valueOf(file.length() / 1024);
-
 
             ExifInterface exif = null;
             try {
@@ -293,10 +299,9 @@ public class DetailActivity extends AppCompatActivity implements android.support
             photo.setState(imageState);
             photo.setTaskId(taskId);
             photo.save();
-            imageNum = imageNum + 1;
-
+            imageList.add(photo);
         }
-        return imageNum;
+        return imageList;
     }
 
     private void addOrRemove(int position) {
@@ -357,6 +362,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
 
 //        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
         Log.d("LY", "size: "+imagePathList.size());
+        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
 
         String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
         for(int i=0; i<imagePathList.size(); i++){
@@ -380,6 +386,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
 
         Log.d("LY", "size: "+imagePathList.size());
+        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
 
         String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
         for(int i=0; i<imagePathList.size(); i++){
