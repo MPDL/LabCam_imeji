@@ -64,7 +64,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
     private SharedPreferences mPrefs;
     private String username;
     private String userId;
-    private ImageView uploadCurrentImageView =null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +107,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
                     @Override
                     public void onItemLongClick(View view, int position) {
                         if (actionMode == null) {
-                            uploadCurrentImageView.setVisibility(View.GONE);
                             actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
                         }
                     }
@@ -116,29 +114,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
             }else {
                 viewPagerAdapter.setOnItemClickListener(null);
             }
-
-            // upload current image
-            uploadCurrentImageView = (ImageView) findViewById(R.id.icon_upload);
-
-            // hide upload if it is remote image
-            if(isLocalImage){
-                uploadCurrentImageView.setVisibility(View.VISIBLE);
-            }else {
-                uploadCurrentImageView.setVisibility(View.GONE);
-            }
-
-            uploadCurrentImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // create list for reuse code upload list
-                    List<String> currentImageList = new ArrayList<>();
-                    String currentImageUrl = itemPathList.get(viewPager.getCurrentItem());
-                    currentImageList.add(currentImageUrl);
-
-                    uploadList(currentImageList);
-                }
-            });
-
         }
 
     }
@@ -198,7 +173,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
     @Override
     public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
         actionMode = null;
-        uploadCurrentImageView.setVisibility(View.VISIBLE);
         positionSet.clear();
         viewPagerAdapter.notifyDataSetChanged();
     }
@@ -316,7 +290,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
         if (positionSet.size() == 0) {
 
             actionMode.finish();
-            uploadCurrentImageView.setVisibility(View.VISIBLE);
         } else {
 
             actionMode.setTitle(positionSet.size() + " selected");
