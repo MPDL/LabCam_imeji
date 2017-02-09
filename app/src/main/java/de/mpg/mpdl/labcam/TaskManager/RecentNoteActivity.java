@@ -15,56 +15,54 @@ import java.util.List;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
+
+import butterknife.BindView;
 
 /**
  * Created by Yunqing on 19.12.16.
  */
 
 
-public class RecentNoteActivity extends AppCompatActivity {
+public class RecentNoteActivity extends BaseCompatActivity {
 
     Activity activity = this;
     RecentNoteAdapter recentNoteAdapter = null;
-    private static final String TAG = "RecentNoteActivity";
 
     //ui elements
-    private static ListView recentTextListView;
-    private static TextView norecentTextView;
+    @BindView(R.id.listView_recent_text_notes)
+    ListView recentTextListView;
+    @BindView(R.id.tv_no_recent_text)
+    TextView noRecentTextView;
     List<Note> noteList =new Select().from(Note.class)
                         .execute();
 
-    //user info
-    private String userId;
-    private SharedPreferences mPrefs;
-    private String serverName;
-
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recent_text_notes);
+    protected int getLayoutId() {
+        return R.layout.activity_recent_text_notes;
+    }
 
-        mPrefs = activity.getSharedPreferences("myPref", 0);
-        userId =  mPrefs.getString("userId", "");
-        serverName = mPrefs.getString("server","");
+    @Override
+    protected void initContentView(Bundle savedInstanceState) {
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar_recent_task);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        norecentTextView = (TextView) findViewById(R.id.tv_no_recent_text);
+        noRecentTextView = (TextView) findViewById(R.id.tv_no_recent_text);
         recentTextListView = (ListView) findViewById(R.id.listView_recent_text_notes);
         recentNoteAdapter = new RecentNoteAdapter(activity, noteList);
         recentNoteAdapter.notifyDataSetChanged();
         recentTextListView.setAdapter(recentNoteAdapter);
 
-        //Display either "no recent upload" or the listview of uploaded tasks
+        //Display either "no recent upload" or the listView of uploaded tasks
         if(noteList.size() == 0) {
-            norecentTextView.setVisibility(View.VISIBLE);
+            noRecentTextView.setVisibility(View.VISIBLE);
             recentTextListView.setVisibility(View.GONE);
         }else {
-            norecentTextView.setVisibility(View.GONE);
+            noRecentTextView.setVisibility(View.GONE);
             recentTextListView.setVisibility(View.VISIBLE);
         }
     }
