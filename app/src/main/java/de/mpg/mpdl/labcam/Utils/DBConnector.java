@@ -181,7 +181,7 @@ public class DBConnector {
                 .execute();
     }
 
-    public static List<Image> getImageByVoice(String voiceId) {
+    public static List<Image> getImageByVoiceId(String voiceId) {
         return new Select()
                 .from(Image.class)
                 .where("voiceId = ?", voiceId)
@@ -275,21 +275,21 @@ public class DBConnector {
         for (Image image : imageList) {  // every selected image
 
             int voiceSortImageListCount = 0;
-            for (VoiceSort voiceSort : voiceSortList) {   // search in noteSort
+            for (VoiceSort voiceSort : voiceSortList) {   // search in voiceSort
 
-                if(voiceSort.getVoiceId()==null // first time edit, noteId is null
-                        || voiceSort.getVoiceId().equalsIgnoreCase(image.getVoiceId())){ // noteId found exist in noteSort
+                if(voiceSort.getVoiceId()==null // first time edit, voiceId is null
+                        || voiceSort.getVoiceId().equalsIgnoreCase(image.getVoiceId())){ // voiceId found exist in voiceSort
                     List<Image> voiceSortImageList = voiceSort.getImageList();
-                    voiceSortImageList.add(image);               // add image to noteSortImageList
+                    voiceSortImageList.add(image);               // add image to voiceSortImageList
                     voiceSort.setImageList(voiceSortImageList);
                     break;
                 }else {
-                    voiceSortImageListCount += 1;   // not this noteSort
+                    voiceSortImageListCount += 1;   // not this voiceSort
                 }
             }
 
-            if(voiceSortImageListCount == voiceSortList.size()){  // NoteSort not exist
-                VoiceSort newVoiceSort = new VoiceSort();             // create NoteSort
+            if(voiceSortImageListCount == voiceSortList.size()){  // VoiceSort not exist
+                VoiceSort newVoiceSort = new VoiceSort();             // create VoiceSort
                 List<Image> voiceSortImageList = new ArrayList<>();
                 newVoiceSort.setVoiceId(image.getVoiceId());
                 voiceSortImageList.add(image);                      // add sortImageList
@@ -299,7 +299,7 @@ public class DBConnector {
         }
 
         /** batch operation on voice **/
-        Voice newVoice = new Voice();  //PREPARE(CREATE) new NOTE
+        Voice newVoice = new Voice();  //PREPARE(CREATE) new VOICE
         newVoice.setVoiceId(UUID.randomUUID().toString());
         newVoice.setVoicePath(voicePath);
         newVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
@@ -310,15 +310,15 @@ public class DBConnector {
             String voiceId = (voiceSort.getVoiceId()!=null)?voiceSort.getVoiceId():"null";
             Log.d(LOG_TAG, voiceId);
             Log.d(LOG_TAG, voiceSort.getImageList().size()+"");
-            if(voiceSort.getVoiceId()!=null && getImageByNoteId(voiceSort.getVoiceId()).size() == voiceSort.getImageList().size()){    //UPDATE
+            if(voiceSort.getVoiceId()!=null && getImageByVoiceId(voiceSort.getVoiceId()).size() == voiceSort.getImageList().size()){    //UPDATE
                 Voice updateVoice = getVoiceById(voiceSort.getVoiceId());
                 updateVoice.setVoicePath(voicePath);
                 updateVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
                 updateVoice.save();
-            }else { // case 1: new NOTE; case 2:
-                // BIND NOTE
+            }else { // case 1: new VOICE; case 2:
+                // BIND VOICE
                 for (Image image : voiceSort.getImageList()) {
-                    image.setNoteId(voiceSort.getVoiceId());
+                    image.setVoiceId(newVoice.getVoiceId());
                     image.save();
                     deleteVoice = false;
                 }
