@@ -1,12 +1,6 @@
 package de.mpg.mpdl.labcam.Utils;
 
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.RectF;
-import android.util.SparseArray;
-
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.MultiDetector;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
@@ -14,14 +8,20 @@ import com.google.android.gms.vision.text.Line;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.RectF;
+import android.util.SparseArray;
+
+import de.mpg.mpdl.labcam.Objects.LineAttributes;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import de.mpg.mpdl.labcam.Objects.LineAttributes;
 
 /**
  * Created by soultice on 02-Oct-16.

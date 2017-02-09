@@ -14,16 +14,16 @@ import android.widget.Toast;
 
 import com.activeandroid.query.Select;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Upload.UploadResultReceiver;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 
 /**

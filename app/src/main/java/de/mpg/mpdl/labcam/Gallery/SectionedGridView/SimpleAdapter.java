@@ -9,19 +9,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.DBConnector;
-import de.mpg.mpdl.labcam.Utils.ToastUtil;
 
 /**
  * Created by yingli on 2/23/16.

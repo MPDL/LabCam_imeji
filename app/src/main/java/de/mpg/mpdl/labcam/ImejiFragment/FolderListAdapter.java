@@ -21,14 +21,14 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.mpg.mpdl.labcam.ItemDetails.ItemsActivity;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.CustomImageDownaloder;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by allen on 06/04/15.

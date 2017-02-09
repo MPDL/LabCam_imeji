@@ -17,7 +17,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Toast;
+
+import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.Model.LocalModel.Task;
+import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,16 +38,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
-import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
-import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.Model.LocalModel.Task;
-import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.DBConnector;
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
-import uk.co.senab.photoview.PhotoViewAttacher;
 
 
 public class DetailActivity extends AppCompatActivity implements android.support.v7.view.ActionMode.Callback{

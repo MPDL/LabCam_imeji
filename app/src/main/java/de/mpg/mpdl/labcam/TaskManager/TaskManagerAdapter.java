@@ -19,16 +19,16 @@ import android.widget.TextView;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
 import de.mpg.mpdl.labcam.AutoRun.ManualUploadService;
 import de.mpg.mpdl.labcam.AutoRun.TaskUploadService;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by yingli on 1/22/16.

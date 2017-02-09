@@ -1,9 +1,7 @@
 package de.mpg.mpdl.labcam.TaskManager;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
@@ -11,11 +9,11 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 
-import java.util.List;
-
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
+
+import java.util.List;
 
 import butterknife.BindView;
 

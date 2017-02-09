@@ -46,12 +46,6 @@ import android.widget.Toast;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
 import de.mpg.mpdl.labcam.Auth.LoginActivity;
 import de.mpg.mpdl.labcam.AutoRun.ManualUploadService;
 import de.mpg.mpdl.labcam.AutoRun.TaskUploadService;
@@ -67,14 +61,19 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Settings.RemoteCollectionSettingsActivity;
 import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
-import de.mpg.mpdl.labcam.TaskManager.RecentProcessActivity;
 import de.mpg.mpdl.labcam.TaskManager.RecentNoteActivity;
+import de.mpg.mpdl.labcam.TaskManager.RecentProcessActivity;
 import de.mpg.mpdl.labcam.TaskManager.RecentVoiceActivity;
-
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.code.common.adapter.TitleFragmentPagerAdapter;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;

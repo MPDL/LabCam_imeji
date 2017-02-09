@@ -1,17 +1,17 @@
 package de.mpg.mpdl.labcam.Utils.UiElements;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Log;
-import android.util.SparseArray;
-
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.MultiDetector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
+import android.util.SparseArray;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -11,13 +11,13 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RecentProcessActivity extends AppCompatActivity {
 

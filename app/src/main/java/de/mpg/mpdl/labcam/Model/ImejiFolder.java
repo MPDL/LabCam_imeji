@@ -1,13 +1,14 @@
 package de.mpg.mpdl.labcam.Model;
 
+import com.google.gson.annotations.Expose;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
-import com.google.gson.annotations.Expose;
-
-import java.util.List;
 
 import de.mpg.mpdl.labcam.Model.MessageModel.Person;
+
+import java.util.List;
 
 /**
  * Created by allen on 27/08/15.

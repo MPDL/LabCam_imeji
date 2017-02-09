@@ -21,6 +21,15 @@ import android.widget.Toast;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
+import de.mpg.mpdl.labcam.Folder.MainActivity;
+import de.mpg.mpdl.labcam.Model.ImejiFolder;
+import de.mpg.mpdl.labcam.Model.LocalModel.Task;
+import de.mpg.mpdl.labcam.Model.User;
+import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
+import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.Utils.QRUtils;
+
 import org.eclipse.jetty.util.MultiMap;
 import org.eclipse.jetty.util.UrlEncoded;
 
@@ -31,14 +40,6 @@ import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import de.mpg.mpdl.labcam.Folder.MainActivity;
-import de.mpg.mpdl.labcam.Model.ImejiFolder;
-import de.mpg.mpdl.labcam.Model.LocalModel.Task;
-import de.mpg.mpdl.labcam.Model.User;
-import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
-import de.mpg.mpdl.labcam.Utils.QRUtils;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
