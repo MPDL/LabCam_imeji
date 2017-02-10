@@ -717,21 +717,28 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         return task.getTaskId();
     }
 
-    private static List<Image> addImages(List<String> fileList, String taskId){
+    /**
+     * addImages function creates a List<Image> for UPLOAD, BATCH_EDIT_NOTE, BATCH_EDIT_VOICE operations
+     */
 
+    private static List<Image> addImages(List<String> fileList, String taskId){
         List<Image> imageList = new ArrayList<>();
 
         for (String filePath: fileList) {
-            File file = new File(filePath);
-            File imageFile = file.getAbsoluteFile();
             String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
             Image image = DBConnector.getImageByPath(filePath);
             if(image!=null){  // image already exist
+                if(!taskId.equalsIgnoreCase("")) {  // upload process
+                    image.setTaskId(taskId);
+                    image.setState(String.valueOf(DeviceStatus.state.WAITING));
+                    image.save();
+                }
                 imageList.add(image);
                 continue;
             }
 
             //imageSize
+            File file = new File(filePath);
             String fileSize = String.valueOf(file.length() / 1024);
 
             ExifInterface exif = null;

@@ -137,7 +137,7 @@ public class RecentVoiceAdapter extends BaseAdapter {
         });
     }
     private void deleteVoice(Voice voice){
-        for (Image image : DBConnector.getImageByVoice(voice.getVoiceId())) {
+        for (Image image : DBConnector.getImageByVoiceId(voice.getVoiceId())) {
             image.setVoiceId(null);
             image.save();
         }

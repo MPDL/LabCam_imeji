@@ -290,7 +290,7 @@ public class ViewPagerAdapter extends PagerAdapter {
     }
 
     private void deleteVoice(Voice voice, int position){
-        for (Image image : DBConnector.getImageByVoice(voice.getVoiceId())) {
+        for (Image image : DBConnector.getImageByVoiceId(voice.getVoiceId())) {
             image.setVoiceId(null);
             image.save();
         }

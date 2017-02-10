@@ -16,7 +16,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 
 import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
 import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
@@ -64,7 +63,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
     private SharedPreferences mPrefs;
     private String username;
     private String userId;
-    private ImageView uploadCurrentImageView =null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +106,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
                     @Override
                     public void onItemLongClick(View view, int position) {
                         if (actionMode == null) {
-                            uploadCurrentImageView.setVisibility(View.GONE);
                             actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
                         }
                     }
@@ -116,29 +113,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
             }else {
                 viewPagerAdapter.setOnItemClickListener(null);
             }
-
-            // upload current image
-            uploadCurrentImageView = (ImageView) findViewById(R.id.icon_upload);
-
-            // hide upload if it is remote image
-            if(isLocalImage){
-                uploadCurrentImageView.setVisibility(View.VISIBLE);
-            }else {
-                uploadCurrentImageView.setVisibility(View.GONE);
-            }
-
-            uploadCurrentImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // create list for reuse code upload list
-                    List<String> currentImageList = new ArrayList<>();
-                    String currentImageUrl = itemPathList.get(viewPager.getCurrentItem());
-                    currentImageList.add(currentImageUrl);
-
-                    uploadList(currentImageList);
-                }
-            });
-
         }
 
     }
@@ -198,7 +172,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
     @Override
     public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
         actionMode = null;
-        uploadCurrentImageView.setVisibility(View.VISIBLE);
         positionSet.clear();
         viewPagerAdapter.notifyDataSetChanged();
     }
@@ -255,16 +228,20 @@ public class DetailActivity extends AppCompatActivity implements android.support
         List<Image> imageList = new ArrayList<>();
 
         for (String filePath: fileList) {
-            File file = new File(filePath);
-            File imageFile = file.getAbsoluteFile();
             String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
             Image image = DBConnector.getImageByPath(filePath);
             if(image!=null){  // image already exist
+                if(!taskId.equalsIgnoreCase("")) {  // upload process
+                    image.setTaskId(taskId);
+                    image.setState(String.valueOf(DeviceStatus.state.WAITING));
+                    image.save();
+                }
                 imageList.add(image);
                 continue;
             }
 
             //imageSize
+            File file = new File(filePath);
             String fileSize = String.valueOf(file.length() / 1024);
 
             ExifInterface exif = null;
@@ -316,7 +293,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
         if (positionSet.size() == 0) {
 
             actionMode.finish();
-            uploadCurrentImageView.setVisibility(View.VISIBLE);
         } else {
 
             actionMode.setTitle(positionSet.size() + " selected");

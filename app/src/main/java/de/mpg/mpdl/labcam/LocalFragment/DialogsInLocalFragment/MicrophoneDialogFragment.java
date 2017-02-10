@@ -98,9 +98,8 @@ public class MicrophoneDialogFragment extends DialogFragment{
                                     if(image!=null){
                                         selectedImageList.add(image);   // add image to imageList
                                     }
-
-                                    DBConnector.batchEditVoice(selectedImageList, fileFullName);
                                 }
+                                DBConnector.batchEditVoice(selectedImageList, fileFullName);
                             }
                         }
                 )
