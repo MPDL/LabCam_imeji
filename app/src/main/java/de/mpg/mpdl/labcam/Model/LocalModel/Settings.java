@@ -1,8 +1,9 @@
 package de.mpg.mpdl.labcam.Model.LocalModel;
 
+import com.google.gson.annotations.Expose;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
-import com.google.gson.annotations.Expose;
 
 /**
  * Created by yingli on 3/1/16.

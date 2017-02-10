@@ -24,6 +24,14 @@ import com.sch.rfview.AnimRFRecyclerView;
 import com.sch.rfview.decoration.DividerGridItemDecoration;
 import com.sch.rfview.manager.AnimRFGridLayoutManager;
 
+import de.mpg.mpdl.labcam.Gallery.LocalAlbum.LocalAlbumAdapter;
+import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.Model.LocalModel.Task;
+import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.Utils.ImageFileFilter;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -33,14 +41,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import de.mpg.mpdl.labcam.Gallery.LocalAlbum.LocalAlbumAdapter;
-import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.Model.LocalModel.Task;
-import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
-import de.mpg.mpdl.labcam.Utils.ImageFileFilter;
 
 /**
  * Created by allen on 03/09/15.

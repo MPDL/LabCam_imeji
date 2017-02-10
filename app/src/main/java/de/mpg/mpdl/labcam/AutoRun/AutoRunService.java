@@ -8,11 +8,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
 
-import java.util.List;
-
 import de.mpg.mpdl.labcam.NetChangeManager.NetChangeObserver;
 import de.mpg.mpdl.labcam.NetChangeManager.NetWorkStateReceiver;
 import de.mpg.mpdl.labcam.Upload.UploadResultReceiver;
+
+import java.util.List;
 
 /**
  * Created by yingli on 12/10/15.

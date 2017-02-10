@@ -35,19 +35,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.UUID;
-
-
 import de.mpg.mpdl.labcam.AutoRun.dbObserver;
 import de.mpg.mpdl.labcam.Gallery.AlbumRecyclerAdapter;
 import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
@@ -64,6 +51,18 @@ import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.

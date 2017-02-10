@@ -19,6 +19,15 @@ import android.view.ViewGroup;
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
 
+import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
+import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;
+import de.mpg.mpdl.labcam.Model.DataItem;
+import de.mpg.mpdl.labcam.Model.ImejiFolder;
+import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
+import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
+import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
+
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,14 +38,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
 
-import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
-import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;
-import de.mpg.mpdl.labcam.Model.DataItem;
-import de.mpg.mpdl.labcam.Model.ImejiFolder;
-import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
-import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
-import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;

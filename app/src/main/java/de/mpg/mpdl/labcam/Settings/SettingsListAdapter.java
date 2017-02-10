@@ -15,12 +15,12 @@ import android.widget.TextView;
 
 import com.activeandroid.util.Log;
 
-import java.util.List;
-
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
+
+import java.util.List;
 
 /**
  * Created by allen on 12/10/15.

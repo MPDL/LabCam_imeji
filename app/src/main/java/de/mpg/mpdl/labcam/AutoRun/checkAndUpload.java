@@ -1,5 +1,8 @@
 package de.mpg.mpdl.labcam.AutoRun;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -13,18 +16,7 @@ import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.squareup.otto.Produce;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 
 import de.mpg.mpdl.labcam.Folder.MainActivity;
 import de.mpg.mpdl.labcam.Model.DataItem;
@@ -39,6 +31,16 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.UiElements.Notification.NotificationID;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;

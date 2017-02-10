@@ -22,13 +22,6 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
 import de.mpg.mpdl.labcam.Auth.QRScannerActivity;
 import de.mpg.mpdl.labcam.AutoRun.ManualUploadService;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
@@ -38,6 +31,14 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Settings.SettingsListAdapter;
 import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;

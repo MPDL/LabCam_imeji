@@ -11,10 +11,10 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 
-import java.util.List;
-
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
+
+import java.util.List;
 
 /**
  * Created by Yunqing on 19.12.16.

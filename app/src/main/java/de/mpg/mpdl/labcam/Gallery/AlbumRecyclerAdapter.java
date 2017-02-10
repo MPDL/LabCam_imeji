@@ -19,14 +19,15 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
+import de.mpg.mpdl.labcam.R;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
-import de.mpg.mpdl.labcam.R;
 import me.grantland.widget.AutofitHelper;
 
 /**
