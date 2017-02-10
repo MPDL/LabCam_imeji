@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
 
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+
 /**
  * Created by allen on 09/04/15.
  */
@@ -299,6 +301,7 @@ public class DeviceStatus {
         String SensingMethodStr = "";
         String ApertureValueStr = "";
         String ColorSpaceStr = "";
+        String note ="";
         int orientation = 0;
 
         if(exifIFD0Directory!=null){
@@ -341,8 +344,11 @@ public class DeviceStatus {
 
         }
 
-        Log.e(LOG_TAG, "orientation: " + orientation);
+        int e1 = Log.e(LOG_TAG, "orientation: " + orientation);
 
+        Image image = DBConnector.getImageByPath(imagePath);
+        if(image.getNoteId() != null || !"".equals(image.getNoteId()))
+            note = DBConnector.getNoteById(image.getNoteId()).getNoteContent();
 
         String ocr = "";
 
@@ -388,11 +394,12 @@ public class DeviceStatus {
                 jsonObject.put("Aperture Value", ApertureValueStr);
             }if(typeList[8]){
                 jsonObject.put("Color Space", ColorSpaceStr);
-            }
-            if(typeList[9]){
+            }if(typeList[9]){
                 jsonObject.put("Exposure Time", ExposureTimeStr);
-            }if(typeList[10]){
-                jsonObject.put("OCR", ocr);
+            }if(typeList[10]) {
+                jsonObject.put("Note", note);
+            }if(typeList[11]){
+                    jsonObject.put("OCR", ocr);
             }
             metaDataJsonStr = jsonObject.toString();
         } catch (JSONException e) {

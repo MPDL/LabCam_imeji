@@ -85,9 +85,9 @@ public class checkAndUpload {
     List<StatementTO> collectionProfileStatementTOList;
 
     //compare labCam template profile
-    String[] labCamTemplateProfileLabels = {"Make", "Model", "ISO Speed Ratings","Creation Date", "Geolocation","GPS Version ID", "Sensing Method", "Aperture Value", "Color Space", "Exposure Time", "OCR"};
-    String[] labCamTemplateProfileTypes ={"text", "text", "number", "date", "geolocation", "text", "text", "text", "text", "text", "text"};
-    Boolean[] checkTypeList = {false,false,false,false,false,false,false,false,false,false,false};
+    String[] labCamTemplateProfileLabels = {"Make", "Model", "ISO Speed Ratings","Creation Date", "Geolocation","GPS Version ID", "Sensing Method", "Aperture Value", "Color Space", "Exposure Time", "Note", "OCR"};
+    String[] labCamTemplateProfileTypes ={"text", "text", "number", "date", "geolocation", "text", "text", "text", "text", "text", "text", "text"};
+    Boolean[] checkTypeList = {false,false,false,false,false,false,false,false,false,false,false,false};
 
     public checkAndUpload(Context context, String currentTaskId) {
         this.context = context;
@@ -474,7 +474,14 @@ public class checkAndUpload {
                         "              \"lang\": \"en\"\n" +
                         "            }\n" +
                         "          ]\n" +
-                        "        },\n" +
+                        "        },\n" +                        "        {\n" +
+                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
+                        "          \"labels\": [\n" +
+                        "            {\n" +
+                        "              \"value\": \"Note\",\n" +
+                        "              \"lang\": \"en\"\n" +
+                        "            }\n" +
+                        "          ]\n" +
                         "        {\n" +
                         "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
                         "          \"labels\": [\n" +
@@ -485,6 +492,7 @@ public class checkAndUpload {
                         "          ]\n" +
                         "        }\n" +
                         "      ]\n";
+
 
                 String jsonPostProfile = "{" + jsonTitlePart + ","+jsonStatementsPart+"}";
                 RetrofitClient.createProfile(jsonPostProfile,callback_create_profile,apiKey);

@@ -201,6 +201,7 @@ public class DBConnector {
                 .executeSingle();
     }
 
+
     public static void batchEditNote(List<Image> imageList, String noteContent){
 
         /** create new Note **/
@@ -284,7 +285,6 @@ public class DBConnector {
         }
 
   */
-
     }
 
     public static void batchEditVoice(List<Image> imageList, String voicePath){
