@@ -201,12 +201,38 @@ public class DBConnector {
                 .executeSingle();
     }
 
-
     public static void batchEditNote(List<Image> imageList, String noteContent){
-        List<NoteSort> noteSortList= new ArrayList<NoteSort>();
 
-        /** create noteSortList **/
+        /** create new Note **/
+        Note newNote = new Note();  //PREPARE(CREATE) new NOTE
+        newNote.setNoteId(UUID.randomUUID().toString());
+        newNote.setNoteContent(noteContent);
+        newNote.getNoteId();
+        newNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+        for(Image i : imageList)
+            newNote.getImageIds().add(i.getImageId());
+        newNote.save();
+
         for (Image image : imageList) {  // every selected image
+            if (image.getNoteId() == null || "".equals(image.getNoteId())) {
+                // add noteId
+                image.setNoteId(newNote.getNoteId());
+            } else {
+                String oldNoteId = image.getNoteId();
+                // update noteId
+                image.setNoteId(newNote.getNoteId());
+                // remove imageId from note record
+                Note note = getNoteById(oldNoteId);
+                note.getImageIds().remove(image.getImageId());
+
+                //remove note entry with empty imageIds
+                if (note.getImageIds().size() == 0)
+                    note.delete();
+            }
+            image.save();
+        }
+
+/*
 
             int noteSortImageListCount = 0;
             for (NoteSort noteSort : noteSortList) {   // search in noteSort
@@ -232,12 +258,7 @@ public class DBConnector {
             }
         }
 
-        /** batch operation on notes **/
-        Note newNote = new Note();  //PREPARE(CREATE) new NOTE
-        newNote.setNoteId(UUID.randomUUID().toString());
-        newNote.setNoteContent(noteContent);
-        newNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-        newNote.save();
+
 
         boolean deleteNote = true;
         for (NoteSort noteSort : noteSortList) {
@@ -262,6 +283,7 @@ public class DBConnector {
             newNote.delete();
         }
 
+  */
 
     }
 
@@ -325,6 +347,7 @@ public class DBConnector {
         }
     }
 
+    /*
     private static class NoteSort{
         String noteId;
         List<Image> imageList;
@@ -363,7 +386,7 @@ public class DBConnector {
             this.imageList = imageList;
         }
     }
-
+*/
 
     private static class VoiceSort {
         String voiceId;

@@ -5,6 +5,9 @@ import com.google.gson.annotations.Expose;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import java.util.List;
+import java.util.ArrayList;
+
 
 /**
  * Created by yingli on 11/28/16.
@@ -24,10 +27,15 @@ public class Note extends Model{
     @Column(name = "createTime")
     String createTime;
 
-    public Note(String noteId, String noteContent, String createTime) {
+    @Expose
+    @Column(name = "imageIds")
+    List<String> imageIds;
+
+    public Note(String noteId, String noteContent, String createTime, ArrayList<String> imageIds){
         this.noteId = noteId;
         this.noteContent = noteContent;
         this.createTime = createTime;
+        this.imageIds = imageIds;
     }
 
     public Note() {
@@ -57,4 +65,15 @@ public class Note extends Model{
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
+
+    public List<String> getImageIds() {
+        return imageIds;
+    }
+
+    public void setImageIds(List<String> imageIds) {
+        this.imageIds = imageIds;
+    }
+
+
+
 }
