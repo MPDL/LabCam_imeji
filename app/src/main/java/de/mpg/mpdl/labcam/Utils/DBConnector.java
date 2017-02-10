@@ -221,13 +221,13 @@ public class DBConnector {
                 String oldNoteId = image.getNoteId();
                 // update noteId
                 image.setNoteId(newNote.getNoteId());
-                // remove imageId from note record
-                Note note = getNoteById(oldNoteId);
-                note.getImageIds().remove(image.getImageId());
-
+                // remove imageId from old note record
+                Note oldNote = getNoteById(oldNoteId);
+                oldNote.getImageIds().remove(image.getImageId());
+                //TODO modifiedDate ??
                 //remove note entry with empty imageIds
-                if (note.getImageIds().size() == 0)
-                    note.delete();
+                if (oldNote.getImageIds().size() == 0)
+                    oldNote.delete();
             }
             image.save();
         }
