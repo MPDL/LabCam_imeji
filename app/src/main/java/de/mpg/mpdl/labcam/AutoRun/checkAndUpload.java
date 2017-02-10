@@ -56,8 +56,6 @@ public class checkAndUpload {
 
     List<Image> waitingImages = null;
     List<Image> finishedImages = null;
-    List<Image> startedImages = null;
-
     List<Image> failedImages = null;
 
     //  position in waitingImage list
@@ -129,6 +127,11 @@ public class checkAndUpload {
                     "");
         }
         if(!taskIsStopped()){
+
+            List<Image> allImagesInTask = new Select().from(Image.class)
+                    .where("taskId = ?", currentTaskId).orderBy("RANDOM()").execute();
+
+            Log.d("", allImagesInTask.size()+"");
 
             waitingImages = new Select().from(Image.class)
                     .where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
@@ -209,7 +212,7 @@ public class checkAndUpload {
                     .from(Image.class)
                     .where("imageId = ?", currentImageId)
                     .execute();
-            // continue unpload
+            // continue uploading
             uploadNext();
 
             return;
@@ -547,10 +550,6 @@ public class checkAndUpload {
                     }
                 }
             }
-//            print checkTypeList
-//            for(int i = 0; i < checkTypeList.length; i++){
-//                Log.e(TAG,checkTypeList[i] +"");
-//            }
             startUpload();
         }
 
@@ -572,12 +571,7 @@ public class checkAndUpload {
             Log.e(TAG,"new profileId: "+profileId);
 
             profileStatementTOList = metadataProfileTO.getStatements();
-//            for (StatementTO statementTO: profileStatementTOList) {
-//                Log.e(TAG,statementTO.getLabels()+"");
-////                statementTO.getLiteralConstraints()
-//                Log.e(TAG,statementTO.getPos()+"");
-//                Log.e(TAG,statementTO.getType()+"");
-//            }
+
             //update collection
             //build update json
             JsonParser parser = new JsonParser();
@@ -669,8 +663,6 @@ public class checkAndUpload {
 
             currentImage.setState(String.valueOf(DeviceStatus.state.FINISHED));
             currentImage.save();
- //           if(DeviceStatus.getUploadingItemPaths().size()>0)
-   //             DeviceStatus.getUploadingItemPaths().remove(currentImage.getImagePath());
 
             finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 

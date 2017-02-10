@@ -229,16 +229,20 @@ public class DetailActivity extends AppCompatActivity implements android.support
         List<Image> imageList = new ArrayList<>();
 
         for (String filePath: fileList) {
-            File file = new File(filePath);
-            File imageFile = file.getAbsoluteFile();
             String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
             Image image = DBConnector.getImageByPath(filePath);
             if(image!=null){  // image already exist
+                if(!taskId.equalsIgnoreCase("")) {  // upload process
+                    image.setTaskId(taskId);
+                    image.setState(String.valueOf(DeviceStatus.state.WAITING));
+                    image.save();
+                }
                 imageList.add(image);
                 continue;
             }
 
             //imageSize
+            File file = new File(filePath);
             String fileSize = String.valueOf(file.length() / 1024);
 
             ExifInterface exif = null;
