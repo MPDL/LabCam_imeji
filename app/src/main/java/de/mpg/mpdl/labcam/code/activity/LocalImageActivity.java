@@ -1,4 +1,4 @@
-package de.mpg.mpdl.labcam.Gallery;
+package de.mpg.mpdl.labcam.code.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -24,13 +24,15 @@ import com.sch.rfview.AnimRFRecyclerView;
 import com.sch.rfview.decoration.DividerGridItemDecoration;
 import com.sch.rfview.manager.AnimRFGridLayoutManager;
 
-import de.mpg.mpdl.labcam.Gallery.LocalAlbum.LocalAlbumAdapter;
+import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
+import de.mpg.mpdl.labcam.code.common.adapter.LocalAlbumAdapter;
 import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ImageFileFilter;
+import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,59 +44,62 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import butterknife.BindView;
+
 /**
  * Created by allen on 03/09/15.
  * it is the album pictures view (for a single album)
  */
-public class LocalImageActivity extends AppCompatActivity implements android.support.v7.view.ActionMode.Callback {
+public class LocalImageActivity extends BaseCompatActivity implements android.support.v7.view.ActionMode.Callback {
 
-    private ArrayList<String> dataPathList = new ArrayList<String>();
-    private ArrayList<String> datas = new ArrayList<>();
-    private int dataCounter = 6; // initialize this value as 6, in order to correct display items
 
-    public LocalAlbumAdapter localAlbumAdapter;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.title)
+    TextView titleView;
 
-//    public  ImagesGridAdapter adapter;
-    private AnimRFRecyclerView recyclerView;
-    private View rootView;
-    private Activity activity = this;
     private final String LOG_TAG = LocalImageActivity.class.getSimpleName();
-    private SharedPreferences mPrefs;
     private String username;
     private String userId;
     private String serverURL;
+    private String folderPath;
+    private int dataCounter = 6; // initialize this value as 6, in order to correct display items
 
+    private ArrayList<String> dataPathList = new ArrayList<String>();
+    private ArrayList<String> datas = new ArrayList<>();
+    public Set<Integer> positionSet = new HashSet<>();
+
+    private Activity activity = this;
+    private SharedPreferences mPrefs;
+
+    private View rootView;
     private View headerView;
     private View footerView;
 
     //actionMode
     private android.support.v7.view.ActionMode actionMode;
-
     android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
-    public Set<Integer> positionSet = new HashSet<>();
-
-    private Toolbar toolbar;
-    private String folderPath;
+    private AnimRFRecyclerView recyclerView;
+    public LocalAlbumAdapter localAlbumAdapter;
 
     private Handler mHandler = new Handler();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.active_gallery_gridview);
+    protected int getLayoutId() {
+        return R.layout.active_gallery_gridview;
+    }
 
+    @Override
+    protected void initContentView(Bundle savedInstanceState) {
         rootView = findViewById(android.R.id.content);
         // load more and refresh
         headerView = LayoutInflater.from(activity).inflate(R.layout.header_view, null);
         footerView = LayoutInflater.from(activity).inflate(R.layout.footer_view, null);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-        TextView titleView = (TextView) findViewById(R.id.title);
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");

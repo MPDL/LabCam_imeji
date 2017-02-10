@@ -1,4 +1,4 @@
-package de.mpg.mpdl.labcam.TaskManager;
+package de.mpg.mpdl.labcam.code.common.adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -24,6 +24,7 @@ import de.mpg.mpdl.labcam.AutoRun.TaskUploadService;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.code.common.callback.RemoveTaskInterface;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 
 import java.util.Date;

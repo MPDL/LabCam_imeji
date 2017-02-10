@@ -46,7 +46,7 @@ import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragmen
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
+import de.mpg.mpdl.labcam.code.activity.ActiveTaskActivity;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;

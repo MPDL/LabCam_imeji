@@ -130,11 +130,6 @@ public class checkAndUpload {
         }
         if(!taskIsStopped()){
 
-            List<Image> allImagesInTask = new Select().from(Image.class)
-                    .where("taskId = ?", currentTaskId).orderBy("RANDOM()").execute();
-
-            Log.d("", allImagesInTask.size()+"");
-
             waitingImages = new Select().from(Image.class)
                     .where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.WAITING)).orderBy("RANDOM()").execute();
             failedImages = new Select().from(Image.class)

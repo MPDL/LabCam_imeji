@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#ffffff"
     android:orientation="vertical"
-    tools:context=".Gallery.LocalImageActivity">
+    tools:context=".code.activity.LocalImageActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"

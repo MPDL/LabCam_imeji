@@ -1,9 +1,8 @@
-package de.mpg.mpdl.labcam.TaskManager;
+package de.mpg.mpdl.labcam.code.activity;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
@@ -14,19 +13,25 @@ import com.activeandroid.query.Select;
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.code.common.adapter.RecentTaskAdapter;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RecentProcessActivity extends AppCompatActivity {
+import butterknife.BindView;
+
+public class RecentProcessActivity extends BaseCompatActivity {
 
     Activity activity = this;
     RecentTaskAdapter recentTaskAdapter = null;
 
     //ui elements
-    private static ListView recentTaskListView;
-    private static TextView norecentTaskView;
+    @BindView(R.id.listView_recent_task)
+    ListView recentTaskListView;
+    @BindView(R.id.tv_no_recent_task)
+    TextView noRecentTaskView;
     List<Task> taskList =new ArrayList<>();
 
     //user info
@@ -34,12 +39,13 @@ public class RecentProcessActivity extends AppCompatActivity {
     private SharedPreferences mPrefs;
     private String serverName;
 
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_recent_process;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recent_process);
-
+    protected void initContentView(Bundle savedInstanceState) {
         mPrefs = activity.getSharedPreferences("myPref", 0);
         userId =  mPrefs.getString("userId", "");
         serverName = mPrefs.getString("server","");
@@ -54,18 +60,16 @@ public class RecentProcessActivity extends AppCompatActivity {
         taskList = DBConnector.getRecentTasks(userId, serverName);
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
 
-        norecentTaskView = (TextView) findViewById(R.id.tv_no_recent_task);
-        recentTaskListView = (ListView) findViewById(R.id.listView_recent_task);
         recentTaskAdapter = new RecentTaskAdapter(activity, taskList);
         recentTaskAdapter.notifyDataSetChanged();
         recentTaskListView.setAdapter(recentTaskAdapter);
 
         //Display either "no recent upload" or the listview of uploaded tasks
         if(taskList.size() == 0) {
-            norecentTaskView.setVisibility(View.VISIBLE);
+            noRecentTaskView.setVisibility(View.VISIBLE);
             recentTaskListView.setVisibility(View.GONE);
         }else {
-            norecentTaskView.setVisibility(View.GONE);
+            noRecentTaskView.setVisibility(View.GONE);
             recentTaskListView.setVisibility(View.VISIBLE);
         }
     }

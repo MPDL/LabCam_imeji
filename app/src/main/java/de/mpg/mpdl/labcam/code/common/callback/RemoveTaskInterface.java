@@ -1,8 +1,8 @@
-package de.mpg.mpdl.labcam.TaskManager;
+package de.mpg.mpdl.labcam.code.common.callback;
 
 /**
  * Created by yingli on 2/11/16.
  */
 public interface RemoveTaskInterface {
-    public void remove(int postion);
+    void remove(int postion);
 }

@@ -1,4 +1,4 @@
-package de.mpg.mpdl.labcam.TaskManager;
+package de.mpg.mpdl.labcam.code.common.adapter;
 
 import android.app.Activity;
 import android.content.Context;

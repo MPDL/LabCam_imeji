@@ -1,4 +1,4 @@
-package de.mpg.mpdl.labcam.TaskManager;
+package de.mpg.mpdl.labcam.code.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -11,13 +11,12 @@ import com.activeandroid.query.Select;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.code.common.adapter.RecentNoteAdapter;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 
 import java.util.List;
 
 import butterknife.BindView;
-
-import java.util.List;
 
 /**
  * Created by Yunqing on 19.12.16.
@@ -51,8 +50,6 @@ public class RecentNoteActivity extends BaseCompatActivity {
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        noRecentTextView = (TextView) findViewById(R.id.tv_no_recent_text);
-        recentTextListView = (ListView) findViewById(R.id.listView_recent_text_notes);
         recentNoteAdapter = new RecentNoteAdapter(activity, noteList);
         recentNoteAdapter.notifyDataSetChanged();
         recentTextListView.setAdapter(recentNoteAdapter);

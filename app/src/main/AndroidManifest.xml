@@ -99,7 +99,7 @@
                 android:value=".ItemDetails.ItemsActivity" />
         </activity>
         <activity
-            android:name=".Gallery.LocalImageActivity"
+            android:name=".code.activity.LocalImageActivity"
             android:label="@string/title_local_activity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -148,13 +148,13 @@
             android:name="com.activeandroid.content.ContentProvider"
             android:authorities="com.activeandroid.content.ContentProvider" />
 
-        <activity android:name=".TaskManager.ActiveTaskActivity" >
+        <activity android:name=".code.activity.ActiveTaskActivity" >
         </activity>
-        <activity android:name=".TaskManager.RecentProcessActivity" >
+        <activity android:name=".code.activity.RecentProcessActivity" >
         </activity>
-        <activity android:name=".TaskManager.RecentNoteActivity" >
+        <activity android:name=".code.activity.RecentNoteActivity" >
         </activity>
-        <activity android:name=".TaskManager.RecentVoiceActivity" >
+        <activity android:name=".code.activity.RecentVoiceActivity" >
         </activity>
     </application>
 

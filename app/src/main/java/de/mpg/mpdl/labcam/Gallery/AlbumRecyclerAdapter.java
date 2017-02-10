@@ -21,6 +21,7 @@ import com.squareup.picasso.Picasso;
 
 import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.code.activity.LocalImageActivity;
 
 import java.io.File;
 import java.util.ArrayList;
