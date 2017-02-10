@@ -29,7 +29,7 @@ public class Note extends Model{
 
     @Expose
     @Column(name = "imageIds")
-    List<String> imageIds;
+    List<String> imageIds = new ArrayList<String>();
 
     public Note(String noteId, String noteContent, String createTime, ArrayList<String> imageIds){
         this.noteId = noteId;
