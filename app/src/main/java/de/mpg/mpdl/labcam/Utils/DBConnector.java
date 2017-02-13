@@ -225,6 +225,7 @@ public class DBConnector {
                 // remove imageId from old note record
                 Note oldNote = getNoteById(oldNoteId);
                 oldNote.getImageIds().remove(image.getImageId());
+                oldNote.save();
                 //TODO modifiedDate ??
                 //remove note entry with empty imageIds
                 if (oldNote.getImageIds().size() == 0)
