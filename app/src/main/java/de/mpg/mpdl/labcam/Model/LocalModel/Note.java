@@ -29,14 +29,7 @@ public class Note extends Model{
 
     @Expose
     @Column(name = "imageIds")
-    List<String> imageIds = new ArrayList<String>();
-
-    public Note(String noteId, String noteContent, String createTime, ArrayList<String> imageIds){
-        this.noteId = noteId;
-        this.noteContent = noteContent;
-        this.createTime = createTime;
-        this.imageIds = imageIds;
-    }
+    List imageIds = new ArrayList();
 
     public Note() {
         super();
@@ -73,7 +66,5 @@ public class Note extends Model{
     public void setImageIds(List<String> imageIds) {
         this.imageIds = imageIds;
     }
-
-
 
 }
