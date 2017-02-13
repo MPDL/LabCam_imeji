@@ -208,7 +208,6 @@ public class DBConnector {
         Note newNote = new Note();  //PREPARE(CREATE) new NOTE
         newNote.setNoteId(UUID.randomUUID().toString());
         newNote.setNoteContent(noteContent);
-        newNote.getNoteId();
         newNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
         for(Image i : imageList)
             newNote.getImageIds().add(i.getImageId());
@@ -227,194 +226,47 @@ public class DBConnector {
                 oldNote.getImageIds().remove(image.getImageId());
                 oldNote.save();
                 //TODO modifiedDate ??
-                //remove note entry with empty imageIds
+                //remove note entry which has empty imageIds
                 if (oldNote.getImageIds().size() == 0)
                     oldNote.delete();
             }
             image.save();
         }
 
-/*
 
-            int noteSortImageListCount = 0;
-            for (NoteSort noteSort : noteSortList) {   // search in noteSort
-
-                if(noteSort.getNoteId()==null  // first time edit, noteId is null
-                        || noteSort.getNoteId().equalsIgnoreCase(image.getNoteId())){ // noteId found exist in noteSort
-                    List<Image> noteSortImageList = noteSort.getImageList();
-                    noteSortImageList.add(image);               // add image to noteSortImageList
-                    noteSort.setImageList(noteSortImageList);
-                    break;
-                }else {
-                    noteSortImageListCount += 1;   // not this noteSort
-                }
-            }
-
-            if(noteSortImageListCount == noteSortList.size()){  // NoteSort not exist
-                NoteSort newNoteSort = new NoteSort();             // create NoteSort
-                List<Image> noteSortImageList = new ArrayList<>();
-                newNoteSort.setNoteId(image.getNoteId());
-                noteSortImageList.add(image);                      // add sortImageList
-                newNoteSort.setImageList(noteSortImageList);
-                noteSortList.add(newNoteSort);
-            }
-        }
-
-
-
-        boolean deleteNote = true;
-        for (NoteSort noteSort : noteSortList) {
-            String noteId = (noteSort.getNoteId()!=null)?noteSort.getNoteId():"null";
-            Log.d(LOG_TAG, noteId);
-            Log.d(LOG_TAG, noteSort.getImageList().size()+"");
-            if(noteSort.getNoteId()!=null && getImageByNoteId(noteSort.getNoteId()).size() == noteSort.getImageList().size()){    //UPDATE
-                Note updateNote = getNoteById(noteSort.getNoteId());
-                updateNote.setNoteContent(noteContent);
-                updateNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-                updateNote.save();
-            }else { // case 1: new NOTE; case 2:
-                // BIND NOTE
-                for (Image image : noteSort.getImageList()) {
-                    image.setNoteId(newNote.getNoteId());
-                    image.save();
-                    deleteNote = false;
-                }
-            }
-        }
-        if(deleteNote){
-            newNote.delete();
-        }
-
-  */
     }
 
     public static void batchEditVoice(List<Image> imageList, String voicePath){
-        List<VoiceSort> voiceSortList= new ArrayList<VoiceSort>();
 
-        /** create voiceSortList **/
-        for (Image image : imageList) {  // every selected image
-
-            int voiceSortImageListCount = 0;
-            for (VoiceSort voiceSort : voiceSortList) {   // search in voiceSort
-                if(voiceSort.getVoiceId()==null // first time edit, voiceId is null
-                        || voiceSort.getVoiceId().equalsIgnoreCase(image.getVoiceId())){ // voiceId found exist in voiceSort
-                    List<Image> voiceSortImageList = voiceSort.getImageList();
-                    voiceSortImageList.add(image);               // add image to voiceSortImageList
-                    voiceSort.setImageList(voiceSortImageList);
-                    break;
-                }else {
-                    voiceSortImageListCount += 1;   // not this voiceSort
-                }
-            }
-
-            if(voiceSortImageListCount == voiceSortList.size()){  // VoiceSort not exist
-                VoiceSort newVoiceSort = new VoiceSort();             // create VoiceSort
-                List<Image> voiceSortImageList = new ArrayList<>();
-                newVoiceSort.setVoiceId(image.getVoiceId());
-                voiceSortImageList.add(image);                      // add sortImageList
-                newVoiceSort.setImageList(voiceSortImageList);
-                voiceSortList.add(newVoiceSort);
-            }
-        }
-
-        /** batch operation on voice **/
+        /** create new Voice **/
         Voice newVoice = new Voice();  //PREPARE(CREATE) new VOICE
         newVoice.setVoiceId(UUID.randomUUID().toString());
         newVoice.setVoicePath(voicePath);
         newVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
+        for(Image i : imageList)
+            newVoice.getImageIds().add(i.getImageId());
         newVoice.save();
 
-        boolean deleteVoice = true;
-        for (VoiceSort voiceSort : voiceSortList) {
-            String voiceId = (voiceSort.getVoiceId()!=null)?voiceSort.getVoiceId():"null";
-            Log.d(LOG_TAG, voiceId);
-            Log.d(LOG_TAG, voiceSort.getImageList().size()+"");
-            if(voiceSort.getVoiceId()!=null && getImageByVoiceId(voiceSort.getVoiceId()).size() == voiceSort.getImageList().size()){    //UPDATE
-                Voice updateVoice = getVoiceById(voiceSort.getVoiceId());
-                updateVoice.setVoicePath(voicePath);
-                updateVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-                updateVoice.save();
-            }else { // case 1: new NOTE; case 2:
-                // BIND NOTE
-                for (Image image : voiceSort.getImageList()) {
-                    image.setNoteId(voiceSort.getVoiceId());
-                    image.save();
-                    deleteVoice = false;
-                }
+        for (Image image : imageList) {  // every selected image
+            if (image.getVoiceId() == null || "".equals(image.getVoiceId())) {
+                // add voiceId
+                image.setVoiceId(newVoice.getVoiceId());
+            } else {
+                String oldVoiceId = image.getVoiceId();
+                // update voiceId
+                image.setVoiceId(newVoice.getVoiceId());
+                // remove imageId from old voice record
+                Voice oldVoice = getVoiceById(oldVoiceId);
+                oldVoice.getImageIds().remove(image.getImageId());
+                oldVoice.save();
+                //TODO modifiedDate ??
+                //remove voice entry which has empty imageIds
+                if (oldVoice.getImageIds().size() == 0)
+                    oldVoice.delete();
             }
+            image.save();
         }
-        if(deleteVoice){
-            newVoice.delete();
-        }
+
     }
-
-    /*
-    private static class NoteSort{
-        String noteId;
-        List<Image> imageList;
-        String imageCount;
-
-        public NoteSort() {
-        }
-
-        public NoteSort(String noteId, List<Image> imageList, String imageCount) {
-            this.noteId = noteId;
-            this.imageList = imageList;
-            this.imageCount = imageCount;
-        }
-
-        public String getNoteId() {
-            return noteId;
-        }
-
-        public void setNoteId(String noteId) {
-            this.noteId = noteId;
-        }
-
-        public String getImageCount() {
-            return imageCount;
-        }
-
-        public void setImageCount(String imageCount) {
-            this.imageCount = imageCount;
-        }
-
-        public List<Image> getImageList() {
-            return imageList;
-        }
-
-        public void setImageList(List<Image> imageList) {
-            this.imageList = imageList;
-        }
-    }
-*/
-
-    private static class VoiceSort {
-        String voiceId;
-        List<Image> imageList;
-
-        public VoiceSort() {
-        }
-
-        public VoiceSort(String voiceId, List<Image> imageList) {
-            this.voiceId = voiceId;
-            this.imageList = imageList;
-        }
-
-        public String getVoiceId() {
-            return voiceId;
-        }
-
-        public void setVoiceId(String voiceId) {
-            this.voiceId = voiceId;
-        }
-
-        public List<Image> getImageList() {
-            return imageList;
-        }
-
-        public void setImageList(List<Image> imageList) {
-            this.imageList = imageList;
-        }
-    }
+    
 }
