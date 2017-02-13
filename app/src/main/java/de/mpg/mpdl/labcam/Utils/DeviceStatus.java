@@ -347,8 +347,9 @@ public class DeviceStatus {
         int e1 = Log.e(LOG_TAG, "orientation: " + orientation);
 
         Image image = DBConnector.getImageByPath(imagePath);
-        if(image.getNoteId() != null || !"".equals(image.getNoteId()))
-            note = DBConnector.getNoteById(image.getNoteId()).getNoteContent();
+        if(image.getNoteId() == null || image.getNoteId().equalsIgnoreCase("")) {}
+        else{
+            note = DBConnector.getNoteById(image.getNoteId()).getNoteContent();}
 
         String ocr = "";
 
