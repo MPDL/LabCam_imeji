@@ -33,7 +33,7 @@ public class RecentNoteActivity extends BaseCompatActivity {
     ListView recentTextListView;
     @BindView(R.id.tv_no_recent_text)
     TextView noRecentTextView;
-    List<Note> noteList =new Select().from(Note.class)
+    List<Note> noteList =new Select().from(Note.class).orderBy("createTime DESC")
                         .execute();
 
 

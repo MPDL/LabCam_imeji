@@ -34,7 +34,7 @@ public class RecentVoiceActivity extends BaseCompatActivity {
     ListView recentVoiceListView;
     @BindView(R.id.tv_no_recent_voice)
     TextView noRecentVoiceView;
-    List<Voice> voiceList =new Select().from(Voice.class)
+    List<Voice> voiceList =new Select().from(Voice.class).orderBy("createTime DESC")
             .execute();
 
     @Override
