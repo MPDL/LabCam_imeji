@@ -482,6 +482,7 @@ public class checkAndUpload {
                         "              \"lang\": \"en\"\n" +
                         "            }\n" +
                         "          ]\n" +
+                        "        },\n" +
                         "        {\n" +
                         "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
                         "          \"labels\": [\n" +
