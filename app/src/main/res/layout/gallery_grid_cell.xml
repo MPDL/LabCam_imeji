@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:padding="2dip"
     android:descendantFocusability="blocksDescendants">
 
@@ -9,7 +9,7 @@
     <ImageView
         android:background="#8cf7f3ff"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/image_view"
         android:gravity="center"
         android:scaleType="centerCrop"
@@ -23,30 +23,4 @@
         android:visibility="gone"
         android:src="@drawable/btn_check"
         />
-
-    <!--<Button-->
-        <!--android:layout_width="20dp"-->
-        <!--android:layout_height="20dp"-->
-        <!--android:visibility="gone"-->
-        <!--android:background="@drawable/cloud"-->
-        <!--android:id="@+id/cloud"-->
-        <!--android:layout_margin="4dp"-->
-        <!--android:layout_gravity="right|top"-->
-        <!--android:clickable="false"-->
-        <!--android:scaleType="fitCenter"-->
-        <!--android:adjustViewBounds="true"-->
-        <!--/>-->
-    <!--<Button-->
-        <!--android:layout_width="20dp"-->
-        <!--android:layout_height="20dp"-->
-        <!--android:background="@drawable/uploading"-->
-        <!--android:id="@+id/uploading"-->
-        <!--android:layout_margin="4dp"-->
-        <!--android:layout_gravity="right|top"-->
-        <!--android:clickable="false"-->
-        <!--android:scaleType="fitCenter"-->
-        <!--android:adjustViewBounds="true"-->
-        <!--/>-->
-
-
 </FrameLayout>

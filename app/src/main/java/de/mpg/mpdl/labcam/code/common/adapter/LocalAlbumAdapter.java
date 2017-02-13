@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.squareup.picasso.Picasso;
 
 import de.mpg.mpdl.labcam.R;
