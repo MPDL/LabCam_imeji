@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:gravity="top"
         android:id="@+id/note_edit_text"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="24dp"
         android:layout_marginRight="16dp"
         android:background="@android:color/transparent"
         android:hint="Write your text note Here, then save it...."/>

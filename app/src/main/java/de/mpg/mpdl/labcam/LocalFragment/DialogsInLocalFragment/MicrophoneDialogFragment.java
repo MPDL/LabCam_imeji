@@ -121,7 +121,7 @@ public class MicrophoneDialogFragment extends DialogFragment{
                 );
 
 //        // hint text
-//        TextView textView = (TextView) view.findViewById(R.id.text_view_voice_hint);
+        final TextView hintTextView = (TextView) view.findViewById(R.id.text_view_voice_hint);
 //        textView.setHeight(squareWidth/5);
 
         checkPermission();
@@ -149,10 +149,8 @@ public class MicrophoneDialogFragment extends DialogFragment{
                         v.setClickable(false);
                         v.setEnabled(false);
                         voiceTextView.setVisibility(View.VISIBLE);
-                        if(fileFullName.contains("/")){
-                            String[] filename = fileFullName.split("/");
-                            voiceTextView.setText(filename[filename.length-1]);
-                        }else voiceTextView.setText(fileFullName);
+                        hintTextView.setVisibility(View.GONE);
+                        voiceTextView.setText(activity.getResources().getText(R.string.voice_upload_success));
                         break;
                 }
                 return false;

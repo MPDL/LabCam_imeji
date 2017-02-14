@@ -70,5 +70,7 @@
     <string name="tab_local">LOCAL</string>
     <string name="tab_server">SERVER</string>
 
+    <!--voice-->
+    <string name="voice_upload_success">Your voice note has been successfully created.</string>
 
 </resources>
