@@ -111,7 +111,7 @@
         <!-- service -->
         <service
             android:name=".AutoRun.ManualUploadService"
-            android:enabled="true" >
+            android:enabled="true">
         </service>
 
         <receiver
@@ -134,6 +134,12 @@
             android:name=".AutoRun.TaskUploadService"
             android:enabled="true" >
         </service>
+        <service
+            android:name=".AutoRun.MediaContentJobService"
+            android:enabled="true"
+            android:permission="android.permission.BIND_JOB_SERVICE"    >
+        </service>
+
 
         <receiver
             android:name=".AutoRun.CameraEventReceiver"

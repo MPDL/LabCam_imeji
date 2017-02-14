@@ -1,12 +1,19 @@
 package de.mpg.mpdl.labcam.Auth;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Messenger;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,7 +27,9 @@ import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.tbruyelle.rxpermissions.RxPermissions;
 
+import de.mpg.mpdl.labcam.AutoRun.MediaContentJobService;
 import de.mpg.mpdl.labcam.Folder.MainActivity;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;

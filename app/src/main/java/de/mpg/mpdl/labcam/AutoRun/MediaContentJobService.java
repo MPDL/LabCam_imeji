@@ -1,16 +1,22 @@
 package de.mpg.mpdl.labcam.AutoRun;
 
-import android.content.BroadcastReceiver;
+import android.app.job.JobInfo;
+import android.app.job.JobParameters;
+import android.app.job.JobScheduler;
+import android.app.job.JobService;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
+import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.activeandroid.query.Select;
 
@@ -22,25 +28,71 @@ import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
-
 /**
- * Created by yingli on 12/16/15.
+ * Created by yingli on 2/14/17.
  */
-public class CameraEventReceiver extends BroadcastReceiver implements UploadResultReceiver.Receiver{
+
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+public class MediaContentJobService extends JobService implements UploadResultReceiver.Receiver{
 
     private String userId;
     private String serverName;
     private SharedPreferences mPrefs;
-    static CountDownTimer timer =null;
-    Toast toast;
+    private Context context = this;
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public boolean onStartJob(JobParameters params) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Media content has changed:\n");
+        if (params.getTriggeredContentAuthorities() != null) {
+            sb.append("Authorities: ");
+            boolean first = true;
+            for (String auth :
+                    params.getTriggeredContentAuthorities()) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(", ");
+                }
+                sb.append(auth);
+            }
+            if (params.getTriggeredContentUris() != null) {
+                for (Uri uri : params.getTriggeredContentUris()) {
+                    sb.append("\n");
+                    sb.append(uri);
+                    cameraEventHandling(convertMediaUriToPath(uri));
+                }
+            }
+        } else {
+            sb.append("(No content)");
+        }
+        Log.i("MediaContentJobService", sb.toString());
+        return false;
+    }
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public boolean onStopJob(JobParameters params) {
+        return false;
+    }
+
+    protected String convertMediaUriToPath(Uri uri) {
+        String [] proj={MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri, proj,  null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String path = cursor.getString(column_index);
+        cursor.close();
+        return path;
+    }
 
 
+    private void cameraEventHandling(String imagePath){
         mPrefs = context.getSharedPreferences("myPref", 0);
         userId = mPrefs.getString("userId","");
         serverName = mPrefs.getString("server","");
@@ -55,13 +107,10 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
             Log.e("cameraEvent","!isAutoUpload");
             return;
         } else if(DBConnector.getAuTask(userId,serverName)==null){ //no auto task
-           Log.e("cameraEvent","can't get auTask");
-           return;
-       }
+            Log.e("cameraEvent","can't get auTask");
+            return;
+        }
 
-        Cursor cursor = context.getContentResolver().query(intent.getData(), null, null, null, null);
-        cursor.moveToFirst();
-        String imagePath = cursor.getString(cursor.getColumnIndex("_data"));
 
         String imageName = imagePath.substring(imagePath.lastIndexOf('/') + 1);
 
@@ -137,15 +186,10 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
             uploadIntent.putExtra("receiver", mReceiver);
             context.startService(uploadIntent);
         }
-
     }
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
 
     }
-
-
-
-
 }

@@ -4,6 +4,8 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -48,6 +50,7 @@ import com.activeandroid.query.Select;
 
 import de.mpg.mpdl.labcam.Auth.LoginActivity;
 import de.mpg.mpdl.labcam.AutoRun.ManualUploadService;
+import de.mpg.mpdl.labcam.AutoRun.MediaContentJobService;
 import de.mpg.mpdl.labcam.AutoRun.TaskUploadService;
 import de.mpg.mpdl.labcam.ImejiFragment.ImejiFragment;
 import de.mpg.mpdl.labcam.LocalFragment.LocalFragment;
@@ -152,6 +155,8 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
     boolean isDestroyByCamera = false;   //Camera destroy activity
     //
     private RelativeLayout chooseCollectionLayout = null;
+
+    public static final int MY_BACKGROUND_JOB = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -260,8 +265,21 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
     }
 
     @Override
-    public void onStart() {
+    protected void onStart() {
         super.onStart();
+        // Start service and provide it a way to communicate with this class.
+        Intent startServiceIntent = new Intent(this, MediaContentJobService.class);
+        startService(startServiceIntent);
+    }
+
+    @Override
+    protected void onStop() {
+        // A service can be "started" and/or "bound". In this case, it's "started" by this Activity
+        // and "bound" to the JobScheduler (also called "Scheduled" by the JobScheduler). This call
+        // to stopService() won't prevent scheduled jobs to be processed. However, failing
+        // to call stopService() would keep it alive indefinitely.
+        stopService(new Intent(this, MediaContentJobService.class));
+        super.onStop();
     }
 
     @Override
@@ -760,6 +778,8 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
     private void dispatchTakePictureIntent() {
 
+        scheduleJob(this);
+
         PackageManager packman = getPackageManager();
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         String pack = intent.resolveActivity(packman).getPackageName();
@@ -850,6 +870,23 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         }
 
     }
+
+    public static void scheduleJob(Context context) {
+        JobScheduler js =
+                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        JobInfo.Builder builder = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            builder = new JobInfo.Builder(
+                    MY_BACKGROUND_JOB,
+                    new ComponentName(context, MediaContentJobService.class));
+            builder.addTriggerContentUri(
+                    new JobInfo.TriggerContentUri(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS));
+            js.schedule(builder.build());
+        }
+    }
+
 
     /***********************************   permission   ****************************************/
 
