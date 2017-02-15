@@ -30,6 +30,7 @@
         android:layout_alignParentBottom="true">
 
 
+        <!--note panel-->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,7 +92,7 @@
         <!--voice panel-->
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:id="@+id/layout_voice_panel"
             android:layout_below="@id/layout_note_panel"
             android:visibility="gone">
