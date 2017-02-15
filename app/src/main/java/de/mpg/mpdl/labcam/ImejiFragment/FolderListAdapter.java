@@ -164,13 +164,6 @@ public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.Fo
 
             // description
             holder.description.setText(collection.getDescription());
-//            String description = "";
-//            if(collection.getDescription().length()>100){
-//                description = collection.getDescription().substring(0,100)+"...";
-//            }else {
-//                description = collection.getDescription();
-//            }
-//            holder.description.setText(description);
 
             // author full name
 
@@ -187,9 +180,6 @@ public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.Fo
                     activity.startActivity(showItemsIntent);
                 }
             });
-
-            // date
-            //date.setText(String.valueOf(m.getCreatedDate()).split("\\+")[0]);
         }
 
     }

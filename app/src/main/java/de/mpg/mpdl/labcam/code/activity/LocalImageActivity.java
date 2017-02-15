@@ -19,12 +19,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sch.rfview.AnimRFRecyclerView;
 import com.sch.rfview.decoration.DividerGridItemDecoration;
 import com.sch.rfview.manager.AnimRFGridLayoutManager;
 
 import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.code.common.adapter.LocalAlbumAdapter;
 import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
@@ -61,7 +65,7 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
     private final String LOG_TAG = LocalImageActivity.class.getSimpleName();
     private String username;
     private String userId;
-    private String serverURL;
+    private String serverName;
     private String folderPath;
     private int dataCounter = 6; // initialize this value as 6, in order to correct display items
 
@@ -104,7 +108,7 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         userId = mPrefs.getString("userId","");
-        serverURL = mPrefs.getString("server", "");
+        serverName = mPrefs.getString("server","");
 
         //Kiran's title
         Intent intent = activity.getIntent();
@@ -264,95 +268,6 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         return remoteListDialogFragment;
     }
 
-    /*
-            upload the selected files
-        */
-    private void uploadList(List<String> fileList) {
-
-        mPrefs = activity.getSharedPreferences("myPref", 0);
-        String currentTaskId = "";
-
-        currentTaskId = createTask(fileList);
-
-        newInstance(currentTaskId).show(getFragmentManager(), "remoteListDialog");
-
-    }
-
-
-    private String createTask(List<String> fileList){
-
-        String uniqueID = UUID.randomUUID().toString();
-        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-        Long now = new Date().getTime();
-
-        Task task = new Task();
-        task.setTotalItems(fileList.size());
-        task.setFinishedItems(0);
-        task.setTaskId(uniqueID);
-        task.setUploadMode("MU");
-        task.setState(String.valueOf(DeviceStatus.state.WAITING));
-        task.setSeverName(serverURL);
-        task.setUserName(username);
-        task.setUserId(userId);
-        task.setStartDate(String.valueOf(now));
-        task.save();
-        int num = addImages(fileList, task.getTaskId());
-        task.setTotalItems(num);
-        task.save();
-        Log.v(LOG_TAG,"setTotalItems:"+num);
-
-        return task.getTaskId();
-    }
-
-    private int addImages(List<String> fileList,String taskId){
-
-        int imageNum = 0;
-        for (String filePath: fileList) {
-            File file = new File(filePath);
-            File imageFile = file.getAbsoluteFile();
-            String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
-
-            //imageSize
-            String fileSize = String.valueOf(file.length() / 1024);
-
-
-            ExifInterface exif = null;
-            try {
-                exif = new ExifInterface(filePath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            //createTime
-            String createTime = exif.getAttribute(ExifInterface.TAG_DATETIME);
-
-            //latitude
-            String latitude = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
-
-            //longitude
-            String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
-
-            //state
-            String imageState = String.valueOf(DeviceStatus.state.WAITING);
-
-            String imageId = UUID.randomUUID().toString();
-            //store image in local database
-            Image photo = new Image();
-            photo.setImageId(imageId);
-            photo.setImageName(imageName);
-            photo.setImagePath(filePath);
-            photo.setLongitude(longitude);
-            photo.setLatitude(latitude);
-            photo.setCreateTime(createTime);
-            photo.setSize(fileSize);
-            photo.setState(imageState);
-            photo.setTaskId(taskId);
-            photo.save();
-            imageNum = imageNum + 1;
-        }
-        return imageNum;
-    }
 
     @Override
     public boolean onCreateActionMode(android.support.v7.view.ActionMode mode, Menu menu) {
@@ -376,22 +291,18 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
     public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_upload_local:
-
-                Log.v(LOG_TAG, "upload");
-
-                if (positionSet.size() != 0) {
-                    Log.v(LOG_TAG, " " + positionSet.size());
-                    List uploadPathList = new ArrayList();
-                    for (Integer i : positionSet) {
-                        uploadPathList.add(dataPathList.get(i));
-                    }
-
-                    if (uploadPathList != null) {
-                        uploadList(uploadPathList);
-                    }
-                    uploadPathList.clear();
-
-                }
+                Log.i(LOG_TAG, "upload");
+                batchOperation(R.id.item_upload_local);
+                mode.finish();
+                return true;
+            case R.id.item_microphone_local:
+                Log.i(LOG_TAG, "microphone");
+                batchOperation(R.id.item_microphone_local);
+                mode.finish();
+                return true;
+            case R.id.item_notes_local:
+                Log.i(LOG_TAG, "notes");
+                batchOperation(R.id.item_notes_local);
                 mode.finish();
                 return true;
             default:
@@ -476,5 +387,185 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
                 }
             });
         }
+    }
+
+    private void batchOperation(int operationType){
+        if(positionSet.size()!=0) {
+            Log.v(LOG_TAG, " "+positionSet.size());
+            ArrayList imagePathList = new ArrayList();
+            for (Integer i : positionSet) {
+                imagePathList.add(dataPathList.get(i));
+            }
+
+            if (imagePathList != null) {
+                switch (operationType){
+                    case R.id.item_upload_local:
+                        uploadList(imagePathList);
+                        break;
+                    case R.id.item_microphone_local:
+                        showVoiceDialog(imagePathList);
+                        break;
+                    case R.id.item_notes_local:
+                        showNoteDialog(imagePathList);
+                        break;
+                }
+            }
+            imagePathList.clear();
+        }
+    }
+
+    /**upload methods**/
+     /*
+            upload the selected files
+        */
+    private void uploadList(List<String> fileList) {
+        String currentTaskId = createTask(fileList);
+
+        remoteListNewInstance(currentTaskId).show(getFragmentManager(), "remoteListDialog");
+    }
+
+    public static RemoteListDialogFragment remoteListNewInstance(String taskId)
+    {
+        RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("taskId", taskId);
+        remoteListDialogFragment.setArguments(args);
+        return remoteListDialogFragment;
+    }
+
+    private String createTask(List<String> fileList){
+
+        String uniqueID = UUID.randomUUID().toString();
+        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+        Long now = new Date().getTime();
+
+        Task task = new Task();
+        task.setTotalItems(fileList.size());
+        task.setFinishedItems(0);
+        task.setTaskId(uniqueID);
+        task.setUploadMode("MU");
+        task.setState(String.valueOf(DeviceStatus.state.WAITING));
+        task.setUserName(username);
+        task.setUserId(userId);
+        task.setSeverName(serverName);
+        task.setStartDate(String.valueOf(now));
+        task.save();
+        int num = addImages(fileList, task.getTaskId()).size();
+        task.setTotalItems(num);
+        task.save();
+        Log.v(LOG_TAG,"MU task"+task.getTaskId() );
+        Log.v(LOG_TAG, "setTotalItems:" + num);
+
+        return task.getTaskId();
+    }
+
+    /**
+     * addImages function creates a List<Image> for UPLOAD, BATCH_EDIT_NOTE, BATCH_EDIT_VOICE operations
+     */
+
+    private static List<Image> addImages(List<String> fileList, String taskId){
+        List<Image> imageList = new ArrayList<>();
+
+        for (String filePath: fileList) {
+            String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
+            Image image = DBConnector.getImageByPath(filePath);
+            if(image!=null){  // image already exist
+                if(!taskId.equalsIgnoreCase("")) {  // upload process
+                    image.setTaskId(taskId);
+                    image.setState(String.valueOf(DeviceStatus.state.WAITING));
+                    image.save();
+                }
+                imageList.add(image);
+                continue;
+            }
+
+            //imageSize
+            File file = new File(filePath);
+            String fileSize = String.valueOf(file.length() / 1024);
+
+            ExifInterface exif = null;
+            try {
+                exif = new ExifInterface(filePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            //createTime
+            String createTime = exif.getAttribute(ExifInterface.TAG_DATETIME);
+
+            //latitude
+            String latitude = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
+
+            //longitude
+            String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
+
+            //state
+            String imageState = String.valueOf(DeviceStatus.state.WAITING);
+            String imageId = UUID.randomUUID().toString();
+            //store image in local database
+            Image photo = new Image();
+            photo.setImageId(imageId);
+            photo.setImageName(imageName);
+            photo.setImagePath(filePath);
+            photo.setLongitude(longitude);
+            photo.setLatitude(latitude);
+            photo.setCreateTime(createTime);
+            photo.setSize(fileSize);
+            photo.setState(imageState);
+            photo.setTaskId(taskId);
+            photo.save();
+            imageList.add(photo);
+        }
+        return imageList;
+    }
+
+    /**** take notes ****/
+    public static NoteDialogFragment noteDialogNewInstance(ArrayList<String> imagePathList)
+    {
+        NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
+
+        Log.d("LY", "size: "+imagePathList.size());
+        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
+
+        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
+        for(int i=0; i<imagePathList.size(); i++){
+            imagePathArray[i] = imagePathList.get(i);
+        }
+
+        Bundle args = new Bundle();
+
+        args.putStringArray("imagePathArray", imagePathArray);
+        noteDialogFragment.setArguments(args);    // pass imagePathArray to NoteDialogFragment
+        return noteDialogFragment;
+    }
+
+    public void showNoteDialog(ArrayList<String> imagePathList){
+        noteDialogNewInstance(imagePathList).show(getFragmentManager(), "noteDialogFragment");
+    }
+
+    /**** record voice ****/
+    public static MicrophoneDialogFragment voiceDialogNewInstance(ArrayList<String> imagePathList)
+    {
+        MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
+
+//        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
+        Log.d("LY", "size: "+imagePathList.size());
+        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
+
+        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
+        for(int i=0; i<imagePathList.size(); i++){
+            imagePathArray[i] = imagePathList.get(i);
+        }
+
+        Bundle args = new Bundle();
+
+        args.putStringArray("imagePathArray", imagePathArray);
+        microphoneDialogFragment.setArguments(args);
+        return microphoneDialogFragment;
+    }
+
+    public void showVoiceDialog(ArrayList<String> imagePathList){
+        voiceDialogNewInstance(imagePathList).show(getFragmentManager(), "voiceDialogFragment");
     }
 }
