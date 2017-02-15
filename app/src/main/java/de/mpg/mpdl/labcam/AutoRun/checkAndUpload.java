@@ -88,6 +88,7 @@ public class checkAndUpload {
     String[] labCamTemplateProfileLabels = {"Make", "Model", "ISO Speed Ratings","Creation Date", "Geolocation","GPS Version ID", "Sensing Method", "Aperture Value", "Color Space", "Exposure Time", "Note", "OCR"};
     String[] labCamTemplateProfileTypes ={"text", "text", "number", "date", "geolocation", "text", "text", "text", "text", "text", "text", "text"};
     Boolean[] checkTypeList = {false,false,false,false,false,false,false,false,false,false,false,false};
+    boolean ocrIsOn = false;
 
     public checkAndUpload(Context context, String currentTaskId) {
         this.context = context;
@@ -101,6 +102,7 @@ public class checkAndUpload {
         //prepare apiKey
         mPrefs = context.getSharedPreferences("myPref", 0);
         apiKey = mPrefs.getString("apiKey", "");
+        ocrIsOn = mPrefs.getBoolean("ocrIsOn", false);
 
         if(!taskIsStopped()) {
             Log.v(TAG,"not stopped");
@@ -201,7 +203,7 @@ public class checkAndUpload {
         if(f.exists() && !f.isDirectory()) {
             // do something
             Log.i(TAG,collectionID+": file exist");
-            jsonPart2 = DeviceStatus.metaDataJson(filePath, checkTypeList, context);
+            jsonPart2 = DeviceStatus.metaDataJson(filePath, checkTypeList, ocrIsOn, context);
         }else {
             Log.i(TAG, "file not exist: " + currentImageId);
             // delete Image from task

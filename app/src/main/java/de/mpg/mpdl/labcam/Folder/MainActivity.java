@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
     //UI
     static Switch autoUploadSwitch = null;
+    static Switch ocrSwitch = null;
     static TextView chooseCollectionLabel = null;
     static TextView collectionNameTextView = null;
     static {
@@ -218,6 +219,8 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
         initAutoSwitch();
 
+        initOcrSwitch();
+
         if(isQRLogin) { // login with qr
             setAutoUploadStatus(isQRLogin, true);
         }else { // normal login
@@ -267,18 +270,22 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
     @Override
     protected void onStart() {
         super.onStart();
-        // Start service and provide it a way to communicate with this class.
-        Intent startServiceIntent = new Intent(this, MediaContentJobService.class);
-        startService(startServiceIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // Start service and provide it a way to communicate with this class.
+            Intent startServiceIntent = new Intent(this, MediaContentJobService.class);
+            startService(startServiceIntent);
+        }
     }
 
     @Override
     protected void onStop() {
-        // A service can be "started" and/or "bound". In this case, it's "started" by this Activity
-        // and "bound" to the JobScheduler (also called "Scheduled" by the JobScheduler). This call
-        // to stopService() won't prevent scheduled jobs to be processed. However, failing
-        // to call stopService() would keep it alive indefinitely.
-        stopService(new Intent(this, MediaContentJobService.class));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // A service can be "started" and/or "bound". In this case, it's "started" by this Activity
+            // and "bound" to the JobScheduler (also called "Scheduled" by the JobScheduler). This call
+            // to stopService() won't prevent scheduled jobs to be processed. However, failing
+            // to call stopService() would keep it alive indefinitely.
+            stopService(new Intent(this, MediaContentJobService.class));
+        }
         super.onStop();
     }
 
@@ -477,6 +484,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
         //initUI
         autoUploadSwitch = (Switch) findViewById(R.id.switch_auto_upload);
+        ocrSwitch = (Switch) findViewById(R.id.switch_ocr);
         Log.i("autoUploadSwitch",""+autoUploadSwitch.isChecked());
         chooseCollectionLabel = (TextView) findViewById(R.id.tv_choose_collection);
         collectionNameTextView = (TextView) findViewById(R.id.collection_name);
@@ -635,6 +643,21 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         if(settings!=null && settings.isAutoUpload()){
             Toast.makeText(activity,"Automatic upload is active!",Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void initOcrSwitch(){
+        ocrSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor mEditor = mPrefs.edit();
+                if(buttonView.isChecked()){
+                    mEditor.putBoolean("ocrIsOn",true).apply();
+                }else {
+                    mEditor.putBoolean("ocrIsOn",false).apply();
+                }
+                mEditor.commit();
+            }
+        });
     }
 
     //logout
@@ -872,11 +895,10 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
     }
 
     public static void scheduleJob(Context context) {
-        JobScheduler js =
-                (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        JobInfo.Builder builder = null;
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            JobScheduler js =
+                    (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobInfo.Builder builder = null;
             builder = new JobInfo.Builder(
                     MY_BACKGROUND_JOB,
                     new ComponentName(context, MediaContentJobService.class));

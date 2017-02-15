@@ -100,7 +100,7 @@
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="400dp">
+            android:layout_height="460dp">
             <!--upload option-->
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -153,13 +153,57 @@
 
             </RelativeLayout>
 
+
+            <!--ocr switch-->
+            <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout_ocr"
+                    android:layout_marginTop="30dp"
+                    android:layout_below="@id/layout_upload_option">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/label_ocr"
+                        android:text="OCR"
+                        android:textColor="@color/tabUnselect"
+                        android:textSize="14sp"
+                        android:layout_marginLeft="16dp"/>
+
+                <!--divider-->
+                <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_below="@id/label_ocr"
+                        android:background="#80808080" >
+                </LinearLayout>
+
+                <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/layout_switch_ocr">
+
+                    <Switch
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/switch_ocr"
+                            android:layout_alignParentRight="true"
+                            android:checked="false"
+                            android:layout_marginRight="10dp" />
+                </RelativeLayout>
+            </RelativeLayout>
+
             <!--auto upload-->
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/layout_auto_upload"
                 android:layout_marginTop="30dp"
-                android:layout_below="@id/layout_upload_option">
+                android:layout_below="@id/layout_ocr">
 
                 <TextView
                     android:layout_width="wrap_content"

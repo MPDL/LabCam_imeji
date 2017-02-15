@@ -240,7 +240,7 @@ public class DeviceStatus {
 
     }
 
-    public static String metaDataJson(String imagePath, Boolean[] typeList, Context context ){
+    public static String metaDataJson(String imagePath, Boolean[] typeList, boolean ocrIsOn, Context context ){
 
         String metaDataJsonStr = null;
 
@@ -250,7 +250,7 @@ public class DeviceStatus {
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(file);
 
-            metaDataJsonStr =  generateJsonStr(metadata, typeList, context, imagePath);
+            metaDataJsonStr =  generateJsonStr(metadata, typeList, context, imagePath, ocrIsOn);
 
             print(metadata);
         } catch (ImageProcessingException e) {
@@ -271,7 +271,7 @@ public class DeviceStatus {
      * generate json string
      * @param metadata
      */
-    private static String generateJsonStr(Metadata metadata, Boolean[] typeList, Context context, String imagePath){
+    private static String generateJsonStr(Metadata metadata, Boolean[] typeList, Context context, String imagePath, boolean ocrIsOn){
 
         String metaDataJsonStr = null;
 
@@ -303,6 +303,7 @@ public class DeviceStatus {
         String ColorSpaceStr = "";
         String note ="";
         int orientation = 0;
+        String ocr = "";
 
         if(exifIFD0Directory!=null){
             makeStr = (exifIFD0Directory.getString(ExifIFD0Directory.TAG_MAKE) != null) ? exifIFD0Directory.getString(ExifIFD0Directory.TAG_MAKE) : "";
@@ -328,46 +329,46 @@ public class DeviceStatus {
             GPSVersionIDStr = gpsDirectory.getString(gpsDirectory.TAG_VERSION_ID);
         }
 
-        if(exifThumbnailDirectory!=null){
-            String orientationStr = exifThumbnailDirectory.getString(exifThumbnailDirectory.TAG_ORIENTATION);
-            if(orientationStr==null){
-                Log.i(LOG_TAG, "no orientation information");
-            }else if(orientationStr.contains("1")){
-                orientation = 0;
-            }else if(orientationStr.contains("6")){
-                orientation = 90;
-            }else if(orientationStr.contains("3")){
-                orientation = 180;
-            }else if(orientationStr.contains("8")){
-                orientation = 270;
+        if(ocrIsOn) {
+            if(exifThumbnailDirectory!=null){
+                String orientationStr = exifThumbnailDirectory.getString(exifThumbnailDirectory.TAG_ORIENTATION);
+                if(orientationStr==null){
+                    Log.i(LOG_TAG, "no orientation information");
+                }else if(orientationStr.contains("1")){
+                    orientation = 0;
+                }else if(orientationStr.contains("6")){
+                    orientation = 90;
+                }else if(orientationStr.contains("3")){
+                    orientation = 180;
+                }else if(orientationStr.contains("8")){
+                    orientation = 270;
+                }
+
             }
 
+            int e1 = Log.e(LOG_TAG, "orientation: " + orientation);
+
+            Image image = DBConnector.getImageByPath(imagePath);
+            if(image.getNoteId() == null || image.getNoteId().equalsIgnoreCase("")) {}
+            else{
+                note = DBConnector.getNoteById(image.getNoteId()).getNoteContent();}
+
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap bitMapOrig = BitmapFactory.decodeFile(imagePath, options);
+
+            Matrix matrix = new Matrix();
+            matrix.postRotate(orientation);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(bitMapOrig, 0, 0, bitMapOrig.getWidth(), bitMapOrig.getHeight(), matrix, true);
+            if(bitMapOrig != rotatedBitmap)
+                bitMapOrig.recycle();
+            bitMapOrig = null;
+
+            // ocr exception
+            ocr = OCRtextHandler.getText(context, rotatedBitmap);
+            Log.e(LOG_TAG, "ocr: " + ocr);
         }
-
-        int e1 = Log.e(LOG_TAG, "orientation: " + orientation);
-
-        Image image = DBConnector.getImageByPath(imagePath);
-        if(image.getNoteId() == null || image.getNoteId().equalsIgnoreCase("")) {}
-        else{
-            note = DBConnector.getNoteById(image.getNoteId()).getNoteContent();}
-
-        String ocr = "";
-
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitMapOrig = BitmapFactory.decodeFile(imagePath, options);
-
-        Matrix matrix = new Matrix();
-        matrix.postRotate(orientation);
-        Bitmap rotatedBitmap = Bitmap.createBitmap(bitMapOrig, 0, 0, bitMapOrig.getWidth(), bitMapOrig.getHeight(), matrix, true);
-        if(bitMapOrig != rotatedBitmap)
-            bitMapOrig.recycle();
-        bitMapOrig = null;
-
-        // ocr exception
-        ocr = OCRtextHandler.getText(context, rotatedBitmap);
-        Log.e(LOG_TAG, "ocr: " + ocr);
-
         try {
             JSONObject jsonObject = new JSONObject();
             if(typeList[0]){
