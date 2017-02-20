@@ -58,7 +58,6 @@ public class RecentProcessActivity extends BaseCompatActivity {
 
         //taskManager listView
         taskList = DBConnector.getRecentTasks(userId, serverName);
-        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
 
         recentTaskAdapter = new RecentTaskAdapter(activity, taskList);
         recentTaskAdapter.notifyDataSetChanged();

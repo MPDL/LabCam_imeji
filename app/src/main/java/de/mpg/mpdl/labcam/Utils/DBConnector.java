@@ -1,5 +1,6 @@
 package de.mpg.mpdl.labcam.Utils;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.activeandroid.query.Delete;
@@ -7,8 +8,10 @@ import com.activeandroid.query.Select;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
+import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.LocalModel.Voice;
+import de.mpg.mpdl.labcam.code.data.db.LiteOrmManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -268,5 +271,16 @@ public class DBConnector {
         }
 
     }
-    
+
+    /************************************ refactoring **************************************/
+
+    //get all store
+    public static Settings getSettingsByUserId(Context context, String userId){
+        List<Settings> settingsList = LiteOrmManager.getInstance(context).queryByEqual("userId", userId, Settings.class);
+        if(settingsList!=null && settingsList.size()>0){
+            return settingsList.get(0);
+        }else
+            return null;
+    }
+
 }

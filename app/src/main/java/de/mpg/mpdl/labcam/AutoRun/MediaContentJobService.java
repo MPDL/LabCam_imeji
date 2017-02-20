@@ -26,6 +26,7 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Upload.UploadResultReceiver;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.data.db.LiteOrmManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -98,7 +99,7 @@ public class MediaContentJobService extends JobService implements UploadResultRe
         serverName = mPrefs.getString("server","");
 
         //isAutoUpload
-        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+        Settings settings = DBConnector.getSettingsByUserId(context, userId);
         // if auto is turned off
         if (settings == null){
             Log.e("cameraEvent","settings is null");
