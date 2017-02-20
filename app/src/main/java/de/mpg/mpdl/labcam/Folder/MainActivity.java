@@ -47,6 +47,7 @@ import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.litesuits.orm.LiteOrm;
 
 import de.mpg.mpdl.labcam.Auth.LoginActivity;
 import de.mpg.mpdl.labcam.AutoRun.ManualUploadService;
@@ -71,6 +72,7 @@ import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.code.common.adapter.TitleFragmentPagerAdapter;
+import de.mpg.mpdl.labcam.code.data.db.LiteOrmManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -555,7 +557,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
      * toast
      */
     private void setAutoUploadStatus(boolean isQRLogin, boolean isAUOn){
-        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();   // get old settings
+        Settings settings = DBConnector.getSettingsByUserId(getApplicationContext(), userId);
         if(settings==null){
             settings = new Settings();  // no setting
         }
@@ -564,7 +566,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             // login set true
             settings.setUserId(userId);
             settings.setIsAutoUpload(true);
-            settings.save();
+            LiteOrmManager.getInstance(getApplicationContext()).save(settings);
             autoUploadSwitch.setChecked(settings.isAutoUpload());
 
             // if auto is on in settings, enable choose collection
@@ -574,7 +576,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         }else { // set AUOff
             settings.setUserId(userId);
             settings.setIsAutoUpload(false);
-            settings.save();
+            LiteOrmManager.getInstance(getApplicationContext()).save(settings);
             autoUploadSwitch.setChecked(settings.isAutoUpload());
 
             chooseCollectionLayout.setEnabled(false);
@@ -602,7 +604,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         autoUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+                Settings settings = DBConnector.getSettingsByUserId(context, userId);
                 //init settings
                 if (settings == null) {
                     settings = new Settings();
@@ -612,7 +614,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     Log.e(TAG, "userId" + userId);
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(true);
-                    settings.save();
+                    LiteOrmManager.getInstance(getApplicationContext()).save(settings);
                     chooseCollectionLayout.setEnabled(true);
                     chooseCollectionLabel.setTextColor(getResources().getColor(R.color.dark_text));
                     collectionNameTextView.setTextColor(getResources().getColor(R.color.dark_text));
@@ -621,7 +623,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     Log.e(TAG, "userId" + userId);
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(false);
-                    settings.save();
+                    LiteOrmManager.getInstance(getApplicationContext()).save(settings);
                     chooseCollectionLayout.setEnabled(false);
                     chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
                     collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
@@ -639,7 +641,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
         });
 
-        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();   // get old settings
+        Settings settings = DBConnector.getSettingsByUserId(context, userId);   // get old settings
         if(settings!=null && settings.isAutoUpload()){
             Toast.makeText(activity,"Automatic upload is active!",Toast.LENGTH_SHORT).show();
         }
@@ -844,7 +846,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             }else if(resultCode == RESULT_OK){
 
                 // prepare settings
-                Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+                Settings settings = DBConnector.getSettingsByUserId(context, userId);
                 if(settings==null){
                     settings = new Settings();
                 }
@@ -863,7 +865,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(true);
-                    settings.save();
+                    LiteOrmManager.getInstance(getApplicationContext()).save(settings);
 
                     // UI enable click
                     chooseCollectionLayout.setEnabled(true);
@@ -882,7 +884,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(false);
-                    settings.save();
+                    LiteOrmManager.getInstance(getApplicationContext()).save(settings);
 
                     // UI disable click
                     chooseCollectionLayout.setEnabled(false);
@@ -993,7 +995,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 //            viewPager.setCurrentItem(currentTab);
 
             pDialog.dismiss();
-            Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();   // get old settings
+            Settings settings = DBConnector.getSettingsByUserId(context, userId); // get old settings
 
             //switch on
             //check the previous status of automatic upload
@@ -1095,8 +1097,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     Log.e(TAG+"5", "collectionNameTextView set to " +folderList.get(0).getTitle());
                 }
 
-
-                Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();   // get old settings
+                Settings settings = DBConnector.getSettingsByUserId(context, userId);   // get old settings
 
                 //switch on
                 if(settings.isAutoUpload()){
@@ -1120,7 +1121,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     return;
                 }
 
-                Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();   // get old settings
+                Settings settings = DBConnector.getSettingsByUserId(context, userId);   // get old settings
 
                 //set collection name
                 collectionNameTextView = (TextView) findViewById(R.id.collection_name);

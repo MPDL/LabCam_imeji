@@ -22,6 +22,7 @@ import de.mpg.mpdl.labcam.code.common.callback.RemoveTaskInterface;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.TaskManagerAdapter;
+import de.mpg.mpdl.labcam.code.data.db.LiteOrmManager;
 
 import java.util.Iterator;
 import java.util.List;
@@ -82,7 +83,8 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
 
                     taskList = DBConnector.getActiveTasks(userId, serverUrl);
 
-                    Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+                    Settings settings = DBConnector.getSettingsByUserId(getApplicationContext(), userId);
+                    //Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
                     Task auTask = new Task();
                     if(taskList==null){
                         Log.e("handler", "task list is empty");
@@ -114,7 +116,8 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
 
         taskList = DBConnector.getActiveTasks(userId, serverUrl);
 
-        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+        Settings settings = DBConnector.getSettingsByUserId(getApplicationContext(), userId);
+//        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
 
         // auTask only for delete
         Task auTask = new Task();

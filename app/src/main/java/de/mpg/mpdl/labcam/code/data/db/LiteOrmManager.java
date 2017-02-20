@@ -12,10 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Created by jzhu on 2016/11/9.
- */
-
 public class LiteOrmManager {
 
     private static volatile LiteOrmManager sInstance;
