@@ -1,9 +1,10 @@
 package de.mpg.mpdl.labcam.Model.LocalModel;
 
+import com.google.gson.annotations.Expose;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
-import com.google.gson.annotations.Expose;
 
 /**
  * Created by yingli on 12/14/15.
@@ -54,27 +55,33 @@ public class Image extends Model {
     @Column(name = "logs")
     private String log;
 
+    @Expose
+    @Column(name = "noteId")
+    private String noteId;
 
-
+    @Expose
+    @Column(name = "voiceId")
+    private String voiceId;
 
 
     public Image() {
         super();
     }
 
-
-    public Image(String imageId, String taskId, String imageName, String state, String errorLeverl, String imagePath, String size, String createTime, String latitude, String longitude, String log) {
+    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, String noteId, String voiceId) {
         this.imageId = imageId;
         this.taskId = taskId;
         this.imageName = imageName;
         this.state = state;
-        this.errorLevel = errorLeverl;
+        this.errorLevel = errorLevel;
         this.imagePath = imagePath;
         this.size = size;
         this.createTime = createTime;
         this.latitude = latitude;
         this.longitude = longitude;
         this.log = log;
+        this.noteId = noteId;
+        this.voiceId = voiceId;
     }
 
     public String getImageId() {
@@ -163,5 +170,29 @@ public class Image extends Model {
 
     public void setLog(String log) {
         this.log = log;
+    }
+
+    public String getErrorLevel() {
+        return errorLevel;
+    }
+
+    public void setErrorLevel(String errorLevel) {
+        this.errorLevel = errorLevel;
+    }
+
+    public String getNoteId() {
+        return noteId;
+    }
+
+    public void setNoteId(String noteId) {
+        this.noteId = noteId;
+    }
+
+    public String getVoiceId() {
+        return voiceId;
+    }
+
+    public void setVoiceId(String voiceId) {
+        this.voiceId = voiceId;
     }
 }

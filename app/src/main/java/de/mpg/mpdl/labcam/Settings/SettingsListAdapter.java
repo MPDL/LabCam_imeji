@@ -15,12 +15,12 @@ import android.widget.TextView;
 
 import com.activeandroid.util.Log;
 
-import java.util.List;
-
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
+
+import java.util.List;
 
 /**
  * Created by allen on 12/10/15.
@@ -47,12 +47,14 @@ public class SettingsListAdapter extends BaseAdapter {
 
         String userId = mPrefs.getString("userId", "");
         String serverName = mPrefs.getString("server","");
-        try{
-            lastCollectionId = DBConnector.getAuTask(userId,serverName).getCollectionId();
+
+        try {
+            lastCollectionId = DBConnector.getAuTask(userId, serverName).getCollectionId();
+        }catch (NullPointerException e){
+            e.printStackTrace();
         }
-        catch(Exception e){
-        }
-        if(lastCollectionId!=null){
+
+        if(lastCollectionId!=null && !lastCollectionId.equalsIgnoreCase("")){
             collectionId = lastCollectionId;}
     }
 

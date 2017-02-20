@@ -20,4 +20,72 @@
     <dimen name="margintopOne">120dp</dimen>
     <dimen name="margintopTwo">95dp</dimen>
 
+
+
+    <!--<<<<<<<<<<<<<<<<<<<<<<<<><<<<<<<<<<<<<REFACTORING>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>-->
+    <!-- title bar -->
+    <dimen name="title_bar_subtitle_padding_lr">15dp</dimen>
+    <dimen name="title_bar_subtitle_padding_tb">12dp</dimen>
+    <dimen name="title_bar_bullet_wh">20dp</dimen>
+    <dimen name="title_bar_bullet_margin_right">4dp</dimen>
+    <dimen name="title_bar_bullet_margin_top">4dp</dimen>
+    <dimen name="title_bar_left_layout">60dp</dimen>
+    <dimen name="title_bar_left_bullet_wh">10dp</dimen>
+    <dimen name="title_bar_left_bullet_margin_right">12dp</dimen>
+    <dimen name="title_bar_left_bullet_margin_top">6dp</dimen>
+
+    <!-- text size -->
+    <dimen name="t0">10sp</dimen>
+    <dimen name="t1">12sp</dimen>
+    <dimen name="t2">13sp</dimen>
+    <dimen name="t3">14sp</dimen>
+    <dimen name="t4">15sp</dimen>
+    <dimen name="t5">16sp</dimen>
+    <dimen name="t6">17sp</dimen>
+    <dimen name="t7">18sp</dimen>
+    <dimen name="t8">19sp</dimen>
+    <dimen name="t9">20sp</dimen>
+
+    <!-- text size -->
+    <dimen name="f1">11sp</dimen>
+    <dimen name="f2">12sp</dimen>
+    <dimen name="f3">13sp</dimen>
+    <dimen name="f4">14sp</dimen>
+    <dimen name="f5">15sp</dimen>
+    <dimen name="f6">16sp</dimen>
+    <dimen name="f7">17sp</dimen>
+    <dimen name="f8">18sp</dimen>
+    <dimen name="f9">19sp</dimen>
+    <dimen name="f10">20sp</dimen>
+
+    <dimen name="common_margin_lr">15dp</dimen>
+    <dimen name="spe_margin_lr">24dp</dimen>
+
+    <!-- dialog -->
+    <dimen name="dialog_width">300dp</dimen>
+    <dimen name="dialog_title_margintop">30dp</dimen>
+    <dimen name="dialog_button_height">40dp</dimen>
+    <dimen name="dialog_content_size">16sp</dimen>
+    <dimen name="dialog_button_size">16sp</dimen>
+    <dimen name="dialog_line_margintop">30dp</dimen>
+
+    <!-- dialog -->
+    <dimen name="photo_dialog_height">48dp</dimen>
+    <dimen name="photo_dialog_marginglr">12dp</dimen>
+
+
+
+    <!-- setting item -->
+    <dimen name="setting_item_height">48dp</dimen>
+    <dimen name="setting_item_right_label_margin_left">15dp</dimen>
+    <dimen name="setting_item_left_label_margin_right">15dp</dimen>
+    <dimen name="setting_item_icon_padding_left">16dp</dimen>
+    <dimen name="setting_warimg_padding_tb">16dp</dimen>
+    <dimen name="setting_item_sub_margin_left">8dp</dimen>
+
+    <!-- title bar -->
+    <dimen name="title_bar_height">53dp</dimen>
+
+    <dimen name="normal_corners">5dp</dimen>
+
 </resources>

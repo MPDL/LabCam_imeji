@@ -5,10 +5,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import de.mpg.mpdl.labcam.Model.Gallery;
+
 import java.io.File;
 import java.util.ArrayList;
-
-import de.mpg.mpdl.labcam.Model.Gallery;
 
 /**
  * Created by kiran on 26.10.15.

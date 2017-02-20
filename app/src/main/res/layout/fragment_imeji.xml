@@ -6,10 +6,10 @@
     tools:context="de.mpg.mpdl.labcam.ImejiFragment.ImejiFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:id="@+id/folder_listView"/>
+        android:id="@+id/folder_cardview"/>
 
 </FrameLayout>

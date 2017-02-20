@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--voice panel-->
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black"
+        android:id="@+id/layout_voice_panel_cell"
+        android:layout_margin="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:text="780780"
+            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:id="@+id/voice_list_cell_text" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_pause_voice_cell"
+            android:background="@drawable/voice_pause_white"
+            android:layout_below="@id/voice_list_cell_text"/>
+
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_rewind_voice_cell"
+            android:background="@drawable/voice_play_arrow_white"
+            android:layout_toRightOf="@id/btn_pause_voice_cell"
+            android:layout_below="@id/voice_list_cell_text"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_reset_voice_cell"
+            android:background="@drawable/voice_stop_white"
+            android:layout_toRightOf="@id/btn_rewind_voice_cell"
+            android:layout_below="@id/voice_list_cell_text"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_delete_voice_cell"
+            android:background="@drawable/voice_delete_forever_white"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/voice_list_cell_text"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

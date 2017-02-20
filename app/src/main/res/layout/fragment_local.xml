@@ -114,7 +114,7 @@
     <!-- TODO: Update blank fragment layout -->
 
 
-    <GridView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/gallery_gridView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

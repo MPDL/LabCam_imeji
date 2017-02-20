@@ -47,8 +47,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-
-
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -61,17 +59,14 @@
                 android:orientation="horizontal"
                 android:id="@+id/fake_toolbar">
 
-                <!-- The Scrollable View here               -->
+                <!-- The Scrollable View here -->
                 <android.support.design.widget.TabLayout
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                     android:id="@+id/tabLayout"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content" />
 
-
             </LinearLayout>
-
-            <!--android:background="@drawable/bottom_bg"-->
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewPager"
@@ -105,13 +100,13 @@
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="400dp">
+            android:layout_height="460dp">
             <!--upload option-->
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/layout_upload_option"
-                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
                 android:layout_marginTop="30dp">
 
                 <TextView
@@ -158,13 +153,57 @@
 
             </RelativeLayout>
 
+
+            <!--ocr switch-->
+            <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/layout_ocr"
+                    android:layout_marginTop="30dp"
+                    android:layout_below="@id/layout_upload_option">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/label_ocr"
+                        android:text="OCR"
+                        android:textColor="@color/tabUnselect"
+                        android:textSize="14sp"
+                        android:layout_marginLeft="16dp"/>
+
+                <!--divider-->
+                <LinearLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_below="@id/label_ocr"
+                        android:background="#80808080" >
+                </LinearLayout>
+
+                <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/layout_switch_ocr">
+
+                    <Switch
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/switch_ocr"
+                            android:layout_alignParentRight="true"
+                            android:checked="false"
+                            android:layout_marginRight="10dp" />
+                </RelativeLayout>
+            </RelativeLayout>
+
             <!--auto upload-->
             <RelativeLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/layout_auto_upload"
                 android:layout_marginTop="30dp"
-                android:layout_below="@id/layout_upload_option">
+                android:layout_below="@id/layout_ocr">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -271,6 +310,80 @@
                 </LinearLayout>
              </RelativeLayout>
 
+            <!--recent text notes-->
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/layout_recent_text_notes"
+                android:layout_below="@id/layout_recent_processes"
+                android:layout_marginTop="30dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recent_text_notes"
+                    android:id="@+id/label_recent_text_notes"
+                    android:textColor="@color/tabUnselect"
+                    android:textSize="14sp"
+                    android:layout_marginLeft="16dp"/>
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/arrow_blue"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"/>
+
+                <!--divider-->
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/label_recent_text_notes"
+                    android:id="@+id/divider_recent_text_notes"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="#80808080" >
+                </LinearLayout>
+            </RelativeLayout>
+
+            <!--recent voice notes-->
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/layout_recent_voice_notes"
+                android:layout_below="@id/layout_recent_text_notes"
+                android:layout_marginTop="30dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recent_voice_notes"
+                    android:id="@+id/label_recent_voice_notes"
+                    android:textColor="@color/tabUnselect"
+                    android:textSize="14sp"
+                    android:layout_marginLeft="16dp"/>
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/arrow_blue"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="16dp"/>
+
+                <!--divider-->
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:orientation="horizontal"
+                    android:layout_below="@id/label_recent_voice_notes"
+                    android:id="@+id/divider_recent_voice_notes"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="#80808080" >
+                </LinearLayout>
+            </RelativeLayout>
+
             <!--logout-->
 
             <ImageView
@@ -288,5 +401,4 @@
         </ScrollView>
     </android.support.design.widget.NavigationView>
 
-    <!--app:menu="@menu/navigation_drawer_items"-->
 </android.support.v4.widget.DrawerLayout>

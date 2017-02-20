@@ -2,14 +2,15 @@ package de.mpg.mpdl.labcam.Retrofit;
 
 import com.google.gson.JsonObject;
 
-import java.util.List;
-
 import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.Model.TO.MetadataProfileTO;
 import de.mpg.mpdl.labcam.Model.User;
+
+import java.util.List;
+
 import retrofit.Callback;
 import retrofit.client.Response;
 import retrofit.http.Body;
@@ -78,13 +79,13 @@ public interface ImejiAPI {
      *  For collections
     */
     //get all collections
-    @GET(value = "/collections?size=30")
+    @GET(value = "/collections?size=10000")
     void getCollections(Callback<CollectionMessage> callback);
 
-    @GET(value = "/collections?size=30")
+    @GET(value = "/collections?size=10000")
     void getCollectionMessage(Callback<JsonObject> callback);
 
-    @GET(value = "/collections?size=30")
+    @GET(value = "/collections?size=10000")
     void getGrantedCollectionMessage(@Query("q") String q, Callback<CollectionMessage> callback);
 
     //get all items by collection id

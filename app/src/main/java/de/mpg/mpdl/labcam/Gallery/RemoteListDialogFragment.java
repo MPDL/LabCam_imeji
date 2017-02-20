@@ -22,13 +22,6 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
 import de.mpg.mpdl.labcam.Auth.QRScannerActivity;
 import de.mpg.mpdl.labcam.AutoRun.ManualUploadService;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
@@ -38,6 +31,14 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Settings.SettingsListAdapter;
 import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -77,7 +78,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
 
         this.setCancelable(false);
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.fragment_dialog_remote_list, null);
+        View view = inflater.inflate(R.layout.dialog_fragment_remote_list, null);
         activity = this.getActivity();
         currentTaskId = getArguments().getString("taskId");
 
@@ -222,6 +223,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                         .show();
             }
 
+            new Delete().from(ImejiFolder.class).execute();
 
             ActiveAndroid.beginTransaction();
             try {

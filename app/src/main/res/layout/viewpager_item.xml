@@ -3,13 +3,14 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--image contents-->
     <ImageView
         android:id="@+id/detail_image"
         android:src="@drawable/imeji"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent"/>
 
+    <!--check mark-->
     <ImageView
         android:layout_width="60dp"
         android:layout_height="60dp"
@@ -19,5 +20,119 @@
         android:id="@+id/viewpager_check_mark"
         android:visibility="gone"
         android:src="@drawable/btn_check"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginBottom="32dp"
+        android:layout_alignParentBottom="true">
+
+
+        <!--note panel-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/layout_note_panel"
+            android:visibility="gone">
+
+            <!--notes-->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/layout_edit_note_button"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:background="@color/white_shadow"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="48dp"
+                    android:text="CANCEL"
+                    android:id="@+id/tv_cancel_edit_note"
+                    android:textColor="@color/primary"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="48dp"
+                    android:layout_alignParentRight="true"
+                    android:text="SAVE"
+                    android:id="@+id/tv_save_edit_note"
+                    android:textColor="@color/primary"/>
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_notes_detail"
+                android:minLines="3"
+                android:textColor="@color/white"
+                android:layout_marginTop="20dp"
+                android:layout_below="@id/layout_edit_note_button"
+                android:visibility="gone"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/et_notes_detail"
+                android:minLines="3"
+                android:textColor="@color/white"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"/>
+
+
+        </RelativeLayout>
+
+
+        <!--voice panel-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:id="@+id/layout_voice_panel"
+            android:layout_below="@id/layout_note_panel"
+            android:visibility="gone">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_pause_voice"
+                android:background="@drawable/voice_pause_white"
+                android:layout_alignParentBottom="true"/>
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_rewind_voice"
+                android:background="@drawable/voice_play_arrow_white"
+                android:layout_toRightOf="@+id/btn_pause_voice"
+                android:layout_alignParentBottom="true"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_reset_voice"
+                android:background="@drawable/voice_stop_white"
+                android:layout_toRightOf="@+id/btn_rewind_voice"
+                android:layout_alignParentBottom="true"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_delete_voice"
+                android:background="@drawable/voice_delete_forever_white"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
 
 </RelativeLayout>

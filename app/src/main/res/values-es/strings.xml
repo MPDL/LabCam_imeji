@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">LabCam</string>
+
+    <!--url-->
+    <string name="url_gluons">https://gluons.mpdl.mpg.de/imeji/rest/</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="syncall">Sync All</string>
+    <string name="item1">Settings</string>
+    <string name="item2">Back Up</string>
+    <string name="item3">Item3</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="login">Login</string>
+    <string name="title_backup_activity">Backup</string>
+    <string name="title_item_activity">Items</string>
+    <string name="title_item_detail_activity">details</string>
+    <string name="title_local_activity">Local Gallery</string>
+    <string name="wifi">Over Wifi Only</string>
+    <string name="wifidata">Over Wifi or mobile network</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="btn_done">done</string>
+    <string name="app_text">Upload when the app is running</string>
+    <string name="back_text">Upload in the background with wifi</string>
+    <string name="manual">Upload Manually</string>
+    <string name="backup_photos">Backup Photos</string>
+    <string name="logout_after_upload">Logout after uploading</string>
+    <string name="remove_after_upload">Remove photos</string>
+    <string name="rgl">Remove Geo Location</string>
+    <string name="logout">All Files are Uploaded, Do you want to log out?</string>
+    <string name="title_activity_local_album_settings">Local Album Settings</string>
+
+    <string name="Upload">Upload</string>
+    <string name="Error">Error</string>
+    <string name="Complete">Upload Successful</string>
+    <string name="Success">Success</string>
+    <string name="Loading">Loading..</string>
+
+    <string name="auto_upload">AUTOMATIC UPLOAD</string>
+    <string name="privacy_setting">Privacy Settings</string>
+    <string name="upload_options">UPLOAD OPTIONS</string>
+    <string name="resent_processes">RECENT UPLOADS</string>
+    <string name="recent_uploads">Recent Uploads</string>
+    <string name="ocr">OCR</string>
+
+    <string name="option_wifi">WI-FI</string>
+    <string name="option_cellular">WI-FI/cellular network</string>
+
+    <string name="change_account">Change Account</string>
+
+    <string name="notification_title">notification</string>
+    <string name="recent_text_notes">RECENT TEXT NOTES</string>
+    <string name="recent_voice_notes">RECENT VOICE NOTES</string>
+    <string name="recent_text_note">Recent Text Notes</string>
+    <string name="recent_voice_note">Recent Voice Notes</string>
+    <string name="no_photos">No photos recently uploaded</string>
+    <string name="no_texts">There are no recent text notes</string>
+    <string name="no_voice">There are no recent voice notes</string>
+
+
+    <!-- btn text-->
+    <string name="camera">camera</string>
+    <string name="cancel">cancel</string>
+    <string name="photo_album">Album</string>
+    <string name="exception_no_sd_permission">no SD card permission</string>
+    <string name="exception_no_gif_head">gif head not allowed</string>
+    <string name="exception_no_photo_permission">no camera permission</string>
+    <string name="exception_no_fine_location">no GPS permission</string>
+
+    <string name="tab_local">LOCAL</string>
+    <string name="tab_server">SERVER</string>
+
+
+</resources>

@@ -1,21 +1,26 @@
 package de.mpg.mpdl.labcam.LocalFragment;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Display;
@@ -25,11 +30,27 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import de.mpg.mpdl.labcam.AutoRun.dbObserver;
+import de.mpg.mpdl.labcam.Gallery.AlbumRecyclerAdapter;
+import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
+import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
+import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;
+import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.Model.LocalModel.Task;
+import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.code.activity.ActiveTaskActivity;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.Utils.ToastUtil;
+import de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,30 +58,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-
-import de.mpg.mpdl.labcam.AutoRun.dbObserver;
-import de.mpg.mpdl.labcam.Gallery.GalleryListAdapter;
-import de.mpg.mpdl.labcam.Gallery.LocalImageActivity;
-import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
-import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
-import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;
-import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
-import de.mpg.mpdl.labcam.Model.Gallery;
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.Model.LocalModel.Task;
-import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
-import de.mpg.mpdl.labcam.Utils.DBConnector;
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
-import de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -86,31 +88,32 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     android.support.v7.app.ActionBar actionBar;
 
-    GridView gridView;
-    RecyclerView recyclerView;
-    SharedPreferences preferences;
+    RecyclerView albumRecyclerView;
+    RecyclerView dateRecyclerView;
 
-    GalleryListAdapter adapter;
+    AlbumRecyclerAdapter adapter;
     SectionedGridRecyclerViewAdapter mSectionedAdapter;
     SimpleAdapter simpleAdapter;
 
     android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
 
-    //
-    final ArrayList<Gallery> folders = new ArrayList<Gallery>();
 
     /**
-     * imageList store all images date and path
      * treeMap auto sort it by date (prepare data for timeline view)
      * <imageDate,imagePath> **/
-    TreeMap<Long, String> imageList = new TreeMap<Long, String>();
+
     ArrayList<String> sortedImageNameList;
+
+    TreeMap<Long, String> imageNameList = new TreeMap<>();
 
     /**
      *
      * store the imagePathList of each album
      */
     ArrayList<List<String[]>> imagePathListAllAlbums = new ArrayList<>();
+    List<String> albumNameArrayList = new ArrayList<>();
+    List<String> imageNameArrayList = new ArrayList<>();
+    List<Long> imageDateArrayList = new ArrayList<>();
 
     //user info
     private SharedPreferences mPrefs;
@@ -155,23 +158,20 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_local, container, false);
         // folder gridView
-        gridView = (GridView) rootView.findViewById(R.id.gallery_gridView);
+        albumRecyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_gridView);
 
         actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
         renderTimeLine();
 
         //prepare local gallery image data
-        prepareData();
+        checkPermission();    // check SD permission first
 
         //set grid adapter
         loadLocalGallery();
 
         //set header recycleView adapter
         loadTimeLinePicture();
-
-
-
 
         //switch
         dateLabel = (TextView) rootView.findViewById(R.id.label_date);
@@ -192,8 +192,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
                 dateLabel.setTextColor(getResources().getColor(R.color.primary));
                 albumLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
-                gridView.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
+                albumRecyclerView.setVisibility(View.GONE);
+                dateRecyclerView.setVisibility(View.VISIBLE);
             }
         });
 
@@ -212,8 +212,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
                 dateLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
                 albumLabel.setTextColor(getResources().getColor(R.color.primary));
-                gridView.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
+                albumRecyclerView.setVisibility(View.VISIBLE);
+                dateRecyclerView.setVisibility(View.GONE);
             }
         });
 
@@ -243,98 +243,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 super.handleMessage(msg);
 
                 if(msg.what==1234){
-
-                    List<Task> waitingTasks = DBConnector.getUserWaitingTasks(userId, serverName);
-                    List<Task> stoppedTasks = DBConnector.getUserStoppedTasks(userId, serverName);
-                    Task mostRecentTask = DBConnector.getLatestFinishedTask(userId, serverName);
-
-                    int num_activate = 0;
-
-                    num_activate = stoppedTasks.size() + waitingTasks.size();
-
-                    if(num_activate > 0){
-                        Task auTask = DBConnector.getAuTask(userId,serverName);
-                        if(auTask!=null && String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState()) &&  auTask.getTotalItems()==auTask.getFinishedItems())
-                            num_activate --;
-                    }
-                    if(num_activate == 0)
-                    {
-                        if(mostRecentTask!=null && !DeviceStatus.twoDateWithinSecounds(DeviceStatus.longToDate(mostRecentTask.getEndDate()), DeviceStatus.longToDate(DeviceStatus.dateNow()))){
-                            activeTaskLayout.setVisibility(View.GONE);
-                            return;
-                        }
-                        //execute the task
-                        numActiveTextView.setText("0");
-
-                        percentTextView.setText(100+"%");
-                        mCircleProgressBar.setProgress(100);
-
-                        new Handler().postDelayed(new Runnable() {
-
-                            public void run() {
-                                Log.e(LOG_TAG, "no task  is null");
-                                activeTaskLayout.setVisibility(View.GONE);
-                                return;
-
-                            }
-
-                        }, 1000);
-                    }
-
-                    for(Task task:waitingTasks){
-                        Log.e(LOG_TAG,"waitingTasks~~~~~~~");
-                        Log.e(LOG_TAG,"mode:"+task.getUploadMode());
-                        Log.e(LOG_TAG,"state:"+task.getState());
-                        Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
-                        Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
-                    }
-                    for(Task task:stoppedTasks){
-                        Log.e(LOG_TAG,"stoppedTasks~~~~~~~");
-                        Log.e(LOG_TAG,"mode:"+task.getUploadMode());
-                        Log.e(LOG_TAG,"state:"+task.getState());
-                        Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
-                        Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
-                    }
-
-
-                    if(waitingTasks.size()>0){
-                        activeTaskLayout.setVisibility(View.VISIBLE);
-                        Task task = waitingTasks.get(0);
-
-                        //
-                        if(task.getTotalItems()==0){
-                            return;
-                        }
-//                        String titleTaskInfo = task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName();
-
-
-                        if(task.getUploadMode().equalsIgnoreCase("AU")){
-                            // AU
-                            titleTaskTextView.setText("Automatic upload to " + task.getCollectionName());
-                        }else {
-                            titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
-                        }
-
-                        numActiveTextView.setText(num_activate+"");
-
-                        int percent = (task.getFinishedItems()*100)/task.getTotalItems();
-                        percentTextView.setText(percent+"%");
-                        mCircleProgressBar.setProgress(percent);
-                    }else if(stoppedTasks.size()>0){
-                        activeTaskLayout.setVisibility(View.VISIBLE);
-                        Task task = stoppedTasks.get(0);
-
-                        //
-                        if(task.getTotalItems()==0){
-                            return;
-                        }
-                        titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
-                        numActiveTextView.setText(num_activate+"");
-
-                        int percent = (task.getFinishedItems()*100)/task.getTotalItems();
-                        percentTextView.setText(percent+"%");
-                        mCircleProgressBar.setProgress(percent);
-                    }
+                    renderStatusBar();
                 }
 
             }
@@ -347,6 +256,105 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         return rootView;
 
+    }
+
+    private void renderStatusBar(){
+        {
+
+            List<Task> activeTasks = DBConnector.getActiveTasks(userId, serverName);  // not finished
+            List<Task> waitingTasks = DBConnector.getUserWaitingTasks(userId, serverName); // waiting
+            List<Task> stoppedTasks = DBConnector.getUserStoppedTasks(userId, serverName); // stopped
+            Task mostRecentTask = DBConnector.getLatestFinishedTask(userId, serverName);  // last task
+
+            int num_activate = 0;
+
+            num_activate = activeTasks.size();  // waiting, stop, failed tasks
+
+            if(num_activate > 0){
+                // remove always waiting auTask
+                Task auTask = DBConnector.getAuTask(userId,serverName);
+                if(auTask!=null && String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState()) &&  auTask.getTotalItems()==auTask.getFinishedItems())
+                    num_activate --;
+            }
+            if(num_activate == 0)
+            {
+                if(mostRecentTask!=null && !DeviceStatus.twoDateWithinSecounds(DeviceStatus.longToDate(mostRecentTask.getEndDate()), DeviceStatus.longToDate(DeviceStatus.dateNow()))){
+                    activeTaskLayout.setVisibility(View.GONE);
+                    return;
+                }
+                //execute the task
+                numActiveTextView.setText("0");
+
+                percentTextView.setText(100+"%");
+                mCircleProgressBar.setProgress(100);
+
+                new Handler().postDelayed(new Runnable() {
+
+                    public void run() {
+                        Log.e(LOG_TAG, "no task  is null");
+                        activeTaskLayout.setVisibility(View.GONE);
+                        return;
+
+                    }
+
+                }, 1000);
+            }
+
+            for(Task task:waitingTasks){
+                Log.e(LOG_TAG,"waitingTasks~~~~~~~");
+                Log.e(LOG_TAG,"mode:"+task.getUploadMode());
+                Log.e(LOG_TAG,"state:"+task.getState());
+                Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
+                Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
+            }
+            for(Task task:stoppedTasks){
+                Log.e(LOG_TAG,"stoppedTasks~~~~~~~");
+                Log.e(LOG_TAG,"mode:"+task.getUploadMode());
+                Log.e(LOG_TAG,"state:"+task.getState());
+                Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
+                Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
+            }
+
+
+            if(waitingTasks.size()>0){
+                activeTaskLayout.setVisibility(View.VISIBLE);
+                Task task = waitingTasks.get(0);
+
+                //
+                if(task.getTotalItems()==0){
+                    return;
+                }
+//                        String titleTaskInfo = task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName();
+
+
+                if(task.getUploadMode().equalsIgnoreCase("AU")){
+                    // AU
+                    titleTaskTextView.setText("Automatic upload to " + task.getCollectionName());
+                }else {
+                    titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
+                }
+
+                numActiveTextView.setText(num_activate+"");
+
+                int percent = (task.getFinishedItems()*100)/task.getTotalItems();
+                percentTextView.setText(percent+"%");
+                mCircleProgressBar.setProgress(percent);
+            }else if(stoppedTasks.size()>0){
+                activeTaskLayout.setVisibility(View.VISIBLE);
+                Task task = stoppedTasks.get(0);
+
+                //
+                if(task.getTotalItems()==0){
+                    return;
+                }
+                titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
+                numActiveTextView.setText(num_activate+"");
+
+                int percent = (task.getFinishedItems()*100)/task.getTotalItems();
+                percentTextView.setText(percent+"%");
+                mCircleProgressBar.setProgress(percent);
+            }
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -388,36 +396,18 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_upload_local:
-
-                Log.v(LOG_TAG, "upload");
-
-                if(positionSet.size()!=0) {
-                    Log.v(LOG_TAG, " "+positionSet.size());
-                    List uploadPathList = new ArrayList();
-                    for (Integer i : positionSet) {
-                        uploadPathList.add(sortedImageNameList.get(i));
-                    }
-
-                    if (uploadPathList != null) {
-                        uploadList(uploadPathList);
-                    }
-                    uploadPathList.clear();
-
-                }else if(albumPositionSet.size()!=0){
-                    Toast.makeText(getActivity(),"albums upload",Toast.LENGTH_SHORT).show();
-                    // upload albums
-                    List<String> imagePathListForAlbumTask = new ArrayList<>();
-                    // add selected albums
-                    for (Integer i: albumPositionSet){
-                        // add path by album
-                            for(String[] imageStrArray: imagePathListAllAlbums.get(i)){
-                            imagePathListForAlbumTask.add(imageStrArray[1]);
-                        }
-                    }
-                    Log.e(LOG_TAG,"imagePathListForAlbumTask: " +imagePathListForAlbumTask.size());
-                    uploadList(imagePathListForAlbumTask);
-                    imagePathListForAlbumTask.clear();
-                }
+                Log.i(LOG_TAG, "upload");
+                batchOperation(R.id.item_upload_local);
+                mode.finish();
+                return true;
+            case R.id.item_microphone_local:
+                Log.i(LOG_TAG, "microphone");
+                batchOperation(R.id.item_microphone_local);
+                mode.finish();
+                return true;
+            case R.id.item_notes_local:
+                Log.i(LOG_TAG, "notes");
+                batchOperation(R.id.item_notes_local);
                 mode.finish();
                 return true;
             default:
@@ -501,68 +491,41 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
      */
     private void loadLocalGallery(){
 
-        ArrayList<Gallery> imageFolders = new ArrayList<Gallery>();
-        imageFolders = new ArrayList<Gallery>(new LinkedHashSet<Gallery>(folders));
-
-        adapter = new GalleryListAdapter(getActivity(), imageFolders );
-
-        gridView.setAdapter(adapter);
-
-        adapter.setOnItemClickListener(new GalleryListAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-
-                if (actionMode != null) {
-                    // muti select mode
-                    // maintain position choosing
-                    addOrRemoveAlbum(position);
-                    adapter.setPositionSet(albumPositionSet);
-                } else {
-                    //  simple click
-                    //  show picture
-                    //  go to album detail
-                    Gallery gallery = (Gallery) adapter.getItem(position);
-                    Intent galleryImagesIntent = new Intent(getActivity(), LocalImageActivity.class);
-                    galleryImagesIntent.putExtra("galleryTitle", gallery.getGalleryPath());
-
-                    startActivity(galleryImagesIntent);
-                }
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-                if (actionMode == null) {
-                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(ActionModeCallback);
-                }
-            }
-        });
+        adapter = new AlbumRecyclerAdapter(getActivity(), imagePathListAllAlbums );
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        albumRecyclerView.setLayoutManager(llm);
+        albumRecyclerView.setAdapter(adapter);
     }
 
 
     private void prepareData(){
-        folders.clear();
+
+        // create a cursor to retrieve information for all pictures
         imagePathListAllAlbums.clear();
+
         String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME
                 ,MediaStore.Images.Media.DATA
                 , MediaStore.Images.Media.DATE_TAKEN
 
         };
+
+        String sorting =  MediaStore.Images.Media.DATE_TAKEN + " DESC";
         Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        preferences = getActivity().getSharedPreferences("folder", Context.MODE_PRIVATE);
+        Cursor cur = getActivity().getContentResolver().query(images, albums,null,null,sorting);
 
-        Cursor cur = getActivity().getContentResolver().query(images, albums,null,null,null);
 
-        imageList.clear();
+        //loop over the cursor, find all unique albums
         /*
             Listing out all the image folders(Galleries) in the file system.
          */
         if (cur.moveToFirst()) {
 
-            int albumLocation = cur.getColumnIndex(MediaStore.Images.
+            int albumNameColumn = cur.getColumnIndex(MediaStore.Images.
                     Media.BUCKET_DISPLAY_NAME);
-            int nameColumn = cur.getColumnIndex(
+            int fileNameColumn = cur.getColumnIndex(
                     MediaStore.Images.Media.DATA);
-            int dateColumn = cur.getColumnIndex(
+            int fileDateColumn = cur.getColumnIndex(
                     MediaStore.Images.Media.DATE_TAKEN);
 
             /**
@@ -571,106 +534,74 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
              * imagePathListForEachAlbum is created for each album to store image path
              */
             List<String> albumNames = new ArrayList<>();
-//            HashMap<String,String> imagePathListForEachAlbum = new HashMap<>();
-            do {
-                /** for timeline view **/
-                //get all image and date
-                Long imageDate =  cur.getLong(dateColumn);
-//                Date d = new Date(imageDate);
-                String imagePath = cur.getString(nameColumn);
-                imageList.put(imageDate,imagePath);
 
-                /** for gallery view **/
-                /**
-                 * imagePathListByAlbum
-                 * create List<String> imagePathList for each Album
-                 * need to be same order with folder
-                 */
+            String tempAlbumName;
 
-                // existing code, need to rewrite gallery view
-                Gallery album = new Gallery();
-                album.setGalleryName(cur.getString(albumLocation));
-                String currentAlbum = cur.getString(albumLocation);
-                if(!albumNames.contains(currentAlbum)) {
-                    // new album
-                    folders.add(album); // adapter rewrite later
-                    albumNames.add(currentAlbum);
+            imageNameArrayList.clear();
+            albumNameArrayList.clear();
+            imageDateArrayList.clear();
+            do{
+                imageNameArrayList.add(cur.getString(fileNameColumn));
+                albumNameArrayList.add(cur.getString(albumNameColumn));
+                imageDateArrayList.add(cur.getLong(fileDateColumn));
+            }while (cur.moveToNext());
 
+            albumNames.clear();
+            // check unique albums and initialize the structure of imagePathListAllAlbums
+            for (int i = 0; i < albumNameArrayList.size(); i++ ){
+                tempAlbumName = albumNameArrayList.get(i);
+                if(!albumNames.contains(tempAlbumName)) {
+                    albumNames.add(tempAlbumName);
                     List<String[]> imagePathListForCurrentAlbum = new ArrayList<>();
-                    // add picture to current album
-                    String[] imageStrArray = new String[2];
-                    imageStrArray[0] = currentAlbum;
-                    imageStrArray[1] = cur.getString(nameColumn);
-                    imagePathListForCurrentAlbum.add(imageStrArray);
                     // add current album hash map
                     imagePathListAllAlbums.add(imagePathListForCurrentAlbum);
+                }
+            }
 
-                }else {
-                    for (List<String[]> albumList :imagePathListAllAlbums){
-                        // if exist, get first imageStrArray, compare
-                        if(albumList.get(0)[0].equalsIgnoreCase(currentAlbum)){
-                            String[] imageStrArray = new String[2];
-                            imageStrArray[0] = currentAlbum;
-                            imageStrArray[1] = cur.getString(nameColumn);
-                            albumList.add(imageStrArray);
-                        }
+            // searching for every album the corresponding index of files in the XXXArrayList
+            for (int j = 0; j < albumNameArrayList.size(); j++ ){
+                tempAlbumName = albumNameArrayList.get(j);
+                for (int i = 0; i < albumNames.size() ; i++) {
+                    if (albumNames.get(i).equalsIgnoreCase(tempAlbumName)) {
+                        String[] imageStrArray = new String[2];
+                        imageStrArray[0] = tempAlbumName;
+                        imageStrArray[1] = imageNameArrayList.get(j);
+                        imagePathListAllAlbums.get(i).add(imageStrArray);
+                        break;
                     }
                 }
-            } while (cur.moveToNext());
+            }
         }
-
-        //try close cursor here
         cur.close();
     }
 
     //load timeLinePicture
     private void loadTimeLinePicture(){
         // Your RecyclerView.Adapter
-        // sortedImageNameList is imagePath list
-        ArrayList<String> ImageNameList = new ArrayList<>();
         sortedImageNameList = new ArrayList<>();
         sortedImageNameList.clear();
         // sectionMap key is the date, value is the picture number
-        List<String> dateAseList = new ArrayList<String>();
-        List<String> dateList = new ArrayList<String>();
-        HashMap<String,Integer> sectionMap = new HashMap<String,Integer>();
+        List<String> dateList = new ArrayList<>();
 
-        for(Map.Entry<Long,String> entry: imageList.entrySet()){
-            Date d = new Date(entry.getKey());
+        for (int i = 0; i < imageNameArrayList.size(); i++){
+            Date d = new Date(imageDateArrayList.get(i));
             SimpleDateFormat dt = new SimpleDateFormat(" dd.MM.yyyy");
             String dateStr = dt.format(d);
-            dateAseList.add(dateStr);
-            ImageNameList.add(entry.getValue());
-//            Log.v(LOG_TAG,dateStr+" -> "+entry.getValue());
+            dateList.add(dateStr);
+            sortedImageNameList.add(imageNameArrayList.get(i));
         }
-
-
-        // treeMap order is ASE, need DSE, so reverse
-        for(int i=dateAseList.size()-1;i>=0;i--){
-                dateList.add(dateAseList.get(i));
-        }
-
-        for(int i=ImageNameList.size()-1;i>=0;i--){
-            sortedImageNameList.add(ImageNameList.get(i));
-        }
-
-        Log.e(LOG_TAG,sortedImageNameList.size()+"");
 
          simpleAdapter = new SimpleAdapter(getActivity(),sortedImageNameList);
         if(positionSet!=null){
             simpleAdapter.setPositionSet(positionSet);
         }
 
-
         //This is the code to provide a sectioned grid
-        List<SectionedGridRecyclerViewAdapter.Section> sections =
-                new ArrayList<SectionedGridRecyclerViewAdapter.Section>();
-
+        List<SectionedGridRecyclerViewAdapter.Section> sections = new ArrayList<>();
 
         // section init
         String preStr = "";
         int count = 0;
-//        int imgPosition = 0;
         for(String dateStr:dateList){
             // count is img position
             if(preStr.equalsIgnoreCase(dateStr)){
@@ -687,11 +618,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         //Add your adapter to the sectionAdapter
         SectionedGridRecyclerViewAdapter.Section[] dummy = new SectionedGridRecyclerViewAdapter.Section[sections.size()];
         mSectionedAdapter = new
-                SectionedGridRecyclerViewAdapter(getActivity(),R.layout.header_grid_section,R.id.section_text,recyclerView,simpleAdapter);
+                SectionedGridRecyclerViewAdapter(getActivity(),R.layout.header_grid_section,R.id.section_text, dateRecyclerView,simpleAdapter);
         mSectionedAdapter.setSections(sections.toArray(dummy));
 
         //Apply this adapter to the RecyclerView
-        recyclerView.setAdapter(mSectionedAdapter);
+        dateRecyclerView.setAdapter(mSectionedAdapter);
 
 
         simpleAdapter.setOnItemClickListener(new SimpleAdapter.OnItemClickListener() {
@@ -736,9 +667,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         spanCount = width/235;
 
         // timeline recycleView
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_recycleView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
+        dateRecyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_recycleView);
+        dateRecyclerView.setHasFixedSize(true);
+        dateRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), spanCount));
     }
 
     /**upload methods**/
@@ -748,10 +679,10 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private void uploadList(List<String> fileList) {
         String currentTaskId = createTask(fileList);
 
-        newInstance(currentTaskId).show(getActivity().getFragmentManager(), "remoteListDialog");
+        remoteListNewInstance(currentTaskId).show(getActivity().getFragmentManager(), "remoteListDialog");
     }
 
-    public static RemoteListDialogFragment newInstance(String taskId)
+    public static RemoteListDialogFragment remoteListNewInstance(String taskId)
     {
         RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
         Bundle args = new Bundle();
@@ -777,7 +708,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         task.setSeverName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
-        int num = addImages(fileList, task.getTaskId());
+        int num = addImages(fileList, task.getTaskId()).size();
         task.setTotalItems(num);
         task.save();
         Log.v(LOG_TAG,"MU task"+task.getTaskId() );
@@ -786,17 +717,29 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         return task.getTaskId();
     }
 
-    private int addImages(List<String> fileList,String taskId){
+    /**
+     * addImages function creates a List<Image> for UPLOAD, BATCH_EDIT_NOTE, BATCH_EDIT_VOICE operations
+     */
 
-        int imageNum = 0;
+    private static List<Image> addImages(List<String> fileList, String taskId){
+        List<Image> imageList = new ArrayList<>();
+
         for (String filePath: fileList) {
-            File file = new File(filePath);
-            File imageFile = file.getAbsoluteFile();
             String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
+            Image image = DBConnector.getImageByPath(filePath);
+            if(image!=null){  // image already exist
+                if(!taskId.equalsIgnoreCase("")) {  // upload process
+                    image.setTaskId(taskId);
+                    image.setState(String.valueOf(DeviceStatus.state.WAITING));
+                    image.save();
+                }
+                imageList.add(image);
+                continue;
+            }
 
             //imageSize
+            File file = new File(filePath);
             String fileSize = String.valueOf(file.length() / 1024);
-
 
             ExifInterface exif = null;
             try {
@@ -817,22 +760,71 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
             //state
             String imageState = String.valueOf(DeviceStatus.state.WAITING);
-                String imageId = UUID.randomUUID().toString();
-                //store image in local database
-                Image photo = new Image();
-                photo.setImageId(imageId);
-                photo.setImageName(imageName);
-                photo.setImagePath(filePath);
-                photo.setLongitude(longitude);
-                photo.setLatitude(latitude);
-                photo.setCreateTime(createTime);
-                photo.setSize(fileSize);
-                photo.setState(imageState);
-                photo.setTaskId(taskId);
-                photo.save();
-                imageNum = imageNum + 1;
+            String imageId = UUID.randomUUID().toString();
+            //store image in local database
+            Image photo = new Image();
+            photo.setImageId(imageId);
+            photo.setImageName(imageName);
+            photo.setImagePath(filePath);
+            photo.setLongitude(longitude);
+            photo.setLatitude(latitude);
+            photo.setCreateTime(createTime);
+            photo.setSize(fileSize);
+            photo.setState(imageState);
+            photo.setTaskId(taskId);
+            photo.save();
+            imageList.add(photo);
         }
-        return imageNum;
+        return imageList;
+    }
+
+    /**** take notes ****/
+    public static NoteDialogFragment noteDialogNewInstance(ArrayList<String> imagePathList)
+    {
+        NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
+
+        Log.d("LY", "size: "+imagePathList.size());
+        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
+
+        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
+        for(int i=0; i<imagePathList.size(); i++){
+            imagePathArray[i] = imagePathList.get(i);
+        }
+
+        Bundle args = new Bundle();
+
+        args.putStringArray("imagePathArray", imagePathArray);
+        noteDialogFragment.setArguments(args);    // pass imagePathArray to NoteDialogFragment
+        return noteDialogFragment;
+    }
+
+    public void showNoteDialog(ArrayList<String> imagePathList){
+        noteDialogNewInstance(imagePathList).show(getActivity().getFragmentManager(), "noteDialogFragment");
+    }
+
+    /**** record voice ****/
+    public static MicrophoneDialogFragment voiceDialogNewInstance(ArrayList<String> imagePathList)
+    {
+        MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
+
+//        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
+        Log.d("LY", "size: "+imagePathList.size());
+        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
+
+        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
+        for(int i=0; i<imagePathList.size(); i++){
+            imagePathArray[i] = imagePathList.get(i);
+        }
+
+        Bundle args = new Bundle();
+
+        args.putStringArray("imagePathArray", imagePathArray);
+        microphoneDialogFragment.setArguments(args);
+        return microphoneDialogFragment;
+    }
+
+    public void showVoiceDialog(ArrayList<String> imagePathList){
+        voiceDialogNewInstance(imagePathList).show(getActivity().getFragmentManager(), "voiceDialogFragment");
     }
 
     @Override
@@ -848,9 +840,10 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         if(isAlbum) {
             dateLabel.setTextColor(getResources().getColor(R.color.lightGrey));
             albumLabel.setTextColor(getResources().getColor(R.color.primary));
-            gridView.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
+            albumRecyclerView.setVisibility(View.VISIBLE);
+            dateRecyclerView.setVisibility(View.GONE);
         }
+        renderStatusBar();
         super.onResume();
 
     }
@@ -867,12 +860,108 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     public void onPause() {
         resolver.unregisterContentObserver(dbObserver);
 
-        prepareData();
-//        loadTimeLinePicture();
+        checkPermission();
+        loadTimeLinePicture();
         simpleAdapter.notifyDataSetChanged();
         mSectionedAdapter.notifyDataSetChanged();
 
         super.onPause();
 
     }
+
+    private void batchOperation(int operationType){
+        if(positionSet.size()!=0) {
+            Log.v(LOG_TAG, " "+positionSet.size());
+            ArrayList imagePathList = new ArrayList();
+            for (Integer i : positionSet) {
+                imagePathList.add(sortedImageNameList.get(i));
+            }
+
+            if (imagePathList != null) {
+                switch (operationType){
+                    case R.id.item_upload_local:
+                        uploadList(imagePathList);
+                        break;
+                    case R.id.item_microphone_local:
+                        showVoiceDialog(imagePathList);
+                        break;
+                    case R.id.item_notes_local:
+                        showNoteDialog(imagePathList);
+                        break;
+                }
+            }
+            imagePathList.clear();
+
+        }else if(albumPositionSet.size()!=0){
+            Toast.makeText(getActivity(),"albums upload",Toast.LENGTH_SHORT).show();
+            // upload albums
+            ArrayList<String> imagePathListForAlbumTask = new ArrayList<>();
+            // add selected albums
+            for (Integer i: albumPositionSet){
+                // add path by album
+                for(String[] imageStrArray: imagePathListAllAlbums.get(i)){
+                    imagePathListForAlbumTask.add(imageStrArray[1]);
+                }
+            }
+            if (imagePathListForAlbumTask != null) {
+                switch (operationType){
+                    case R.id.item_upload_local:
+                        uploadList(imagePathListForAlbumTask);
+                        break;
+                    case R.id.item_microphone_local:
+                        showVoiceDialog(imagePathListForAlbumTask);
+                        break;
+                    case R.id.item_notes_local:
+                        showNoteDialog(imagePathListForAlbumTask);
+                        break;
+                }
+            }
+            imagePathListForAlbumTask.clear();
+        }
+    }
+
+    /***********************************   permissions   ****************************************/
+
+    private static final int CHECK_PERMISSION = 1;
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void requestCameraPermission() {
+        requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, CHECK_PERMISSION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CHECK_PERMISSION && grantResults.length >= 2) {
+            int firstGrantResult = grantResults[0];
+            int secondGrantResult = grantResults[1];
+            boolean granted = (firstGrantResult == PackageManager.PERMISSION_GRANTED) && (secondGrantResult == PackageManager.PERMISSION_GRANTED);
+            Log.i("permission", "onRequestPermissionsResult granted=" + granted);
+
+            if(granted) {
+                prepareData();
+            }else{
+                ToastUtil.showShortToast(getActivity(), "please grant CAMERA and WRITE_EXTERNAL_STORAGE permissions");
+            }
+        }
+    }
+
+    /**
+     * Open image intent
+     */
+    private void checkPermission() {
+        // check permission for android > 6.0
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED ||
+                    ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED ) {
+                requestCameraPermission();
+
+                return;
+            }
+        }
+        prepareData();
+    }
+
 }

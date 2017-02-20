@@ -16,7 +16,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
+
+import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
+import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.Model.LocalModel.Task;
+import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,13 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
-import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.Model.LocalModel.Task;
-import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
-import uk.co.senab.photoview.PhotoViewAttacher;
 
 
 public class DetailActivity extends AppCompatActivity implements android.support.v7.view.ActionMode.Callback{
@@ -60,7 +63,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
     private SharedPreferences mPrefs;
     private String username;
     private String userId;
-    private ImageView uploadCurrentImageView =null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +106,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
                     @Override
                     public void onItemLongClick(View view, int position) {
                         if (actionMode == null) {
-                            uploadCurrentImageView.setVisibility(View.GONE);
                             actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
                         }
                     }
@@ -112,29 +113,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
             }else {
                 viewPagerAdapter.setOnItemClickListener(null);
             }
-
-            // upload current image
-            uploadCurrentImageView = (ImageView) findViewById(R.id.icon_upload);
-
-            // hide upload if it is remote image
-            if(isLocalImage){
-                uploadCurrentImageView.setVisibility(View.VISIBLE);
-            }else {
-                uploadCurrentImageView.setVisibility(View.GONE);
-            }
-
-            uploadCurrentImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // create list for reuse code upload list
-                    List<String> currentImageList = new ArrayList<>();
-                    String currentImageUrl = itemPathList.get(viewPager.getCurrentItem());
-                    currentImageList.add(currentImageUrl);
-
-                    uploadList(currentImageList);
-                }
-            });
-
         }
 
     }
@@ -172,18 +150,18 @@ public class DetailActivity extends AppCompatActivity implements android.support
     public boolean onActionItemClicked(android.support.v7.view.ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_upload_local:
-                Log.v(LOG_TAG, "upload");
-
-                Log.v(LOG_TAG, " "+positionSet.size());
-                List uploadPathList = new ArrayList();
-                for(Integer i:positionSet){
-                    uploadPathList.add(itemPathList.get(i));
-                }
-
-                if(uploadPathList != null) {
-                    uploadList(uploadPathList);
-                }
-                uploadPathList.clear();
+                Log.i(LOG_TAG, "upload");
+                batchOperation(R.id.item_upload_local);
+                mode.finish();
+                return true;
+            case R.id.item_microphone_local:
+                Log.i(LOG_TAG, "microphone");
+                batchOperation(R.id.item_microphone_local);
+                mode.finish();
+                return true;
+            case R.id.item_notes_local:
+                Log.i(LOG_TAG, "notes");
+                batchOperation(R.id.item_notes_local);
                 mode.finish();
                 return true;
             default:
@@ -194,7 +172,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
     @Override
     public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
         actionMode = null;
-        uploadCurrentImageView.setVisibility(View.VISIBLE);
         positionSet.clear();
         viewPagerAdapter.notifyDataSetChanged();
     }
@@ -237,7 +214,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         task.setSeverName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
-        int num = addImages(fileList, task.getTaskId());
+        int num = addImages(fileList, task.getTaskId()).size();
         task.setTotalItems(num);
         task.save();
         Log.v(LOG_TAG,"MU task"+task.getTaskId() );
@@ -246,17 +223,26 @@ public class DetailActivity extends AppCompatActivity implements android.support
         return task.getTaskId();
     }
 
-    private int addImages(List<String> fileList,String taskId){
+    private static List<Image> addImages(List<String> fileList, String taskId){
 
-        int imageNum = 0;
+        List<Image> imageList = new ArrayList<>();
+
         for (String filePath: fileList) {
-            File file = new File(filePath);
-            File imageFile = file.getAbsoluteFile();
             String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
+            Image image = DBConnector.getImageByPath(filePath);
+            if(image!=null){  // image already exist
+                if(!taskId.equalsIgnoreCase("")) {  // upload process
+                    image.setTaskId(taskId);
+                    image.setState(String.valueOf(DeviceStatus.state.WAITING));
+                    image.save();
+                }
+                imageList.add(image);
+                continue;
+            }
 
             //imageSize
+            File file = new File(filePath);
             String fileSize = String.valueOf(file.length() / 1024);
-
 
             ExifInterface exif = null;
             try {
@@ -277,31 +263,22 @@ public class DetailActivity extends AppCompatActivity implements android.support
 
             //state
             String imageState = String.valueOf(DeviceStatus.state.WAITING);
-
-
-
-            try {
-
-                String imageId = UUID.randomUUID().toString();
-                //store image in local database
-                Image photo = new Image();
-                photo.setImageId(imageId);
-                photo.setImageName(imageName);
-                photo.setImagePath(filePath);
-                photo.setLongitude(longitude);
-                photo.setLatitude(latitude);
-                photo.setCreateTime(createTime);
-                photo.setSize(fileSize);
-                photo.setState(imageState);
-                photo.setTaskId(taskId);
-                photo.save();
-                imageNum = imageNum + 1;
-
-            } catch (Exception e) {
-            }
-
+            String imageId = UUID.randomUUID().toString();
+            //store image in local database
+            Image photo = new Image();
+            photo.setImageId(imageId);
+            photo.setImageName(imageName);
+            photo.setImagePath(filePath);
+            photo.setLongitude(longitude);
+            photo.setLatitude(latitude);
+            photo.setCreateTime(createTime);
+            photo.setSize(fileSize);
+            photo.setState(imageState);
+            photo.setTaskId(taskId);
+            photo.save();
+            imageList.add(photo);
         }
-        return imageNum;
+        return imageList;
     }
 
     private void addOrRemove(int position) {
@@ -316,7 +293,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
         if (positionSet.size() == 0) {
 
             actionMode.finish();
-            uploadCurrentImageView.setVisibility(View.VISIBLE);
         } else {
 
             actionMode.setTitle(positionSet.size() + " selected");
@@ -326,6 +302,77 @@ public class DetailActivity extends AppCompatActivity implements android.support
         }
     }
 
+    private void batchOperation(int operationType){
+        if(positionSet.size()!=0) {
+            Log.v(LOG_TAG, " "+positionSet.size());
+            List imagePathList = new ArrayList();
+            for (Integer i : positionSet) {
+                imagePathList.add(itemPathList.get(i));
+            }
+
+            if (imagePathList != null) {
+                switch (operationType){
+                    case R.id.item_upload_local:
+                        uploadList(imagePathList);
+                        break;
+                    case R.id.item_microphone_local:
+                        showVoiceDialog(imagePathList);
+                        break;
+                    case R.id.item_notes_local:
+                        showNoteDialog(imagePathList);
+                        break;
+                }
+            }
+            imagePathList.clear();
+        }
+    }
+    public void showVoiceDialog(List<String> imagePathList){
+        voiceDialogNewInstance(imagePathList).show(this.getFragmentManager(), "voiceDialogFragment");
+    }
 
 
+    /**** record voice ****/
+    public static MicrophoneDialogFragment voiceDialogNewInstance(List<String> imagePathList)
+    {
+        MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
+
+//        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
+        Log.d("LY", "size: "+imagePathList.size());
+        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
+
+        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
+        for(int i=0; i<imagePathList.size(); i++){
+            imagePathArray[i] = imagePathList.get(i);
+        }
+
+        Bundle args = new Bundle();
+
+        args.putStringArray("imagePathArray", imagePathArray);
+        microphoneDialogFragment.setArguments(args);
+        return microphoneDialogFragment;
+    }
+
+    public void showNoteDialog(List<String> imagePathList){
+        noteDialogNewInstance(imagePathList).show(this.getFragmentManager(),"noteDialogFragment");
+    }
+
+    /**** take notes ****/
+    public static NoteDialogFragment noteDialogNewInstance(List<String> imagePathList)
+    {
+        NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
+
+        Log.d("LY", "size: "+imagePathList.size());
+        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
+
+        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
+        for(int i=0; i<imagePathList.size(); i++){
+            imagePathArray[i] = imagePathList.get(i);
+        }
+
+        Bundle args = new Bundle();
+
+        args.putStringArray("imagePathArray", imagePathArray);
+        noteDialogFragment.setArguments(args);    // pass imagePathArray to NoteDialogFragment
+        return noteDialogFragment;
+    }
 }

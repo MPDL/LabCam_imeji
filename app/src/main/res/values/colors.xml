@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="view_bg">#b20e0f</color>
+    <color name="white_shadow">#f8ffffff</color>
     <color name="white">#ffffff</color>
     <color name="black">#f8000000</color>
+    <color name="black_shadow">#80000000</color>
     <color name="btn_bg">#3e4a56</color>
     <color name="green">#ff12ff15</color>
     <color name="blue">#ff76a2ff</color>
@@ -36,5 +38,21 @@
     <color name="black_overlay">#66000000</color>
     <color name="dark_text">#555555</color>
 
+
+
+
+    <!--colors in app-->
+    <color name="C1">#2ecc71</color>
+    <color name="C2">#FFFEFE</color>
+    <color name="C3">#fafafa</color>
+    <color name="C4">#d1d1d1</color>
+    <color name="C5">#2f3641</color>
+    <color name="C6">#333333</color>
+    <color name="C7">#8E8E93</color>
+    <color name="C8">#FFB142</color>
+    <color name="C9">#B00905</color>
+
+    <color name="transparent">#00000000</color>
+    <color name="dark_transparent_bg">#55555555</color>
 
 </resources>

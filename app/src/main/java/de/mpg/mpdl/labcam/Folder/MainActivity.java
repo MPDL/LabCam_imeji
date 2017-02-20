@@ -1,7 +1,11 @@
 package de.mpg.mpdl.labcam.Folder;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,13 +17,14 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -43,14 +48,9 @@ import android.widget.Toast;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
 import de.mpg.mpdl.labcam.Auth.LoginActivity;
 import de.mpg.mpdl.labcam.AutoRun.ManualUploadService;
+import de.mpg.mpdl.labcam.AutoRun.MediaContentJobService;
 import de.mpg.mpdl.labcam.AutoRun.TaskUploadService;
 import de.mpg.mpdl.labcam.ImejiFragment.ImejiFragment;
 import de.mpg.mpdl.labcam.LocalFragment.LocalFragment;
@@ -63,10 +63,21 @@ import de.mpg.mpdl.labcam.NetChangeManager.NetWorkStateReceiver;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Settings.RemoteCollectionSettingsActivity;
-import de.mpg.mpdl.labcam.TaskManager.ActiveTaskActivity;
-import de.mpg.mpdl.labcam.TaskManager.RecentProcessActivity;
+import de.mpg.mpdl.labcam.code.activity.ActiveTaskActivity;
+import de.mpg.mpdl.labcam.code.activity.RecentNoteActivity;
+import de.mpg.mpdl.labcam.code.activity.RecentProcessActivity;
+import de.mpg.mpdl.labcam.code.activity.RecentVoiceActivity;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.Utils.ToastUtil;
+import de.mpg.mpdl.labcam.code.common.adapter.TitleFragmentPagerAdapter;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -91,9 +102,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final int PICK_COLLECTION_REQUEST = 1997;
-    // flag
-    // no collection selected before
-//    private boolean isFirstCollection = false;
 
     private String email;
     private String username;
@@ -113,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
     //UI
     static Switch autoUploadSwitch = null;
+    static Switch ocrSwitch = null;
     static TextView chooseCollectionLabel = null;
     static TextView collectionNameTextView = null;
     static {
@@ -135,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
     //new ui
     TabLayout tabLayout;
+
     ViewPager viewPager;
 
     //activity
@@ -146,6 +156,8 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
     boolean isDestroyByCamera = false;   //Camera destroy activity
     //
     private RelativeLayout chooseCollectionLayout = null;
+
+    public static final int MY_BACKGROUND_JOB = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,8 +172,8 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             }
         }
 
-                //user info
-        mPrefs = this.getSharedPreferences("myPref", 0);
+        //user info
+        mPrefs = this.getSharedPreferences("myPref", MODE_PRIVATE);
         email = mPrefs.getString("email", "");
 //        username =  mPrefs.getString("username", "");
         username = mPrefs.getString("familyName","")+" "+mPrefs.getString("givenName","");
@@ -170,10 +182,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         serverUrl = mPrefs.getString("server","");
 //        serverUrl = DeviceStatus.parseServerUrl(serverUrl);
 
-        try{
-            Bundle args = this.getIntent().getExtras();
-            isQRLogin = args.getBoolean("isQRLogin", false);}   // get isQRLogin from extra
-        catch (Exception e){}
+        Bundle args = this.getIntent().getExtras();         // get isQRLogin from extra
+        try {
+            isQRLogin = args.getBoolean("isQRLogin", false);
+        } catch(NullPointerException e) {
+            e.printStackTrace();
+        }
 
         getLocalCamFolder();
         // register NetStateObserver
@@ -197,13 +211,18 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
         checkRecent();
 
-        setUserInfoText();
+        checkRecentNote();
+
+        checkRecentVoice();
+
+        setUserInfoText();    // exception in
 
         initAutoSwitch();
 
+        initOcrSwitch();
+
         if(isQRLogin) { // login with qr
             setAutoUploadStatus(isQRLogin, true);
-            Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
         }else { // normal login
             isLoginCall = true;
             RetrofitClient.getGrantCollectionMessage(callback, apiKey);  // show alert if no collection available
@@ -213,12 +232,16 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
         /**************************************************  check upload not finished task ***************************************************/
 
-        List<Task> taskList = DBConnector.getUserTasks(userId, serverUrl);
+        List<Task> activeTaskList = DBConnector.getActiveTasks(userId, serverUrl);
         boolean isFinished = true;
 
-        for(Task task:taskList){
-            if(task.getFinishedItems()<task.getTotalItems()){
-                isFinished = false;
+        if(activeTaskList.size()>0){
+            for (Task task : activeTaskList) {
+                if(task.getUploadMode().equalsIgnoreCase("AU") && task.getTotalItems() == 0){
+                    isFinished = true;
+                }else {
+                    isFinished = false;
+                }
             }
         }
 
@@ -242,21 +265,33 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         }else if(isFinished){
             //do nothing
         }
-
     }
 
     @Override
-    public void onStart() {
+    protected void onStart() {
         super.onStart();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // Start service and provide it a way to communicate with this class.
+            Intent startServiceIntent = new Intent(this, MediaContentJobService.class);
+            startService(startServiceIntent);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // A service can be "started" and/or "bound". In this case, it's "started" by this Activity
+            // and "bound" to the JobScheduler (also called "Scheduled" by the JobScheduler). This call
+            // to stopService() won't prevent scheduled jobs to be processed. However, failing
+            // to call stopService() would keep it alive indefinitely.
+            stopService(new Intent(this, MediaContentJobService.class));
+        }
+        super.onStop();
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(tabAdapter);
-        viewPager.setOffscreenPageLimit(1);
-        viewPager.setCurrentItem(currentTab);
 
         //set selected collection name
         collectionNameTextView = (TextView) findViewById(R.id.collection_name);
@@ -311,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         cameraImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dispatchTakePictureIntent();
+                checkPermission();
             }
         });
         return super.onCreateOptionsMenu(menu);
@@ -431,118 +466,33 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
      * init Fragments
      */
     private void initInstances() {
-        // Setup tabs
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         viewPager = (ViewPager) findViewById(R.id.viewPager);
-        SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(tabAdapter);
-//
-//        if(isTaskFragment){
-//            currentTab = 2;
-//        viewPager.setCurrentItem(currentTab);
-//        }
 
+        List<Fragment> fragments = new ArrayList<Fragment>(2);
+        fragments.add(new LocalFragment());
+        fragments.add(new ImejiFragment());
+
+        TitleFragmentPagerAdapter adapter = new TitleFragmentPagerAdapter(getSupportFragmentManager(), fragments, this);
+        viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(adapter.getCount());
         tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(0).setCustomView(R.layout.tab_local);
-        tabLayout.getTabAt(1).setCustomView(R.layout.tab_imeji);
-//        tabLayout.getTabAt(2).setCustomView(R.layout.tab_upload);
-
-//        if(isTaskFragment){
-//            TextView taskTextView = (TextView)tabLayout.findViewById(R.id.tabicon_upload);
-//            taskTextView.setTextColor(getResources().getColor(R.color.primary));
-//            TextView fotoTextView = (TextView)tabLayout.findViewById(R.id.tabicon_local);
-//            fotoTextView.setTextColor(getResources().getColor(R.color.tabUnselect));
-//        }
-
-        //tab style change on page change
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            float scale = getResources().getDisplayMetrics().density;
-            int selectedIndex = -1;
-
-
-            //tab Icon and Text id in layout files
-            int[] backgroundIconId = {R.id.tabicon_local, R.id.tabicon_imeji, R.id.tabicon_upload};
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                //if the tab is not the selected one, set its text and icon style as inactive
-
-                if (0 != position && 0 != selectedIndex) {
-                    TextView iconText0 = (TextView) tabLayout.findViewById(backgroundIconId[0]);
-                    iconText0.setTextColor(getResources().getColor(R.color.tabUnselect));
-                }
-                if (1 != position && 1 != selectedIndex) {
-                    TextView iconText1 = (TextView) tabLayout.findViewById(backgroundIconId[1]);
-                    iconText1.setTextColor(getResources().getColor(R.color.tabUnselect));
-                }
-//                if (2 != position && 2 != selectedIndex) {
-//                    TextView iconText2 = (TextView) tabLayout.findViewById(backgroundIconId[2]);
-//                    iconText2.setTextColor(getResources().getColor(R.color.tabUnselect));
-//                }
-
-                //background icon
-                TextView iconText = (TextView) tabLayout.findViewById(backgroundIconId[position]);
-                iconText.setTextColor(getResources().getColor(R.color.primary));
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
+        for (int i = 0; i < adapter.getCount(); i++) {
+            tabLayout.getTabAt(i).setCustomView(adapter.getTabView(i));
+        }
+        setCurrentItem(0);
 
         //initUI
         autoUploadSwitch = (Switch) findViewById(R.id.switch_auto_upload);
+        ocrSwitch = (Switch) findViewById(R.id.switch_ocr);
+        Log.i("autoUploadSwitch",""+autoUploadSwitch.isChecked());
         chooseCollectionLabel = (TextView) findViewById(R.id.tv_choose_collection);
         collectionNameTextView = (TextView) findViewById(R.id.collection_name);
 
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-
-        @Override
-        public int getCount() {
-                return 2;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-
-            android.support.v4.app.Fragment fragment;
-
-            //try with exception
-            switch (position) {
-                case 0:
-                    fragment = new LocalFragment();
-                    return fragment;
-                case 1:
-                    fragment = new ImejiFragment();
-                    return fragment;
-                default:
-                    return new LocalFragment();
-            }
-
-        }
-
-        @Override
-        public int getItemPosition(Object object) {
-            return POSITION_NONE;
-        }
+    public void setCurrentItem(int index) {
+        viewPager.setCurrentItem(index);
     }
 
     //choose collection
@@ -573,6 +523,30 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                 startActivity(recentIntent);
             }
         });
+
+
+    }
+
+    private void checkRecentNote(){
+        RelativeLayout chooseRecentNoteLayout = (RelativeLayout) findViewById(R.id.layout_recent_text_notes);
+        chooseRecentNoteLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent recentNoteIntent = new Intent(context, RecentNoteActivity.class);
+                startActivity(recentNoteIntent);
+            }
+        });
+    }
+
+    private void checkRecentVoice(){
+        RelativeLayout chooseRecentVoiceLayout = (RelativeLayout) findViewById(R.id.layout_recent_voice_notes);
+        chooseRecentVoiceLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent recentVoiceIntent = new Intent(context, RecentVoiceActivity.class);
+                startActivity(recentVoiceIntent);
+            }
+        });
     }
 
     /**
@@ -601,7 +575,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             settings.setUserId(userId);
             settings.setIsAutoUpload(false);
             settings.save();
-            autoUploadSwitch.setChecked(false);
+            autoUploadSwitch.setChecked(settings.isAutoUpload());
 
             chooseCollectionLayout.setEnabled(false);
             chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
@@ -618,17 +592,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     return;
                 }
                 //off to on
-                Task auTask = DBConnector.getAuTask(userId,serverUrl);
-
-//                if(auTask==null){  // col wasValue not null
-
                 RetrofitClient.getGrantCollectionMessage(callback, apiKey);
                 isLoginCall = true;
-//
-//                }else
-//                    Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
+
             }
         });
+
 
         autoUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -658,6 +627,35 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
                 }
                 Log.e(LOG_TAG, settings.isAutoUpload() + "");
+
+                // pop up to display switch on/off the automatic upload option
+                if(compoundButton.isChecked()) {
+                    Toast.makeText(activity,"Automatic upload is active!",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(activity,"Automatic upload is inactive!",Toast.LENGTH_SHORT).show();
+                }
+            }
+
+
+        });
+
+        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();   // get old settings
+        if(settings!=null && settings.isAutoUpload()){
+            Toast.makeText(activity,"Automatic upload is active!",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void initOcrSwitch(){
+        ocrSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                SharedPreferences.Editor mEditor = mPrefs.edit();
+                if(buttonView.isChecked()){
+                    mEditor.putBoolean("ocrIsOn",true).apply();
+                }else {
+                    mEditor.putBoolean("ocrIsOn",false).apply();
+                }
+                mEditor.commit();
             }
         });
     }
@@ -783,9 +781,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
     //set user info textView(name email)
     private void setUserInfoText(){
-        TextView nameTextView = (TextView) findViewById(R.id.tv_username);
-        TextView emailTextView = (TextView) findViewById(R.id.tv_user_email);
-        TextView serverTextView = (TextView) findViewById(R.id.tv_server_url);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation);
+        View headerLayout = navigationView.getHeaderView(0);
+
+        TextView nameTextView = (TextView) headerLayout.findViewById(R.id.tv_username);
+        TextView emailTextView = (TextView) headerLayout.findViewById(R.id.tv_user_email);
+        TextView serverTextView = (TextView) headerLayout.findViewById(R.id.tv_server_url);
         nameTextView.setText(username);
         emailTextView.setText(email);
         if(serverUrl.length()<25){
@@ -799,6 +800,8 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private void dispatchTakePictureIntent() {
+
+        scheduleJob(this);
 
         PackageManager packman = getPackageManager();
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -851,7 +854,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                 if(lastAUTask!= null){
                     collectionNameTextView.setText(lastAUTask.getCollectionName());
                     Log.e(TAG+"2.3", "collectionNameTextView set to "+ lastAUTask.getCollectionName());
-                    autoUploadSwitch.setChecked(true);
+
+                    if(settings.isAutoUpload()){
+                        autoUploadSwitch.setChecked(true);
+                    }else{
+                        autoUploadSwitch.setChecked(false);
+                    }
 
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(true);
@@ -865,7 +873,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                 else{
                     collectionNameTextView.setText("none");
                     Log.e(TAG+"2.5", "collectionNameTextView set to none");
-                    autoUploadSwitch.setChecked(false);
+
+                    if(settings.isAutoUpload()){
+                        autoUploadSwitch.setChecked(true);
+                    }else{
+                        autoUploadSwitch.setChecked(false);
+                    }
 
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(false);
@@ -880,6 +893,67 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         }
 
     }
+
+    public static void scheduleJob(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            JobScheduler js =
+                    (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobInfo.Builder builder = null;
+            builder = new JobInfo.Builder(
+                    MY_BACKGROUND_JOB,
+                    new ComponentName(context, MediaContentJobService.class));
+            builder.addTriggerContentUri(
+                    new JobInfo.TriggerContentUri(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                            JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS));
+            js.schedule(builder.build());
+        }
+    }
+
+
+    /***********************************   permission   ****************************************/
+
+    private static final int CHECK_PERMISSION = 1;
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void requestCameraPermission() {
+        requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, CHECK_PERMISSION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CHECK_PERMISSION && grantResults.length >= 2) {
+            int firstGrantResult = grantResults[0];
+            int secondGrantResult = grantResults[1];
+            boolean granted = (firstGrantResult == PackageManager.PERMISSION_GRANTED) && (secondGrantResult == PackageManager.PERMISSION_GRANTED);
+            Log.i("permission", "onRequestPermissionsResult granted=" + granted);
+
+            if(granted) {
+                dispatchTakePictureIntent();
+            }else{
+                ToastUtil.showShortToast(this, "please grant CAMERA and WRITE_EXTERNAL_STORAGE permissions");
+            }
+        }
+    }
+
+    /**
+     * Open image intent
+     */
+    private void checkPermission() {
+        // check permission for android > 6.0
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!(checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)||
+                    !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+                requestCameraPermission();
+
+                return;
+            }
+        }
+
+        dispatchTakePictureIntent();
+    }
+
+    /**********************************     callbacks     *****************************************/
 
     Callback<ImejiFolder> createCollection_callback = new Callback<ImejiFolder>() {
         @Override
@@ -912,22 +986,28 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             collectionNameTextView.setText(imejiFolder.getTitle());
             Log.e(TAG+"3", "collectionNameTextView set to "+ imejiFolder.getTitle());
 
-            //switch on
-            autoUploadSwitch.setChecked(true);
-
             // go to fragment
-            SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
-            viewPager.setAdapter(tabAdapter);
+//            SectionsPagerAdapter tabAdapter= new SectionsPagerAdapter(getSupportFragmentManager());
+//            viewPager.setAdapter(tabAdapter);
 //            currentTab = 0;
 //            viewPager.setCurrentItem(currentTab);
 
             pDialog.dismiss();
             Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();   // get old settings
 
+            //switch on
+            //check the previous status of automatic upload
+            Log.i("autoUploadSwitch", ""+autoUploadSwitch.isChecked());
+
+            if(settings.isAutoUpload()) {
+                autoUploadSwitch.setChecked(true);
+            }else{
+                autoUploadSwitch.setChecked(false);
+            }
+
             if(settings!=null && settings.isAutoUpload())  // history AU is on
             {
                 setAutoUploadStatus(false,true);
-                Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
             }else {                                        // history AU is off or not set
                 setAutoUploadStatus(false,false);
             }
@@ -1014,15 +1094,20 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     collectionNameTextView.setText(folderList.get(0).getTitle());
                     Log.e(TAG+"5", "collectionNameTextView set to " +folderList.get(0).getTitle());
                 }
-                //switch on
-                autoUploadSwitch.setChecked(true);
+
 
                 Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();   // get old settings
+
+                //switch on
+                if(settings.isAutoUpload()){
+                    autoUploadSwitch.setChecked(true);
+                }else{
+                    autoUploadSwitch.setChecked(false);
+                }
 
                 if(settings!=null && settings.isAutoUpload())  // history AU is on
                 {
                     setAutoUploadStatus(false,true);
-                    Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
                 }else {                                        // history AU is off or not set
                     setAutoUploadStatus(false,false);
                 }
@@ -1052,7 +1137,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                             collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
                             Log.e(TAG+"6", "collectionNameTextView set to " + auTask.getCollectionName());
                             setAutoUploadStatus(false,true);
-                            Toast.makeText(activity,"Automatic upload is active",Toast.LENGTH_SHORT).show();
                         }
                     }
 

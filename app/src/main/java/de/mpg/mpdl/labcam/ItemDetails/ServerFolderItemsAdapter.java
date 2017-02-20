@@ -20,12 +20,12 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.CustomImageDownaloder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.CustomImageDownaloder;
 
 
 /**

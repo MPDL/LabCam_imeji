@@ -1,13 +1,15 @@
 package de.mpg.mpdl.labcam.Retrofit;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import android.util.Base64;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.OkHttpClient;
 
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
