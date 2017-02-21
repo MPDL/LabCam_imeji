@@ -19,6 +19,8 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.code.rxbus.RxBus;
+import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,8 +82,9 @@ public class NoteDialogFragment extends DialogFragment {
                                 }
 
                                 DBConnector.batchEditNote(selectedImageList, noteContentStr);
-                                // log notes size
-                               Log.e("NOTES_SIZE", "size" + new Select().from(Note.class).execute().size());
+
+                                NoteRefreshEvent noteRefreshEvent = new NoteRefreshEvent();
+                                RxBus.getDefault().post(noteRefreshEvent);
                             }
                         }
                 )

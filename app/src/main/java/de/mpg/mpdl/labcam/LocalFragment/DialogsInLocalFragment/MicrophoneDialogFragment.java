@@ -27,6 +27,8 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
+import de.mpg.mpdl.labcam.code.rxbus.RxBus;
+import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,6 +102,9 @@ public class MicrophoneDialogFragment extends DialogFragment{
                                     }
                                 }
                                 DBConnector.batchEditVoice(selectedImageList, fileFullName);
+
+                                VoiceRefreshEvent voiceRefreshEvent = new VoiceRefreshEvent();
+                                RxBus.getDefault().post(voiceRefreshEvent);
                             }
                         }
                 )

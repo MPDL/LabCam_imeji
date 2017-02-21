@@ -51,6 +51,10 @@ import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar;
+import de.mpg.mpdl.labcam.code.rxbus.EventSubscriber;
+import de.mpg.mpdl.labcam.code.rxbus.RxBus;
+import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
+import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,6 +67,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+
+import rx.Subscription;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -135,6 +141,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     static de.mpg.mpdl.labcam.AutoRun.dbObserver dbObserver;
     static Uri uri;
 
+    private Subscription mNoteRefreshEventSub;
+    private Subscription mVoiceRefreshEventSub;
+
     public LocalFragment() {
         // Required empty public constructor
     }
@@ -157,6 +166,10 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_local, container, false);
+
+        observeNoteRefresh();
+        observeVoiceRefresh();
+
         // folder gridView
         albumRecyclerView = (RecyclerView) rootView.findViewById(R.id.gallery_gridView);
 
@@ -962,6 +975,30 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             }
         }
         prepareData();
+    }
+
+    private void observeNoteRefresh() {
+        mNoteRefreshEventSub = RxBus.getDefault()
+                .observe(NoteRefreshEvent.class)
+                .subscribe(new EventSubscriber<NoteRefreshEvent>() {
+                    @Override
+                    public void onEvent(NoteRefreshEvent event) {
+                        renderTimeLine();
+                        loadTimeLinePicture();
+                    }
+                });
+    }
+
+    private void observeVoiceRefresh() {
+        mVoiceRefreshEventSub = RxBus.getDefault()
+                .observe(VoiceRefreshEvent.class)
+                .subscribe(new EventSubscriber<VoiceRefreshEvent>() {
+                    @Override
+                    public void onEvent(VoiceRefreshEvent event) {
+                        renderTimeLine();
+                        loadTimeLinePicture();
+                    }
+                });
     }
 
 }
