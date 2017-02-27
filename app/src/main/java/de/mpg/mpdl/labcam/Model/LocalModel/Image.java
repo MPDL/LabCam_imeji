@@ -63,6 +63,13 @@ public class Image extends Model {
     @Column(name = "voiceId")
     private String voiceId;
 
+    @Expose
+    @Column(name = "userId")
+    private String userId;
+
+    @Expose
+    @Column(name = "severName")
+    private String severName;
 
     public Image() {
         super();
@@ -194,5 +201,21 @@ public class Image extends Model {
 
     public void setVoiceId(String voiceId) {
         this.voiceId = voiceId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getSeverName() {
+        return severName;
+    }
+
+    public void setSeverName(String severName) {
+        this.severName = severName;
     }
 }

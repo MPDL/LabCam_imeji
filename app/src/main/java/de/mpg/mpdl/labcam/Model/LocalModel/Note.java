@@ -31,6 +31,14 @@ public class Note extends Model{
     @Column(name = "imageIds")
     List imageIds = new ArrayList();
 
+    @Expose
+    @Column(name = "userId")
+    private String userId;
+
+    @Expose
+    @Column(name = "severName")
+    private String severName;
+
     public Note() {
         super();
     }
@@ -67,4 +75,19 @@ public class Note extends Model{
         this.imageIds = imageIds;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getSeverName() {
+        return severName;
+    }
+
+    public void setSeverName(String severName) {
+        this.severName = severName;
+    }
 }
