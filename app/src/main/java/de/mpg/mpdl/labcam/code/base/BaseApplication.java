@@ -3,6 +3,8 @@ package de.mpg.mpdl.labcam.code.base;
 import android.app.Application;
 import android.util.Log;
 
+import com.facebook.stetho.Stetho;
+
 import de.mpg.mpdl.labcam.code.injection.component.ApplicationComponent;
 import de.mpg.mpdl.labcam.code.injection.component.DaggerApplicationComponent;
 import de.mpg.mpdl.labcam.code.injection.module.ApplicationModule;
@@ -15,6 +17,7 @@ public class BaseApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Stetho.initializeWithDefaults(this);
         initializeInjector();
 
     }
