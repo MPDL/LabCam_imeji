@@ -75,13 +75,20 @@ public class ViewPagerAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, final int position) {
-        ImageView imageView;
+
         inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View itemView = inflater.inflate(R.layout.viewpager_item, container,
                 false);
 
-        imageView = (ImageView) itemView.findViewById(R.id.detail_image);
+        ImageView imageView = (ImageView) itemView.findViewById(R.id.detail_image);
+        TextView imageNameTextView = (TextView) itemView.findViewById(R.id.tv_image_detail_name);
+        String fileName = "";
+        if(imagePathList.get(position)!=null){
+            String[] imgPathSplit = imagePathList.get(position).split("/");
+            fileName = imgPathSplit[imgPathSplit.length-1];
+        }
+        imageNameTextView.setText(fileName);
 
         // voice panel
 

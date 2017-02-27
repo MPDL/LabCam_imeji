@@ -3,10 +3,19 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_image_detail_name"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="4dp"
+            android:textColor="@color/white"/>
+
     <!--image contents-->
     <ImageView
         android:id="@+id/detail_image"
         android:src="@drawable/imeji"
+        android:layout_below="@id/tv_image_detail_name"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
