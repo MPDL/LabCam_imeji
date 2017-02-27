@@ -53,6 +53,11 @@ public class MicrophoneDialogFragment extends DialogFragment{
     private String file_exts[] = { AUDIO_RECORDER_FILE_EXT_MP4, AUDIO_RECORDER_FILE_EXT_3GP };
 
     private String fileFullName = null;
+
+    static TextView voiceTextView;
+    static TextView hintTextView;
+    Button voiceImageView;
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
@@ -126,18 +131,18 @@ public class MicrophoneDialogFragment extends DialogFragment{
                 );
 
 //        // hint text
-        final TextView hintTextView = (TextView) view.findViewById(R.id.text_view_voice_hint);
+        hintTextView = (TextView) view.findViewById(R.id.text_view_voice_hint);
 //        textView.setHeight(squareWidth/5);
 
         checkPermission();
 
         // record voice
-        Button voiceImageView = (Button)view.findViewById(R.id.im_microphone_record);  // record icon
+        voiceImageView = (Button)view.findViewById(R.id.im_microphone_record);  // record icon
         voiceImageView.getLayoutParams().height = squareWidth/3;
         voiceImageView.getLayoutParams().width = squareWidth/3;
 
         // record name
-        final TextView voiceTextView = (TextView) view.findViewById(R.id.text_view_voice_file_name); // record name
+        voiceTextView = (TextView) view.findViewById(R.id.text_view_voice_file_name); // record name
 
         voiceImageView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -150,12 +155,6 @@ public class MicrophoneDialogFragment extends DialogFragment{
                     case MotionEvent.ACTION_UP:
                         Log.d(LOG_TAG, "stop Recording");
                         stopRecording();
-                        v.setVisibility(View.INVISIBLE);
-                        v.setClickable(false);
-                        v.setEnabled(false);
-                        voiceTextView.setVisibility(View.VISIBLE);
-                        hintTextView.setVisibility(View.GONE);
-                        voiceTextView.setText(activity.getResources().getText(R.string.voice_upload_success));
                         break;
                 }
                 return false;
@@ -220,12 +219,27 @@ public class MicrophoneDialogFragment extends DialogFragment{
 
     private void stopRecording(){
         if(null != recorder){
-            recorder.stop();
+            try{
+                recorder.stop();
+            }catch(RuntimeException stopException){
+                //handle cleanup here
+                ToastUtil.showShortToast(getActivity(),"please try long click the record button");
+                recorder.reset();
+                recorder.release();
+                recorder = null;
+                return;
+            }
             recorder.reset();
             recorder.release();
 
             recorder = null;
         }
+        voiceImageView.setVisibility(View.INVISIBLE);
+        voiceImageView.setClickable(false);
+        voiceImageView.setEnabled(false);
+        voiceTextView.setVisibility(View.VISIBLE);
+        hintTextView.setVisibility(View.GONE);
+        voiceTextView.setText(getActivity().getResources().getText(R.string.voice_upload_success));
     }
 
     /***********************************   permissions   ****************************************/
