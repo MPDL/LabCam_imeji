@@ -848,6 +848,14 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         isAlbum = mPrefs.getBoolean("isAlbum",isAlbum);
 
         renderTimeLine();
+
+        //prepare local gallery image data
+        checkPermission();    // check SD permission first
+
+        //set grid adapter
+        loadLocalGallery();
+
+        //set header recycleView adapter
         loadTimeLinePicture();
 
         if(isAlbum) {
