@@ -83,7 +83,7 @@ public class NoteDialogFragment extends DialogFragment {
 
                                 DBConnector.batchEditNote(selectedImageList, noteContentStr);
 
-                                NoteRefreshEvent noteRefreshEvent = new NoteRefreshEvent();
+                                NoteRefreshEvent noteRefreshEvent = new NoteRefreshEvent(imagePathArray[imagePathArray.length-1]);
                                 RxBus.getDefault().post(noteRefreshEvent);
                             }
                         }

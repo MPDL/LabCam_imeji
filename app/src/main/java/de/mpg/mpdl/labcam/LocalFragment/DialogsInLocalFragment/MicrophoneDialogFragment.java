@@ -108,7 +108,7 @@ public class MicrophoneDialogFragment extends DialogFragment{
                                 }
                                 DBConnector.batchEditVoice(selectedImageList, fileFullName);
 
-                                VoiceRefreshEvent voiceRefreshEvent = new VoiceRefreshEvent();
+                                VoiceRefreshEvent voiceRefreshEvent = new VoiceRefreshEvent(imagePathArray[imagePathArray.length-1]);
                                 RxBus.getDefault().post(voiceRefreshEvent);
                             }
                         }

@@ -25,6 +25,10 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.rxbus.EventSubscriber;
+import de.mpg.mpdl.labcam.code.rxbus.RxBus;
+import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
+import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -37,6 +41,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import rx.Subscription;
 
 
 public class DetailActivity extends AppCompatActivity implements android.support.v7.view.ActionMode.Callback{
@@ -52,6 +58,8 @@ public class DetailActivity extends AppCompatActivity implements android.support
     // viewPager
     private ViewPager viewPager;
     private  ViewPagerAdapter viewPagerAdapter;
+    boolean isLocalImage;
+    int positionInList;
 
     // positionSet
     public Set<Integer> positionSet = new HashSet<>();
@@ -64,10 +72,16 @@ public class DetailActivity extends AppCompatActivity implements android.support
     private String username;
     private String userId;
 
+    private Subscription mNoteRefreshEventSub;
+    private Subscription mVoiceRefreshEventSub;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        observeNoteRefresh();
+        observeVoiceRefresh();
 
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
@@ -80,39 +94,10 @@ public class DetailActivity extends AppCompatActivity implements android.support
         Bundle extras = intent.getExtras();
         if (extras != null) {
             itemPathList = extras.getStringArrayList("itemPathList");
-            boolean isLocalImage = extras.getBoolean("isLocalImage");
-            int positionInList = extras.getInt("positionInList");
+            isLocalImage = extras.getBoolean("isLocalImage");
+            positionInList = extras.getInt("positionInList");
 
-            WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-            Display display = windowManager.getDefaultDisplay();
-
-            Point size = new Point();
-            display.getSize(size);
-
-            viewPager = (ViewPager) rootView.findViewById(R.id.view_pager_detail_image);
-            viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList);
-            viewPager.setAdapter(viewPagerAdapter);
-            viewPager.setCurrentItem(positionInList);
-            if(isLocalImage) {
-                viewPagerAdapter.setOnItemClickListener(new ViewPagerAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        if(actionMode != null) {
-                            addOrRemove(position);
-                            viewPagerAdapter.setPositionSet(positionSet);
-                        }
-                    }
-
-                    @Override
-                    public void onItemLongClick(View view, int position) {
-                        if (actionMode == null) {
-                            actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
-                        }
-                    }
-                });
-            }else {
-                viewPagerAdapter.setOnItemClickListener(null);
-            }
+            forceRefresh();
         }
 
     }
@@ -374,5 +359,68 @@ public class DetailActivity extends AppCompatActivity implements android.support
         args.putStringArray("imagePathArray", imagePathArray);
         noteDialogFragment.setArguments(args);    // pass imagePathArray to NoteDialogFragment
         return noteDialogFragment;
+    }
+
+    private void observeNoteRefresh() {
+        mNoteRefreshEventSub = RxBus.getDefault()
+                .observe(NoteRefreshEvent.class)
+                .subscribe(new EventSubscriber<NoteRefreshEvent>() {
+                    @Override
+                    public void onEvent(NoteRefreshEvent event) {
+                        String imgPath = event.getImgPath();
+                        if(itemPathList.contains(imgPath)){
+                            positionInList = itemPathList.indexOf(imgPath);
+                        }
+                        forceRefresh();
+                    }
+                });
+    }
+
+    private void observeVoiceRefresh() {
+        mVoiceRefreshEventSub = RxBus.getDefault()
+                .observe(VoiceRefreshEvent.class)
+                .subscribe(new EventSubscriber<VoiceRefreshEvent>() {
+                    @Override
+                    public void onEvent(VoiceRefreshEvent event) {
+                        String imgPath = event.getImgPath();
+                        if(itemPathList.contains(imgPath)){
+                            positionInList = itemPathList.indexOf(imgPath);
+                        }
+                       forceRefresh();
+                    }
+                });
+    }
+
+    private void forceRefresh(){
+        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+
+        Point size = new Point();
+        display.getSize(size);
+
+        viewPager = (ViewPager) rootView.findViewById(R.id.view_pager_detail_image);
+        viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList);
+        viewPager.setAdapter(viewPagerAdapter);
+        viewPager.setCurrentItem(positionInList);
+        if(isLocalImage) {
+            viewPagerAdapter.setOnItemClickListener(new ViewPagerAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(View view, int position) {
+                    if(actionMode != null) {
+                        addOrRemove(position);
+                        viewPagerAdapter.setPositionSet(positionSet);
+                    }
+                }
+
+                @Override
+                public void onItemLongClick(View view, int position) {
+                    if (actionMode == null) {
+                        actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
+                    }
+                }
+            });
+        }else {
+            viewPagerAdapter.setOnItemClickListener(null);
+        }
     }
 }

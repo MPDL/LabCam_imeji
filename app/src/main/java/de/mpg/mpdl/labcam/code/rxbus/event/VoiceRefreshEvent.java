@@ -5,4 +5,17 @@ package de.mpg.mpdl.labcam.code.rxbus.event;
  */
 
 public class VoiceRefreshEvent {
+    String imgPath;
+
+    public String getImgPath() {
+        return imgPath;
+    }
+
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
+    }
+
+    public VoiceRefreshEvent(String imgPath) {
+        this.imgPath = imgPath;
+    }
 }
