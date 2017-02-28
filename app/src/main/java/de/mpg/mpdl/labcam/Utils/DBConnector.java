@@ -174,6 +174,13 @@ public class DBConnector {
                 .executeSingle();
     }
 
+    public static Image getImageByImgId(String imageId) {
+        return new Select()
+                .from(Image.class)
+                .where("imageId = ?", imageId)
+                .executeSingle();
+    }
+
     public static List<Image> getImageByNoteId(String noteId) {
         return new Select()
                 .from(Image.class)

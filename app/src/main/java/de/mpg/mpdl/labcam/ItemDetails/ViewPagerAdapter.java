@@ -25,6 +25,8 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.Utils.camPicassoLoader;
+import de.mpg.mpdl.labcam.code.rxbus.RxBus;
+import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -291,19 +293,19 @@ public class ViewPagerAdapter extends PagerAdapter {
             public void onClick(View v) {
                 ToastUtil.showLongToast(context, "Deleting sound");
                 voicePanelLayout.setVisibility(View.GONE);
-                deleteVoice(DBConnector.getVoiceById(image.getVoiceId()), position);
+                deleteVoice(DBConnector.getVoiceById(image.getVoiceId()), position, image.getImageId());
             }
         });
     }
 
-    private void deleteVoice(Voice voice, int position){
-        for (Image image : DBConnector.getImageByVoiceId(voice.getVoiceId())) {
-            image.setVoiceId(null);
-            image.save();
-        }
-        voice.delete();
-        imagePathList.remove(position);
-        notifyDataSetChanged();
+    private void deleteVoice(Voice voice, int position, String imgId){
+        Image image = DBConnector.getImageByImgId(imgId);
+        image.setVoiceId(null);
+        image.save();
+
+        voice.getImageIds().remove(imgId);
+        VoiceRefreshEvent voiceRefreshEvent = new VoiceRefreshEvent(imagePathList.get(position));
+        RxBus.getDefault().post(voiceRefreshEvent);
     }
 
 }
