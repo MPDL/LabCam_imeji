@@ -86,38 +86,26 @@ public class LoginActivity extends AppCompatActivity {
 
         mPrefs = getSharedPreferences("myPref", 0);
         String Key = mPrefs.getString("apiKey", "");
+        serverURL = mPrefs.getString("server", "");
+        String otherServerUrl = mPrefs.getString("otherServer", "");
 
-        // check login states
+        /********************   if already have apiKey, jump over login steps ***********/
         if(Key.equalsIgnoreCase("")){
             setContentView(R.layout.layout_login);
             ButterKnife.bind(this);
         }else {
             //login
-            serverURL = mPrefs.getString("server", "");
             RetrofitClient.setRestServer(serverURL);
             Intent intent = new Intent(activity, MainActivity.class);
             startActivity(intent);
             finish();
             return;
         }
+        /********************************************************************************/
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
-
-        // use soft keyboard enter to login
-        passwordView.setImeOptions(EditorInfo.IME_ACTION_SEND);
-        passwordView.setOnEditorActionListener(
-                new TextView.OnEditorActionListener() {
-            public boolean onEditorAction(TextView v, int actionId,
-            KeyEvent event){
-                if (actionId == EditorInfo.IME_ACTION_SEND
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || (event != null && KeyEvent.KEYCODE_ENTER == event.getKeyCode()
-                        && KeyEvent.ACTION_DOWN == event.getAction())) {
-                  login();
-                }
-                return false;
-            }
-        });
+        usernameView.setText(mPrefs.getString("email", ""));   // set last user email
+        serverURLView.setText(otherServerUrl);
 
         // gluons server is choosen
         gluonsLabel.setOnClickListener(new View.OnClickListener() {
@@ -130,7 +118,6 @@ public class LoginActivity extends AppCompatActivity {
                 othersLabel.setTextColor(Color.parseColor("#cccccc"));
                 othersLabel.setBackground(null);
                 serverURLView.setVisibility(View.GONE);
-                serverURLView.setText(R.string.url_gluons);
             }
         });
 
@@ -146,45 +133,29 @@ public class LoginActivity extends AppCompatActivity {
                 gluonsLabel.setBackground(null);
                 serverURLView.setVisibility(View.VISIBLE);
 
-                if(serverURL.contains("gluons")){
-                    serverURLView.setText("https://");
+                if(serverURL.equalsIgnoreCase(DeviceStatus.BASE_URL)){
+//                    serverURLView.setText("https://");
                 }else {
-                    serverURLView.setText(serverURL);
+                    serverURLView.setText(otherServerUrl);
                 }
             }
         });
 
-        // last user
-        usernameView.setText(mPrefs.getString("email", ""));
-
-        // store server url in sharedPreference
-        if (!mPrefs.getString("server", "").equals("") && !mPrefs.getString("server", "").equals(DeviceStatus.BASE_URL)){
-            serverURL = mPrefs.getString("server", "");
-            //gluonsLabel
-            othersLabel.setTextColor(Color.parseColor("#ffffff"));
-            othersLabel.setBackground(getResources().getDrawable(R.drawable.round_button));
-            //othersLabel
-            gluonsLabel.setTextColor(Color.parseColor("#cccccc"));
-            gluonsLabel.setBackground(null);
-            serverURLView.setVisibility(View.VISIBLE);
-            serverURLView.setText(serverURL);
-
-        } else { // BASE_URL as serverURL
-            serverURL = DeviceStatus.BASE_URL;
-
-            //gluonsLabel
-            gluonsLabel.setTextColor(Color.parseColor("#ffffff"));
-            gluonsLabel.setBackground(getResources().getDrawable(R.drawable.round_button));
-            //othersLabel
-            othersLabel.setTextColor(Color.parseColor("#cccccc"));
-            othersLabel.setBackground(null);
-            serverURLView.setVisibility(View.GONE);
-            serverURLView.setText(R.string.url_gluons);
-        }
-
-        RetrofitClient.setRestServer(serverURL);
-
-        serverURLView.setText(serverURL);
+        // use soft keyboard enter to login
+        passwordView.setImeOptions(EditorInfo.IME_ACTION_SEND);
+        passwordView.setOnEditorActionListener(
+                new TextView.OnEditorActionListener() {
+                    public boolean onEditorAction(TextView v, int actionId,
+                                                  KeyEvent event){
+                        if (actionId == EditorInfo.IME_ACTION_SEND
+                                || actionId == EditorInfo.IME_ACTION_DONE
+                                || (event != null && KeyEvent.KEYCODE_ENTER == event.getKeyCode()
+                                && KeyEvent.ACTION_DOWN == event.getAction())) {
+                            login();
+                        }
+                        return false;
+                    }
+                });
 
         signIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -228,12 +199,10 @@ public class LoginActivity extends AppCompatActivity {
         username = usernameView.getText().toString();
         password = passwordView.getText().toString();
 
-        String url;
-        serverURL = serverURLView.getText().toString();
+        if(serverURLView.getVisibility()==View.VISIBLE) {
+            serverURL = serverURLView.getText().toString();
+        }else serverURL = DeviceStatus.BASE_URL;
 
-        /** parse server url **/
-
-//                RetrofitClient.setRestServer(parseServerUrl(serverURL));
         RetrofitClient.setRestServer(serverURL);
 
         Log.v(LOG_TAG,serverURL);
@@ -261,6 +230,9 @@ public class LoginActivity extends AppCompatActivity {
             mEditor.putString("username", username).apply();
             mEditor.putString("password", password).apply();
             mEditor.putString("server", serverURL).apply();
+            if(serverURLView.getVisibility()==View.VISIBLE) {
+                mEditor.putString("otherServer", serverURL).apply();
+            }
             SharedPreferences preferences = getSharedPreferences("folder", Context.MODE_PRIVATE);
             SharedPreferences.Editor ed = preferences.edit();
             ed.putString("Camera", "On");
@@ -269,8 +241,6 @@ public class LoginActivity extends AppCompatActivity {
         }
 
     }
-
-    //    apiKey  LOG_TAG activity userId serverUrl collectionId
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -281,10 +251,10 @@ public class LoginActivity extends AppCompatActivity {
                     String APIkey = QRUtils.processQRCode(data, activity, LOG_TAG, null).getAPIkey();
                     collectionId = QRUtils.processQRCode(data, activity, LOG_TAG, null).getQrCollectionId();
 
-                    serverURL = serverURLView.getText().toString();
-
-                    /** parse server url **/
-
+                    if(serverURLView.getVisibility()==View.VISIBLE) {
+                        serverURL = serverURLView.getText().toString();
+                    }else serverURL = DeviceStatus.BASE_URL;
+                
                     RetrofitClient.setRestServer(serverURL);
 
                     Log.v(LOG_TAG,serverURL);
@@ -294,6 +264,9 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.putString("APIkey",APIkey).apply();
                     mEditor.putString("server", serverURL).apply();
+                    if(serverURLView.getVisibility()==View.VISIBLE) {
+                        mEditor.putString("otherServer", serverURL).apply();
+                    }
                     mEditor.putString("collectionID", collectionId).apply();
                     mEditor.commit();
                     RetrofitClient.apiLogin(APIkey,callback_login);
@@ -306,18 +279,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    /**
-
-    public static List<Image> getImages(String q) {
-        return new Select()
-                .from(Image.class)
-                .where(" = ?",q)
-                .orderBy("imageName ASC")
-                .execute();
-    }
-     */
-    boolean isTaskFragment = false;
-
     public void accountLogin(String userId, boolean isQRLogin) {
         Intent intent = new Intent(activity, MainActivity.class);
         intent.putExtra("isQRLogin", isQRLogin);
@@ -325,26 +286,6 @@ public class LoginActivity extends AppCompatActivity {
         // layout_login out of stack
         finish();
     }
-
-
-    private static void jettyUtil(String url) throws Exception {
-        URL u = new URL(url);
-
-        String path = u.getPath();
-        String collectionId = null;
-        if (path != null) {
-            collectionId = path.substring(path.lastIndexOf("/") + 1);
-        }
-
-        String query = u.getQuery();
-        MultiMap<String> values = new MultiMap<String>();
-        UrlEncoded.decodeTo(query, values, "UTF-8", 1000);
-
-        System.out.println(collectionId);
-        System.out.println(values.getString("username"));
-        System.out.println(values.getString("password"));
-    }
-
 
     // createTask only when with QRcode
     private void createTask(){
@@ -407,45 +348,6 @@ public class LoginActivity extends AppCompatActivity {
         accountLogin(userId,true);
         Toast.makeText(activity,"Successfully login with QR code",Toast.LENGTH_LONG).show();
     }
-
-    /**
-     * method for parse server url, examples as below
-     *
-     * https://spot.mpdl.mpg.de/rest
-     * https://spot.mpdl.mpg.de/rest/
-     * spot.mpdl.mpg.de
-     * spot.mpdl.mpg.de/rest
-     * spot.mpdl.mpg.de/rest/
-     */
-    private String url1 = "https://spot.mpdl.mpg.de/rest";
-    private String url2 = "https://spot.mpdl.mpg.de/rest/";
-    private String url3 = "spot.mpdl.mpg.de";
-    private String url4 = "spot.mpdl.mpg.de/rest";
-    private String url5 = "spot.mpdl.mpg.de/rest/";
-
-    private String parseServerUrl(String Url){
-        // divide string
-        String[] parts = Url.split("/");
-        String coreUrl = null;
-        String serverUrl = null;
-        for (int i = 0;i < parts.length;i++){
-            if(parts[i].equalsIgnoreCase("https:")){
-                // ignore https:
-            } else if(parts[i].equalsIgnoreCase("")){
-                // ignore empty
-            } else if (parts[i].equalsIgnoreCase("rest")) {
-                // also ignore rest
-            } else {
-                 coreUrl = parts[i];
-            }
-        }
-        serverUrl = "http://"+coreUrl+"/rest/";
-        return serverUrl;
-    }
-
-    /**
-     * callbacks
-     */
 
     Callback<User> callback_login = new Callback<User>() {
         @Override
