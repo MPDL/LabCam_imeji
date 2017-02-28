@@ -293,17 +293,17 @@ public class ViewPagerAdapter extends PagerAdapter {
             public void onClick(View v) {
                 ToastUtil.showLongToast(context, "Deleting sound");
                 voicePanelLayout.setVisibility(View.GONE);
-                deleteVoice(DBConnector.getVoiceById(image.getVoiceId()), position);
+                deleteVoice(DBConnector.getVoiceById(image.getVoiceId()), position, image.getImageId());
             }
         });
     }
 
-    private void deleteVoice(Voice voice, int position){
-        for (Image image : DBConnector.getImageByVoiceId(voice.getVoiceId())) {
-            image.setVoiceId(null);
-            image.save();
-        }
-        voice.delete();
+    private void deleteVoice(Voice voice, int position, String imgId){
+        Image image = DBConnector.getImageByImgId(imgId);
+        image.setVoiceId(null);
+        image.save();
+
+        voice.getImageIds().remove(imgId);
         VoiceRefreshEvent voiceRefreshEvent = new VoiceRefreshEvent(imagePathList.get(position));
         RxBus.getDefault().post(voiceRefreshEvent);
     }
