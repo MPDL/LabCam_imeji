@@ -25,6 +25,8 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.Utils.camPicassoLoader;
+import de.mpg.mpdl.labcam.code.rxbus.RxBus;
+import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -302,8 +304,8 @@ public class ViewPagerAdapter extends PagerAdapter {
             image.save();
         }
         voice.delete();
-        imagePathList.remove(position);
-        notifyDataSetChanged();
+        VoiceRefreshEvent voiceRefreshEvent = new VoiceRefreshEvent(imagePathList.get(position));
+        RxBus.getDefault().post(voiceRefreshEvent);
     }
 
 }
