@@ -16,10 +16,6 @@ import java.util.ArrayList;
 public class Note extends Model{
 
     @Expose
-    @Column(name = "noteId")
-    String noteId;
-
-    @Expose
     @Column(name = "noteContent")
     String noteContent;
 
@@ -41,14 +37,6 @@ public class Note extends Model{
 
     public Note() {
         super();
-    }
-
-    public String getNoteId() {
-        return noteId;
-    }
-
-    public void setNoteId(String noteId) {
-        this.noteId = noteId;
     }
 
     public String getNoteContent() {

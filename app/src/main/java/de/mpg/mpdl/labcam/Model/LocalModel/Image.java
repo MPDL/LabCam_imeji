@@ -57,7 +57,7 @@ public class Image extends Model {
 
     @Expose
     @Column(name = "noteId")
-    private String noteId;
+    private Long noteId;
 
     @Expose
     @Column(name = "voiceId")
@@ -75,7 +75,7 @@ public class Image extends Model {
         super();
     }
 
-    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, String noteId, String voiceId) {
+    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, Long noteId, String voiceId) {
         this.imageId = imageId;
         this.taskId = taskId;
         this.imageName = imageName;
@@ -187,11 +187,11 @@ public class Image extends Model {
         this.errorLevel = errorLevel;
     }
 
-    public String getNoteId() {
+    public Long getNoteId() {
         return noteId;
     }
 
-    public void setNoteId(String noteId) {
+    public void setNoteId(Long noteId) {
         this.noteId = noteId;
     }
 

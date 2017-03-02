@@ -178,7 +178,7 @@ public class DBConnector {
                 .executeSingle();
     }
 
-    public static List<Image> getImageByNoteId(String noteId) {
+    public static List<Image> getImageByNoteId(Long noteId) {
         return new Select()
                 .from(Image.class)
                 .where("noteId = ?", noteId)
@@ -193,10 +193,10 @@ public class DBConnector {
     }
 
     /*****  Note  ******/
-    public static Note getNoteById(String noteId) {
+    public static Note getNoteById(Long id) {
         return new Select()
                 .from(Note.class)
-                .where("noteId = ?", noteId)
+                .where("Id = ?", id)
                 .executeSingle();
     }
 
@@ -213,7 +213,6 @@ public class DBConnector {
 
         /** create new Note **/
         Note newNote = new Note();  //PREPARE(CREATE) new NOTE
-        newNote.setNoteId(UUID.randomUUID().toString());
         newNote.setNoteContent(noteContent);
         newNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
         for(Image i : imageList)
@@ -223,11 +222,11 @@ public class DBConnector {
         for (Image image : imageList) {  // every selected image
             if (image.getNoteId() == null || "".equals(image.getNoteId())) {
                 // add noteId
-                image.setNoteId(newNote.getNoteId());
+                image.setNoteId(newNote.getId());
             } else {
-                String oldNoteId = image.getNoteId();
+                Long oldNoteId = image.getId();
                 // update noteId
-                image.setNoteId(newNote.getNoteId());
+                image.setNoteId(newNote.getId());
                 // remove imageId from old note record
                 Note oldNote = getNoteById(oldNoteId);
                 oldNote.getImageIds().remove(image.getImageId());
