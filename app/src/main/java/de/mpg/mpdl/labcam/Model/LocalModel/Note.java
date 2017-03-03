@@ -32,8 +32,8 @@ public class Note extends Model{
     private String userId;
 
     @Expose
-    @Column(name = "severName")
-    private String severName;
+    @Column(name = "serverName")
+    private String serverName;
 
     public Note() {
         super();
@@ -71,11 +71,11 @@ public class Note extends Model{
         this.userId = userId;
     }
 
-    public String getSeverName() {
-        return severName;
+    public String getServerName() {
+        return serverName;
     }
 
-    public void setSeverName(String severName) {
-        this.severName = severName;
+    public void setServerName(String severName) {
+        this.serverName = severName;
     }
 }

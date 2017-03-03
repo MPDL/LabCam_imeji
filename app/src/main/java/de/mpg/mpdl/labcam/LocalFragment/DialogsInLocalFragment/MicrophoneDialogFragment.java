@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.media.MediaRecorder;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
 /**
  * Created by yingli on 11/24/16.
  */
@@ -53,6 +55,9 @@ public class MicrophoneDialogFragment extends DialogFragment{
     private String file_exts[] = { AUDIO_RECORDER_FILE_EXT_MP4, AUDIO_RECORDER_FILE_EXT_3GP };
 
     private String fileFullName = null;
+    private SharedPreferences mPrefs;
+    private String userId;
+    private String serverName;
 
     static TextView voiceTextView;
     static TextView hintTextView;
@@ -65,7 +70,9 @@ public class MicrophoneDialogFragment extends DialogFragment{
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View view = inflater.inflate(R.layout.dialog_fragment_microphone, null);
         final Activity activity = this.getActivity();
-
+        mPrefs = activity.getSharedPreferences("myPref", MODE_PRIVATE);
+        userId = mPrefs.getString("userId", "");
+        serverName = mPrefs.getString("serverName", "");
         Bundle bundle = getArguments();
         final String[] imagePathArray = bundle.getStringArray("imagePathArray");
         for (String s : imagePathArray) {

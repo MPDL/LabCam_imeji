@@ -86,7 +86,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("server","");
+        serverName = mPrefs.getString("serverName","");
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
@@ -196,7 +196,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         task.setState(String.valueOf(DeviceStatus.state.WAITING));
         task.setUserName(username);
         task.setUserId(userId);
-        task.setSeverName(serverName);
+        task.setServerName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
         int num = addImages(fileList, task.getTaskId()).size();
@@ -399,7 +399,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         display.getSize(size);
 
         viewPager = (ViewPager) rootView.findViewById(R.id.view_pager_detail_image);
-        viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList);
+        viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList, userId, serverName);
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setCurrentItem(positionInList);
         if(isLocalImage) {

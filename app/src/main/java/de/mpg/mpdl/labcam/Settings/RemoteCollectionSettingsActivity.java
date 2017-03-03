@@ -211,7 +211,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         userId = mPrefs.getString("userId","");
         apiKey = mPrefs.getString("apiKey", "");
         email = mPrefs.getString("email", "");
-        serverUrl = mPrefs.getString("server","");
+        serverUrl = mPrefs.getString("serverName","");
 
         /** scan QR **/
         Button qrCodeImageView = (Button) findViewById(R.id.im_qr_scan);
@@ -279,7 +279,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
-            task.setSeverName(serverUrl);
+            task.setServerName(serverUrl);
 
             Long now = new Date().getTime();
             task.setStartDate(String.valueOf(now));
@@ -494,7 +494,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     task.setState(String.valueOf(DeviceStatus.state.WAITING));
                                     task.setUserName(username);
                                     task.setUserId(userId);
-                                    task.setSeverName(serverUrl);
+                                    task.setServerName(serverUrl);
 
                                     Long now = new Date().getTime();
                                     task.setStartDate(String.valueOf(now));

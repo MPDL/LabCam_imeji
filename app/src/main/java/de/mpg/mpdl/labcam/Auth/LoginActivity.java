@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
 
         mPrefs = getSharedPreferences("myPref", 0);
         String Key = mPrefs.getString("apiKey", "");
-        serverURL = mPrefs.getString("server", "");
+        serverURL = mPrefs.getString("serverName", "");
         String otherServerUrl = mPrefs.getString("otherServer", "");
 
         /********************   if already have apiKey, jump over login steps ***********/
@@ -229,7 +229,7 @@ public class LoginActivity extends AppCompatActivity {
             SharedPreferences.Editor mEditor = mPrefs.edit();
             mEditor.putString("username", username).apply();
             mEditor.putString("password", password).apply();
-            mEditor.putString("server", serverURL).apply();
+            mEditor.putString("serverName", serverURL).apply();
             if(serverURLView.getVisibility()==View.VISIBLE) {
                 mEditor.putString("otherServer", serverURL).apply();
             }
@@ -263,7 +263,7 @@ public class LoginActivity extends AppCompatActivity {
                     mPrefs = getSharedPreferences("myPref", 0);
                     SharedPreferences.Editor mEditor = mPrefs.edit();
                     mEditor.putString("APIkey",APIkey).apply();
-                    mEditor.putString("server", serverURL).apply();
+                    mEditor.putString("serverName", serverURL).apply();
                     if(serverURLView.getVisibility()==View.VISIBLE) {
                         mEditor.putString("otherServer", serverURL).apply();
                     }
@@ -308,7 +308,7 @@ public class LoginActivity extends AppCompatActivity {
             task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
-            task.setSeverName(serverURL);
+            task.setServerName(serverURL);
 
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
@@ -333,7 +333,7 @@ public class LoginActivity extends AppCompatActivity {
             task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
-            task.setSeverName(serverURL);
+            task.setServerName(serverURL);
 
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
@@ -363,7 +363,7 @@ public class LoginActivity extends AppCompatActivity {
                     mEditor.putString("userId",user.getPerson().getId()).apply();
                     mEditor.putString("email",user.getEmail()).apply();
                     mEditor.putString("apiKey",user.getApiKey()).apply();
-                    mEditor.putString("server",serverURL).apply();
+                    mEditor.putString("serverName",serverURL).apply();
                 mEditor.commit();
                 if(collectionId!=null&&collectionId!=""){   // login with qr code
                     RetrofitClient.getCollectionById(collectionId, callback_collection, user.getApiKey());

@@ -68,6 +68,8 @@ public class checkAndUpload {
     // SharedPreferences
     private SharedPreferences mPrefs;
     private String apiKey;
+    private String userId;
+    private String serverName;
 
     private TypedFile typedFile;
     private String json;
@@ -102,6 +104,8 @@ public class checkAndUpload {
         //prepare apiKey
         mPrefs = context.getSharedPreferences("myPref", 0);
         apiKey = mPrefs.getString("apiKey", "");
+        userId = mPrefs.getString("userId","");
+        serverName = mPrefs.getString("userName", "");
         ocrIsOn = mPrefs.getBoolean("ocrIsOn", false);
 
         if(!taskIsStopped()) {
@@ -203,7 +207,7 @@ public class checkAndUpload {
         if(f.exists() && !f.isDirectory()) {
             // do something
             Log.i(TAG,collectionID+": file exist");
-            jsonPart2 = DeviceStatus.metaDataJson(filePath, checkTypeList, ocrIsOn, context);
+            jsonPart2 = DeviceStatus.metaDataJson(filePath, checkTypeList, ocrIsOn, context, userId, serverName);
         }else {
             Log.i(TAG, "file not exist: " + currentImageId);
             // delete Image from task
@@ -291,7 +295,6 @@ public class checkAndUpload {
             }
         }else {
             if(task.getUploadMode().equalsIgnoreCase("AU")){
-
                 task.setUploadMode("AU_FINISHED");
                 task.setEndDate(DeviceStatus.dateNow());
                 task.setState(String.valueOf(DeviceStatus.state.FINISHED));
@@ -865,7 +868,7 @@ public class checkAndUpload {
         newAUTask.setUserId(oldTask.getUserId());
         newAUTask.setTotalItems(0);
         newAUTask.setFinishedItems(0);
-        newAUTask.setSeverName(oldTask.getSeverName());
+        newAUTask.setServerName(oldTask.getServerName());
 
         Long now = new Date().getTime();
         newAUTask.setStartDate(String.valueOf(now));

@@ -73,7 +73,7 @@ public class TaskUploadService extends Service {
         // prepare auth for upload
         mPrefs = this.getSharedPreferences("myPref", 0);
         userId = mPrefs.getString("userId", "");
-        serverName = mPrefs.getString("server", "");
+        serverName = mPrefs.getString("serverName", "");
 
 
         //set task

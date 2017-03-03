@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -25,11 +26,17 @@ import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by yingli on 11/24/16.
  */
 
 public class NoteDialogFragment extends DialogFragment {
+
+    private SharedPreferences mPrefs;
+    private String userId;
+    private String serverName;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -38,6 +45,9 @@ public class NoteDialogFragment extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_fragment_note, null);
         Activity activity = this.getActivity();
+        mPrefs = activity.getSharedPreferences("myPref", MODE_PRIVATE);
+        userId = mPrefs.getString("userId", "");
+        serverName = mPrefs.getString("serverName", "");
 
         Bundle bundle = getArguments();
         final String[] imagePathArray = bundle.getStringArray("imagePathArray");
@@ -81,7 +91,7 @@ public class NoteDialogFragment extends DialogFragment {
                                     }
                                 }
 
-                                DBConnector.batchEditNote(selectedImageList, noteContentStr);
+                                DBConnector.batchEditNote(selectedImageList, noteContentStr, userId, serverName);
 
                                 NoteRefreshEvent noteRefreshEvent = new NoteRefreshEvent(imagePathArray[imagePathArray.length-1]);
                                 RxBus.getDefault().post(noteRefreshEvent);

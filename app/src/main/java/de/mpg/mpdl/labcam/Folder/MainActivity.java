@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         username = mPrefs.getString("familyName","")+" "+mPrefs.getString("givenName","");
         userId = mPrefs.getString("userId","");
         apiKey = mPrefs.getString("apiKey","");
-        serverUrl = mPrefs.getString("server","");
+        serverUrl = mPrefs.getString("serverName","");
 //        serverUrl = DeviceStatus.parseServerUrl(serverUrl);
 
         Bundle args = this.getIntent().getExtras();         // get isQRLogin from extra
@@ -710,7 +710,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                                         task.setUserId(userId);
                                         task.setTotalItems(0);
                                         task.setFinishedItems(0);
-                                        task.setSeverName(serverUrl);
+                                        task.setServerName(serverUrl);
 
                                         Long now = new Date().getTime();
                                         task.setStartDate(String.valueOf(now));
@@ -739,7 +739,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                                     mEditor.remove("userId").commit();
                                     mEditor.remove("username").commit();
                                     mEditor.remove("isAlbum").commit();
-                                    mEditor.remove("server").commit();
+                                    mEditor.remove("serverName").commit();
                                     Intent logoutIntent = new Intent(context, LoginActivity.class);
                                     startActivity(logoutIntent);
 
@@ -971,7 +971,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
             task.setUserName(username);
             task.setUserId(userId);
-            task.setSeverName(serverUrl);
+            task.setServerName(serverUrl);
             task.setTotalItems(0);
             task.setFinishedItems(0);
 
@@ -1078,7 +1078,7 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                 task.setState(String.valueOf(DeviceStatus.state.WAITING));
                 task.setUserName(username);
                 task.setUserId(userId);
-                task.setSeverName(serverUrl);
+                task.setServerName(serverUrl);
                 task.setTotalItems(0);
                 task.setFinishedItems(0);
 

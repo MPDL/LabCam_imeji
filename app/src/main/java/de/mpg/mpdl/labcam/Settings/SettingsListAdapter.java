@@ -46,7 +46,7 @@ public class SettingsListAdapter extends BaseAdapter {
         mPrefs = activity.getSharedPreferences("myPref", 0);
 
         String userId = mPrefs.getString("userId", "");
-        String serverName = mPrefs.getString("server","");
+        String serverName = mPrefs.getString("serverName","");
 
         try {
             lastCollectionId = DBConnector.getAuTask(userId, serverName).getCollectionId();

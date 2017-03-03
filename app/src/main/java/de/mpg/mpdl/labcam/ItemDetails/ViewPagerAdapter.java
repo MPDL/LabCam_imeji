@@ -44,6 +44,8 @@ public class ViewPagerAdapter extends PagerAdapter {
     LayoutInflater inflater;
     Point size;
     List<String> imagePathList;
+    private String userId;
+    private String serverName;
     boolean isLocalImage;
     private OnItemClickListener onItemClickListener;
 
@@ -58,11 +60,13 @@ public class ViewPagerAdapter extends PagerAdapter {
         notifyDataSetChanged();
     }
 
-    public ViewPagerAdapter(Context context, Point size,boolean isLocalImage, List<String> imagePathList) {
+    public ViewPagerAdapter(Context context, Point size,boolean isLocalImage, List<String> imagePathList, String userId, String serverName) {
         this.context = context;
         this.size = size;
         this.isLocalImage = isLocalImage;
         this.imagePathList = imagePathList;
+        this.userId = userId;
+        this.serverName = serverName;
     }
 
     @Override
@@ -190,7 +194,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         noteTextView.setVisibility(View.VISIBLE);
         if(image.getNoteId()==null){
             noteTextView.setVisibility(View.GONE);
-        }else noteTextView.setText(DBConnector.getNoteById(image.getNoteId()).getNoteContent());
+        }else noteTextView.setText(DBConnector.getNoteById(image.getNoteId(), userId, serverName).getNoteContent());
 
         cancelTextView.setOnClickListener(new View.OnClickListener() {  //
             @Override
@@ -206,7 +210,7 @@ public class ViewPagerAdapter extends PagerAdapter {
                 List<Image> selectedImageList = new ArrayList<Image>(); // selected ImageList
                 selectedImageList.add(image);
 
-                DBConnector.batchEditNote(selectedImageList, String.valueOf(noteEditText.getText()));
+                DBConnector.batchEditNote(selectedImageList, String.valueOf(noteEditText.getText()), userId, serverName);
 
                 editNoteButtonLayout.setVisibility(View.GONE);
                 noteEditText.setVisibility(View.GONE);
@@ -221,7 +225,7 @@ public class ViewPagerAdapter extends PagerAdapter {
             public void onClick(View v) {
                 noteTextView.setVisibility(View.GONE);
 
-                noteEditText.setText(DBConnector.getNoteById(image.getNoteId()).getNoteContent());
+                noteEditText.setText(DBConnector.getNoteById(image.getNoteId(),userId,serverName).getNoteContent());
                 noteEditText.setVisibility(View.VISIBLE);
 
                 editNoteButtonLayout.setVisibility(View.VISIBLE);

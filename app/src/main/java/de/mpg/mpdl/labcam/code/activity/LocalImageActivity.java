@@ -108,7 +108,7 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("server","");
+        serverName = mPrefs.getString("serverName","");
 
         //Kiran's title
         Intent intent = activity.getIntent();
@@ -447,7 +447,7 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         task.setState(String.valueOf(DeviceStatus.state.WAITING));
         task.setUserName(username);
         task.setUserId(userId);
-        task.setSeverName(serverName);
+        task.setServerName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
         int num = addImages(fileList, task.getTaskId()).size();
@@ -469,12 +469,12 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         for (String filePath: fileList) {
             String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
             Image image = DBConnector.getImageByPath(filePath);
-            if(image!=null){  // image already exist
+
                 if(!taskId.equalsIgnoreCase("")) {  // upload process
                     image.setTaskId(taskId);
                     image.setState(String.valueOf(DeviceStatus.state.WAITING));
                     image.save();
-                }
+
                 imageList.add(image);
                 continue;
             }

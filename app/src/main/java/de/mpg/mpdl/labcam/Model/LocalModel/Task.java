@@ -70,8 +70,8 @@ public class Task extends Model{
     private String uploadMode;
 
     @Expose
-    @Column(name = "severName")
-    private String severName;
+    @Column(name = "serverName")
+    private String serverName;
 
     @Expose
     @Column(name = "logs")
@@ -82,7 +82,7 @@ public class Task extends Model{
         super();
     }
 
-    public Task(String taskId, String taskName, String state, String errorLevel, String startDate, long endDate, String userId, String userName, String apiKey, String collectionId, String collectionName, int finishedItems, int totalItems, String uploadMode, String severName, String logs) {
+    public Task(String taskId, String taskName, String state, String errorLevel, String startDate, long endDate, String userId, String userName, String apiKey, String collectionId, String collectionName, int finishedItems, int totalItems, String uploadMode, String serverName, String logs) {
         this.taskId = taskId;
         this.taskName = taskName;
         this.state = state;
@@ -97,7 +97,7 @@ public class Task extends Model{
         this.finishedItems = finishedItems;
         this.totalItems = totalItems;
         this.uploadMode = uploadMode;
-        this.severName = severName;
+        this.serverName = serverName;
         this.logs = logs;
     }
 
@@ -213,12 +213,12 @@ public class Task extends Model{
         this.uploadMode = uploadMode;
     }
 
-    public String getSeverName() {
-        return severName;
+    public String getServerName() {
+        return serverName;
     }
 
-    public void setSeverName(String severName) {
-        this.severName = severName;
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
     }
 
     public String getLogs() {

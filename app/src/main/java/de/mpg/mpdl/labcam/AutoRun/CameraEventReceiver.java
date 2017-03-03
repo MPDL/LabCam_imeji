@@ -43,7 +43,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
 
         mPrefs = context.getSharedPreferences("myPref", 0);
         userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("server","");
+        serverName = mPrefs.getString("serverName","");
 
         //isAutoUpload
         Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();

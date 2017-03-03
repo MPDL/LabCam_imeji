@@ -155,7 +155,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         mPrefs = getActivity().getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("server","");
+        serverName = mPrefs.getString("serverName","");
 
 
 
@@ -604,7 +604,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             sortedImageNameList.add(imageNameArrayList.get(i));
         }
 
-         simpleAdapter = new SimpleAdapter(getActivity(),sortedImageNameList);
+         simpleAdapter = new SimpleAdapter(getActivity(),sortedImageNameList, userId, serverName);
         if(positionSet!=null){
             simpleAdapter.setPositionSet(positionSet);
         }
@@ -718,7 +718,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         task.setState(String.valueOf(DeviceStatus.state.WAITING));
         task.setUserName(username);
         task.setUserId(userId);
-        task.setSeverName(serverName);
+        task.setServerName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
         int num = addImages(fileList, task.getTaskId()).size();
