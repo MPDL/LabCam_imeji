@@ -85,7 +85,7 @@ public class NoteDialogFragment extends DialogFragment {
 
                                 List<Image> selectedImageList = new ArrayList<Image>(); // selected ImageList
                                 for (String imagePath : imagePathArray) {
-                                    Image image = DBConnector.getImageByPath(imagePath);
+                                    Image image = DBConnector.getImageByPath(imagePath, userId, serverName);
                                     if(image!=null){
                                         selectedImageList.add(image);   // add image to imageList
                                     }

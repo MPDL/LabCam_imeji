@@ -25,6 +25,7 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.activity.LocalImageActivity;
 import de.mpg.mpdl.labcam.code.rxbus.EventSubscriber;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
@@ -199,7 +200,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         task.setServerName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
-        int num = addImages(fileList, task.getTaskId()).size();
+        int num = LocalImageActivity.addImages(fileList, task.getTaskId(), userId, serverName).size();
         task.setTotalItems(num);
         task.save();
         Log.v(LOG_TAG,"MU task"+task.getTaskId() );
@@ -208,6 +209,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         return task.getTaskId();
     }
 
+    /*
     private static List<Image> addImages(List<String> fileList, String taskId){
 
         List<Image> imageList = new ArrayList<>();
@@ -266,6 +268,8 @@ public class DetailActivity extends AppCompatActivity implements android.support
         return imageList;
     }
 
+    */
+
     private void addOrRemove(int position) {
 
         if (positionSet.contains(position)) {
@@ -312,18 +316,19 @@ public class DetailActivity extends AppCompatActivity implements android.support
         }
     }
     public void showVoiceDialog(List<String> imagePathList){
-        voiceDialogNewInstance(imagePathList).show(this.getFragmentManager(), "voiceDialogFragment");
+        LocalImageActivity.voiceDialogNewInstance(imagePathList, userId, serverName).show(this.getFragmentManager(), "voiceDialogFragment");
     }
 
 
     /**** record voice ****/
+    /*
     public static MicrophoneDialogFragment voiceDialogNewInstance(List<String> imagePathList)
     {
         MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
 
 //        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
         Log.d("LY", "size: "+imagePathList.size());
-        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
+        List<Image> list = LocaladdImages(imagePathList, "");  // task id set empty, init images
 
         String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
         for(int i=0; i<imagePathList.size(); i++){
@@ -336,12 +341,15 @@ public class DetailActivity extends AppCompatActivity implements android.support
         microphoneDialogFragment.setArguments(args);
         return microphoneDialogFragment;
     }
+*/
 
     public void showNoteDialog(List<String> imagePathList){
-        noteDialogNewInstance(imagePathList).show(this.getFragmentManager(),"noteDialogFragment");
+        LocalImageActivity.noteDialogNewInstance(imagePathList, userId, serverName).show(this.getFragmentManager(),"noteDialogFragment");
     }
 
     /**** take notes ****/
+
+    /*
     public static NoteDialogFragment noteDialogNewInstance(List<String> imagePathList)
     {
         NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
@@ -360,7 +368,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         noteDialogFragment.setArguments(args);    // pass imagePathArray to NoteDialogFragment
         return noteDialogFragment;
     }
-
+*/
     private void observeNoteRefresh() {
         mNoteRefreshEventSub = RxBus.getDefault()
                 .observe(NoteRefreshEvent.class)

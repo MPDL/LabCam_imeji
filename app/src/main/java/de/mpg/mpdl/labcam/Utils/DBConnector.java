@@ -164,10 +164,12 @@ public class DBConnector {
                 .execute();
     }
 
-    public static Image getImageByPath(String imagePath) {
+    public static Image getImageByPath(String imagePath, String userId, String serverName) {
         return new Select()
                 .from(Image.class)
                 .where("imagePath = ?", imagePath)
+                .where("userId = ?", userId)
+                .where("serverName = ?", serverName)
                 .executeSingle();
     }
 

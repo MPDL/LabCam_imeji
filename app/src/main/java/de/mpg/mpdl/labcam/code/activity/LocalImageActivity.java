@@ -450,7 +450,7 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         task.setServerName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
-        int num = addImages(fileList, task.getTaskId()).size();
+        int num = addImages(fileList, task.getTaskId(), userId, serverName).size();
         task.setTotalItems(num);
         task.save();
         Log.v(LOG_TAG,"MU task"+task.getTaskId() );
@@ -463,18 +463,19 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
      * addImages function creates a List<Image> for UPLOAD, BATCH_EDIT_NOTE, BATCH_EDIT_VOICE operations
      */
 
-    private static List<Image> addImages(List<String> fileList, String taskId){
+    public static List<Image> addImages(List<String> fileList, String taskId, String userId, String serverName){
         List<Image> imageList = new ArrayList<>();
 
         for (String filePath: fileList) {
             String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
-            Image image = DBConnector.getImageByPath(filePath);
-
+            Image image = DBConnector.getImageByPath(filePath, userId, serverName);
+            //TODO
+            if(image!=null){  // image already exist
                 if(!taskId.equalsIgnoreCase("")) {  // upload process
                     image.setTaskId(taskId);
                     image.setState(String.valueOf(DeviceStatus.state.WAITING));
                     image.save();
-
+                }
                 imageList.add(image);
                 continue;
             }
@@ -502,31 +503,34 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
 
             //state
             String imageState = String.valueOf(DeviceStatus.state.WAITING);
+            //TODO
             String imageId = UUID.randomUUID().toString();
             //store image in local database
-            Image photo = new Image();
-            photo.setImageId(imageId);
-            photo.setImageName(imageName);
-            photo.setImagePath(filePath);
-            photo.setLongitude(longitude);
-            photo.setLatitude(latitude);
-            photo.setCreateTime(createTime);
-            photo.setSize(fileSize);
-            photo.setState(imageState);
-            photo.setTaskId(taskId);
-            photo.save();
-            imageList.add(photo);
+            Image newImage = new Image();
+            newImage.setImageId(imageId);
+            newImage.setImageName(imageName);
+            newImage.setImagePath(filePath);
+            newImage.setLongitude(longitude);
+            newImage.setLatitude(latitude);
+            newImage.setCreateTime(createTime);
+            newImage.setSize(fileSize);
+            newImage.setState(imageState);
+            newImage.setTaskId(taskId);
+            newImage.setUserId(userId);
+            newImage.setServerName(serverName);
+            newImage.save();
+            imageList.add(newImage);
         }
         return imageList;
     }
 
     /**** take notes ****/
-    public static NoteDialogFragment noteDialogNewInstance(ArrayList<String> imagePathList)
+    public static NoteDialogFragment noteDialogNewInstance(List<String> imagePathList, String userId, String serverName)
     {
         NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
 
         Log.d("LY", "size: "+imagePathList.size());
-        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
+        List<Image> list = addImages(imagePathList, "", userId, serverName);  // task id set empty, init images
 
         String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
         for(int i=0; i<imagePathList.size(); i++){
@@ -541,17 +545,17 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
     }
 
     public void showNoteDialog(ArrayList<String> imagePathList){
-        noteDialogNewInstance(imagePathList).show(getFragmentManager(), "noteDialogFragment");
+        noteDialogNewInstance(imagePathList, userId, serverName).show(getFragmentManager(), "noteDialogFragment");
     }
 
     /**** record voice ****/
-    public static MicrophoneDialogFragment voiceDialogNewInstance(ArrayList<String> imagePathList)
+    public static MicrophoneDialogFragment voiceDialogNewInstance(List<String> imagePathList, String userId, String serverName)
     {
         MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
 
 //        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
         Log.d("LY", "size: "+imagePathList.size());
-        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
+        List<Image> list = addImages(imagePathList, "", userId, serverName);  // task id set empty, init images
 
         String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
         for(int i=0; i<imagePathList.size(); i++){
@@ -566,6 +570,6 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
     }
 
     public void showVoiceDialog(ArrayList<String> imagePathList){
-        voiceDialogNewInstance(imagePathList).show(getFragmentManager(), "voiceDialogFragment");
+        voiceDialogNewInstance(imagePathList, userId, serverName).show(getFragmentManager(), "voiceDialogFragment");
     }
 }

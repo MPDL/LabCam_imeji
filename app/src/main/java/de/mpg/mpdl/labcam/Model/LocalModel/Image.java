@@ -56,6 +56,14 @@ public class Image extends Model {
     private String log;
 
     @Expose
+    @Column(name = "userId")
+    private String userId;
+
+    @Expose
+    @Column(name = "serverName")
+    private String serverName;
+
+    @Expose
     @Column(name = "noteId")
     private Long noteId;
 
@@ -67,7 +75,7 @@ public class Image extends Model {
         super();
     }
 
-    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, Long noteId, String voiceId) {
+    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, String userId, String serverName, Long noteId, String voiceId) {
         this.imageId = imageId;
         this.taskId = taskId;
         this.imageName = imageName;
@@ -79,6 +87,8 @@ public class Image extends Model {
         this.latitude = latitude;
         this.longitude = longitude;
         this.log = log;
+        this.userId = userId;
+        this.serverName = serverName;
         this.noteId = noteId;
         this.voiceId = voiceId;
     }
@@ -177,6 +187,23 @@ public class Image extends Model {
 
     public void setErrorLevel(String errorLevel) {
         this.errorLevel = errorLevel;
+    }
+
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String severName) {
+        this.serverName = severName;
     }
 
     public Long getNoteId() {
