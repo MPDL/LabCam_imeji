@@ -50,7 +50,7 @@ public class RecentNoteActivity extends BaseCompatActivity {
     protected void initContentView(Bundle savedInstanceState) {
         mPrefs = activity.getSharedPreferences("myPref", MODE_PRIVATE);
         userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("userName", "");
+        serverName = mPrefs.getString("serverName", "");
         noteList = new Select().from(Note.class).where("userId = ?", userId).where("serverName = ?", serverName).orderBy("createTime DESC").execute();
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar_recent_task);

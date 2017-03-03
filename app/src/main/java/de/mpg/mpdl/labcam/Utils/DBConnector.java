@@ -211,7 +211,7 @@ public class DBConnector {
                 // add noteId
                 image.setNoteId(newNote.getId());
             } else if(DBConnector.getNoteById(image.getNoteId(), userId, serverName)!=null) {
-                Long oldNoteId = image.getId();
+                Long oldNoteId = image.getNoteId();
                 // update noteId
                 image.setNoteId(newNote.getId());
                 // remove imageId from old note record
@@ -221,8 +221,10 @@ public class DBConnector {
                     oldNote.save();
                     //TODO modifiedDate ??
                     //remove note entry which has empty imageIds
-                    if (oldNote.getImageIds().size() == 0)
+                    if (oldNote.getImageIds().size() == 0) {
                         oldNote.delete();
+                    }
+
                 }
             }
             image.save();
