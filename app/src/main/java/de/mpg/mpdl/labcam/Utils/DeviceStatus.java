@@ -262,9 +262,6 @@ public class DeviceStatus {
         } catch (NegativeArraySizeException e){
             e.printStackTrace();
         }
-
-
-//        Log.e(LOG_TAG, metaDataJsonStr);
         return metaDataJsonStr;
     }
 
@@ -331,6 +328,12 @@ public class DeviceStatus {
             GPSVersionIDStr = gpsDirectory.getString(gpsDirectory.TAG_VERSION_ID);
         }
 
+        //note
+        Image image = DBConnector.getImageByPath(imagePath, userId, serverName);
+
+        if(image.getNoteId() != null && DBConnector.getNoteById(image.getNoteId(), userId, serverName) != null)
+            note = DBConnector.getNoteById(image.getNoteId(), userId, serverName).getNoteContent();
+
         if(ocrIsOn) {
             if(exifThumbnailDirectory!=null){
                 String orientationStr = exifThumbnailDirectory.getString(exifThumbnailDirectory.TAG_ORIENTATION);
@@ -349,13 +352,6 @@ public class DeviceStatus {
             }
 
             int e1 = Log.e(LOG_TAG, "orientation: " + orientation);
-
-            Image image = DBConnector.getImageByPath(imagePath);
-
-
-            if(image.getNoteId() == null && DBConnector.getNoteById(image.getNoteId(), userId, serverName) != null)
-                note = DBConnector.getNoteById(image.getNoteId(), userId, serverName).getNoteContent();
-            Log.e(LOG_TAG, "noteeeee: " + note);
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -484,10 +480,8 @@ public class DeviceStatus {
             NetworkInfo info = connectivity.getActiveNetworkInfo();
             if (info != null && info.isConnected())
             {
-                // 当前网络是连接的
                 if (info.getState() == NetworkInfo.State.CONNECTED)
                 {
-                    // 当前所连接的网络可用
                     return true;
                 }
             }

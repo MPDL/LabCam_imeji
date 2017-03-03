@@ -105,7 +105,7 @@ public class checkAndUpload {
         mPrefs = context.getSharedPreferences("myPref", 0);
         apiKey = mPrefs.getString("apiKey", "");
         userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("userName", "");
+        serverName = mPrefs.getString("serverName", "");
         ocrIsOn = mPrefs.getBoolean("ocrIsOn", false);
 
         if(!taskIsStopped()) {

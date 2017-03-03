@@ -74,7 +74,7 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     public void onBindViewHolder(SimpleViewHolder holder, final int position) {
         String filePath = mItems.get(position);
 
-        Image image = DBConnector.getImageByPath(filePath);
+        Image image = DBConnector.getImageByPath(filePath, userId, serverName);
         boolean layoutVisibility = false;
         if(image != null){
             if(image.getNoteId() != null && DBConnector.getNoteById(image.getNoteId(), userId, serverName) != null) {

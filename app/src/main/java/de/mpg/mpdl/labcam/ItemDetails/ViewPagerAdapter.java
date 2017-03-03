@@ -167,7 +167,7 @@ public class ViewPagerAdapter extends PagerAdapter {
 
     private void initImageInfoLayout(View itemView, int position){
         // get Image object
-        Image image = DBConnector.getImageByPath(imagePathList.get(position));
+        Image image = DBConnector.getImageByPath(imagePathList.get(position), userId, serverName);
         if(image != null){
             RelativeLayout notePanelLayout = (RelativeLayout) itemView.findViewById(R.id.layout_note_panel);
             RelativeLayout voicePanelLayout = (RelativeLayout) itemView.findViewById(R.id.layout_voice_panel);

@@ -35,6 +35,7 @@ import java.util.UUID;
 
 /**
  * Created by yingli on 2/14/17.
+ * Since NEW_PHOTO event is deprecated in Android 7. MediaContentJobService is a compromised solution(not in run time)
  */
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -138,31 +139,21 @@ public class MediaContentJobService extends JobService implements UploadResultRe
         //state
         String imageState = String.valueOf(DeviceStatus.state.WAITING);
 
-        //taskId
-
-
-//        Toast.makeText(context, "New Photo:" + imageName + "is Saved as : -" + imagePath, Toast.LENGTH_LONG).show();
-
-        Log.i("CameraEventReceiver", imageName);
-        Log.i("CameraEventReceiver",imagePath );
-        Log.i("CameraEventReceiver", fileSize + "kb");
-        Log.i("CameraEventReceiver", String.valueOf(createTime));
-
-
         //store image in local database
-
         String imageId = UUID.randomUUID().toString();
-        Image photo = new Image();
-        photo.setImageId(imageId);
-        photo.setImageName(imageName);
-        photo.setImagePath(imagePath);
-        photo.setLongitude(longitude);
-        photo.setLatitude(latitude);
-        photo.setCreateTime(createTime);
-        photo.setSize(fileSize);
-        photo.setState(imageState);
-        photo.setTaskId(DBConnector.getAuTask(userId,serverName).getTaskId());
-        photo.save();
+        Image newImage = new Image();
+        newImage.setImageId(imageId);
+        newImage.setImageName(imageName);
+        newImage.setImagePath(imagePath);
+        newImage.setLongitude(longitude);
+        newImage.setLatitude(latitude);
+        newImage.setCreateTime(createTime);
+        newImage.setSize(fileSize);
+        newImage.setState(imageState);
+        newImage.setTaskId(DBConnector.getAuTask(userId,serverName).getTaskId());
+        newImage.setUserId(userId);
+        newImage.setServerName(serverName);
+        newImage.save();
 
         //get current Task id
 

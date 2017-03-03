@@ -71,6 +71,10 @@ import java.util.UUID;
 
 import rx.Subscription;
 
+import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.addImages;
+import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.noteDialogNewInstance;
+import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.voiceDialogNewInstance;
+
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -722,7 +726,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         task.setServerName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
-        int num = LocalImageActivity.addImages(fileList, task.getTaskId(), userId, serverName).size();
+        int num = addImages(fileList, task.getTaskId(), userId, serverName).size();
         task.setTotalItems(num);
         task.save();
         Log.v(LOG_TAG,"MU task"+task.getTaskId() );
@@ -731,17 +735,12 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
         return task.getTaskId();
     }
 
-
-
-
     public void showNoteDialog(ArrayList<String> imagePathList){
-        LocalImageActivity.noteDialogNewInstance(imagePathList, userId, serverName).show(getActivity().getFragmentManager(), "noteDialogFragment");
+        noteDialogNewInstance(imagePathList, userId, serverName).show(getActivity().getFragmentManager(), "noteDialogFragment");
     }
 
-
-
     public void showVoiceDialog(ArrayList<String> imagePathList){
-        LocalImageActivity.voiceDialogNewInstance(imagePathList, userId, serverName).show(getActivity().getFragmentManager(), "voiceDialogFragment");
+        voiceDialogNewInstance(imagePathList, userId, serverName).show(getActivity().getFragmentManager(), "voiceDialogFragment");
     }
 
     @Override
