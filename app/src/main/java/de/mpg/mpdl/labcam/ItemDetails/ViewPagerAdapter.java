@@ -240,7 +240,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         final MediaPlayer mediaPlayer = new MediaPlayer();
 
         try {
-            mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId()).getVoicePath());
+            mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName).getVoicePath());
             mediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
@@ -280,7 +280,7 @@ public class ViewPagerAdapter extends PagerAdapter {
                 ToastUtil.showLongToast(context, "Reseting sound");
                 try {
                     mediaPlayer.reset();
-                    mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId()).getVoicePath());
+                    mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName).getVoicePath());
                     mediaPlayer.prepare();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -297,7 +297,7 @@ public class ViewPagerAdapter extends PagerAdapter {
             public void onClick(View v) {
                 ToastUtil.showLongToast(context, "Deleting sound");
                 voicePanelLayout.setVisibility(View.GONE);
-                deleteVoice(DBConnector.getVoiceById(image.getVoiceId()), position, image.getImageId());
+                deleteVoice(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName), position, image.getImageId());
             }
         });
     }

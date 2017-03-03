@@ -168,7 +168,7 @@ public class DBConnector {
                 .execute();
     }
 
-    public static List<Image> getImageByVoiceId(String voiceId) {
+    public static List<Image> getImageByVoiceId(Long voiceId) {
         return new Select()
                 .from(Image.class)
                 .where("voiceId = ?", voiceId)
@@ -186,10 +186,12 @@ public class DBConnector {
     }
 
     /*****  Voice  ******/
-    public static Voice getVoiceById(String voiceId) {
+    public static Voice getVoiceById(Long id, String userId, String serverName) {
         return new Select()
                 .from(Voice.class)
-                .where("voiceId = ?", voiceId)
+                .where("Id = ?", id)
+                .where("userId = ?", userId)
+                .where("serverName = ?", serverName)
                 .executeSingle();
     }
 
@@ -211,7 +213,7 @@ public class DBConnector {
                 // add noteId
                 image.setNoteId(newNote.getId());
             } else if(DBConnector.getNoteById(image.getNoteId(), userId, serverName)!=null) {
-                Long oldNoteId = image.getId();
+                Long oldNoteId = image.getNoteId();
                 // update noteId
                 image.setNoteId(newNote.getId());
                 // remove imageId from old note record
@@ -231,12 +233,13 @@ public class DBConnector {
 
     }
 
-    public static void batchEditVoice(List<Image> imageList, String voicePath){
+    public static void batchEditVoice(List<Image> imageList, String voicePath, String userId, String serverName){
 
         /** create new Voice **/
         Voice newVoice = new Voice();  //PREPARE(CREATE) new VOICE
-        newVoice.setVoiceId(UUID.randomUUID().toString());
         newVoice.setVoicePath(voicePath);
+        newVoice.setUserId(userId);
+        newVoice.setServerName(serverName);
         newVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
         for(Image i : imageList)
             newVoice.getImageIds().add(i.getImageId());
@@ -245,13 +248,13 @@ public class DBConnector {
         for (Image image : imageList) {  // every selected image
             if (image.getVoiceId() == null || "".equals(image.getVoiceId())) {
                 // add voiceId
-                image.setVoiceId(newVoice.getVoiceId());
-            } else {
-                String oldVoiceId = image.getVoiceId();
+                image.setVoiceId(newVoice.getId());
+            } else if(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName)!=null) {
+                Long oldVoiceId = image.getVoiceId();
                 // update voiceId
-                image.setVoiceId(newVoice.getVoiceId());
+                image.setVoiceId(newVoice.getId());
                 // remove imageId from old voice record
-                Voice oldVoice = getVoiceById(oldVoiceId);
+                Voice oldVoice = getVoiceById(oldVoiceId, userId,serverName);
                 oldVoice.getImageIds().remove(image.getImageId());
                 oldVoice.save();
                 //TODO modifiedDate ??

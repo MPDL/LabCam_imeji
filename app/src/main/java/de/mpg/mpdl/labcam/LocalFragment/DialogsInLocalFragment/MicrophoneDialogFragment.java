@@ -113,7 +113,7 @@ public class MicrophoneDialogFragment extends DialogFragment{
                                         selectedImageList.add(image);   // add image to imageList
                                     }
                                 }
-                                DBConnector.batchEditVoice(selectedImageList, fileFullName);
+                                DBConnector.batchEditVoice(selectedImageList, fileFullName, userId, serverName);
 
                                 VoiceRefreshEvent voiceRefreshEvent = new VoiceRefreshEvent(imagePathArray[imagePathArray.length-1]);
                                 RxBus.getDefault().post(voiceRefreshEvent);

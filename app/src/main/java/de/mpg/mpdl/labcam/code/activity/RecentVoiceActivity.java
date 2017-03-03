@@ -1,6 +1,7 @@
 package de.mpg.mpdl.labcam.code.activity;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +15,7 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.adapter.RecentVoiceAdapter;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -28,14 +30,16 @@ public class RecentVoiceActivity extends BaseCompatActivity {
 
     Activity activity = this;
     RecentVoiceAdapter recentVoiceAdapter = null;
+    private SharedPreferences mPrefs;
+    private String userId;
+    private String serverName;
 
     //ui elements
     @BindView(R.id.listView_recent_voice)
     ListView recentVoiceListView;
     @BindView(R.id.tv_no_recent_voice)
     TextView noRecentVoiceView;
-    List<Voice> voiceList =new Select().from(Voice.class).orderBy("createTime DESC")
-            .execute();
+    List<Voice> voiceList = new ArrayList<>();
 
     @Override
     protected int getLayoutId() {
@@ -44,6 +48,13 @@ public class RecentVoiceActivity extends BaseCompatActivity {
 
     @Override
     protected void initContentView(Bundle savedInstanceState) {
+
+        mPrefs = activity.getSharedPreferences("myPref", MODE_PRIVATE);
+        userId = mPrefs.getString("userId","");
+        serverName = mPrefs.getString("serverName", "");
+        voiceList =new Select().from(Voice.class).where("userId = ?", userId).where("serverName = ?", serverName).orderBy("createTime DESC")
+                .execute();
+
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar_recent_task);
         setSupportActionBar(toolbar);
 
