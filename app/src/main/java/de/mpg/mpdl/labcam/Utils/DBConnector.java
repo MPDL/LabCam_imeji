@@ -223,8 +223,10 @@ public class DBConnector {
                     oldNote.save();
                     //TODO modifiedDate ??
                     //remove note entry which has empty imageIds
-                    if (oldNote.getImageIds().size() == 0)
+                    if (oldNote.getImageIds().size() == 0) {
                         oldNote.delete();
+                    }
+
                 }
             }
             image.save();
