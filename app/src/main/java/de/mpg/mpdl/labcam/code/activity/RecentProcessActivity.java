@@ -16,6 +16,8 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.adapter.RecentTaskAdapter;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,6 @@ public class RecentProcessActivity extends BaseCompatActivity {
 
     //user info
     private String userId;
-    private SharedPreferences mPrefs;
     private String serverName;
 
     @Override
@@ -46,9 +47,8 @@ public class RecentProcessActivity extends BaseCompatActivity {
 
     @Override
     protected void initContentView(Bundle savedInstanceState) {
-        mPrefs = activity.getSharedPreferences("myPref", 0);
-        userId =  mPrefs.getString("userId", "");
-        serverName = mPrefs.getString("serverName","");
+        userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar_recent_task);
         setSupportActionBar(toolbar);

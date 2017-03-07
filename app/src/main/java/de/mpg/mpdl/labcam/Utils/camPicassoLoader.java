@@ -1,10 +1,12 @@
 package de.mpg.mpdl.labcam.Utils;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 
 import com.squareup.picasso.UrlConnectionDownloader;
+
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -15,12 +17,9 @@ import java.net.HttpURLConnection;
 public class camPicassoLoader extends UrlConnectionDownloader {
 
     String apiKey;
-    SharedPreferences mPrefs;
     public camPicassoLoader(Context context) {
         super(context);
-        //user info
-        mPrefs = context.getSharedPreferences("myPref", 0);
-        apiKey = mPrefs.getString("apiKey","");
+        apiKey = PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
     }
 
 

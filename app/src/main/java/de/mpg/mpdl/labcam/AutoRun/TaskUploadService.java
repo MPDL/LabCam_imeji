@@ -12,6 +12,8 @@ import android.util.Log;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 /**
  * Created by yingli on 1/26/16.
@@ -25,7 +27,6 @@ public class TaskUploadService extends Service {
     private int finishedNum;
     private String currentTaskId;
 
-    private SharedPreferences mPrefs;
     private String userId;
     private String serverName;
 
@@ -69,12 +70,8 @@ public class TaskUploadService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         Log.v(TAG, "onStartCommand!");
-
-        // prepare auth for upload
-        mPrefs = this.getSharedPreferences("myPref", 0);
-        userId = mPrefs.getString("userId", "");
-        serverName = mPrefs.getString("serverName", "");
-
+        userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
         //set task
         task = DBConnector.getAuTask(userId, serverName);

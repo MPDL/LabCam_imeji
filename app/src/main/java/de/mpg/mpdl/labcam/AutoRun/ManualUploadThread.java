@@ -17,31 +17,10 @@ import retrofit.mime.TypedFile;
  */
 public class ManualUploadThread extends Thread {
 
-
     private static final String TAG = ManualUploadThread.class.getSimpleName();
-
-    List<Image> waitingImages = null;
-    List<Image> finishedImages = null;
-    List<Image> failedImages = null;
-
-    //  position in waitingImage list
-
-    String currentImageId;
-    Task task;
-
-    // SharedPreferences
-    private SharedPreferences mPrefs;
-    private String apiKey;
-
-    private TypedFile typedFile;
-    private String json;
-
-    // handler for toast
-    private Handler handler = new Handler();
 
     private Context context;
     private String currentTaskId;
-    private String collectionID;
 
     public ManualUploadThread(Context context,String currentTaskId) {
         super("ManualUploadThread");

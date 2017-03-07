@@ -1,19 +1,10 @@
 package de.mpg.mpdl.labcam.Auth;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Messenger;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -27,9 +18,7 @@ import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
-import com.tbruyelle.rxpermissions.RxPermissions;
 
-import de.mpg.mpdl.labcam.AutoRun.MediaContentJobService;
 import de.mpg.mpdl.labcam.Folder.MainActivity;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
@@ -38,11 +27,9 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.QRUtils;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
-import org.eclipse.jetty.util.MultiMap;
-import org.eclipse.jetty.util.UrlEncoded;
-
-import java.net.URL;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -72,7 +59,6 @@ public class LoginActivity extends AppCompatActivity {
     private String username;
     private String password;
     private String serverURL;
-    private SharedPreferences mPrefs;
     private View rootView;
     private static final int INTENT_QR = 1001;
     private String LOG_TAG = LoginActivity.class.getSimpleName();
@@ -84,10 +70,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mPrefs = getSharedPreferences("myPref", 0);
-        String Key = mPrefs.getString("apiKey", "");
-        serverURL = mPrefs.getString("serverName", "");
-        String otherServerUrl = mPrefs.getString("otherServer", "");
+        String Key = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
+        serverURL =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
+        String otherServerUrl = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.OTHER_SERVER, "");
 
         /********************   if already have apiKey, jump over login steps ***********/
         if(Key.equalsIgnoreCase("")){
@@ -104,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
         /********************************************************************************/
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
-        usernameView.setText(mPrefs.getString("email", ""));   // set last user email
+        usernameView.setText(PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.EMAIL, "")); // set last user email
         serverURLView.setText(otherServerUrl);
 
         // gluons server is choosen
@@ -224,19 +209,12 @@ public class LoginActivity extends AppCompatActivity {
             // There was an error, focus the first form field with an error.
             focusView.requestFocus();
         } else {
-
-            mPrefs = getSharedPreferences("myPref", 0);
-            SharedPreferences.Editor mEditor = mPrefs.edit();
-            mEditor.putString("username", username).apply();
-            mEditor.putString("password", password).apply();
-            mEditor.putString("serverName", serverURL).apply();
+            PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.USER_NAME, username);
+            PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.PASSWORD, password);
+            PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.SERVER_NAME, serverURL);
             if(serverURLView.getVisibility()==View.VISIBLE) {
-                mEditor.putString("otherServer", serverURL).apply();
+                PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.OTHER_SERVER, serverURL);
             }
-            SharedPreferences preferences = getSharedPreferences("folder", Context.MODE_PRIVATE);
-            SharedPreferences.Editor ed = preferences.edit();
-            ed.putString("Camera", "On");
-            ed.commit();
             RetrofitClient.login(username,password,callback_login);
         }
 
@@ -248,28 +226,26 @@ public class LoginActivity extends AppCompatActivity {
 
             if (resultCode == Activity.RESULT_OK) {
 
-                    String APIkey = QRUtils.processQRCode(data, activity, LOG_TAG, null).getAPIkey();
-                    collectionId = QRUtils.processQRCode(data, activity, LOG_TAG, null).getQrCollectionId();
+                String APIkey = QRUtils.processQRCode(data, activity, LOG_TAG, null).getAPIkey();
+                collectionId = QRUtils.processQRCode(data, activity, LOG_TAG, null).getQrCollectionId();
 
-                    if(serverURLView.getVisibility()==View.VISIBLE) {
-                        serverURL = serverURLView.getText().toString();
-                    }else serverURL = DeviceStatus.BASE_URL;
-                
-                    RetrofitClient.setRestServer(serverURL);
+                if(serverURLView.getVisibility()==View.VISIBLE) {
+                    serverURL = serverURLView.getText().toString();
+                }else serverURL = DeviceStatus.BASE_URL;
 
-                    Log.v(LOG_TAG,serverURL);
+                RetrofitClient.setRestServer(serverURL);
+
+                Log.v(LOG_TAG,serverURL);
 
                     //get collection
-                    mPrefs = getSharedPreferences("myPref", 0);
-                    SharedPreferences.Editor mEditor = mPrefs.edit();
-                    mEditor.putString("APIkey",APIkey).apply();
-                    mEditor.putString("serverName", serverURL).apply();
-                    if(serverURLView.getVisibility()==View.VISIBLE) {
-                        mEditor.putString("otherServer", serverURL).apply();
-                    }
-                    mEditor.putString("collectionID", collectionId).apply();
-                    mEditor.commit();
-                    RetrofitClient.apiLogin(APIkey,callback_login);
+                PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.API_KEY, APIkey);
+                PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.SERVER_NAME, serverURL);
+
+                if(serverURLView.getVisibility()==View.VISIBLE) {
+                    PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.OTHER_SERVER, serverURL);
+                }
+                PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.COLLECTION_ID, APIkey);
+                RetrofitClient.apiLogin(APIkey,callback_login);
 
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
@@ -289,9 +265,9 @@ public class LoginActivity extends AppCompatActivity {
 
     // createTask only when with QRcode
     private void createTask(){
-        mPrefs = getSharedPreferences("myPref", 0);
-        String userName = mPrefs.getString("username", "");
-        String userId = mPrefs.getString("userId", "");
+
+        String userName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_NAME, "");
+        String userId = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
 
         Task latestTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
 
@@ -355,16 +331,13 @@ public class LoginActivity extends AppCompatActivity {
             String userCompleteName = "";
             userCompleteName = user.getPerson().getCompleteName();
             if(userCompleteName!="" && userCompleteName!=null){
-                mPrefs = getSharedPreferences("myPref", 0);
-                SharedPreferences.Editor mEditor = mPrefs.edit();
-                    mEditor.putString("username",user.getPerson().getCompleteName()).apply();
-                    mEditor.putString("familyName",user.getPerson().getFamilyName()).apply();
-                    mEditor.putString("givenName",user.getPerson().getGivenName()).apply();
-                    mEditor.putString("userId",user.getPerson().getId()).apply();
-                    mEditor.putString("email",user.getEmail()).apply();
-                    mEditor.putString("apiKey",user.getApiKey()).apply();
-                    mEditor.putString("serverName",serverURL).apply();
-                mEditor.commit();
+                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.USER_NAME, user.getPerson().getCompleteName());
+                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.FAMILY_NAME, user.getPerson().getFamilyName());
+                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.GIVEN_NAME, user.getPerson().getGivenName());
+                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.USER_ID, user.getPerson().getId());
+                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.EMAIL, user.getEmail());
+                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.API_KEY, user.getApiKey());
+                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.SERVER_NAME, serverURL);
                 if(collectionId!=null&&collectionId!=""){   // login with qr code
                     RetrofitClient.getCollectionById(collectionId, callback_collection, user.getApiKey());
 

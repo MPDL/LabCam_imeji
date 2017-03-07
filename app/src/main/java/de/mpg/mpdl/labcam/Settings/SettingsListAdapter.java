@@ -19,6 +19,8 @@ import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.util.List;
 
@@ -29,9 +31,7 @@ public class SettingsListAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
     private List<ImejiFolder> folderItems;
-    private final String LOG_TAG = SettingsListAdapter.class.getSimpleName();
     int selectedPosition = -1;
-    private SharedPreferences mPrefs;
 
     private String collectionId;
     private CollectionIdInterface ie;
@@ -43,10 +43,9 @@ public class SettingsListAdapter extends BaseAdapter {
         this.folderItems = folderItems;
         this.ie = ie;
         String lastCollectionId ="";
-        mPrefs = activity.getSharedPreferences("myPref", 0);
 
-        String userId = mPrefs.getString("userId", "");
-        String serverName = mPrefs.getString("serverName","");
+        String userId = PreferenceUtil.getString(activity, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        String serverName = PreferenceUtil.getString(activity, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
         try {
             lastCollectionId = DBConnector.getAuTask(userId, serverName).getCollectionId();
@@ -79,8 +78,6 @@ public class SettingsListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Log.v("getView");
-        mPrefs =  activity.getSharedPreferences("myPref", 0);
-
 
         WindowManager windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();

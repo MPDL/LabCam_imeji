@@ -14,17 +14,6 @@ public class Constants {
 
     public static String HOST_PORT = "8080";
 
-    // name of shared preferences
-    public static final String SHARED_PREFERENCES = "myPref";
-
-    public static final String USER_ID = "userId";
-
-    public static final String API_KEY = "apiKey";
-
-    public static final String EMAIL = "email";
-
-    public static final String IS_GUIDE = "isGuide";
-
     // splash cover timeout
     public static final long SPLASH_TIME_OUT = 4000;
 
@@ -60,4 +49,23 @@ public class Constants {
         public static String URL = "url";
 
     }
+
+    /**************************   SHARED_PREFERENCES **********************************/
+    public static final String SHARED_PREFERENCES = "myPref"; // name of shared preferences
+
+    public static final String API_KEY = "apiKey";
+    public static final String USER_ID = "userId";
+    public static final String USER_NAME = "username";
+    public static final String FAMILY_NAME = "familyName";
+    public static final String GIVEN_NAME = "givenName";
+    public static final String PASSWORD = "password";
+
+    public static final String EMAIL = "email";
+    public static final String SERVER_NAME = "serverName";
+    public static final String OTHER_SERVER = "otherServer";
+    public static final String COLLECTION_ID = "collectionID";
+    public static final String OCR_IS_ON = "ocrIsOn";
+    public static final String IS_ALBUM = "isAlbum";
+
+
 }

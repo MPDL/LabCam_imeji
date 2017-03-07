@@ -26,7 +26,9 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Upload.UploadResultReceiver;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.data.db.LiteOrmManager;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,7 +46,6 @@ public class MediaContentJobService extends JobService implements UploadResultRe
 
     private String userId;
     private String serverName;
-    private SharedPreferences mPrefs;
     private Context context = this;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -95,10 +96,8 @@ public class MediaContentJobService extends JobService implements UploadResultRe
 
 
     private void cameraEventHandling(String imagePath){
-        mPrefs = context.getSharedPreferences("myPref", 0);
-        userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("serverName","");
-
+        userId =  PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        serverName = PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
         //isAutoUpload
         Settings settings = DBConnector.getSettingsByUserId(context, userId);
         // if auto is turned off

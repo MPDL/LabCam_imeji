@@ -22,6 +22,8 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.CustomImageDownaloder;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,17 +38,13 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
     private Activity activity;
     private ArrayList<String> galleryItems;
     private String apiKey;
-    private SharedPreferences mPrefs;
     private Map<String, String> headers = new HashMap<String,String>() {
     };
     public ServerFolderItemsAdapter(Activity activity, ArrayList<String> galleryItems) {
         this.activity = activity;
         this.galleryItems = galleryItems;
 
-        mPrefs = activity.getSharedPreferences("myPref", 0);
-        apiKey = mPrefs.getString("apiKey","");
-
-
+        apiKey = PreferenceUtil.getString(activity, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
         this.headers.put("Authorization","Bearer "+apiKey);
     }
 

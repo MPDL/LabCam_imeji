@@ -26,10 +26,12 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.activity.LocalImageActivity;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.rxbus.EventSubscriber;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
 import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -73,7 +75,6 @@ public class DetailActivity extends AppCompatActivity implements android.support
     android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
 
     //user info
-    private SharedPreferences mPrefs;
     private String username;
     private String userId;
 
@@ -88,10 +89,9 @@ public class DetailActivity extends AppCompatActivity implements android.support
         observeNoteRefresh();
         observeVoiceRefresh();
 
-        mPrefs = this.getSharedPreferences("myPref", 0);
-        username = mPrefs.getString("username", "");
-        userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("serverName","");
+        username = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_NAME, "");
+        userId = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 

@@ -28,8 +28,10 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +57,6 @@ public class MicrophoneDialogFragment extends DialogFragment{
     private String file_exts[] = { AUDIO_RECORDER_FILE_EXT_MP4, AUDIO_RECORDER_FILE_EXT_3GP };
 
     private String fileFullName = null;
-    private SharedPreferences mPrefs;
     private String userId;
     private String serverName;
 
@@ -70,9 +71,8 @@ public class MicrophoneDialogFragment extends DialogFragment{
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View view = inflater.inflate(R.layout.dialog_fragment_microphone, null);
         final Activity activity = this.getActivity();
-        mPrefs = activity.getSharedPreferences("myPref", MODE_PRIVATE);
-        userId = mPrefs.getString("userId", "");
-        serverName = mPrefs.getString("serverName", "");
+        userId =  PreferenceUtil.getString(activity, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        serverName = PreferenceUtil.getString(activity, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
         Bundle bundle = getArguments();
         final String[] imagePathArray = bundle.getStringArray("imagePathArray");
         for (String s : imagePathArray) {

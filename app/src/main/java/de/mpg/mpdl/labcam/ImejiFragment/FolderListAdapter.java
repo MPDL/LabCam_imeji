@@ -25,6 +25,8 @@ import de.mpg.mpdl.labcam.ItemDetails.ItemsActivity;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.CustomImageDownaloder;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +41,6 @@ public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.Fo
     private List<ImejiFolder> folderItems;
     private final String LOG_TAG = FolderListAdapter.class.getSimpleName();
 
-    private SharedPreferences mPrefs;
     private String apiKey;
 
     private Map<String, String> headers = new HashMap<String,String>() {};
@@ -52,8 +53,7 @@ public class FolderListAdapter extends RecyclerView.Adapter<FolderListAdapter.Fo
             return;
         }
 
-        mPrefs = activity.getSharedPreferences("myPref", 0);
-        apiKey = mPrefs.getString("apiKey","");
+        apiKey = PreferenceUtil.getString(activity, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
 
         this.headers.put("Authorization","Bearer "+apiKey);
 

@@ -31,6 +31,8 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.UiElements.Notification.NotificationID;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -66,7 +68,6 @@ public class checkAndUpload {
     Task task;
 
     // SharedPreferences
-    private SharedPreferences mPrefs;
     private String apiKey;
     private String userId;
     private String serverName;
@@ -102,11 +103,10 @@ public class checkAndUpload {
         Log.i(TAG,"Thread --> startUpload()");
 
         //prepare apiKey
-        mPrefs = context.getSharedPreferences("myPref", 0);
-        apiKey = mPrefs.getString("apiKey", "");
-        userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("serverName", "");
-        ocrIsOn = mPrefs.getBoolean("ocrIsOn", false);
+        apiKey = PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
+        userId = PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        serverName = PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
+        ocrIsOn = PreferenceUtil.getBoolean(context, Constants.SHARED_PREFERENCES, Constants.OCR_IS_ON, false);
 
         if(!taskIsStopped()) {
             Log.v(TAG,"not stopped");

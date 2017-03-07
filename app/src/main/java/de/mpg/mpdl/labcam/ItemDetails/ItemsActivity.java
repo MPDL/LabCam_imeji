@@ -18,6 +18,8 @@ import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +46,6 @@ public class ItemsActivity extends AppCompatActivity {
     private String dataCollectionId;
     private Activity activity = this;
 
-    SharedPreferences mPrefs;
-    private String username;
     private String APIkey;
 
     //pagination
@@ -106,9 +106,7 @@ public class ItemsActivity extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mPrefs = activity.getSharedPreferences("myPref", 0);
-        username = mPrefs.getString("username", "");
-        APIkey = mPrefs.getString("apiKey", "");
+        APIkey = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
 
         Intent intent = activity.getIntent();
         if (intent != null && intent.hasExtra(Intent.EXTRA_TEXT)) {

@@ -52,10 +52,12 @@ import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar;
 import de.mpg.mpdl.labcam.code.activity.LocalImageActivity;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.rxbus.EventSubscriber;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
 import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -127,7 +129,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     List<Long> imageDateArrayList = new ArrayList<>();
 
     //user info
-    private SharedPreferences mPrefs;
     private String username;
     private String userId;
     private String serverName;
@@ -156,14 +157,9 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mPrefs = getActivity().getSharedPreferences("myPref", 0);
-        username = mPrefs.getString("username", "");
-        userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("serverName","");
-
-
-
+        username = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.USER_NAME,"");
+        userId = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.USER_ID,"");
+        serverName = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.SERVER_NAME,"");
     }
 
     @Override
@@ -202,10 +198,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     // finish actionMode when switch
                     actionMode.finish();
                 }
-
-                SharedPreferences.Editor mEditor = mPrefs.edit();
-                mEditor.putBoolean("isAlbum", false).apply();
-                mEditor.commit();
+                PreferenceUtil.setBoolean(getActivity(), Constants.SHARED_PREFERENCES, Constants.IS_ALBUM, false);
                 isAlbum = false;
 
                 dateLabel.setTextColor(getResources().getColor(R.color.primary));
@@ -222,10 +215,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     // finish actionMode when switch
                     actionMode.finish();
                 }
-
-                SharedPreferences.Editor mEditor = mPrefs.edit();
-                mEditor.putBoolean("isAlbum", true).apply();
-                mEditor.commit();
+                PreferenceUtil.setBoolean(getActivity(), Constants.SHARED_PREFERENCES, Constants.IS_ALBUM, true);
                 isAlbum = true;
 
                 dateLabel.setTextColor(getResources().getColor(R.color.no_focus_primary));
@@ -747,19 +737,15 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     public void onResume() {
         resolver.registerContentObserver(uri, true, dbObserver);
 
-        /** remember the date/timeLine option **/
-        isAlbum = mPrefs.getBoolean("isAlbum",isAlbum);
+        isAlbum = PreferenceUtil.getBoolean(getActivity(), Constants.SHARED_PREFERENCES, Constants.IS_ALBUM, false);
 
         renderTimeLine();
 
-        //prepare local gallery image data
-        checkPermission();    // check SD permission first
+        checkPermission();   //prepare local gallery image data, check SD permission first
 
-        //set grid adapter
-        loadLocalGallery();
+        loadLocalGallery();  //set grid adapter
 
-        //set header recycleView adapter
-        loadTimeLinePicture();
+        loadTimeLinePicture();  //set header recycleView adapter
 
         if(isAlbum) {
             dateLabel.setTextColor(getResources().getColor(R.color.lightGrey));

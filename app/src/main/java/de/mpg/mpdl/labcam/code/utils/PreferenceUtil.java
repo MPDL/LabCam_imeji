@@ -7,6 +7,8 @@ import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+
 /**
  * Created by yingli on 3/7/17.
  */

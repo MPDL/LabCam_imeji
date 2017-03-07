@@ -14,6 +14,8 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.adapter.RecentNoteAdapter;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,6 @@ public class RecentNoteActivity extends BaseCompatActivity {
 
     Activity activity = this;
     RecentNoteAdapter recentNoteAdapter = null;
-    private SharedPreferences mPrefs;
     private String userId;
     private String serverName;
 
@@ -48,9 +49,9 @@ public class RecentNoteActivity extends BaseCompatActivity {
 
     @Override
     protected void initContentView(Bundle savedInstanceState) {
-        mPrefs = activity.getSharedPreferences("myPref", MODE_PRIVATE);
-        userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("serverName", "");
+
+        userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
         noteList = new Select().from(Note.class).where("userId = ?", userId).where("serverName = ?", serverName).orderBy("createTime DESC").execute();
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar_recent_task);

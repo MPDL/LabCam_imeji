@@ -22,7 +22,9 @@ import de.mpg.mpdl.labcam.code.common.callback.RemoveTaskInterface;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.TaskManagerAdapter;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.data.db.LiteOrmManager;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.util.Iterator;
 import java.util.List;
@@ -39,7 +41,6 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
     //user info
     private String userId;
     private String serverUrl;
-    private SharedPreferences mPrefs;
 
     //taskList contents
     private TaskManagerAdapter taskManagerAdapter;
@@ -67,9 +68,8 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
         uri = Uri.parse("content://de.mpg.mpdl.labcam/tasks");
         resolver = activity.getContentResolver();
 
-        mPrefs = activity.getSharedPreferences("myPref", 0);
-        userId =  mPrefs.getString("userId", "");
-        serverUrl = mPrefs.getString("serverName","");
+        userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        serverUrl = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
 
         /** handler observer **/

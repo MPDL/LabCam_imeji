@@ -20,7 +20,9 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Upload.UploadResultReceiver;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.data.db.LiteOrmManager;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,17 +36,12 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
 
     private String userId;
     private String serverName;
-    private SharedPreferences mPrefs;
-    static CountDownTimer timer =null;
-    Toast toast;
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
-
-        mPrefs = context.getSharedPreferences("myPref", 0);
-        userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("serverName","");
+        userId =  PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        serverName = PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
         //isAutoUpload
         Settings settings = DBConnector.getSettingsByUserId(context, userId);

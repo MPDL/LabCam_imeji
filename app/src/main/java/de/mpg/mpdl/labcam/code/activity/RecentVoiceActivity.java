@@ -14,6 +14,8 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Voice;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.adapter.RecentVoiceAdapter;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +32,6 @@ public class RecentVoiceActivity extends BaseCompatActivity {
 
     Activity activity = this;
     RecentVoiceAdapter recentVoiceAdapter = null;
-    private SharedPreferences mPrefs;
     private String userId;
     private String serverName;
 
@@ -48,10 +49,8 @@ public class RecentVoiceActivity extends BaseCompatActivity {
 
     @Override
     protected void initContentView(Bundle savedInstanceState) {
-
-        mPrefs = activity.getSharedPreferences("myPref", MODE_PRIVATE);
-        userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("serverName", "");
+        userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
         voiceList =new Select().from(Voice.class).where("userId = ?", userId).where("serverName = ?", serverName).orderBy("createTime DESC")
                 .execute();
 

@@ -31,6 +31,8 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Settings.SettingsListAdapter;
 import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,10 +55,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
     private static final int INTENT_QR = 1001;
 
     //user
-    private String username;
     private String apiKey;
-    private String email;
-    private SharedPreferences mPrefs;
 
     //interface
     private CollectionIdInterface ie = this;
@@ -82,10 +81,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
         activity = this.getActivity();
         currentTaskId = getArguments().getString("taskId");
 
-        mPrefs = activity.getSharedPreferences("myPref", 0);
-        username = mPrefs.getString("username", "");
-        apiKey = mPrefs.getString("apiKey", "");
-        email = mPrefs.getString("email", "");
+        apiKey = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
 
         /** scan QR **/
         Button qrCodeImageView = (Button) view.findViewById(R.id.btn_qr_scan);

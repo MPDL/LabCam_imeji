@@ -38,6 +38,8 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ImageFileFilter;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,7 +81,6 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
     public Set<Integer> positionSet = new HashSet<>();
 
     private Activity activity = this;
-    private SharedPreferences mPrefs;
 
     private View rootView;
     private View headerView;
@@ -110,10 +111,9 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        mPrefs = activity.getSharedPreferences("myPref", 0);
-        username = mPrefs.getString("username", "");
-        userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("serverName","");
+        username =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_NAME, "");
+        userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
         //Kiran's title
         Intent intent = activity.getIntent();

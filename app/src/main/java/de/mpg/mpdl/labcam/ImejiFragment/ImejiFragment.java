@@ -1,13 +1,8 @@
 package de.mpg.mpdl.labcam.ImejiFragment;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,18 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.activeandroid.ActiveAndroid;
-import com.activeandroid.query.Select;
-
-import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
-import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;
 import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,68 +28,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.TreeMap;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ImejiFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ImejiFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ImejiFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     private View rootView;
     private final String LOG_TAG = "ImejiFragment";
-    private String username;
     private String APIKey;
-    private SharedPreferences mPrefs;
-
-//    private ProgressDialog pDialog;
-
     private FolderListAdapter adapter;
     private RecyclerView cardView;
-
     private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
-
-    SharedPreferences preferencesFiles;
-
-    /** reuse the adapters in Local fragment **/
-    SectionedGridRecyclerViewAdapter mSectionedAdapter;
-    SimpleAdapter simpleAdapter;
-
-    RecyclerView recyclerView;
-    /**
-     * imageList store all images date and path
-     * treeMap auto sort it by date (prepare data for timeline view)
-     * <imageDate,imagePath> **/
-    TreeMap<Long, String> imageList = new TreeMap<Long, String>();
-    ArrayList<String> sortedImageNameList;
-
-
     private OnFragmentInteractionListener mListener;
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ImejiFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ImejiFragment newInstance(String param1, String param2) {
-        ImejiFragment fragment = new ImejiFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     public ImejiFragment() {
         // Required empty public constructor
     }
@@ -112,17 +56,8 @@ public class ImejiFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         rootView = inflater.inflate(R.layout.fragment_imeji, container, false);
+        APIKey = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
 
-        mPrefs = getActivity().getSharedPreferences("myPref", 0);
-        username = mPrefs.getString("username", "");
-        APIKey = mPrefs.getString("apiKey", "");
-
-//        renderTimeLine();
-
-        //set header recycleView adapter
-//        loadTimeLinePicture();
-
-//        loadImejiFolder();
         adapter = new FolderListAdapter(getActivity(), collectionListLocal);
         cardView = (RecyclerView) rootView.findViewById(R.id.folder_cardview);
 
@@ -131,20 +66,6 @@ public class ImejiFragment extends Fragment {
         cardView.setLayoutManager(llm);
 
         cardView.setAdapter(adapter);
-
-//        // Set OnItemClickListener so we can be notified on item clicks
-//        cardView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-//                ImejiFolder folder = (ImejiFolder) adapter.getItem(position);
-//
-//                Intent showItemsIntent = new Intent(getActivity(), ItemsActivity.class);
-//                showItemsIntent.putExtra(Intent.EXTRA_TEXT, folder.id);
-//                showItemsIntent.putExtra("folderTitle", folder.getTitle());
-//                startActivity(showItemsIntent);
-//            }
-//        });
-
         return rootView;
     }
 
@@ -163,8 +84,6 @@ public class ImejiFragment extends Fragment {
     /** screen orientation **/
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-//        renderTimeLine();
-//        loadTimeLinePicture();
         super.onConfigurationChanged(newConfig);
     }
 
@@ -186,76 +105,10 @@ public class ImejiFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
-    }
-
-    //
-    private void loadImejiFolder(){
-        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-
-        if(sharedPreferences.getString("status","").isEmpty()) {
-            SharedPreferences.Editor editorS = sharedPreferences.edit();
-            editorS.putString("status","wifi");
-            editorS.commit();
-
-        }
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-
-        editor.putString("UploadStatus", "false");
-        //editor.putString("status", "wifi");
-        editor.commit();
-
-
-        String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME,MediaStore.Images.Media.DATA};
-        Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        preferencesFiles = getActivity().getSharedPreferences("gallery", Context.MODE_PRIVATE);
-
-        Cursor cur = getActivity().getContentResolver().query(images, albums, null, null, null);
-
-        // final ArrayList<String> folders = new ArrayList<String>();
-
-        /*
-            set the folder path and folder names in shared preferences
-         */
-        if(cur != null) {
-            if (cur.moveToFirst()) {
-                String album;
-                String folderPath;
-                int albumLocation = cur.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-                int path = cur.getColumnIndex(MediaStore.Images.Media.DATA);
-
-                do {
-                    // here store filename and filepath
-                    album = cur.getString(albumLocation);
-                    folderPath = cur.getString(path);
-                    File file = new File(folderPath);
-                    String dir = file.getParent();
-                    SharedPreferences.Editor ed = preferencesFiles.edit();
-                    ed.putString(album, dir);
-                    ed.commit();
-                    // folders.add(album);
-                    Log.i("ListingImages", " album=" + album);
-                } while (cur.moveToNext());
-            }
-        }
-
-        mPrefs = getActivity().getSharedPreferences("myPref", 0);
-        username = mPrefs.getString("username", "");
-        APIKey = mPrefs.getString("apiKey", "");
-
-        collectionListLocal = new Select()
-                .from(ImejiFolder.class)
-                .execute();
-        Log.v(LOG_TAG, "size: " + collectionListLocal.size() + "");
+         void onFragmentInteraction(Uri uri);
     }
 
     private void updateFolder(){
-//        pDialog = new ProgressDialog(getActivity());
-//        pDialog.setMessage("Loading...");
-//        pDialog.show();
-//        RetrofitClient.getCollections(callback, username, password);
         RetrofitClient.getCollections(callback_collection, APIKey);
     }
 

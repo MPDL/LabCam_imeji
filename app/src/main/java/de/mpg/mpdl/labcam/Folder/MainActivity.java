@@ -72,7 +72,9 @@ import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.code.common.adapter.TitleFragmentPagerAdapter;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.data.db.LiteOrmManager;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -110,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
     private String userId;
     private String apiKey;
     private String serverUrl;
-    private SharedPreferences mPrefs;
 
     //current tab
     private int currentTab = 0;
@@ -175,14 +176,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         }
 
         //user info
-        mPrefs = this.getSharedPreferences("myPref", MODE_PRIVATE);
-        email = mPrefs.getString("email", "");
-//        username =  mPrefs.getString("username", "");
-        username = mPrefs.getString("familyName","")+" "+mPrefs.getString("givenName","");
-        userId = mPrefs.getString("userId","");
-        apiKey = mPrefs.getString("apiKey","");
-        serverUrl = mPrefs.getString("serverName","");
-//        serverUrl = DeviceStatus.parseServerUrl(serverUrl);
+        email = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.EMAIL, "");
+        username = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.FAMILY_NAME, "")
+                +" "+ PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.GIVEN_NAME, "");
+        userId = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        apiKey = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
+        serverUrl = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
         Bundle args = this.getIntent().getExtras();         // get isQRLogin from extra
         try {
@@ -651,13 +650,12 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
         ocrSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences.Editor mEditor = mPrefs.edit();
+
                 if(buttonView.isChecked()){
-                    mEditor.putBoolean("ocrIsOn",true).apply();
+                    PreferenceUtil.setBoolean(context, Constants.SHARED_PREFERENCES, Constants.OCR_IS_ON, true);
                 }else {
-                    mEditor.putBoolean("ocrIsOn",false).apply();
+                    PreferenceUtil.setBoolean(context, Constants.SHARED_PREFERENCES, Constants.OCR_IS_ON, false);
                 }
-                mEditor.commit();
             }
         });
     }
@@ -736,12 +734,11 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                                     stopService(MUIntent);
 
                                     //delete sharedPreference(move to logout callback after backend implementation)
-                                    SharedPreferences.Editor mEditor = mPrefs.edit();
-                                    mEditor.remove("apiKey").commit();
-                                    mEditor.remove("userId").commit();
-                                    mEditor.remove("username").commit();
-                                    mEditor.remove("isAlbum").commit();
-                                    mEditor.remove("serverName").commit();
+                                    PreferenceUtil.clearPrefs(context, Constants.SHARED_PREFERENCES, Constants.API_KEY);
+                                    PreferenceUtil.clearPrefs(context, Constants.SHARED_PREFERENCES, Constants.USER_ID);
+                                    PreferenceUtil.clearPrefs(context, Constants.SHARED_PREFERENCES, Constants.USER_NAME);
+                                    PreferenceUtil.clearPrefs(context, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME);
+                                    PreferenceUtil.clearPrefs(context, Constants.SHARED_PREFERENCES, Constants.IS_ALBUM);
                                     Intent logoutIntent = new Intent(context, LoginActivity.class);
                                     startActivity(logoutIntent);
 
@@ -764,17 +761,17 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                     Intent MUIntent = new Intent(context, ManualUploadService.class);
                     stopService(MUIntent);
 
-                //delete sharedPreference(move to logout callback after backend implementation)
-                SharedPreferences.Editor mEditor = mPrefs.edit();
-                    mEditor.remove("apiKey").commit();
-                    mEditor.remove("userId").commit();
-                    mEditor.remove("username").commit();
-                    mEditor.remove("isAlbum").commit();
+                    //delete sharedPreference(move to logout callback after backend implementation)
+                    PreferenceUtil.clearPrefs(context, Constants.SHARED_PREFERENCES, Constants.API_KEY);
+                    PreferenceUtil.clearPrefs(context, Constants.SHARED_PREFERENCES, Constants.USER_ID);
+                    PreferenceUtil.clearPrefs(context, Constants.SHARED_PREFERENCES, Constants.USER_NAME);
+                    PreferenceUtil.clearPrefs(context, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME);
+                    PreferenceUtil.clearPrefs(context, Constants.SHARED_PREFERENCES, Constants.IS_ALBUM);
 
-                Intent logoutIntent = new Intent(context, LoginActivity.class);
-                startActivity(logoutIntent);
+                    Intent logoutIntent = new Intent(context, LoginActivity.class);
+                    startActivity(logoutIntent);
 
-                finish();
+                    finish();
                 }
             }
         });

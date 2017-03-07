@@ -35,6 +35,8 @@ import de.mpg.mpdl.labcam.UploadActivity.CollectionIdInterface;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.QRUtils;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,7 +57,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
     private String userId;
     private String apiKey;
     private String email;
-    private SharedPreferences mPrefs;
 
     private SettingsListAdapter adapter;
     private ListView listView;
@@ -205,13 +206,11 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
-        mPrefs = this.getSharedPreferences("myPref", 0);
-        username = mPrefs.getString("username", "");
-        userId = mPrefs.getString("userId","");
-        apiKey = mPrefs.getString("apiKey", "");
-        email = mPrefs.getString("email", "");
-        serverUrl = mPrefs.getString("serverName","");
+        username = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_NAME, "");
+        userId = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        apiKey = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
+        email = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.EMAIL, "");
+        serverUrl = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
         /** scan QR **/
         Button qrCodeImageView = (Button) findViewById(R.id.im_qr_scan);
