@@ -85,7 +85,7 @@ public class RecentNoteAdapter extends BaseAdapter {
     }
 
     private void deleteNote(Note note){
-        for (Image image : DBConnector.getImageByNoteId(note.getNoteId())) {
+        for (Image image : DBConnector.getImageByNoteId(note.getId())) {
             image.setNoteId(null);
             image.save();
         }

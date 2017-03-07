@@ -48,7 +48,7 @@ public class RecentProcessActivity extends BaseCompatActivity {
     protected void initContentView(Bundle savedInstanceState) {
         mPrefs = activity.getSharedPreferences("myPref", 0);
         userId =  mPrefs.getString("userId", "");
-        serverName = mPrefs.getString("server","");
+        serverName = mPrefs.getString("serverName","");
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar_recent_task);
         setSupportActionBar(toolbar);

@@ -69,7 +69,7 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
         userId =  mPrefs.getString("userId", "");
-        serverUrl = mPrefs.getString("server","");
+        serverUrl = mPrefs.getString("serverName","");
 
 
         /** handler observer **/

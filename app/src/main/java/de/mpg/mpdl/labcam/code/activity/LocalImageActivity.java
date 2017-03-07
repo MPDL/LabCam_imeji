@@ -28,6 +28,7 @@ import com.sch.rfview.manager.AnimRFGridLayoutManager;
 import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
 import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
 import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
+import de.mpg.mpdl.labcam.Utils.BatchOperationUtils;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.code.common.adapter.LocalAlbumAdapter;
 import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
@@ -49,6 +50,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import butterknife.BindView;
+
+import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.addImages;
+import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.noteDialogNewInstance;
+import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.voiceDialogNewInstance;
 
 /**
  * Created by allen on 03/09/15.
@@ -108,7 +113,7 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         mPrefs = activity.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("server","");
+        serverName = mPrefs.getString("serverName","");
 
         //Kiran's title
         Intent intent = activity.getIntent();
@@ -447,10 +452,10 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         task.setState(String.valueOf(DeviceStatus.state.WAITING));
         task.setUserName(username);
         task.setUserId(userId);
-        task.setSeverName(serverName);
+        task.setServerName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
-        int num = addImages(fileList, task.getTaskId()).size();
+        int num = addImages(fileList, task.getTaskId(), userId, serverName).size();
         task.setTotalItems(num);
         task.save();
         Log.v(LOG_TAG,"MU task"+task.getTaskId() );
@@ -459,113 +464,11 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         return task.getTaskId();
     }
 
-    /**
-     * addImages function creates a List<Image> for UPLOAD, BATCH_EDIT_NOTE, BATCH_EDIT_VOICE operations
-     */
-
-    private static List<Image> addImages(List<String> fileList, String taskId){
-        List<Image> imageList = new ArrayList<>();
-
-        for (String filePath: fileList) {
-            String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
-            Image image = DBConnector.getImageByPath(filePath);
-            if(image!=null){  // image already exist
-                if(!taskId.equalsIgnoreCase("")) {  // upload process
-                    image.setTaskId(taskId);
-                    image.setState(String.valueOf(DeviceStatus.state.WAITING));
-                    image.save();
-                }
-                imageList.add(image);
-                continue;
-            }
-
-            //imageSize
-            File file = new File(filePath);
-            String fileSize = String.valueOf(file.length() / 1024);
-
-            ExifInterface exif = null;
-            try {
-                exif = new ExifInterface(filePath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            //createTime
-            String createTime = exif.getAttribute(ExifInterface.TAG_DATETIME);
-
-            //latitude
-            String latitude = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
-
-            //longitude
-            String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
-
-            //state
-            String imageState = String.valueOf(DeviceStatus.state.WAITING);
-            String imageId = UUID.randomUUID().toString();
-            //store image in local database
-            Image photo = new Image();
-            photo.setImageId(imageId);
-            photo.setImageName(imageName);
-            photo.setImagePath(filePath);
-            photo.setLongitude(longitude);
-            photo.setLatitude(latitude);
-            photo.setCreateTime(createTime);
-            photo.setSize(fileSize);
-            photo.setState(imageState);
-            photo.setTaskId(taskId);
-            photo.save();
-            imageList.add(photo);
-        }
-        return imageList;
+    public void showNoteDialog(List<String> imagePathList){
+        noteDialogNewInstance(imagePathList, userId, serverName).show(getFragmentManager(), "noteDialogFragment");
     }
 
-    /**** take notes ****/
-    public static NoteDialogFragment noteDialogNewInstance(ArrayList<String> imagePathList)
-    {
-        NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
-
-        Log.d("LY", "size: "+imagePathList.size());
-        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
-
-        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
-        for(int i=0; i<imagePathList.size(); i++){
-            imagePathArray[i] = imagePathList.get(i);
-        }
-
-        Bundle args = new Bundle();
-
-        args.putStringArray("imagePathArray", imagePathArray);
-        noteDialogFragment.setArguments(args);    // pass imagePathArray to NoteDialogFragment
-        return noteDialogFragment;
-    }
-
-    public void showNoteDialog(ArrayList<String> imagePathList){
-        noteDialogNewInstance(imagePathList).show(getFragmentManager(), "noteDialogFragment");
-    }
-
-    /**** record voice ****/
-    public static MicrophoneDialogFragment voiceDialogNewInstance(ArrayList<String> imagePathList)
-    {
-        MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
-
-//        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
-        Log.d("LY", "size: "+imagePathList.size());
-        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
-
-        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
-        for(int i=0; i<imagePathList.size(); i++){
-            imagePathArray[i] = imagePathList.get(i);
-        }
-
-        Bundle args = new Bundle();
-
-        args.putStringArray("imagePathArray", imagePathArray);
-        microphoneDialogFragment.setArguments(args);
-        return microphoneDialogFragment;
-    }
-
-    public void showVoiceDialog(ArrayList<String> imagePathList){
-        voiceDialogNewInstance(imagePathList).show(getFragmentManager(), "voiceDialogFragment");
+    public void showVoiceDialog(List<String> imagePathList){
+        voiceDialogNewInstance(imagePathList, userId, serverName).show(getFragmentManager(), "voiceDialogFragment");
     }
 }

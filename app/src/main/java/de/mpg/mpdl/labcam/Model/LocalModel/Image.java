@@ -56,26 +56,26 @@ public class Image extends Model {
     private String log;
 
     @Expose
-    @Column(name = "noteId")
-    private String noteId;
-
-    @Expose
-    @Column(name = "voiceId")
-    private String voiceId;
-
-    @Expose
     @Column(name = "userId")
     private String userId;
 
     @Expose
-    @Column(name = "severName")
-    private String severName;
+    @Column(name = "serverName")
+    private String serverName;
+
+    @Expose
+    @Column(name = "noteId")
+    private Long noteId;
+
+    @Expose
+    @Column(name = "voiceId")
+    private Long voiceId;
 
     public Image() {
         super();
     }
 
-    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, String noteId, String voiceId) {
+    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, String userId, String serverName, Long noteId, Long voiceId) {
         this.imageId = imageId;
         this.taskId = taskId;
         this.imageName = imageName;
@@ -87,6 +87,8 @@ public class Image extends Model {
         this.latitude = latitude;
         this.longitude = longitude;
         this.log = log;
+        this.userId = userId;
+        this.serverName = serverName;
         this.noteId = noteId;
         this.voiceId = voiceId;
     }
@@ -187,21 +189,6 @@ public class Image extends Model {
         this.errorLevel = errorLevel;
     }
 
-    public String getNoteId() {
-        return noteId;
-    }
-
-    public void setNoteId(String noteId) {
-        this.noteId = noteId;
-    }
-
-    public String getVoiceId() {
-        return voiceId;
-    }
-
-    public void setVoiceId(String voiceId) {
-        this.voiceId = voiceId;
-    }
 
     public String getUserId() {
         return userId;
@@ -211,11 +198,27 @@ public class Image extends Model {
         this.userId = userId;
     }
 
-    public String getSeverName() {
-        return severName;
+    public String getServerName() {
+        return serverName;
     }
 
-    public void setSeverName(String severName) {
-        this.severName = severName;
+    public void setServerName(String severName) {
+        this.serverName = severName;
+    }
+
+    public Long getNoteId() {
+        return noteId;
+    }
+
+    public void setNoteId(Long noteId) {
+        this.noteId = noteId;
+    }
+
+    public Long getVoiceId() {
+        return voiceId;
+    }
+
+    public void setVoiceId(Long voiceId) {
+        this.voiceId = voiceId;
     }
 }

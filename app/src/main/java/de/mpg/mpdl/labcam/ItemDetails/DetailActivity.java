@@ -25,6 +25,7 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.activity.LocalImageActivity;
 import de.mpg.mpdl.labcam.code.rxbus.EventSubscriber;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
@@ -43,6 +44,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import rx.Subscription;
+
+import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.addImages;
+import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.noteDialogNewInstance;
+import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.voiceDialogNewInstance;
 
 
 public class DetailActivity extends AppCompatActivity implements android.support.v7.view.ActionMode.Callback{
@@ -86,7 +91,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         mPrefs = this.getSharedPreferences("myPref", 0);
         username = mPrefs.getString("username", "");
         userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("server","");
+        serverName = mPrefs.getString("serverName","");
 
         rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
@@ -196,74 +201,16 @@ public class DetailActivity extends AppCompatActivity implements android.support
         task.setState(String.valueOf(DeviceStatus.state.WAITING));
         task.setUserName(username);
         task.setUserId(userId);
-        task.setSeverName(serverName);
+        task.setServerName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
-        int num = addImages(fileList, task.getTaskId()).size();
+        int num = addImages(fileList, task.getTaskId(), userId, serverName).size();
         task.setTotalItems(num);
         task.save();
         Log.v(LOG_TAG,"MU task"+task.getTaskId() );
         Log.v(LOG_TAG, "setTotalItems:" + num);
 
         return task.getTaskId();
-    }
-
-    private static List<Image> addImages(List<String> fileList, String taskId){
-
-        List<Image> imageList = new ArrayList<>();
-
-        for (String filePath: fileList) {
-            String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
-            Image image = DBConnector.getImageByPath(filePath);
-            if(image!=null){  // image already exist
-                if(!taskId.equalsIgnoreCase("")) {  // upload process
-                    image.setTaskId(taskId);
-                    image.setState(String.valueOf(DeviceStatus.state.WAITING));
-                    image.save();
-                }
-                imageList.add(image);
-                continue;
-            }
-
-            //imageSize
-            File file = new File(filePath);
-            String fileSize = String.valueOf(file.length() / 1024);
-
-            ExifInterface exif = null;
-            try {
-                exif = new ExifInterface(filePath);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            //createTime
-            String createTime = exif.getAttribute(ExifInterface.TAG_DATETIME);
-
-            //latitude
-            String latitude = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
-
-            //longitude
-            String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
-
-            //state
-            String imageState = String.valueOf(DeviceStatus.state.WAITING);
-            String imageId = UUID.randomUUID().toString();
-            //store image in local database
-            Image photo = new Image();
-            photo.setImageId(imageId);
-            photo.setImageName(imageName);
-            photo.setImagePath(filePath);
-            photo.setLongitude(longitude);
-            photo.setLatitude(latitude);
-            photo.setCreateTime(createTime);
-            photo.setSize(fileSize);
-            photo.setState(imageState);
-            photo.setTaskId(taskId);
-            photo.save();
-            imageList.add(photo);
-        }
-        return imageList;
     }
 
     private void addOrRemove(int position) {
@@ -312,53 +259,11 @@ public class DetailActivity extends AppCompatActivity implements android.support
         }
     }
     public void showVoiceDialog(List<String> imagePathList){
-        voiceDialogNewInstance(imagePathList).show(this.getFragmentManager(), "voiceDialogFragment");
-    }
-
-
-    /**** record voice ****/
-    public static MicrophoneDialogFragment voiceDialogNewInstance(List<String> imagePathList)
-    {
-        MicrophoneDialogFragment microphoneDialogFragment = new MicrophoneDialogFragment();
-
-//        ImageGroup imageGroup = new ImageGroup(String.valueOf(UUID.randomUUID()),imagePathList);
-        Log.d("LY", "size: "+imagePathList.size());
-        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
-
-        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
-        for(int i=0; i<imagePathList.size(); i++){
-            imagePathArray[i] = imagePathList.get(i);
-        }
-
-        Bundle args = new Bundle();
-
-        args.putStringArray("imagePathArray", imagePathArray);
-        microphoneDialogFragment.setArguments(args);
-        return microphoneDialogFragment;
+        voiceDialogNewInstance(imagePathList, userId, serverName).show(this.getFragmentManager(), "voiceDialogFragment");
     }
 
     public void showNoteDialog(List<String> imagePathList){
-        noteDialogNewInstance(imagePathList).show(this.getFragmentManager(),"noteDialogFragment");
-    }
-
-    /**** take notes ****/
-    public static NoteDialogFragment noteDialogNewInstance(List<String> imagePathList)
-    {
-        NoteDialogFragment noteDialogFragment = new NoteDialogFragment();
-
-        Log.d("LY", "size: "+imagePathList.size());
-        List<Image> list = addImages(imagePathList, "");  // task id set empty, init images
-
-        String[] imagePathArray = new String[imagePathList.size()];  // fragment to fragment can only pass Array
-        for(int i=0; i<imagePathList.size(); i++){
-            imagePathArray[i] = imagePathList.get(i);
-        }
-
-        Bundle args = new Bundle();
-
-        args.putStringArray("imagePathArray", imagePathArray);
-        noteDialogFragment.setArguments(args);    // pass imagePathArray to NoteDialogFragment
-        return noteDialogFragment;
+        noteDialogNewInstance(imagePathList, userId, serverName).show(this.getFragmentManager(),"noteDialogFragment");
     }
 
     private void observeNoteRefresh() {
@@ -399,7 +304,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         display.getSize(size);
 
         viewPager = (ViewPager) rootView.findViewById(R.id.view_pager_detail_image);
-        viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList);
+        viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList, userId, serverName);
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setCurrentItem(positionInList);
         if(isLocalImage) {

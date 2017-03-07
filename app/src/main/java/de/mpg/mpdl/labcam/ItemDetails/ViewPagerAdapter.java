@@ -44,6 +44,8 @@ public class ViewPagerAdapter extends PagerAdapter {
     LayoutInflater inflater;
     Point size;
     List<String> imagePathList;
+    private String userId;
+    private String serverName;
     boolean isLocalImage;
     private OnItemClickListener onItemClickListener;
 
@@ -58,11 +60,13 @@ public class ViewPagerAdapter extends PagerAdapter {
         notifyDataSetChanged();
     }
 
-    public ViewPagerAdapter(Context context, Point size,boolean isLocalImage, List<String> imagePathList) {
+    public ViewPagerAdapter(Context context, Point size,boolean isLocalImage, List<String> imagePathList, String userId, String serverName) {
         this.context = context;
         this.size = size;
         this.isLocalImage = isLocalImage;
         this.imagePathList = imagePathList;
+        this.userId = userId;
+        this.serverName = serverName;
     }
 
     @Override
@@ -163,7 +167,7 @@ public class ViewPagerAdapter extends PagerAdapter {
 
     private void initImageInfoLayout(View itemView, int position){
         // get Image object
-        Image image = DBConnector.getImageByPath(imagePathList.get(position));
+        Image image = DBConnector.getImageByPath(imagePathList.get(position), userId, serverName);
         if(image != null){
             RelativeLayout notePanelLayout = (RelativeLayout) itemView.findViewById(R.id.layout_note_panel);
             RelativeLayout voicePanelLayout = (RelativeLayout) itemView.findViewById(R.id.layout_voice_panel);
@@ -190,7 +194,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         noteTextView.setVisibility(View.VISIBLE);
         if(image.getNoteId()==null){
             noteTextView.setVisibility(View.GONE);
-        }else noteTextView.setText(DBConnector.getNoteById(image.getNoteId()).getNoteContent());
+        }else noteTextView.setText(DBConnector.getNoteById(image.getNoteId(), userId, serverName).getNoteContent());
 
         cancelTextView.setOnClickListener(new View.OnClickListener() {  //
             @Override
@@ -206,7 +210,7 @@ public class ViewPagerAdapter extends PagerAdapter {
                 List<Image> selectedImageList = new ArrayList<Image>(); // selected ImageList
                 selectedImageList.add(image);
 
-                DBConnector.batchEditNote(selectedImageList, String.valueOf(noteEditText.getText()));
+                DBConnector.batchEditNote(selectedImageList, String.valueOf(noteEditText.getText()), userId, serverName);
 
                 editNoteButtonLayout.setVisibility(View.GONE);
                 noteEditText.setVisibility(View.GONE);
@@ -221,7 +225,7 @@ public class ViewPagerAdapter extends PagerAdapter {
             public void onClick(View v) {
                 noteTextView.setVisibility(View.GONE);
 
-                noteEditText.setText(DBConnector.getNoteById(image.getNoteId()).getNoteContent());
+                noteEditText.setText(DBConnector.getNoteById(image.getNoteId(),userId,serverName).getNoteContent());
                 noteEditText.setVisibility(View.VISIBLE);
 
                 editNoteButtonLayout.setVisibility(View.VISIBLE);
@@ -236,7 +240,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         final MediaPlayer mediaPlayer = new MediaPlayer();
 
         try {
-            mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId()).getVoicePath());
+            mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName).getVoicePath());
             mediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
@@ -276,7 +280,7 @@ public class ViewPagerAdapter extends PagerAdapter {
                 ToastUtil.showLongToast(context, "Reseting sound");
                 try {
                     mediaPlayer.reset();
-                    mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId()).getVoicePath());
+                    mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName).getVoicePath());
                     mediaPlayer.prepare();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -293,7 +297,7 @@ public class ViewPagerAdapter extends PagerAdapter {
             public void onClick(View v) {
                 ToastUtil.showLongToast(context, "Deleting sound");
                 voicePanelLayout.setVisibility(View.GONE);
-                deleteVoice(DBConnector.getVoiceById(image.getVoiceId()), position, image.getImageId());
+                deleteVoice(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName), position, image.getImageId());
             }
         });
     }
@@ -304,6 +308,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         image.save();
 
         voice.getImageIds().remove(imgId);
+        voice.save();
         VoiceRefreshEvent voiceRefreshEvent = new VoiceRefreshEvent(imagePathList.get(position));
         RxBus.getDefault().post(voiceRefreshEvent);
     }

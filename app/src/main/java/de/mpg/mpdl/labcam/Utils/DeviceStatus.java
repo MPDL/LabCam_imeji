@@ -2,6 +2,7 @@ package de.mpg.mpdl.labcam.Utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -53,6 +54,7 @@ public class DeviceStatus {
     public static final String password = "";
  //   public static final String BASE_URL= "";
     public static final String BASE_URL = "https://gluons.mpdl.mpg.de/imeji/rest/";
+
 //    public static final String BASE_URL = "http://test-gluons.mpdl.mpg.de/imeji/rest/";
 
     // Checks whether the device currently has a network connection
@@ -240,7 +242,7 @@ public class DeviceStatus {
 
     }
 
-    public static String metaDataJson(String imagePath, Boolean[] typeList, boolean ocrIsOn, Context context ){
+    public static String metaDataJson(String imagePath, Boolean[] typeList, boolean ocrIsOn, Context context, String userId, String serverName){
 
         String metaDataJsonStr = null;
 
@@ -250,7 +252,7 @@ public class DeviceStatus {
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(file);
 
-            metaDataJsonStr =  generateJsonStr(metadata, typeList, context, imagePath, ocrIsOn);
+            metaDataJsonStr =  generateJsonStr(metadata, typeList, context, imagePath, ocrIsOn, userId, serverName);
 
             print(metadata);
         } catch (ImageProcessingException e) {
@@ -260,9 +262,6 @@ public class DeviceStatus {
         } catch (NegativeArraySizeException e){
             e.printStackTrace();
         }
-
-
-//        Log.e(LOG_TAG, metaDataJsonStr);
         return metaDataJsonStr;
     }
 
@@ -271,7 +270,7 @@ public class DeviceStatus {
      * generate json string
      * @param metadata
      */
-    private static String generateJsonStr(Metadata metadata, Boolean[] typeList, Context context, String imagePath, boolean ocrIsOn){
+    private static String generateJsonStr(Metadata metadata, Boolean[] typeList, Context context, String imagePath, boolean ocrIsOn, String userId, String serverName){
 
         String metaDataJsonStr = null;
 
@@ -329,6 +328,12 @@ public class DeviceStatus {
             GPSVersionIDStr = gpsDirectory.getString(gpsDirectory.TAG_VERSION_ID);
         }
 
+        //note
+        Image image = DBConnector.getImageByPath(imagePath, userId, serverName);
+
+        if(image.getNoteId() != null && DBConnector.getNoteById(image.getNoteId(), userId, serverName) != null)
+            note = DBConnector.getNoteById(image.getNoteId(), userId, serverName).getNoteContent();
+
         if(ocrIsOn) {
             if(exifThumbnailDirectory!=null){
                 String orientationStr = exifThumbnailDirectory.getString(exifThumbnailDirectory.TAG_ORIENTATION);
@@ -347,12 +352,6 @@ public class DeviceStatus {
             }
 
             int e1 = Log.e(LOG_TAG, "orientation: " + orientation);
-
-            Image image = DBConnector.getImageByPath(imagePath);
-            if(image.getNoteId() == null || image.getNoteId().equalsIgnoreCase("")) {}
-            else{
-                note = DBConnector.getNoteById(image.getNoteId()).getNoteContent();}
-
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -481,10 +480,8 @@ public class DeviceStatus {
             NetworkInfo info = connectivity.getActiveNetworkInfo();
             if (info != null && info.isConnected())
             {
-                // 当前网络是连接的
                 if (info.getState() == NetworkInfo.State.CONNECTED)
                 {
-                    // 当前所连接的网络可用
                     return true;
                 }
             }

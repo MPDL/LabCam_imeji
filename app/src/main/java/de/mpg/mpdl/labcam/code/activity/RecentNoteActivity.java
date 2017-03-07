@@ -1,6 +1,7 @@
 package de.mpg.mpdl.labcam.code.activity;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +15,7 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.adapter.RecentNoteAdapter;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -27,14 +29,16 @@ public class RecentNoteActivity extends BaseCompatActivity {
 
     Activity activity = this;
     RecentNoteAdapter recentNoteAdapter = null;
+    private SharedPreferences mPrefs;
+    private String userId;
+    private String serverName;
 
     //ui elements
     @BindView(R.id.listView_recent_text_notes)
     ListView recentTextListView;
     @BindView(R.id.tv_no_recent_text)
     TextView noRecentTextView;
-    List<Note> noteList =new Select().from(Note.class).orderBy("createTime DESC")
-                        .execute();
+    List<Note> noteList = new ArrayList<>();
 
 
     @Override
@@ -44,6 +48,10 @@ public class RecentNoteActivity extends BaseCompatActivity {
 
     @Override
     protected void initContentView(Bundle savedInstanceState) {
+        mPrefs = activity.getSharedPreferences("myPref", MODE_PRIVATE);
+        userId = mPrefs.getString("userId","");
+        serverName = mPrefs.getString("serverName", "");
+        noteList = new Select().from(Note.class).where("userId = ?", userId).where("serverName = ?", serverName).orderBy("createTime DESC").execute();
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar_recent_task);
         setSupportActionBar(toolbar);

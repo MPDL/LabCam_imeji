@@ -20,6 +20,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 
 /**
  * Created by yingli on 2/23/16.
@@ -28,6 +29,8 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
 
     private final Context mContext;
     private final List<String> mItems;
+    private String userId;
+    private String serverName;
 
     //remember selected positions
     public Set<Integer> positionSet = new HashSet<>();
@@ -55,9 +58,11 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
         }
     }
 
-    public SimpleAdapter(Context context,List<String> galleryItems) {
-        mContext = context;
-        mItems = galleryItems;
+    public SimpleAdapter(Context context, List<String> galleryItems, String userId, String serverName) {
+        this.mContext = context;
+        this.mItems = galleryItems;
+        this.userId = userId;
+        this.serverName = serverName;
     }
 
     public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -69,7 +74,26 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     public void onBindViewHolder(SimpleViewHolder holder, final int position) {
         String filePath = mItems.get(position);
 
-        Image image = DBConnector.getImageByPath(filePath);
+        Image image = DBConnector.getImageByPath(filePath, userId, serverName);
+        boolean layoutVisibility = false;
+        if(image != null){
+            if(image.getNoteId() != null && DBConnector.getNoteById(image.getNoteId(), userId, serverName) != null) {
+                layoutVisibility = true;
+                holder.noteImageView.setVisibility(View.VISIBLE);
+            }
+            if(image.getVoiceId() != null) {
+                if(!layoutVisibility)
+                    layoutVisibility = true;
+                holder.voiceImageView.setVisibility(View.VISIBLE);
+            }
+
+        }
+        if(layoutVisibility)
+            holder.relativeLayout.setVisibility(View.VISIBLE);
+        else
+            holder.relativeLayout.setVisibility(View.INVISIBLE);
+
+        /*
         if(image!=null && (image.getNoteId()!=null || image.getVoiceId()!=null)){
             holder.relativeLayout.setVisibility(View.VISIBLE);
             if(image.getNoteId()!=null){      // show notes
@@ -82,6 +106,8 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
         }else {
             holder.relativeLayout.setVisibility(View.INVISIBLE);
         }
+
+        */
 
         Uri uri = Uri.fromFile(new File(filePath));
 
@@ -114,6 +140,8 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
         }
     }
 
+
+
     public void remove(String str){
         mItems.remove(str);
         notifyDataSetChanged();
@@ -134,4 +162,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
         void onItemClick(View view, int position);
         void onItemLongClick(View view, int position);
     }
+
+
 }

@@ -28,8 +28,12 @@ public class Voice extends Model {
     private String createTime;
 
     @Expose
-    @Column(name = "voiceId")
-    private String voiceId;
+    @Column(name = "serverName")
+    private String serverName;
+
+    @Expose
+    @Column(name = "userId")
+    private String userId;
 
     @Expose
     @Column(name = "imageIds")
@@ -39,11 +43,12 @@ public class Voice extends Model {
         super();
     }
 
-    public Voice(String voicePath, String voiceName, String createTime, String voiceId, List imageIds) {
+    public Voice(String voicePath, String voiceName, String createTime, String serverName, String userId, List imageIds) {
         this.voicePath = voicePath;
         this.voiceName = voiceName;
         this.createTime = createTime;
-        this.voiceId = voiceId;
+        this.serverName = serverName;
+        this.userId = userId;
         this.imageIds = imageIds;
     }
 
@@ -71,12 +76,20 @@ public class Voice extends Model {
         this.createTime = createTime;
     }
 
-    public String getVoiceId() {
-        return voiceId;
+    public String getServerName() {
+        return serverName;
     }
 
-    public void setVoiceId(String voiceId) {
-        this.voiceId = voiceId;
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public List<String> getImageIds() {
@@ -86,4 +99,5 @@ public class Voice extends Model {
     public void setImageIds(List<String> imageIds) {
         this.imageIds = imageIds;
     }
+
 }

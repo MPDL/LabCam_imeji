@@ -34,7 +34,7 @@ public class DBConnector {
         return new Select()
                 .from(Task.class)
                 .where("userId = ?", userId)
-                .where("severName = ?", serverName)
+                .where("serverName = ?", serverName)
                 .execute();
     }
 
@@ -43,7 +43,7 @@ public class DBConnector {
         return new Select()
                 .from(Task.class)
                 .where("userId = ?", userId)
-                .where("severName = ?", serverName)
+                .where("serverName = ?", serverName)
                 .where("state != ?", String.valueOf(DeviceStatus.state.WAITING))
                 .where("state != ?", String.valueOf(DeviceStatus.state.STOPPED))
                 .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
@@ -58,7 +58,7 @@ public class DBConnector {
                 .from(Task.class)
                 .where("uploadMode = ?", mode)
                 .where("userId = ?", userId)
-                .where("severName = ?", serverName)
+                .where("serverName = ?", serverName)
                 .orderBy("startDate DESC")
                 .executeSingle();
     }
@@ -69,7 +69,7 @@ public class DBConnector {
                 .from(Task.class)
                 .where("userId = ?", userId)
                 .orderBy("endDate DESC")
-                .where("severName = ?", serverName)
+                .where("serverName = ?", serverName)
                 .executeSingle();
     }
 
@@ -77,7 +77,7 @@ public class DBConnector {
         return new Select()
                 .from(Task.class)
                 .where("userId = ?", userId)
-                .where("severName = ?", serverName)
+                .where("serverName = ?", serverName)
                 .where("state = ?", String.valueOf(DeviceStatus.state.STOPPED))
                 .orderBy("startDate DESC")
                 .execute();
@@ -87,7 +87,7 @@ public class DBConnector {
         return new Select()
                 .from(Task.class)
                 .where("userId = ?", userId)
-                .where("severName = ?", serverName)
+                .where("serverName = ?", serverName)
                 .where("state = ?", String.valueOf(DeviceStatus.state.WAITING))
                 .orderBy("startDate DESC")
                 .execute();
@@ -98,7 +98,7 @@ public class DBConnector {
         return new Select()
                 .from(Task.class)
                 .where("userId = ?", userId)
-                .where("severName = ?", serverName)
+                .where("serverName = ?", serverName)
                 .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
 //                .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
                 .execute();
@@ -112,7 +112,7 @@ public class DBConnector {
                 .from(Task.class)
                 .where("uploadMode = ?","AU")
                 .where("userId = ?", userId)
-                .where("severName = ?", serverName)
+                .where("serverName = ?", serverName)
                 .execute();
 
         // remove unfinished tasks form list
@@ -128,7 +128,7 @@ public class DBConnector {
         new Delete().from(Task.class)
                 .where("uploadMode = ?","AU")
                 .where("state = ?", String.valueOf(DeviceStatus.state.FINISHED))
-                .where("severName = ?", serverName)
+                .where("serverName = ?", serverName)
                 .execute();
 
         int num = (new Select()
@@ -148,29 +148,12 @@ public class DBConnector {
                 .executeSingle();
     }
 
-    // get active Image list
-    public static List<Image> getActiveImages(String taskId) {
-        return new Select()
-                .from(Image.class)
-                .where("state != ?", String.valueOf(DeviceStatus.state.FAILED))
-                .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
-                .orderBy("RANDOM()")
-                .execute();
-    }
-
-    public static List<Image> getInactiveImages(String taskId) {
-        return new Select()
-                .from(Image.class)
-                .where("state != ?", String.valueOf(DeviceStatus.state.WAITING))
-                .where("state != ?", String.valueOf(DeviceStatus.state.STARTED))
-                .orderBy("RANDOM()")
-                .execute();
-    }
-
-    public static Image getImageByPath(String imagePath) {
+    public static Image getImageByPath(String imagePath, String userId, String serverName) {
         return new Select()
                 .from(Image.class)
                 .where("imagePath = ?", imagePath)
+                .where("userId = ?", userId)
+                .where("serverName = ?", serverName)
                 .executeSingle();
     }
 
@@ -181,14 +164,14 @@ public class DBConnector {
                 .executeSingle();
     }
 
-    public static List<Image> getImageByNoteId(String noteId) {
+    public static List<Image> getImageByNoteId(Long noteId) {
         return new Select()
                 .from(Image.class)
                 .where("noteId = ?", noteId)
                 .execute();
     }
 
-    public static List<Image> getImageByVoiceId(String voiceId) {
+    public static List<Image> getImageByVoiceId(Long voiceId) {
         return new Select()
                 .from(Image.class)
                 .where("voiceId = ?", voiceId)
@@ -196,49 +179,58 @@ public class DBConnector {
     }
 
     /*****  Note  ******/
-    public static Note getNoteById(String noteId) {
+    public static Note getNoteById(Long id, String userId, String serverName) {
         return new Select()
                 .from(Note.class)
-                .where("noteId = ?", noteId)
+                .where("Id = ?", id)
+                .where("userId = ?", userId)
+                .where("serverName = ?", serverName)
                 .executeSingle();
     }
 
     /*****  Voice  ******/
-    public static Voice getVoiceById(String voiceId) {
+    public static Voice getVoiceById(Long id, String userId, String serverName) {
         return new Select()
                 .from(Voice.class)
-                .where("voiceId = ?", voiceId)
+                .where("Id = ?", id)
+                .where("userId = ?", userId)
+                .where("serverName = ?", serverName)
                 .executeSingle();
     }
 
 
-    public static void batchEditNote(List<Image> imageList, String noteContent){
+    public static void batchEditNote(List<Image> imageList, String noteContent, String userId, String serverName){
 
         /** create new Note **/
         Note newNote = new Note();  //PREPARE(CREATE) new NOTE
-        newNote.setNoteId(UUID.randomUUID().toString());
         newNote.setNoteContent(noteContent);
+        newNote.setUserId(userId);
+        newNote.setServerName(serverName);
         newNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
         for(Image i : imageList)
             newNote.getImageIds().add(i.getImageId());
         newNote.save();
 
         for (Image image : imageList) {  // every selected image
-            if (image.getNoteId() == null || "".equals(image.getNoteId())) {
+            if ((image.getNoteId() == null || "".equals(image.getNoteId()))){
                 // add noteId
-                image.setNoteId(newNote.getNoteId());
-            } else {
-                String oldNoteId = image.getNoteId();
+                image.setNoteId(newNote.getId());
+            } else if(DBConnector.getNoteById(image.getNoteId(), userId, serverName)!=null) {
+                Long oldNoteId = image.getNoteId();
                 // update noteId
-                image.setNoteId(newNote.getNoteId());
+                image.setNoteId(newNote.getId());
                 // remove imageId from old note record
-                Note oldNote = getNoteById(oldNoteId);
-                oldNote.getImageIds().remove(image.getImageId());
-                oldNote.save();
-                //TODO modifiedDate ??
-                //remove note entry which has empty imageIds
-                if (oldNote.getImageIds().size() == 0)
-                    oldNote.delete();
+                Note oldNote = getNoteById(oldNoteId, userId,serverName);
+                if(oldNote != null) {
+                    oldNote.getImageIds().remove(image.getImageId());
+                    oldNote.save();
+                    //TODO modifiedDate ??
+                    //remove note entry which has empty imageIds
+                    if (oldNote.getImageIds().size() == 0) {
+                        oldNote.delete();
+                    }
+
+                }
             }
             image.save();
         }
@@ -246,12 +238,13 @@ public class DBConnector {
 
     }
 
-    public static void batchEditVoice(List<Image> imageList, String voicePath){
+    public static void batchEditVoice(List<Image> imageList, String voicePath, String userId, String serverName){
 
         /** create new Voice **/
         Voice newVoice = new Voice();  //PREPARE(CREATE) new VOICE
-        newVoice.setVoiceId(UUID.randomUUID().toString());
         newVoice.setVoicePath(voicePath);
+        newVoice.setUserId(userId);
+        newVoice.setServerName(serverName);
         newVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
         for(Image i : imageList)
             newVoice.getImageIds().add(i.getImageId());
@@ -260,13 +253,13 @@ public class DBConnector {
         for (Image image : imageList) {  // every selected image
             if (image.getVoiceId() == null || "".equals(image.getVoiceId())) {
                 // add voiceId
-                image.setVoiceId(newVoice.getVoiceId());
-            } else {
-                String oldVoiceId = image.getVoiceId();
+                image.setVoiceId(newVoice.getId());
+            } else if(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName)!=null) {
+                Long oldVoiceId = image.getVoiceId();
                 // update voiceId
-                image.setVoiceId(newVoice.getVoiceId());
+                image.setVoiceId(newVoice.getId());
                 // remove imageId from old voice record
-                Voice oldVoice = getVoiceById(oldVoiceId);
+                Voice oldVoice = getVoiceById(oldVoiceId, userId,serverName);
                 oldVoice.getImageIds().remove(image.getImageId());
                 oldVoice.save();
                 //TODO modifiedDate ??
