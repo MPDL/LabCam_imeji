@@ -29,7 +29,6 @@ import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by yingli on 1/22/16.
@@ -283,7 +282,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                                         activity.stopService(uploadIntent);
 
                                         //delete all image with this taskId
-                                        new Delete().from(Image.class).where("taskId = ?", task.getTaskId()).execute();
+                                        new Delete().from(Image.class).where("taskId = ?", task.getId()).execute();
                                         String collectionID = task.getCollectionId();
                                         String collectionName = task.getCollectionName();
                                         String username = task.getUserName();
@@ -296,9 +295,6 @@ public class TaskManagerAdapter extends BaseAdapter {
                                         //resume task(create task)
 
                                         Task newTask = new Task();
-
-                                        String uniqueID = UUID.randomUUID().toString();
-                                        newTask.setTaskId(uniqueID);
                                         newTask.setUploadMode("AU");
                                         newTask.setCollectionId(collectionID);
                                         newTask.setCollectionName(collectionName);
@@ -351,11 +347,11 @@ public class TaskManagerAdapter extends BaseAdapter {
         isPausedCheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String currentTaskId = task.getTaskId();
+                Long currentTaskId = task.getId();
                 if (!isPausedCheckBox.isChecked()) {
                     //  button clicked
 
-                    Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+                    Task currentTask = new Select().from(Task.class).where("Id = ?", currentTaskId).executeSingle();
                     currentTask.setState(String.valueOf(DeviceStatus.state.WAITING));
                     currentTask.save();
                     Log.v(TAG, "setState: WAITING");
@@ -384,7 +380,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                 } else if (isPausedCheckBox.isChecked()) {
                     //  button clicked
 
-                    Task currentTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+                    Task currentTask = new Select().from(Task.class).where("Id = ?", currentTaskId).executeSingle();
                     currentTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
                     currentTask.save();
                     Log.v(TAG, "setState: STOPPED");
@@ -416,8 +412,8 @@ public class TaskManagerAdapter extends BaseAdapter {
     }
 
     private void deleteTask(Task task,int position){
-        String currentTaskId = task.getTaskId();
-        new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
+        Long currentTaskId = task.getId();
+        new Delete().from(Task.class).where("Id = ?", currentTaskId).execute();
         Log.e(TAG, "task delete clicked");
         //TODO: delete from data list
         removeTaskInterface.remove(position);
@@ -453,7 +449,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                 Log.i(TAG, "MU_FAILED");
                 break;
         }
-        Log.i(TAG, "task: id " + task.getTaskId());
+        Log.i(TAG, "task: id " + task.getId());
         Log.i(TAG, "finished: "+task.getFinishedItems());
         Log.i(TAG, "total: "+task.getTotalItems());
         Log.i(TAG, "getStartDate: "+task.getStartDate());

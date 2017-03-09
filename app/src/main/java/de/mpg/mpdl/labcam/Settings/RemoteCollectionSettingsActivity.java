@@ -39,7 +39,6 @@ import de.mpg.mpdl.labcam.Utils.QRUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -268,9 +267,6 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
             Task task = new Task();
 
             getCollectionNameById(collectionID);
-
-            String uniqueID = UUID.randomUUID().toString();
-            task.setTaskId(uniqueID);
             task.setUploadMode("AU");
             task.setCollectionId(collectionID);
             task.setCollectionName(collectionName);
@@ -410,7 +406,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                 if(i ==0){
                                     //oldCollectionName selected
                                     // yes continue latestTask
-                                    String taskId = latestTask.getTaskId();
+
 
                                     // change state of old task
                                     // MU, STOPPED to WAITING
@@ -436,7 +432,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
                                     List<Image> remainImages = null;
                                      remainImages = new Select().from(Image.class)
-                                            .where("taskId = ?", latestTask.getTaskId())
+                                            .where("taskId = ?", latestTask.getId())
                                             .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
                                             .where("state != ?", String.valueOf(DeviceStatus.state.STARTED))
                                             .execute();
@@ -465,30 +461,14 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     latestTask.setState(String.valueOf(DeviceStatus.state.FINISHED));
                                     latestTask.save();
 
-                                    //uniqueID as new AU taskId
-                                    String uniqueID = UUID.randomUUID().toString();
 
-                                    //set remainImage taskId
-                                    ActiveAndroid.beginTransaction();
-                                    try {
-                                        for (Image image:remainImages) {
 
-                                            image.setTaskId(uniqueID);
-                                            image.save();
-                                        }
-                                        ActiveAndroid.setTransactionSuccessful();
-                                    }
-                                    finally {
-                                        ActiveAndroid.endTransaction();
-                                    }
 
                                     //create new task
                                     Log.v("collectionID", collectionId);
                                     task = new Task();
                                     task.setTotalItems(remainImages.size());
                                     task.setFinishedItems(0);
-
-                                    task.setTaskId(uniqueID);
                                     task.setUploadMode("AU");
                                     task.setCollectionId(collectionId);
                                     task.setState(String.valueOf(DeviceStatus.state.WAITING));
@@ -502,13 +482,27 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
 
                                     task.save();
 
+                                    //set remainImage taskId
+                                    ActiveAndroid.beginTransaction();
+                                    try {
+                                        for (Image image:remainImages) {
+
+                                            image.setTaskId(task.getId());
+                                            image.save();
+                                        }
+                                        ActiveAndroid.setTransactionSuccessful();
+                                    }
+                                    finally {
+                                        ActiveAndroid.endTransaction();
+                                    }
+
                                     // start TaskUploadService here
                                     Intent uploadIntent = new Intent(activity, TaskUploadService.class);
 
                                     activity.startService(uploadIntent);
 
                                     List<Image> fsfasdfasf = new Select().from(Image.class)
-                                            .where("taskId = ?", latestTask.getTaskId())
+                                            .where("taskId = ?", latestTask.getId())
                                             .execute();
 
                                     Log.e(LOG_TAG, "now print the old AU Task,set!");
@@ -522,7 +516,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     }
 
                                     List<Image> dddd = new Select().from(Image.class)
-                                            .where("taskId = ?", task.getTaskId())
+                                            .where("taskId = ?", task.getId())
                                             .execute();
 
                                     Log.e(LOG_TAG, "now print new AU task!");

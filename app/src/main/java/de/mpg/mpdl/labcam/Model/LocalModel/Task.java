@@ -14,10 +14,6 @@ import com.activeandroid.annotation.Table;
 public class Task extends Model{
 
     @Expose
-    @Column(name = "taskId")
-    private String taskId;
-
-    @Expose
     @Column(name = "taskName")
     private String taskName;
 
@@ -82,8 +78,7 @@ public class Task extends Model{
         super();
     }
 
-    public Task(String taskId, String taskName, String state, String errorLevel, String startDate, long endDate, String userId, String userName, String apiKey, String collectionId, String collectionName, int finishedItems, int totalItems, String uploadMode, String serverName, String logs) {
-        this.taskId = taskId;
+    public Task(String taskName, String state, String errorLevel, String startDate, long endDate, String userId, String userName, String apiKey, String collectionId, String collectionName, int finishedItems, int totalItems, String uploadMode, String serverName, String logs) {
         this.taskName = taskName;
         this.state = state;
         this.errorLevel = errorLevel;
@@ -99,14 +94,6 @@ public class Task extends Model{
         this.uploadMode = uploadMode;
         this.serverName = serverName;
         this.logs = logs;
-    }
-
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
     }
 
     public String getTaskName() {

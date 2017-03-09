@@ -33,15 +33,12 @@ import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import rx.Subscription;
 
@@ -74,7 +71,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
 
     //user info
     private SharedPreferences mPrefs;
-    private String username;
+    private String userName;
     private String userId;
 
     private Subscription mNoteRefreshEventSub;
@@ -89,7 +86,7 @@ public class DetailActivity extends AppCompatActivity implements android.support
         observeVoiceRefresh();
 
         mPrefs = this.getSharedPreferences("myPref", 0);
-        username = mPrefs.getString("username", "");
+        userName = mPrefs.getString("username", "");
         userId = mPrefs.getString("userId","");
         serverName = mPrefs.getString("serverName","");
 
@@ -172,46 +169,21 @@ public class DetailActivity extends AppCompatActivity implements android.support
      /*
             upload the selected files
         */
-    private void uploadList(List<String> fileList) {
-        String currentTaskId = createTask(fileList);
+    private void uploadList(String[] imagePathArray) {
 
-        newInstance(currentTaskId).show(this.getFragmentManager(), "remoteListDialog");
+        newInstance(imagePathArray).show(this.getFragmentManager(), "remoteListDialog");
     }
 
-    public static RemoteListDialogFragment newInstance(String taskId)
+    public static RemoteListDialogFragment newInstance(String[] imagePathArray)
     {
         RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
         Bundle args = new Bundle();
-        args.putString("taskId", taskId);
+        args.putStringArray("imagePathArray", imagePathArray);
         remoteListDialogFragment.setArguments(args);
         return remoteListDialogFragment;
     }
 
-    private String createTask(List<String> fileList){
 
-        String uniqueID = UUID.randomUUID().toString();
-        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-        Long now = new Date().getTime();
-
-        Task task = new Task();
-        task.setTotalItems(fileList.size());
-        task.setFinishedItems(0);
-        task.setTaskId(uniqueID);
-        task.setUploadMode("MU");
-        task.setState(String.valueOf(DeviceStatus.state.WAITING));
-        task.setUserName(username);
-        task.setUserId(userId);
-        task.setServerName(serverName);
-        task.setStartDate(String.valueOf(now));
-        task.save();
-        int num = addImages(fileList, task.getTaskId(), userId, serverName).size();
-        task.setTotalItems(num);
-        task.save();
-        Log.v(LOG_TAG,"MU task"+task.getTaskId() );
-        Log.v(LOG_TAG, "setTotalItems:" + num);
-
-        return task.getTaskId();
-    }
 
     private void addOrRemove(int position) {
 
@@ -238,32 +210,33 @@ public class DetailActivity extends AppCompatActivity implements android.support
         if(positionSet.size()!=0) {
             Log.v(LOG_TAG, " "+positionSet.size());
             List imagePathList = new ArrayList();
+            //TODO: Question why convert itemPathList to imagePathList
             for (Integer i : positionSet) {
                 imagePathList.add(itemPathList.get(i));
             }
-
             if (imagePathList != null) {
+                String[] imagePathArray = (String[]) imagePathList.toArray(new String[imagePathList.size()]);
                 switch (operationType){
                     case R.id.item_upload_local:
-                        uploadList(imagePathList);
+                        uploadList(imagePathArray);
                         break;
                     case R.id.item_microphone_local:
-                        showVoiceDialog(imagePathList);
+                        showVoiceDialog(imagePathArray);
                         break;
                     case R.id.item_notes_local:
-                        showNoteDialog(imagePathList);
+                        showNoteDialog(imagePathArray);
                         break;
                 }
             }
             imagePathList.clear();
         }
     }
-    public void showVoiceDialog(List<String> imagePathList){
-        voiceDialogNewInstance(imagePathList, userId, serverName).show(this.getFragmentManager(), "voiceDialogFragment");
+    public void showVoiceDialog(String[] imagePathArray){
+        voiceDialogNewInstance(imagePathArray).show(this.getFragmentManager(), "voiceDialogFragment");
     }
 
-    public void showNoteDialog(List<String> imagePathList){
-        noteDialogNewInstance(imagePathList, userId, serverName).show(this.getFragmentManager(),"noteDialogFragment");
+    public void showNoteDialog(String[] imagePathArray){
+        noteDialogNewInstance(imagePathArray).show(this.getFragmentManager(),"noteDialogFragment");
     }
 
     private void observeNoteRefresh() {

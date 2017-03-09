@@ -19,7 +19,7 @@ public class ManualUploadService extends Service {
     private static final String TAG = ManualUploadService.class.getSimpleName();
 
     // pass currentTaskId to service
-    private List<String> taskIdList = new ArrayList<>();
+    private List<Long> taskIdList = new ArrayList<>();
 
     //
 
@@ -48,7 +48,8 @@ public class ManualUploadService extends Service {
 
         // prepare taskId
         try {
-            String currentTaskId = intent.getStringExtra("currentTaskId");
+
+            Long currentTaskId = intent.getLongExtra("currentTaskId", 1L);
             if(!taskIdList.contains(currentTaskId)) {
                 taskIdList.add(currentTaskId);
             }
@@ -56,8 +57,8 @@ public class ManualUploadService extends Service {
             e.printStackTrace();
         }
 
-        for (String taskId:taskIdList){
-            new ManualUploadThread(activity,taskId).start();
+        for (Long taskId:taskIdList){
+            new ManualUploadThread(activity, taskId).start();
             taskIdList.remove(taskId);
         }
 

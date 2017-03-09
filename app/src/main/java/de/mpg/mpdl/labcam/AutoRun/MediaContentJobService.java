@@ -31,7 +31,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.UUID;
 
 /**
  * Created by yingli on 2/14/17.
@@ -139,10 +138,8 @@ public class MediaContentJobService extends JobService implements UploadResultRe
         //state
         String imageState = String.valueOf(DeviceStatus.state.WAITING);
 
-        //store image in local database
-        String imageId = UUID.randomUUID().toString();
+
         Image newImage = new Image();
-        newImage.setImageId(imageId);
         newImage.setImageName(imageName);
         newImage.setImagePath(imagePath);
         newImage.setLongitude(longitude);
@@ -150,7 +147,7 @@ public class MediaContentJobService extends JobService implements UploadResultRe
         newImage.setCreateTime(createTime);
         newImage.setSize(fileSize);
         newImage.setState(imageState);
-        newImage.setTaskId(DBConnector.getAuTask(userId,serverName).getTaskId());
+        newImage.setTaskId(DBConnector.getAuTask(userId,serverName).getId());
         newImage.setUserId(userId);
         newImage.setServerName(serverName);
         newImage.save();
@@ -164,8 +161,8 @@ public class MediaContentJobService extends JobService implements UploadResultRe
         task.save();
         Log.e("<>", task.getTotalItems()+"");
 
-        Log.v("taskId_task", DBConnector.getAuTask(userId,serverName).getTaskId());
-        Log.v("taskId_Image", DBConnector.getImage().getTaskId());
+        Log.v("taskId_task", DBConnector.getAuTask(userId,serverName).getId().toString());
+        Log.v("taskId_Image", DBConnector.getImage().getId().toString());
         Log.v("taskNum", DBConnector.getAuTask(userId,serverName).getTotalItems() + "");
 
 

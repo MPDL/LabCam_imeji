@@ -12,13 +12,10 @@ import com.activeandroid.annotation.Table;
 
 @Table(name = "Images")
 public class Image extends Model {
-    @Expose
-    @Column(name = "imageId")
-    private String imageId;
 
     @Expose
     @Column(name = "taskId")
-    public String taskId;
+    public Long taskId;
 
     @Expose
     @Column(name = "imageName")
@@ -75,8 +72,7 @@ public class Image extends Model {
         super();
     }
 
-    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, String userId, String serverName, Long noteId, Long voiceId) {
-        this.imageId = imageId;
+    public Image(Long taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, String userId, String serverName, Long noteId, Long voiceId) {
         this.taskId = taskId;
         this.imageName = imageName;
         this.state = state;
@@ -93,19 +89,11 @@ public class Image extends Model {
         this.voiceId = voiceId;
     }
 
-    public String getImageId() {
-        return imageId;
-    }
-
-    public void setImageId(String imageId) {
-        this.imageId = imageId;
-    }
-
-    public String getTaskId() {
+    public Long getTaskId() {
         return taskId;
     }
 
-    public void setTaskId(String taskId) {
+    public void setTaskId(Long taskId) {
         this.taskId = taskId;
     }
 

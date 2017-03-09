@@ -40,10 +40,10 @@ public class ManualUploadThread extends Thread {
     private Handler handler = new Handler();
 
     private Context context;
-    private String currentTaskId;
+    private Long currentTaskId;
     private String collectionID;
 
-    public ManualUploadThread(Context context,String currentTaskId) {
+    public ManualUploadThread(Context context,Long currentTaskId) {
         super("ManualUploadThread");
         this.context = context;
         this.currentTaskId = currentTaskId;
@@ -52,7 +52,7 @@ public class ManualUploadThread extends Thread {
     public void run() {
         //Code
         Log.i(TAG,"Thread --> startUpload()");
-        checkAndUpload checkMateData = new checkAndUpload(context,currentTaskId);
+        checkAndUpload checkMateData = new checkAndUpload(context, currentTaskId);
         checkMateData.run();
     }
 

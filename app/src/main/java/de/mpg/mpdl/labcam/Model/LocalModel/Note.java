@@ -25,7 +25,7 @@ public class Note extends Model{
 
     @Expose
     @Column(name = "imageIds")
-    List imageIds = new ArrayList();
+    List<String> imageIds = new ArrayList<String>();
 
     @Expose
     @Column(name = "userId")

@@ -146,7 +146,7 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
         Log.v(LOG_TAG,"finished: "+task.getFinishedItems());
         Log.v(LOG_TAG,"CollectionId: "+task.getCollectionId());
         Log.v(LOG_TAG, "taskState: " + task.getState());
-        List<Image> imageList = new Select().from(Image.class).where("taskId = ?", task.getTaskId()).execute();
+        List<Image> imageList = new Select().from(Image.class).where("taskId = ?", task.getId()).execute();
         Log.v(LOG_TAG,"imageNum: "+imageList.size());
         for (Image image: imageList){
             Log.v(LOG_TAG,"imageName: "+image.getImageName());

@@ -13,8 +13,8 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Voice;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by yingli on 9/13/16.
@@ -154,10 +154,10 @@ public class DBConnector {
                 .executeSingle();
     }
 
-    public static Image getImageByImgId(String imageId) {
+    public static Image getImageByImgId(Long imageId) {
         return new Select()
                 .from(Image.class)
-                .where("imageId = ?", imageId)
+                .where("Id = ?", imageId)
                 .executeSingle();
     }
 
@@ -196,30 +196,31 @@ public class DBConnector {
     }
 
 
-    public static void batchEditNote(List<Image> imageList, String noteContent, String userId, String serverName){
+    public static void batchEditNote(List<Image> imageList, String noteContent, String userId, String serverName) {
 
         /** create new Note **/
         Note newNote = new Note();  //PREPARE(CREATE) new NOTE
         newNote.setNoteContent(noteContent);
         newNote.setUserId(userId);
         newNote.setServerName(serverName);
+
         newNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
-        for(Image i : imageList)
-            newNote.getImageIds().add(i.getImageId());
+        for (Image i : imageList)
+            newNote.getImageIds().add(i.getId().toString());
         newNote.save();
 
         for (Image image : imageList) {  // every selected image
-            if ((image.getNoteId() == null || "".equals(image.getNoteId()))){
+            if ((image.getNoteId() == null || "".equals(image.getNoteId()))) {
                 // add noteId
                 image.setNoteId(newNote.getId());
-            } else if(DBConnector.getNoteById(image.getNoteId(), userId, serverName)!=null) {
+            } else if (DBConnector.getNoteById(image.getNoteId(), userId, serverName) != null) {
                 Long oldNoteId = image.getNoteId();
                 // update noteId
                 image.setNoteId(newNote.getId());
                 // remove imageId from old note record
-                Note oldNote = getNoteById(oldNoteId, userId,serverName);
-                if(oldNote != null) {
-                    oldNote.getImageIds().remove(image.getImageId());
+                Note oldNote = getNoteById(oldNoteId, userId, serverName);
+                if (oldNote != null) {
+                    oldNote.getImageIds().remove(image.getId().toString());
                     oldNote.save();
                     //TODO modifiedDate ??
                     //remove note entry which has empty imageIds
@@ -231,8 +232,6 @@ public class DBConnector {
             }
             image.save();
         }
-
-
     }
 
     public static void batchEditVoice(List<Image> imageList, String voicePath, String userId, String serverName){
@@ -244,7 +243,7 @@ public class DBConnector {
         newVoice.setServerName(serverName);
         newVoice.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
         for(Image i : imageList)
-            newVoice.getImageIds().add(i.getImageId());
+            newVoice.getImageIds().add(i.getId().toString());
         newVoice.save();
 
         for (Image image : imageList) {  // every selected image
@@ -257,7 +256,7 @@ public class DBConnector {
                 image.setVoiceId(newVoice.getId());
                 // remove imageId from old voice record
                 Voice oldVoice = getVoiceById(oldVoiceId, userId,serverName);
-                oldVoice.getImageIds().remove(image.getImageId());
+                oldVoice.getImageIds().remove(image.getId().toString());
                 oldVoice.save();
                 //TODO modifiedDate ??
                 //remove voice entry which has empty imageIds

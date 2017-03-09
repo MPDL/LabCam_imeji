@@ -26,10 +26,6 @@ import com.sch.rfview.decoration.DividerGridItemDecoration;
 import com.sch.rfview.manager.AnimRFGridLayoutManager;
 
 import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
-import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
-import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
-import de.mpg.mpdl.labcam.Utils.BatchOperationUtils;
-import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.code.common.adapter.LocalAlbumAdapter;
 import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
@@ -47,7 +43,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import butterknife.BindView;
 
@@ -68,13 +63,11 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
     TextView titleView;
 
     private final String LOG_TAG = LocalImageActivity.class.getSimpleName();
-    private String username;
-    private String userId;
-    private String serverName;
+
     private String folderPath;
     private int dataCounter = 6; // initialize this value as 6, in order to correct display items
 
-    private ArrayList<String> dataPathList = new ArrayList<String>();
+    private ArrayList<String> itemPathList = new ArrayList<String>();
     private ArrayList<String> datas = new ArrayList<>();
     public Set<Integer> positionSet = new HashSet<>();
 
@@ -111,9 +104,7 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         mPrefs = activity.getSharedPreferences("myPref", 0);
-        username = mPrefs.getString("username", "");
-        userId = mPrefs.getString("userId","");
-        serverName = mPrefs.getString("serverName","");
+
 
         //Kiran's title
         Intent intent = activity.getIntent();
@@ -141,16 +132,16 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
 
             if(new ImageFileFilter(imageFile).accept(imageFile)) {
                 //filtering img files
-                dataPathList.add(imageFile.getAbsolutePath());
+                itemPathList.add(imageFile.getAbsolutePath());
             }
         }
 
         int size = 6;
-        if(dataPathList.size()<=6){
-            size = dataPathList.size();
+        if(itemPathList.size()<=6){
+            size = itemPathList.size();
         }
         for (int i = 0; i < size; i++) {
-            datas.add(dataPathList.get(i));
+            datas.add(itemPathList.get(i));
         }
 
         // replace with album
@@ -191,7 +182,7 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
                     //  show picture
                     boolean isLocalImage = true;
                     Intent showDetailIntent = new Intent(activity, DetailActivity.class);
-                    showDetailIntent.putStringArrayListExtra("itemPathList", dataPathList);
+                    showDetailIntent.putStringArrayListExtra("itemPathList", itemPathList);
                     showDetailIntent.putExtra("positionInList",position);
                     showDetailIntent.putExtra("isLocalImage", isLocalImage);
                     startActivity(showDetailIntent);
@@ -232,7 +223,7 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
             // create
             if(actionMode==null){
                 actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
-                for(int i = 0;i<dataPathList.size();i++){
+                for(int i = 0; i<itemPathList.size(); i++){
                     positionSet.add(i);
                 }
                 if (positionSet.size() == 0) {
@@ -264,11 +255,11 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
     }
 
 
-    public static RemoteListDialogFragment newInstance(String taskId)
+    public static RemoteListDialogFragment newInstance(String[] imagePathArray)
     {
         RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
         Bundle args = new Bundle();
-        args.putString("taskId", taskId);
+        args.putStringArray("imagePathArray", imagePathArray);
         remoteListDialogFragment.setArguments(args);
         return remoteListDialogFragment;
     }
@@ -315,6 +306,32 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         }
     }
 
+    private void batchOperation(int operationType){
+        if(positionSet.size()!=0) {
+            Log.v(LOG_TAG, " "+positionSet.size());
+            List imagePathList = new ArrayList();
+            //TODO: Question why convert itemPathList to imagePathList
+            for (Integer i : positionSet) {
+                imagePathList.add(itemPathList.get(i));
+            }
+            if (imagePathList != null) {
+                String[] imagePathArray = (String[]) imagePathList.toArray(new String[imagePathList.size()]);
+                switch (operationType){
+                    case R.id.item_upload_local:
+                        uploadList(imagePathArray);
+                        break;
+                    case R.id.item_microphone_local:
+                        showVoiceDialog(imagePathArray);
+                        break;
+                    case R.id.item_notes_local:
+                        showNoteDialog(imagePathArray);
+                        break;
+                }
+            }
+            imagePathList.clear();
+        }
+    }
+
     @Override
     public void onDestroyActionMode(android.support.v7.view.ActionMode mode) {
         actionMode = null;
@@ -345,10 +362,10 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         }
 
         for (int i = 0; i < 6; i++) {
-            if(datas.size()>= dataPathList.size()){
+            if(datas.size() >=  itemPathList.size()){
                 return;
             }
-            datas.add(dataPathList.get(dataCounter));
+            datas.add(itemPathList.get(dataCounter));
             dataCounter = dataCounter +1;
         }
     }
@@ -356,7 +373,7 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
     public void newData() {
         datas.clear();
         for (int i = 0; i < 6; i++) {
-            datas.add(dataPathList.get(i));
+            datas.add(itemPathList.get(i));
         }
     }
 
@@ -394,81 +411,20 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         }
     }
 
-    private void batchOperation(int operationType){
-        if(positionSet.size()!=0) {
-            Log.v(LOG_TAG, " "+positionSet.size());
-            ArrayList imagePathList = new ArrayList();
-            for (Integer i : positionSet) {
-                imagePathList.add(dataPathList.get(i));
-            }
-
-            if (imagePathList != null) {
-                switch (operationType){
-                    case R.id.item_upload_local:
-                        uploadList(imagePathList);
-                        break;
-                    case R.id.item_microphone_local:
-                        showVoiceDialog(imagePathList);
-                        break;
-                    case R.id.item_notes_local:
-                        showNoteDialog(imagePathList);
-                        break;
-                }
-            }
-            imagePathList.clear();
-        }
-    }
 
     /**upload methods**/
      /*
             upload the selected files
         */
-    private void uploadList(List<String> fileList) {
-        String currentTaskId = createTask(fileList);
-
-        remoteListNewInstance(currentTaskId).show(getFragmentManager(), "remoteListDialog");
+    private void uploadList(String[] imagePathArray) {
+        newInstance( imagePathArray).show(this.getFragmentManager(), "remoteListDialog");
     }
 
-    public static RemoteListDialogFragment remoteListNewInstance(String taskId)
-    {
-        RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
-        Bundle args = new Bundle();
-        args.putString("taskId", taskId);
-        remoteListDialogFragment.setArguments(args);
-        return remoteListDialogFragment;
+    public void showNoteDialog(String[] imagePathArray){
+        noteDialogNewInstance(imagePathArray).show(getFragmentManager(), "noteDialogFragment");
     }
 
-    private String createTask(List<String> fileList){
-
-        String uniqueID = UUID.randomUUID().toString();
-        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-        Long now = new Date().getTime();
-
-        Task task = new Task();
-        task.setTotalItems(fileList.size());
-        task.setFinishedItems(0);
-        task.setTaskId(uniqueID);
-        task.setUploadMode("MU");
-        task.setState(String.valueOf(DeviceStatus.state.WAITING));
-        task.setUserName(username);
-        task.setUserId(userId);
-        task.setServerName(serverName);
-        task.setStartDate(String.valueOf(now));
-        task.save();
-        int num = addImages(fileList, task.getTaskId(), userId, serverName).size();
-        task.setTotalItems(num);
-        task.save();
-        Log.v(LOG_TAG,"MU task"+task.getTaskId() );
-        Log.v(LOG_TAG, "setTotalItems:" + num);
-
-        return task.getTaskId();
-    }
-
-    public void showNoteDialog(List<String> imagePathList){
-        noteDialogNewInstance(imagePathList, userId, serverName).show(getFragmentManager(), "noteDialogFragment");
-    }
-
-    public void showVoiceDialog(List<String> imagePathList){
-        voiceDialogNewInstance(imagePathList, userId, serverName).show(getFragmentManager(), "voiceDialogFragment");
+    public void showVoiceDialog(String[] imagePathArray){
+        voiceDialogNewInstance(imagePathArray).show(getFragmentManager(), "voiceDialogFragment");
     }
 }

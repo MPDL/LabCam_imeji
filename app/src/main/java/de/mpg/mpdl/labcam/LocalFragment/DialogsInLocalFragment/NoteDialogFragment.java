@@ -19,6 +19,7 @@ import com.activeandroid.query.Select;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.BatchOperationUtils;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
@@ -83,13 +84,7 @@ public class NoteDialogFragment extends DialogFragment {
                                 // save note
                                 String noteContentStr = editText.getText().toString();
 
-                                List<Image> selectedImageList = new ArrayList<Image>(); // selected ImageList
-                                for (String imagePath : imagePathArray) {
-                                    Image image = DBConnector.getImageByPath(imagePath, userId, serverName);
-                                    if(image!=null){
-                                        selectedImageList.add(image);   // add image to imageList
-                                    }
-                                }
+                                List<Image> selectedImageList = BatchOperationUtils.addImages(imagePathArray, null, userId, serverName);  // init images in db
 
                                 DBConnector.batchEditNote(selectedImageList, noteContentStr, userId, serverName);
 
@@ -101,6 +96,7 @@ public class NoteDialogFragment extends DialogFragment {
                 .setNegativeButton("CANCEL",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
+                                dialog.dismiss();
                             }
                         }
                 );

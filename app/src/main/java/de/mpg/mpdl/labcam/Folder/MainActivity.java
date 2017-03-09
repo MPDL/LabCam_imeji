@@ -76,7 +76,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -699,9 +698,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
 
                                         //create auto task (default)
                                         Task task = new Task();
-
-                                        String uniqueID = UUID.randomUUID().toString();
-                                        task.setTaskId(uniqueID);
                                         task.setUploadMode("AU");
                                         task.setCollectionId(autoTask.getCollectionId());
                                         task.setCollectionName(autoTask.getCollectionName());
@@ -963,8 +959,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
             DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
 
             Task task = new Task();                                 //new a AU Task
-            String uniqueID = UUID.randomUUID().toString();
-            task.setTaskId(uniqueID);
             task.setUploadMode("AU");
             task.setCollectionId(imejiFolder.id);
             Log.e(LOG_TAG,"collectionId: "+imejiFolder.id);
@@ -1070,8 +1064,6 @@ public class MainActivity extends AppCompatActivity implements NetChangeObserver
                 DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
 
                 Task task = new Task();                                 //new a AU Task
-                String uniqueID = UUID.randomUUID().toString();
-                task.setTaskId(uniqueID);
                 task.setUploadMode("AU");
                 task.setCollectionId(folderList.get(0).id);
                 Log.e(LOG_TAG,"collectionId: "+folderList.get(0).id);

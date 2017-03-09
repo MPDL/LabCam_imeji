@@ -39,7 +39,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -62,7 +61,7 @@ public class checkAndUpload {
 
     //  position in waitingImage list
 
-    String currentImageId;
+    Long currentImageId;
     Task task;
 
     // SharedPreferences
@@ -76,7 +75,7 @@ public class checkAndUpload {
 
 
     private Context context;
-    private String currentTaskId;
+    private Long currentTaskId;
     private String collectionID;
 
     //profile and meta data
@@ -92,7 +91,7 @@ public class checkAndUpload {
     Boolean[] checkTypeList = {false,false,false,false,false,false,false,false,false,false,false,false};
     boolean ocrIsOn = false;
 
-    public checkAndUpload(Context context, String currentTaskId) {
+    public checkAndUpload(Context context, Long currentTaskId) {
         this.context = context;
         this.currentTaskId = currentTaskId;
     }
@@ -112,7 +111,7 @@ public class checkAndUpload {
             Log.v(TAG,"not stopped");
             Log.v(TAG, task.getState());
 
-            task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+            task = new Select().from(Task.class).where("Id = ?", currentTaskId).executeSingle();
 
             // task already failed
             if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
@@ -143,7 +142,7 @@ public class checkAndUpload {
             finishedImages = new Select().from(Image.class)
                     .where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
-            task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+            task = new Select().from(Task.class).where("Id = ?", currentTaskId).executeSingle();
 //            List<Image> activeImages = DBConnector.getActiveImages(currentTaskId);
 //            List<Image> inactiveImages = DBConnector.getInactiveImages(currentTaskId);
 
@@ -174,7 +173,7 @@ public class checkAndUpload {
                         .where("state != ?",String.valueOf(DeviceStatus.state.FINISHED))
                         .orderBy("createTime ASC").executeSingle();
 
-                currentImageId = image.getImageId();  // important: set currentImageId
+                currentImageId = image.getId();  // important: set currentImageId
 
                 upload(image);
 
@@ -194,7 +193,7 @@ public class checkAndUpload {
         // prepare image
         String imageState = image.getState();
         String filePath = image.getImagePath();
-        currentImageId = image.getImageId();
+        currentImageId = image.getId();
         Log.e(TAG, "upload" + currentImageId);
 
         // upload image
@@ -233,7 +232,7 @@ public class checkAndUpload {
     }
 
     private boolean taskIsStopped (){
-        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+        task = new Select().from(Task.class).where("Id = ?", currentTaskId).executeSingle();
 
         if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
             Log.v(TAG,"taskIsStopped");
@@ -247,7 +246,7 @@ public class checkAndUpload {
     private void uploadNext(){
 
         int totalNum = 0;
-        task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+        task = new Select().from(Task.class).where("Id = ?", currentTaskId).executeSingle();
 
         Log.i(TAG, "get task");
         if(task==null){
@@ -663,8 +662,8 @@ public class checkAndUpload {
         public void success(DataItem dataItem, Response response) {
 
             Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
-            Log.e(TAG, currentImageId);
-            Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
+            Log.e(TAG, currentImageId.toString());
+            Image currentImage = new Select().from(Image.class).where("Id = ?",currentImageId).executeSingle();
 
             if (currentImage == null) {
                 Log.v(TAG, currentImageId + "is not in database, task might be resumed");
@@ -677,7 +676,7 @@ public class checkAndUpload {
 
             finishedImages = new Select().from(Image.class).where("taskId = ?", currentTaskId).where("state = ?", String.valueOf(DeviceStatus.state.FINISHED)).orderBy("RANDOM()").execute();
 
-            task = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+            task = new Select().from(Task.class).where("Id = ?", currentTaskId).executeSingle();
 
             if(finishedImages==null||task==null) {
                 return;
@@ -743,7 +742,7 @@ public class checkAndUpload {
         @Override
         public void failure(final RetrofitError error) {
 
-            final Image currentImage = new Select().from(Image.class).where("imageId = ?",currentImageId).executeSingle();
+            final Image currentImage = new Select().from(Image.class).where("Id = ?",currentImageId).executeSingle();
 
             if(currentImage!=null){
                 // image upload failed
@@ -857,9 +856,7 @@ public class checkAndUpload {
     /** create new autoTask when old task finished **/
 
     private void createAUTask(Task oldTask){
-        String uniqueID = UUID.randomUUID().toString();
         Task newAUTask = new Task();
-        newAUTask.setTaskId(uniqueID);
         newAUTask.setUploadMode("AU");
         newAUTask.setCollectionId(oldTask.getCollectionId());
         newAUTask.setCollectionName(oldTask.getCollectionName());

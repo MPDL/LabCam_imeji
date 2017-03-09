@@ -45,7 +45,6 @@ import org.eclipse.jetty.util.UrlEncoded;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -69,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.qr_scanner)  Button scan;
     private Activity activity = this;
 
-    private String username;
+    private String userName;
     private String password;
     private String serverURL;
     private SharedPreferences mPrefs;
@@ -196,7 +195,7 @@ public class LoginActivity extends AppCompatActivity {
         boolean cancel = false;
         View focusView = null;
 
-        username = usernameView.getText().toString();
+        userName = usernameView.getText().toString();
         password = passwordView.getText().toString();
 
         if(serverURLView.getVisibility()==View.VISIBLE) {
@@ -210,7 +209,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordView.setError(null);
 
         // Check for a valid password, if the user entered one.
-        if (TextUtils.isEmpty(username)) {
+        if (TextUtils.isEmpty(userName)) {
             usernameView.setError(getString(R.string.error_field_required));
             focusView = usernameView;
             cancel = true;
@@ -227,7 +226,7 @@ public class LoginActivity extends AppCompatActivity {
 
             mPrefs = getSharedPreferences("myPref", 0);
             SharedPreferences.Editor mEditor = mPrefs.edit();
-            mEditor.putString("username", username).apply();
+            mEditor.putString("username", userName).apply();
             mEditor.putString("password", password).apply();
             mEditor.putString("serverName", serverURL).apply();
             if(serverURLView.getVisibility()==View.VISIBLE) {
@@ -237,7 +236,7 @@ public class LoginActivity extends AppCompatActivity {
             SharedPreferences.Editor ed = preferences.edit();
             ed.putString("Camera", "On");
             ed.commit();
-            RetrofitClient.login(username,password,callback_login);
+            RetrofitClient.login(userName,password,callback_login);
         }
 
     }
@@ -290,7 +289,7 @@ public class LoginActivity extends AppCompatActivity {
     // createTask only when with QRcode
     private void createTask(){
         mPrefs = getSharedPreferences("myPref", 0);
-        String userName = mPrefs.getString("username", "");
+        String username = mPrefs.getString("username", "");
         String userId = mPrefs.getString("userId", "");
 
         Task latestTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
@@ -298,13 +297,11 @@ public class LoginActivity extends AppCompatActivity {
         if(latestTask==null){
             Log.v("create Task","no task in database");
             Task task = new Task();
-            String uniqueID = UUID.randomUUID().toString();
-            task.setTaskId(uniqueID);
             task.setUploadMode("AU");
             task.setCollectionId(collectionId);
             task.setCollectionName(collectionName);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
-            task.setUserName(userName);
+            task.setUserName(username);
             task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
@@ -324,12 +321,10 @@ public class LoginActivity extends AppCompatActivity {
             new Delete().from(Task.class).where("uploadMode = ?", "AU").execute();
 
             Task task = new Task();
-            String uniqueID = UUID.randomUUID().toString();
-            task.setTaskId(uniqueID);
             task.setUploadMode("AU");
             task.setCollectionId(collectionId);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
-            task.setUserName(userName);
+            task.setUserName(username);
             task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
