@@ -60,6 +60,14 @@ public class RetrofitClient {
         imejiAPI.postItem(typedFile, json, callback);
     }
 
+    public static void updateItem(String itemId, TypedFile typedFile,
+                                  String json,
+                                  Callback<DataItem> callback,
+                                  String APIkey) {
+        ImejiAPI imejiAPI = ServiceGenerator.
+                createService(ImejiAPI.class, REST_SERVER, APIkey);
+        imejiAPI.putItem(itemId, typedFile, json, callback);
+    }
 
     public static void deleteItem(String itemId,
                                   Callback<Response> callback,

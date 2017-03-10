@@ -573,6 +573,16 @@ public class checkAndUpload {
         }
     };
 
+    Callback<DataItem> callback_update = new Callback<DataItem>() {
+        @Override
+        public void success(DataItem dataItem, Response response) {
+        }
+        @Override
+        public void failure(final RetrofitError error)  {
+        }
+
+    };
+
     Callback<DataItem> callback_upload = new Callback<DataItem>() {
         @Override
         public void success(DataItem dataItem, Response response) {
@@ -664,6 +674,9 @@ public class checkAndUpload {
                     case 422:
                         String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                         if (jsonBody.contains("already exists")) {
+
+                            //TODO Update Item
+
                             // remove from task's imgPaths
                             task = DBConnector.getTaskById(currentTaskId, userId, serverName);
                             List<String> imgPaths = task.getImagePaths();
@@ -673,6 +686,7 @@ public class checkAndUpload {
                             task.setImagePaths(imgPaths);
                             task.setFinishedItems(task.getTotalItems()- task.getImagePaths().size());
                             task.save();
+
                         }else if(jsonBody.contains("Invalid collection")){
                             task.setState(String.valueOf(DeviceStatus.state.FAILED));
                             task.setEndDate(DeviceStatus.dateNow());
