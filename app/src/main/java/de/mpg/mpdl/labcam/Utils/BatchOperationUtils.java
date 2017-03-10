@@ -32,17 +32,14 @@ public class BatchOperationUtils {
 
     public static List<Image> addImages(String[] imagePathArray, Long taskId, String userId, String serverName){
         List<Image> imageList = new ArrayList<>();
+        List<String> imagePaths = new ArrayList<>();
 
         for (String filePath: imagePathArray) {
             String imageName = filePath.substring(filePath.lastIndexOf('/') + 1);
             Image image = DBConnector.getImageByPath(filePath, userId, serverName);
-            //TODO
-            if(image!=null){  // image already exist
-                if(taskId != null) {  // upload process
-                    image.setTaskId(taskId);
-                    image.setState(String.valueOf(DeviceStatus.state.WAITING));
-                    image.save();
-                }
+            imagePaths.add(filePath);
+
+            if(image!=null){  //  already exist Images
                 imageList.add(image);
                 continue;
             }
@@ -68,9 +65,6 @@ public class BatchOperationUtils {
             //longitude
             String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
 
-            //state
-            String imageState = String.valueOf(DeviceStatus.state.WAITING);
-
             //store image in local database
             Image newImage = new Image();
             newImage.setImageName(imageName);
@@ -79,12 +73,16 @@ public class BatchOperationUtils {
             newImage.setLatitude(latitude);
             newImage.setCreateTime(createTime);
             newImage.setSize(fileSize);
-            newImage.setState(imageState);
-            newImage.setTaskId(taskId);
             newImage.setUserId(userId);
             newImage.setServerName(serverName);
             newImage.save();
             imageList.add(newImage);
+        }
+
+        Task task = DBConnector.getTaskById(taskId.toString(), userId, serverName);
+        if(task!=null) {
+            task.setImagePaths(imagePaths);
+            task.save();
         }
         return imageList;
     }

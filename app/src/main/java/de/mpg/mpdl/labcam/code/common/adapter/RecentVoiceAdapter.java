@@ -29,11 +29,14 @@ public class RecentVoiceAdapter extends BaseAdapter {
 
     private Activity activity;
     private List<Voice> voiceList;
+    private String userId;
+    private String serverName;
 
-
-    public RecentVoiceAdapter(Activity activity, List<Voice> voiceList) {
+    public RecentVoiceAdapter(Activity activity, List<Voice> voiceList, String userId, String serverName) {
         this.activity = activity;
         this.voiceList = voiceList;
+        this.userId = userId;
+        this.serverName = serverName;
     }
 
     @Override
@@ -139,7 +142,8 @@ public class RecentVoiceAdapter extends BaseAdapter {
     private void deleteVoice(Voice voice){
         for (Image image : DBConnector.getImageByVoiceId(voice.getId())) {
             image.setVoiceId(null);
-            if(image.getNoteId()==null && image.getVoiceId()== null && image.getTaskId()== null)
+            if(image.getNoteId()==null && image.getVoiceId()== null &&
+                    DBConnector.isNeedUpload(image.getImagePath(), userId, serverName))
                 image.delete();
             else
                 image.save();

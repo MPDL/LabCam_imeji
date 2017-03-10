@@ -6,6 +6,9 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by yingli on 12/14/15.
  */
@@ -73,27 +76,12 @@ public class Task extends Model{
     @Column(name = "logs")
     private String logs;
 
+    @Expose
+    @Column(name = "imagePaths")
+    List<String> imagePaths = new ArrayList<String>();
 
     public Task() {
         super();
-    }
-
-    public Task(String taskName, String state, String errorLevel, String startDate, long endDate, String userId, String userName, String apiKey, String collectionId, String collectionName, int finishedItems, int totalItems, String uploadMode, String serverName, String logs) {
-        this.taskName = taskName;
-        this.state = state;
-        this.errorLevel = errorLevel;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.userId = userId;
-        this.userName = userName;
-        this.apiKey = apiKey;
-        this.collectionId = collectionId;
-        this.collectionName = collectionName;
-        this.finishedItems = finishedItems;
-        this.totalItems = totalItems;
-        this.uploadMode = uploadMode;
-        this.serverName = serverName;
-        this.logs = logs;
     }
 
     public String getTaskName() {
@@ -214,6 +202,14 @@ public class Task extends Model{
 
     public void setLogs(String logs) {
         this.logs = logs;
+    }
+
+    public List<String> getImagePaths() {
+        return imagePaths;
+    }
+
+    public void setImagePaths(List<String> imageIds) {
+        this.imagePaths = imageIds;
     }
 
 }

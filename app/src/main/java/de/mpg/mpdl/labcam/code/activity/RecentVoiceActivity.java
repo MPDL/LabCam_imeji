@@ -60,7 +60,7 @@ public class RecentVoiceActivity extends BaseCompatActivity {
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        recentVoiceAdapter = new RecentVoiceAdapter(activity, voiceList);
+        recentVoiceAdapter = new RecentVoiceAdapter(activity, voiceList, userId, serverName);
         recentVoiceAdapter.notifyDataSetChanged();
         recentVoiceListView.setAdapter(recentVoiceAdapter);
 

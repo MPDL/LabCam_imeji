@@ -42,7 +42,6 @@ import java.util.Set;
 
 import rx.Subscription;
 
-import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.addImages;
 import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.noteDialogNewInstance;
 import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.voiceDialogNewInstance;
 

@@ -58,7 +58,7 @@ public class RecentNoteActivity extends BaseCompatActivity {
 
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        recentNoteAdapter = new RecentNoteAdapter(activity, noteList);
+        recentNoteAdapter = new RecentNoteAdapter(activity, noteList, userId, serverName);
         recentNoteAdapter.notifyDataSetChanged();
         recentTextListView.setAdapter(recentNoteAdapter);
 

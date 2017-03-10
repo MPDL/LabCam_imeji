@@ -27,11 +27,14 @@ public class RecentNoteAdapter extends BaseAdapter {
 
     private Activity activity;
     private List<Note> noteList;
+    private String userId;
+    private String serverName;
 
-
-    public RecentNoteAdapter(Activity activity, List<Note> noteList) {
+    public RecentNoteAdapter(Activity activity, List<Note> noteList, String userId, String serverName) {
         this.activity = activity;
         this.noteList = noteList;
+        this.userId = userId;
+        this.serverName = serverName;
     }
 
     @Override
@@ -87,7 +90,8 @@ public class RecentNoteAdapter extends BaseAdapter {
     private void deleteNote(Note note){
         for (Image image : DBConnector.getImageByNoteId(note.getId())) {
             image.setNoteId(null);
-            if(image.getNoteId()==null && image.getVoiceId()== null && image.getTaskId()== null)
+            if(image.getNoteId()==null && image.getVoiceId()== null &&
+                    DBConnector.isNeedUpload(image.getImagePath(), userId, serverName))
                 image.delete();
             else
                 image.save();

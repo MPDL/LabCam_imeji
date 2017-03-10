@@ -305,7 +305,8 @@ public class ViewPagerAdapter extends PagerAdapter {
     private void deleteVoice(Voice voice, int position, Long imageId){
         Image image = DBConnector.getImageByImgId(imageId);
         image.setVoiceId(null);
-        if(image.getNoteId()==null && image.getVoiceId()== null && image.getTaskId()== null)
+        if(image.getNoteId()==null && image.getVoiceId()== null &&
+                DBConnector.isNeedUpload(image.getImagePath(), userId, serverName))
             image.delete();
         else
             image.save();

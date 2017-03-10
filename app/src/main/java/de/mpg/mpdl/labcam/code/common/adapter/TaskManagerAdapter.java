@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import de.mpg.mpdl.labcam.AutoRun.TaskUploadService;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.code.common.callback.RemoveTaskInterface;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 
@@ -36,6 +38,9 @@ import java.util.List;
 public class TaskManagerAdapter extends BaseAdapter {
 
     private static String TAG = TaskManagerAdapter.class.getSimpleName();
+    SharedPreferences mPref;
+    String userId;
+    String serverName;
     private LayoutInflater inflater;
 
     private Activity activity;
@@ -118,8 +123,8 @@ public class TaskManagerAdapter extends BaseAdapter {
         int percent;
         if(maxNum!=0){
             percent = (currentNum * 100) / maxNum;
-            Log.e(TAG,"currentNum: "+currentNum);
-            Log.e(TAG,"maxNum: "+maxNum);}
+            Log.d(TAG,"currentNum: "+currentNum);
+            Log.d(TAG,"maxNum: "+maxNum);}
 
         else {
             percent = 0;
@@ -205,13 +210,6 @@ public class TaskManagerAdapter extends BaseAdapter {
             case MU_FINISH:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.GONE);
-//                clearButton.setVisibility(View.VISIBLE);
-//                clearButton.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        deleteTask(task, position);
-//                    }
-//                });
                 errorLayout.setVisibility(View.GONE);
                 Log.v(TAG, "MU_FINISH");
                 break;
@@ -219,45 +217,23 @@ public class TaskManagerAdapter extends BaseAdapter {
             case AU_FAILED:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.VISIBLE);
-//                clearButton.setVisibility(View.VISIBLE);
                 errorLayout.setVisibility(View.VISIBLE);
-                //error
-//                clearButton.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        deleteTask(task, position);
-//                    }
-//                });
                 Log.v(TAG, "AU_FAILED");
 
                 break;
             case MU_FAILED:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.VISIBLE);
-//                clearButton.setVisibility(View.VISIBLE);
                 errorLayout.setVisibility(View.VISIBLE);
-//                clearButton.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        deleteTask(task, position);
-//                    }
-//                });
                 Log.v(TAG, "MU_FAILED");
                 break;
 
         }
 
         if(maxNum == 0||currentNum == maxNum){
-            //hide both
-
             //show clear for MU
             if(task.getUploadMode().equalsIgnoreCase("AU")){
                 //AU
-
-            } else {
-                //MU
-                //show clear hide stop/delete
-
             }
 
         }
@@ -351,7 +327,8 @@ public class TaskManagerAdapter extends BaseAdapter {
                 if (!isPausedCheckBox.isChecked()) {
                     //  button clicked
 
-                    Task currentTask = new Select().from(Task.class).where("Id = ?", currentTaskId).executeSingle();
+                    getUserInfo();
+                    Task currentTask = DBConnector.getTaskById(currentTaskId.toString(), userId, serverName);
                     currentTask.setState(String.valueOf(DeviceStatus.state.WAITING));
                     currentTask.save();
                     Log.v(TAG, "setState: WAITING");
@@ -379,8 +356,8 @@ public class TaskManagerAdapter extends BaseAdapter {
 
                 } else if (isPausedCheckBox.isChecked()) {
                     //  button clicked
-
-                    Task currentTask = new Select().from(Task.class).where("Id = ?", currentTaskId).executeSingle();
+                    getUserInfo();
+                    Task currentTask = DBConnector.getTaskById(currentTaskId.toString(), userId, serverName);
                     currentTask.setState(String.valueOf(DeviceStatus.state.STOPPED));
                     currentTask.save();
                     Log.v(TAG, "setState: STOPPED");
@@ -456,6 +433,12 @@ public class TaskManagerAdapter extends BaseAdapter {
         if(phrase == AU_FINISH || phrase == MU_FINISH) {
             Log.i(TAG, "getEndDate: " + task.getEndDate());
         }
+    }
+
+    private void getUserInfo(){
+        mPref = activity.getSharedPreferences("myPref", 0);
+        userId = mPref.getString("userId", "");
+        serverName = mPref.getString("serverName", "");
     }
 }
 

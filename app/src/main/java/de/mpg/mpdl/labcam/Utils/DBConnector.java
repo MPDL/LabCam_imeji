@@ -60,6 +60,16 @@ public class DBConnector {
                 .executeSingle();
     }
 
+    // get Task by TaskId
+    public static Task getTaskById(String taskId, String userId, String serverName) {
+        return new Select()
+                .from(Task.class)
+                .where("Id = ?", taskId)
+                .where("userId = ?", userId)
+                .where("serverName = ?", serverName)
+                .executeSingle();
+    }
+
     //get latest task (sometimes its not right need to distinguish Au Mu)
     public static Task getLatestFinishedTask(String userId, String serverName) {
         return new Select()
@@ -143,6 +153,15 @@ public class DBConnector {
                 .from(Image.class)
                 .orderBy("createTime DESC")
                 .executeSingle();
+    }
+
+    public static boolean isNeedUpload(String imgPath, String userId, String serverName){
+        for (Task task : getActiveTasks(userId, serverName)) {
+            if(task.getImagePaths().contains(imgPath)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Image getImageByPath(String imagePath, String userId, String serverName) {

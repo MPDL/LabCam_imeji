@@ -46,7 +46,6 @@ import java.util.Set;
 
 import butterknife.BindView;
 
-import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.addImages;
 import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.noteDialogNewInstance;
 import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.voiceDialogNewInstance;
 

@@ -23,6 +23,7 @@ import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -85,9 +86,6 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         //longitude
         String longitude = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
 
-        //state
-        String imageState = String.valueOf(DeviceStatus.state.WAITING);
-
         Image newImage = new Image();
         newImage.setImageName(imageName);
         newImage.setImagePath(imagePath);
@@ -95,8 +93,6 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         newImage.setLatitude(latitude);
         newImage.setCreateTime(createTime);
         newImage.setSize(fileSize);
-        newImage.setState(imageState);
-        newImage.setTaskId(DBConnector.getAuTask(userId,serverName).getId());
         newImage.setUserId(userId);
         newImage.setServerName(serverName);
         newImage.save();
@@ -106,14 +102,11 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         Task task = new Select().from(Task.class).where("uploadMode = ?","AU").orderBy("startDate DESC").executeSingle();
 
         task.setTotalItems(task.getTotalItems() + 1);
+        List<String> imagePaths = task.getImagePaths();
+        imagePaths.add(imagePath);
+        task.setImagePaths(imagePaths);
         task.setState(String.valueOf(DeviceStatus.state.WAITING));
         task.save();
-        Log.e("<>", task.getTotalItems()+"");
-
-        Log.v("taskId_task", DBConnector.getAuTask(userId,serverName).getId().toString());
-        Log.v("taskId_Image", DBConnector.getImage().getId().toString());
-        Log.v("taskNum", DBConnector.getAuTask(userId,serverName).getTotalItems() + "");
-
 
         // start service when finished item 0, total item 1
         if(task.getTotalItems()==1 && task.getFinishedItems() == 0) {

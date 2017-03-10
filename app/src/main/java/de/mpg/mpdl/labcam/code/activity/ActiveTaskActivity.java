@@ -34,7 +34,6 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
     ListView taskManagerListView;
 
     private Activity activity = this;
-    private static final String LOG_TAG = ActiveTaskActivity.class.getSimpleName();
     //user info
     private String userId;
     private String serverUrl;
@@ -83,7 +82,6 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
                     taskList = DBConnector.getActiveTasks(userId, serverUrl);
 
                     Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
-                    Task auTask = new Task();
                     if(taskList==null){
                         Log.e("handler", "task list is empty");
                         return;
@@ -119,11 +117,9 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
         // auTask only for delete
         Task auTask = new Task();
         for(Task task:taskList){
-            printTaskDetails(task);
             /** exception **/
             if(task!=null&& settings!=null){
                 // auto task, autoUpload switch off
-//                if (task.getUploadMode().equalsIgnoreCase("AU") && !settings.isAutoUpload()) {
                 if (task.getUploadMode().equalsIgnoreCase("AU") && task.getTotalItems()== 0 ) {
                     auTask = task;
                 }
@@ -135,23 +131,6 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
         taskManagerAdapter = new TaskManagerAdapter(this.activity,taskList,this);
         taskManagerAdapter.notifyDataSetChanged();
         taskManagerListView.setAdapter(taskManagerAdapter);
-    }
-
-    /**  print task and its image name and state **/
-    private void printTaskDetails(Task task){
-        Log.v(LOG_TAG,"--------------------------");
-        Log.v(LOG_TAG,"taskMode: "+task.getUploadMode());
-        Log.v(LOG_TAG,"collection: "+task.getCollectionName());
-        Log.v(LOG_TAG,"taskTotalItems: "+task.getTotalItems());
-        Log.v(LOG_TAG,"finished: "+task.getFinishedItems());
-        Log.v(LOG_TAG,"CollectionId: "+task.getCollectionId());
-        Log.v(LOG_TAG, "taskState: " + task.getState());
-        List<Image> imageList = new Select().from(Image.class).where("taskId = ?", task.getId()).execute();
-        Log.v(LOG_TAG,"imageNum: "+imageList.size());
-        for (Image image: imageList){
-            Log.v(LOG_TAG,"imageName: "+image.getImageName());
-            Log.v(LOG_TAG,"imageState: "+image.getState());
-        }
     }
 
     @Override
