@@ -30,7 +30,7 @@ public class BatchOperationUtils {
      * addImages function creates a List<Image> for UPLOAD, BATCH_EDIT_NOTE, BATCH_EDIT_VOICE operations
      */
 
-    public static List<Image> addImages(String[] imagePathArray, Long taskId, String userId, String serverName){
+    public static List<Image> addImages(String[] imagePathArray, Task task, String userId, String serverName){
         List<Image> imageList = new ArrayList<>();
         List<String> imagePaths = new ArrayList<>();
 
@@ -79,7 +79,6 @@ public class BatchOperationUtils {
             imageList.add(newImage);
         }
 
-        Task task = DBConnector.getTaskById(taskId.toString(), userId, serverName);
         if(task!=null) {
             task.setImagePaths(imagePaths);
             task.save();

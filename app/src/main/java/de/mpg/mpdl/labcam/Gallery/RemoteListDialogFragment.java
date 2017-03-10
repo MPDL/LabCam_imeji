@@ -165,11 +165,11 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
         task.setServerName(serverName);
         task.setStartDate(String.valueOf(now));
         task.save();
-        int num = addImages(imagePathArray, task.getId(), userId, serverName).size();
+        int num = addImages(imagePathArray, task, userId, serverName).size();
         task.setTotalItems(num);
         task.save();
-        Log.v(LOG_TAG,"MU task"+task.getId() );
-        Log.v(LOG_TAG, "setTotalItems:" + num);
+        Log.d(LOG_TAG,"MU task"+task.getId() );
+        Log.d(LOG_TAG, "setTotalItems:" + num);
 
         return task.getId();
     }

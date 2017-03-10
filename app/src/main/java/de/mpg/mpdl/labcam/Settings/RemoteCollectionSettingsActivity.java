@@ -435,6 +435,7 @@ public class RemoteCollectionSettingsActivity extends AppCompatActivity implemen
                                     task.setStartDate(String.valueOf(now));
                                     task.setCollectionName(collectionName);
                                     task.setImagePaths(latestTask.getImagePaths());
+                                    Log.d("Remote", "setImagePaths");
                                     task.save();
 
                                     // start TaskUploadService here

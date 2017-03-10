@@ -123,6 +123,9 @@ public class checkAndUpload {
 
             // waitingImages is a list join waiting (and failed)
             task = DBConnector.getTaskById(currentTaskId, userId, serverName);    // get task (task state might have already changed)
+            Log.d("startUpload", currentTaskId);
+            Log.d("startUpload", task.getServerName());
+            Log.d("startUpload", task.getUserId());
             List<String> waitingImgPathList = task.getImagePaths();
             Log.d("startUpload", waitingImgPathList.size()+"");
             if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
@@ -585,6 +588,7 @@ public class checkAndUpload {
                 imgPaths.remove(currentImagePath);
             }
             task.setImagePaths(imgPaths);
+            Log.d(TAG, "setImagePaths+ callback success");
             task.setFinishedItems(task.getTotalItems()- task.getImagePaths().size());
             task.save();
 
@@ -671,6 +675,7 @@ public class checkAndUpload {
                                 imgPaths.remove(currentImagePath);
                             }
                             task.setImagePaths(imgPaths);
+                            Log.d(TAG, "setImagePaths+callback+422");
                             task.setFinishedItems(task.getTotalItems()- task.getImagePaths().size());
                             task.save();
                         }else if(jsonBody.contains("Invalid collection")){
@@ -715,6 +720,7 @@ public class checkAndUpload {
                             imgPaths.remove(currentImagePath);
                         }
                         task.setImagePaths(imgPaths);
+                        Log.d(TAG, "setImagePaths+callback+400...");
                         task.setFinishedItems(task.getTotalItems()- task.getImagePaths().size());
                         task.save();
 

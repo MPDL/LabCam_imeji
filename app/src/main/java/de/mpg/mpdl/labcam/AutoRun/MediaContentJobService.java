@@ -155,6 +155,7 @@ public class MediaContentJobService extends JobService implements UploadResultRe
         List<String> imagePaths = task.getImagePaths();
         imagePaths.add(imagePath);
         task.setImagePaths(imagePaths);
+        Log.d("media", "setImagePaths");
         task.setState(String.valueOf(DeviceStatus.state.WAITING));
         task.save();
 
