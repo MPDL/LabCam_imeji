@@ -197,10 +197,6 @@ public class checkAndUpload {
             return;
         }
 
-        task.setFinishedItems(task.getTotalItems());
-        task.setEndDate(DeviceStatus.dateNow());
-        task.save();
-
         if (taskIsStopped()) {
             Log.e(TAG,"task is stopped");
             return;
