@@ -598,14 +598,15 @@ public class checkAndUpload {
             task.setFinishedItems(task.getTotalItems()- task.getImagePaths().size());
             task.save();
 
-            if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){
-                Log.e(TAG,"task, stopped");
-                return;
-            }
-
             if(task.getTotalItems() > task.getFinishedItems()){
                 if(task.getImagePaths()!=null && task.getImagePaths().size()>0){  // move on to next
                     currentImagePath = task.getImagePaths().get(0);
+
+                    if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.STOPPED))){  // check task state
+                        Log.e(TAG,"task, stopped");
+                        return;
+                    }
+
                     upload(currentImagePath);
                 }
             }else {

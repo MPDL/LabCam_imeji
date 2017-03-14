@@ -50,6 +50,7 @@ import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.rxbus.EventSubscriber;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
@@ -356,6 +357,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 mCircleProgressBar.setProgress(percent);
             }else if(stoppedTasks.size()>0){
                 activeTaskLayout.setVisibility(View.VISIBLE);
+
                 Task task = stoppedTasks.get(0);
 
                 //
