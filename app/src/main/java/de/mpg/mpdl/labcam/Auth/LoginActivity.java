@@ -382,6 +382,9 @@ public class LoginActivity extends AppCompatActivity {
 
             if(error.getResponse().getStatus()==401) {
                 Toast.makeText(activity, "username or password wrong", Toast.LENGTH_SHORT).show();
+                if(passwordView.getText().length()>0)
+                    passwordView.selectAll();
+
             }else if(error.getResponse().getStatus()==404){
                 Toast.makeText(activity, "server not response", Toast.LENGTH_SHORT).show();
 
