@@ -311,8 +311,17 @@ public class ViewPagerAdapter extends PagerAdapter {
         else
             image.save();
 
-        voice.getImageIds().remove(imageId);
+        List<String> imageIds = voice.getImageIds();
+        if(imageIds.contains(imageId.toString())){
+            imageIds.remove(imageId.toString());
+        }
+        voice.setImageIds(imageIds);
         voice.save();
+
+        if(voice.getImageIds().size()==0){
+            voice.delete();
+        }
+
         VoiceRefreshEvent voiceRefreshEvent = new VoiceRefreshEvent(imagePathList.get(position));
         RxBus.getDefault().post(voiceRefreshEvent);
     }
