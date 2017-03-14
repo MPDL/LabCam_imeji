@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
@@ -38,12 +39,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URL;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+
+import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.addImages;
 
 /**
  * Created by yingli on 2/15/16.
@@ -55,7 +61,11 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
     private static final int INTENT_QR = 1001;
 
     //user
+    private String userId;
+    private String userName;
     private String apiKey;
+
+    private String serverName;
 
     //interface
     private CollectionIdInterface ie = this;
@@ -68,9 +78,10 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
     private String collectionId;
     private String collectionName;
     private List<ImejiFolder> collectionList = new ArrayList<ImejiFolder>();
+    private String[] imagePathArray;
 
     //taskId
-    String currentTaskId;
+    private Long currentTaskId;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -79,9 +90,13 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_fragment_remote_list, null);
         activity = this.getActivity();
-        currentTaskId = getArguments().getString("taskId");
+        currentTaskId = getArguments().getLong("taskId");
 
         apiKey = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
+        userId = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        userName = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.USER_NAME, "");
+        serverName = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
+        imagePathArray = getArguments().getStringArray("imagePathArray");
 
         /** scan QR **/
         Button qrCodeImageView = (Button) view.findViewById(R.id.btn_qr_scan);
@@ -101,11 +116,10 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 if(collectionId==null || collectionId.equalsIgnoreCase("")){
                                     Log.e(LOG_TAG,"collectionId is null or empty");
-                                    //delete task (created earlier)
-                                    new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
                                     dialog.dismiss();
                                     return;
                                 }
+                                currentTaskId = createTask(imagePathArray);
                                 setMUCollection();
 
                             }
@@ -114,8 +128,6 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                 .setNegativeButton("Cancel",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                //delete task (created earlier)
-                                new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
                                 dialog.dismiss();
                             }
                         }
@@ -135,18 +147,43 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
         return b.create();
     }
 
+
+    private Long createTask(String[] imagePathArray){
+
+        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+        Long now = new Date().getTime();
+
+        Task task = new Task();
+        task.setTotalItems(imagePathArray.length);
+        task.setFinishedItems(0);
+        task.setUploadMode("MU");
+        task.setState(String.valueOf(DeviceStatus.state.WAITING));
+        task.setUserName(userName);
+        task.setUserId(userId);
+        task.setServerName(serverName);
+        task.setStartDate(String.valueOf(now));
+        task.save();
+        int num = addImages(imagePathArray, task, userId, serverName).size();
+        task.setTotalItems(num);
+        task.save();
+        Log.d(LOG_TAG,"MU task"+task.getId() );
+        Log.d(LOG_TAG, "setTotalItems:" + num);
+
+        return task.getId();
+    }
+
     private void setMUCollection(){
         // set collectionId and save
         if(collectionId!=null){
             getCollectionNameById(collectionId);
 
-            Task manualTask = new Select().from(Task.class).where("taskId = ?", currentTaskId).executeSingle();
+            Task manualTask = new Select().from(Task.class).where("Id = ?", currentTaskId).executeSingle();
             manualTask.setCollectionId(collectionId);
             manualTask.setTaskName("Manual  " + collectionId);
             manualTask.setCollectionName(collectionName);
             manualTask.save();
 
-            Log.e(LOG_TAG,manualTask.getTaskId());
+            Log.e(LOG_TAG,manualTask.getId().toString());
             Log.e(LOG_TAG,manualTask.getCollectionName());
             Intent manualUploadServiceIntent = new Intent(activity,ManualUploadService.class);
             manualUploadServiceIntent.putExtra("currentTaskId", currentTaskId);
@@ -211,7 +248,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // do nothing
-                                new Delete().from(Task.class).where("taskId = ?", currentTaskId).execute();
+                                new Delete().from(Task.class).where("Id = ?", currentTaskId).execute();
                                 remoteListDialogFragment.dismiss();
                             }
                         })
@@ -259,11 +296,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
             }catch (Exception e){
                 Log.v(LOG_TAG,e.getMessage());
             }
-//            Log.v(LOG_TAG,collectionList.get(0).getTitle());
-//            Log.v(LOG_TAG, collectionList.get(0).getModifiedDate());
 
-
-//            adapter.notifyDataSetChanged();
             adapter = new SettingsListAdapter(activity, collectionList,ie);
             listView.setAdapter(adapter);
         }
@@ -273,16 +306,11 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
         @Override
         public void success(ImejiFolder imejiFolder, Response response) {
             Log.v(LOG_TAG, "createCollection_callback success");
-//            isFirstCollection = true;
-
             pDialog.dismiss();
             // set as MU destination
             collectionId = imejiFolder.id;
             collectionName = imejiFolder.getTitle();
             setMUCollection();
-
-//            RetrofitClient.getGrantCollectionMessage(callback, apiKey);
-            //get collection list
 
         }
 

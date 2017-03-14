@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.BatchOperationUtils;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
@@ -106,13 +107,8 @@ public class MicrophoneDialogFragment extends DialogFragment{
                                     return;
                                 }
 
-                                List<Image> selectedImageList = new ArrayList<Image>(); // selected ImageList
-                                for (String imagePath : imagePathArray) {
-                                    Image image = DBConnector.getImageByPath(imagePath, userId, serverName);
-                                    if(image!=null){
-                                        selectedImageList.add(image);   // add image to imageList
-                                    }
-                                }
+                                List<Image> selectedImageList = BatchOperationUtils.addImages(imagePathArray, null, userId, serverName);  // init images in db
+
                                 DBConnector.batchEditVoice(selectedImageList, fileFullName, userId, serverName);
 
                                 VoiceRefreshEvent voiceRefreshEvent = new VoiceRefreshEvent(imagePathArray[imagePathArray.length-1]);

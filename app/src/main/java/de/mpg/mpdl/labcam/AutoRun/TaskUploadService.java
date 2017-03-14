@@ -25,7 +25,7 @@ public class TaskUploadService extends Service {
     // get last Task, may need to add a param to set task
     private Task task;
     private int finishedNum;
-    private String currentTaskId;
+    private Long currentTaskId;
 
     private String userId;
     private String serverName;
@@ -80,7 +80,7 @@ public class TaskUploadService extends Service {
             return super.onStartCommand(intent, flags, startId);
         }
         //set currentTaskId
-        currentTaskId = task.getTaskId();
+        currentTaskId = task.getId();
         Log.i(TAG, "currentTaskId: " + currentTaskId);
         finishedNum = task.getFinishedItems();
         Log.v("~~~", "onCreate getFinishedItems: " + finishedNum);

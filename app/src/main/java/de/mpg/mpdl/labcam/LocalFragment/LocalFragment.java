@@ -41,17 +41,15 @@ import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SectionedGridRecyclerViewAdapter;
 import de.mpg.mpdl.labcam.Gallery.SectionedGridView.SimpleAdapter;
 import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
-import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.MicrophoneDialogFragment;
-import de.mpg.mpdl.labcam.LocalFragment.DialogsInLocalFragment.NoteDialogFragment;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.Utils.BatchOperationUtils;
 import de.mpg.mpdl.labcam.code.activity.ActiveTaskActivity;
 import de.mpg.mpdl.labcam.Utils.DBConnector;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar;
-import de.mpg.mpdl.labcam.code.activity.LocalImageActivity;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.rxbus.EventSubscriber;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
@@ -69,11 +67,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.UUID;
 
 import rx.Subscription;
 
-import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.addImages;
 import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.noteDialogNewInstance;
 import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.voiceDialogNewInstance;
 
@@ -115,6 +111,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
      * treeMap auto sort it by date (prepare data for timeline view)
      * <imageDate,imagePath> **/
 
+    //TODO Question There is itemPathList variable in DetailActivity and LocalImageActivity
     ArrayList<String> sortedImageNameList;
 
     TreeMap<Long, String> imageNameList = new TreeMap<>();
@@ -349,6 +346,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 mCircleProgressBar.setProgress(percent);
             }else if(stoppedTasks.size()>0){
                 activeTaskLayout.setVisibility(View.VISIBLE);
+
                 Task task = stoppedTasks.get(0);
 
                 //
@@ -684,53 +682,27 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
      /*
             upload the selected files
         */
-    private void uploadList(List<String> fileList) {
-        String currentTaskId = createTask(fileList);
 
-        remoteListNewInstance(currentTaskId).show(getActivity().getFragmentManager(), "remoteListDialog");
+    private void uploadList(String[] imagePathArray) {
+        newInstance(imagePathArray).show(getActivity().getFragmentManager(), "remoteListDialog");
     }
 
-    public static RemoteListDialogFragment remoteListNewInstance(String taskId)
-    {
+    public static RemoteListDialogFragment newInstance(String[] imagePathArray) {
+
         RemoteListDialogFragment remoteListDialogFragment = new RemoteListDialogFragment();
         Bundle args = new Bundle();
-        args.putString("taskId", taskId);
+        args.putStringArray("imagePathArray", imagePathArray);
         remoteListDialogFragment.setArguments(args);
         return remoteListDialogFragment;
     }
 
-    private String createTask(List<String> fileList){
 
-        String uniqueID = UUID.randomUUID().toString();
-        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-        Long now = new Date().getTime();
-
-        Task task = new Task();
-        task.setTotalItems(fileList.size());
-        task.setFinishedItems(0);
-        task.setTaskId(uniqueID);
-        task.setUploadMode("MU");
-        task.setState(String.valueOf(DeviceStatus.state.WAITING));
-        task.setUserName(username);
-        task.setUserId(userId);
-        task.setServerName(serverName);
-        task.setStartDate(String.valueOf(now));
-        task.save();
-        int num = addImages(fileList, task.getTaskId(), userId, serverName).size();
-        task.setTotalItems(num);
-        task.save();
-        Log.v(LOG_TAG,"MU task"+task.getTaskId() );
-        Log.v(LOG_TAG, "setTotalItems:" + num);
-
-        return task.getTaskId();
+    public void showNoteDialog(String[] imagePathArray){
+        noteDialogNewInstance(imagePathArray).show(getActivity().getFragmentManager(), "noteDialogFragment");
     }
 
-    public void showNoteDialog(ArrayList<String> imagePathList){
-        noteDialogNewInstance(imagePathList, userId, serverName).show(getActivity().getFragmentManager(), "noteDialogFragment");
-    }
-
-    public void showVoiceDialog(ArrayList<String> imagePathList){
-        voiceDialogNewInstance(imagePathList, userId, serverName).show(getActivity().getFragmentManager(), "voiceDialogFragment");
+    public void showVoiceDialog(String[] imagePathArray){
+        voiceDialogNewInstance(imagePathArray).show(getActivity().getFragmentManager(), "voiceDialogFragment");
     }
 
     @Override
@@ -782,21 +754,21 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     private void batchOperation(int operationType){
         if(positionSet.size()!=0) {
             Log.v(LOG_TAG, " "+positionSet.size());
-            ArrayList imagePathList = new ArrayList();
+            List imagePathList = new ArrayList();
             for (Integer i : positionSet) {
                 imagePathList.add(sortedImageNameList.get(i));
             }
-
             if (imagePathList != null) {
+                String[] imagePathArray = (String[]) imagePathList.toArray(new String[imagePathList.size()]);
                 switch (operationType){
                     case R.id.item_upload_local:
-                        uploadList(imagePathList);
+                        uploadList(imagePathArray);
                         break;
                     case R.id.item_microphone_local:
-                        showVoiceDialog(imagePathList);
+                        showVoiceDialog(imagePathArray);
                         break;
                     case R.id.item_notes_local:
-                        showNoteDialog(imagePathList);
+                        showNoteDialog(imagePathArray);
                         break;
                 }
             }
@@ -814,15 +786,16 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                 }
             }
             if (imagePathListForAlbumTask != null) {
+                String[] imagePathArray = (String[]) imagePathListForAlbumTask.toArray(new String[imagePathListForAlbumTask.size()]);
                 switch (operationType){
                     case R.id.item_upload_local:
-                        uploadList(imagePathListForAlbumTask);
+                        uploadList(imagePathArray);
                         break;
                     case R.id.item_microphone_local:
-                        showVoiceDialog(imagePathListForAlbumTask);
+                        showVoiceDialog(imagePathArray);
                         break;
                     case R.id.item_notes_local:
-                        showNoteDialog(imagePathListForAlbumTask);
+                        showNoteDialog(imagePathArray);
                         break;
                 }
             }

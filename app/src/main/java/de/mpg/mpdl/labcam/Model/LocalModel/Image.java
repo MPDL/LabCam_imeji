@@ -12,21 +12,10 @@ import com.activeandroid.annotation.Table;
 
 @Table(name = "Images")
 public class Image extends Model {
-    @Expose
-    @Column(name = "imageId")
-    private String imageId;
-
-    @Expose
-    @Column(name = "taskId")
-    public String taskId;
 
     @Expose
     @Column(name = "imageName")
     private String imageName;
-
-    @Expose
-    @Column(name = "state")
-    private String state;
 
     @Expose
     @Column(name = "errorLevel")
@@ -75,62 +64,12 @@ public class Image extends Model {
         super();
     }
 
-    public Image(String imageId, String taskId, String imageName, String state, String errorLevel, String imagePath, String size, String createTime, String latitude, String longitude, String log, String userId, String serverName, Long noteId, Long voiceId) {
-        this.imageId = imageId;
-        this.taskId = taskId;
-        this.imageName = imageName;
-        this.state = state;
-        this.errorLevel = errorLevel;
-        this.imagePath = imagePath;
-        this.size = size;
-        this.createTime = createTime;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.log = log;
-        this.userId = userId;
-        this.serverName = serverName;
-        this.noteId = noteId;
-        this.voiceId = voiceId;
-    }
-
-    public String getImageId() {
-        return imageId;
-    }
-
-    public void setImageId(String imageId) {
-        this.imageId = imageId;
-    }
-
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
-    }
-
     public String getImageName() {
         return imageName;
     }
 
     public void setImageName(String imageName) {
         this.imageName = imageName;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public String getErrorLeverl() {
-        return errorLevel;
-    }
-
-    public void setErrorLeverl(String errorLeverl) {
-        this.errorLevel = errorLeverl;
     }
 
     public String getImagePath() {

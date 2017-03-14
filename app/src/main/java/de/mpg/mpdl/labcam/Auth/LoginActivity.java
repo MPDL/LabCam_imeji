@@ -32,7 +32,6 @@ import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -212,6 +211,7 @@ public class LoginActivity extends AppCompatActivity {
             PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.USER_NAME, username);
             PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.PASSWORD, password);
             PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.SERVER_NAME, serverURL);
+
             if(serverURLView.getVisibility()==View.VISIBLE) {
                 PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.OTHER_SERVER, serverURL);
             }
@@ -265,22 +265,20 @@ public class LoginActivity extends AppCompatActivity {
 
     // createTask only when with QRcode
     private void createTask(){
-
-        String userName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_NAME, "");
+        String username = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_NAME, "");
         String userId = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+
 
         Task latestTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
 
         if(latestTask==null){
             Log.v("create Task","no task in database");
             Task task = new Task();
-            String uniqueID = UUID.randomUUID().toString();
-            task.setTaskId(uniqueID);
             task.setUploadMode("AU");
             task.setCollectionId(collectionId);
             task.setCollectionName(collectionName);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
-            task.setUserName(userName);
+            task.setUserName(username);
             task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
@@ -300,12 +298,10 @@ public class LoginActivity extends AppCompatActivity {
             new Delete().from(Task.class).where("uploadMode = ?", "AU").execute();
 
             Task task = new Task();
-            String uniqueID = UUID.randomUUID().toString();
-            task.setTaskId(uniqueID);
             task.setUploadMode("AU");
             task.setCollectionId(collectionId);
             task.setState(String.valueOf(DeviceStatus.state.WAITING));
-            task.setUserName(userName);
+            task.setUserName(username);
             task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
@@ -360,6 +356,9 @@ public class LoginActivity extends AppCompatActivity {
 
             if(error.getResponse().getStatus()==401) {
                 Toast.makeText(activity, "username or password wrong", Toast.LENGTH_SHORT).show();
+                if(passwordView.getText().length()>0)
+                    passwordView.selectAll();
+
             }else if(error.getResponse().getStatus()==404){
                 Toast.makeText(activity, "server not response", Toast.LENGTH_SHORT).show();
 

@@ -331,7 +331,8 @@ public class DeviceStatus {
         //note
         Image image = DBConnector.getImageByPath(imagePath, userId, serverName);
 
-        if(image.getNoteId() != null && DBConnector.getNoteById(image.getNoteId(), userId, serverName) != null)
+        // if image object not exist, there is no note.
+        if(image!=null && image.getNoteId() != null && DBConnector.getNoteById(image.getNoteId(), userId, serverName) != null)
             note = DBConnector.getNoteById(image.getNoteId(), userId, serverName).getNoteContent();
 
         if(ocrIsOn) {
