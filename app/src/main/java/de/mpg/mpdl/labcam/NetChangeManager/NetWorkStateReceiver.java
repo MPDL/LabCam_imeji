@@ -24,7 +24,6 @@ import java.util.List;
  *              <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
  *              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
  *              <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
- * Created by yingli on 12/8/15.
  */
 public class NetWorkStateReceiver extends BroadcastReceiver {
 
@@ -48,12 +47,9 @@ public class NetWorkStateReceiver extends BroadcastReceiver {
 
             // autoTask is null when first install
             Task autoTask = new Select().from(Task.class).where("uploadMode = ?", "AU").executeSingle();
-            if(autoTask==null){
-                return;
-            }
             List<Task> ManualTaskList = new Select().from(Task.class).where("uploadMode = ?", "MU").execute();
             //activate upload services
-            if (autoTask.getUploadMode().equalsIgnoreCase("AU")) {
+            if (autoTask!=null && autoTask.getUploadMode().equalsIgnoreCase("AU")) {
                 // start AU TaskUploadService
                 Intent uploadIntent = new Intent(context, TaskUploadService.class);
                 Log.i(TAG,"reStart AU after reconnect to internet");
