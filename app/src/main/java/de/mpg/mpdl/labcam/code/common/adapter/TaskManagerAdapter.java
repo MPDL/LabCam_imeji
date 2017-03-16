@@ -257,8 +257,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                                         Intent uploadIntent = new Intent(activity, TaskUploadService.class);
                                         activity.stopService(uploadIntent);
 
-                                        //delete all image with this taskId
-                                        new Delete().from(Image.class).where("taskId = ?", task.getId()).execute();
+                                        //TODO: delete all image with this taskId
                                         String collectionID = task.getCollectionId();
                                         String collectionName = task.getCollectionName();
                                         String username = task.getUserName();
@@ -391,48 +390,12 @@ public class TaskManagerAdapter extends BaseAdapter {
     private void deleteTask(Task task,int position){
         Long currentTaskId = task.getId();
         new Delete().from(Task.class).where("Id = ?", currentTaskId).execute();
+        //// TODO: 3/16/17 delete imgs in task
         Log.e(TAG, "task delete clicked");
-        //TODO: delete from data list
         removeTaskInterface.remove(position);
         taskList.remove(task);
         notifyDataSetChanged();
         /** if it is a Au, what to do? */
-    }
-
-    private void printTaskLog(int phrase, Task task){
-
-        switch (phrase){
-            case AU_WAITING:
-                Log.i(TAG, "AU_WAITING");
-                break;
-            case AU_UPLOADING:
-                Log.i(TAG, "AU_UPLOADING");
-                break;
-            case AU_FINISH:
-                Log.i(TAG, "AU_FINISH");
-                break;
-
-            case MU_UPLOADING:
-                Log.i(TAG, "MU_UPLOADING");
-                break;
-            case MU_FINISH:
-                Log.i(TAG, "MU_FINISH");
-                break;
-
-            case AU_FAILED:
-                Log.i(TAG, "AU_FAILED");
-                break;
-            case MU_FAILED:
-                Log.i(TAG, "MU_FAILED");
-                break;
-        }
-        Log.i(TAG, "task: id " + task.getId());
-        Log.i(TAG, "finished: "+task.getFinishedItems());
-        Log.i(TAG, "total: "+task.getTotalItems());
-        Log.i(TAG, "getStartDate: "+task.getStartDate());
-        if(phrase == AU_FINISH || phrase == MU_FINISH) {
-            Log.i(TAG, "getEndDate: " + task.getEndDate());
-        }
     }
 
     private void getUserInfo(){
