@@ -589,6 +589,10 @@ public class checkAndUpload {
             Log.v(TAG, dataItem.getCollectionId() + ":" + dataItem.getFilename());
 
             task = DBConnector.getTaskById(currentTaskId, userId, serverName);
+
+            if(task==null){
+                return;  // task is deleted before the success callback
+            }
             List<String> imgPaths = task.getImagePaths();
             if(imgPaths.contains(currentImagePath)){
                 imgPaths.remove(currentImagePath);
