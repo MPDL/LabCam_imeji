@@ -2,7 +2,7 @@ package de.mpg.mpdl.labcam.code.base;
 
 import android.content.Context;
 
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 
 import javax.inject.Inject;
 

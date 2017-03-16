@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="de.mpg.mpdl.labcam.LocalFragment.LocalFragment">
+    tools:context="de.mpg.mpdl.labcam.code.common.fragment.LocalFragment">
 
 
     <RelativeLayout
@@ -38,7 +38,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="5dp"
             android:layout_toLeftOf="@id/tv_num_active_task">
-            <de.mpg.mpdl.labcam.Utils.UiElements.CircleProgressBar
+            <de.mpg.mpdl.labcam.code.common.widget.CircleProgressBar
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:id="@+id/circleProgressBar"

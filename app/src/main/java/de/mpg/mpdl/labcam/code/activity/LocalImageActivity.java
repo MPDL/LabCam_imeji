@@ -2,10 +2,8 @@ package de.mpg.mpdl.labcam.code.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,37 +17,27 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.sch.rfview.AnimRFRecyclerView;
 import com.sch.rfview.decoration.DividerGridItemDecoration;
 import com.sch.rfview.manager.AnimRFGridLayoutManager;
 
-import de.mpg.mpdl.labcam.Gallery.RemoteListDialogFragment;
+import de.mpg.mpdl.labcam.code.common.fragment.RemoteListDialogFragment;
 import de.mpg.mpdl.labcam.code.common.adapter.LocalAlbumAdapter;
-import de.mpg.mpdl.labcam.ItemDetails.DetailActivity;
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
-import de.mpg.mpdl.labcam.Utils.ImageFileFilter;
+import de.mpg.mpdl.labcam.code.utils.ImageFileFilter;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
-import de.mpg.mpdl.labcam.code.common.widget.Constants;
-import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import butterknife.BindView;
 
-import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.noteDialogNewInstance;
-import static de.mpg.mpdl.labcam.Utils.BatchOperationUtils.voiceDialogNewInstance;
+import static de.mpg.mpdl.labcam.code.utils.BatchOperationUtils.noteDialogNewInstance;
+import static de.mpg.mpdl.labcam.code.utils.BatchOperationUtils.voiceDialogNewInstance;
 
 /**
  * Created by allen on 03/09/15.

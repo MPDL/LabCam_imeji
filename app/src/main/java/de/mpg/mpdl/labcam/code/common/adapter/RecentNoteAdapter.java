@@ -12,7 +12,7 @@ import android.widget.TextView;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 
 import java.util.List;
 

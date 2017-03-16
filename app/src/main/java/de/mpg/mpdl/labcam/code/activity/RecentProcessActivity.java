@@ -1,20 +1,16 @@
 package de.mpg.mpdl.labcam.code.activity;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.activeandroid.query.Select;
-
-import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.adapter.RecentTaskAdapter;
-import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;

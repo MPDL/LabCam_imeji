@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.squareup.okhttp.OkHttpClient;
 
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;

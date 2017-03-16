@@ -18,16 +18,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.activeandroid.query.Delete;
-import com.activeandroid.query.Select;
 
-import de.mpg.mpdl.labcam.AutoRun.ManualUploadService;
-import de.mpg.mpdl.labcam.AutoRun.TaskUploadService;
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.code.common.service.ManualUploadService;
+import de.mpg.mpdl.labcam.code.common.service.TaskUploadService;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.common.callback.RemoveTaskInterface;
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 
 import java.util.Date;
 import java.util.List;

@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 
 import java.util.List;
 

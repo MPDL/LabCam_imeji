@@ -2,7 +2,6 @@ package de.mpg.mpdl.labcam.code.activity;
 
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,19 +10,15 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import com.activeandroid.query.Select;
-
-import de.mpg.mpdl.labcam.AutoRun.dbObserver;
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.code.common.observer.dbObserver;
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.callback.RemoveTaskInterface;
-import de.mpg.mpdl.labcam.Utils.DBConnector;
+import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.TaskManagerAdapter;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
-import de.mpg.mpdl.labcam.code.data.db.LiteOrmManager;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.util.Iterator;
@@ -48,7 +43,7 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
     // db observer handler
     static ContentResolver resolver;
     static Handler mHandler;
-    static de.mpg.mpdl.labcam.AutoRun.dbObserver dbObserver;
+    static de.mpg.mpdl.labcam.code.common.observer.dbObserver dbObserver;
     static Uri uri;
 
     @Override
