@@ -30,18 +30,6 @@ public class RetrofitClient {
         REST_SERVER = restServer;
     }
 
-    public static void login(String username, String password,Callback<User> callback){
-        ImejiAPI imejiAPI = ServiceGenerator.
-                createService(ImejiAPI.class, REST_SERVER, username, password);
-        imejiAPI.basicLogin(callback);
-    }
-
-    public static void apiLogin(String APIkey,Callback<User> callback){
-        ImejiAPI imejiAPI = ServiceGenerator.
-                createService(ImejiAPI.class, REST_SERVER,APIkey);
-        imejiAPI.basicLogin(callback);
-    }
-
     /*
     for items
      */

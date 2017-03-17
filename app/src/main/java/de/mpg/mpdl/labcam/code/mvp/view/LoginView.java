@@ -1,6 +1,7 @@
 package de.mpg.mpdl.labcam.code.mvp.view;
 
 import de.mpg.mpdl.labcam.code.base.BaseView;
+import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.data.model.UserModel;
 
 /**
@@ -10,4 +11,7 @@ import de.mpg.mpdl.labcam.code.data.model.UserModel;
 public interface LoginView extends BaseView{
     void loginSuc(UserModel model);
     void loginFail(Throwable e);
+
+    void getCollectionByIdSuc(ImejiFolderModel model);
+    void getCollectionByIdFail(Throwable e);
 }

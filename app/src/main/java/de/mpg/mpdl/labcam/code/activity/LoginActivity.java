@@ -22,12 +22,13 @@ import com.activeandroid.query.Select;
 import de.mpg.mpdl.labcam.MainActivity;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
-import de.mpg.mpdl.labcam.Model.User;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.code.base.BaseMvpActivity;
+import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.data.model.UserModel;
 import de.mpg.mpdl.labcam.code.injection.component.DaggerUserComponent;
+import de.mpg.mpdl.labcam.code.injection.module.ImejiFolderModule;
 import de.mpg.mpdl.labcam.code.injection.module.UserModule;
 import de.mpg.mpdl.labcam.code.mvp.presenter.LoginPresenter;
 import de.mpg.mpdl.labcam.code.mvp.view.LoginView;
@@ -59,7 +60,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
     @BindView(R.id.tv_register) TextView newRegister;
     @BindView(R.id.btnSignIn)  Button signIn;
     @BindView(R.id.qr_scanner)  Button scan;
-    private Activity activity = this;
+    private BaseMvpActivity activity = this;
 
     private String username;
     private String password;
@@ -329,27 +330,12 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
         Toast.makeText(activity,"Successfully login with QR code",Toast.LENGTH_LONG).show();
     }
 
-    Callback<ImejiFolder> callback_collection = new Callback<ImejiFolder>() {
-        @Override
-        public void success(ImejiFolder imejiFolder, Response response) {
-            Log.v(LOG_TAG,"success");
-            collectionName = imejiFolder.getTitle();
-            createTask();
-            collectionId = null;
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-            Log.v(LOG_TAG,"failed");
-            Toast.makeText(activity,"The collectionId in QR code is not valid",Toast.LENGTH_LONG).show();
-        }
-    };
-
     @Override
     protected void injectComponent() {
         DaggerUserComponent.builder()
                 .applicationComponent(getApplicationComponent())
                 .userModule(new UserModule())
+                .imejiFolderModule(new ImejiFolderModule())
                 .build()
                 .inject(this);
         mPresenter.setView(this);
@@ -368,7 +354,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
             PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.API_KEY, user.getApiKey());
             PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.SERVER_NAME, serverURL);
             if(collectionId!=null&&collectionId!=""){   // login with qr code
-                RetrofitClient.getCollectionById(collectionId, callback_collection, user.getApiKey());
+                mPresenter.getCollectionById(collectionId, activity);
 
                 //create a new task for new selected collection
             }else {
@@ -386,18 +372,32 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
 
         HttpException httpException = (HttpException)e;
 
-        switch (httpException.code()) {
-            case 401:
-                Toast.makeText(activity, "username or password wrong", Toast.LENGTH_SHORT).show();
-                if(passwordView.getText().length()>0)
-                    passwordView.selectAll();
-                return;
-            case 404:
-                Toast.makeText(activity, "server not response", Toast.LENGTH_SHORT).show();
-                return;
-            case 0:
-                Toast.makeText(activity, serverURL+ " please check your wifi connection", Toast.LENGTH_LONG).show();
-                return;
-        }
+            switch (httpException.code()) {
+                case 401:
+                    Toast.makeText(activity, "username or password wrong", Toast.LENGTH_SHORT).show();
+                    if(passwordView.getText().length()>0)
+                        passwordView.selectAll();
+                    return;
+                case 404:
+                    Toast.makeText(activity, "server not response", Toast.LENGTH_SHORT).show();
+                    return;
+                case 0:
+                    Toast.makeText(activity, serverURL+ " please check your wifi connection", Toast.LENGTH_LONG).show();
+                    return;
+            }
+    }
+
+    @Override
+    public void getCollectionByIdSuc(ImejiFolderModel imejiFolder) {
+        Log.v(LOG_TAG,"success");
+        collectionName = imejiFolder.getTitle();
+        createTask();
+        collectionId = null;
+    }
+
+    @Override
+    public void getCollectionByIdFail(Throwable e) {
+        Log.v(LOG_TAG,"failed");
+        Toast.makeText(activity,"The collectionId in QR code is not valid",Toast.LENGTH_LONG).show();
     }
 }

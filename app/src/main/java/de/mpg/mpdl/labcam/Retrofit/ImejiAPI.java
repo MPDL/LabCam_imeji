@@ -7,7 +7,6 @@ import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.Model.TO.MetadataProfileTO;
-import de.mpg.mpdl.labcam.Model.User;
 
 import java.util.List;
 
@@ -54,15 +53,6 @@ public interface ImejiAPI {
     @DELETE("/items/{id}")
     void deleteItemById(@Path("id") String itemId,
                         Callback<Response> callback);
-
-
-    /**
-     * login
-     * @param callback
-     */
-    @POST("/login")
-    void basicLogin(Callback<User> callback);
-
 
     /*
      *  For collections
