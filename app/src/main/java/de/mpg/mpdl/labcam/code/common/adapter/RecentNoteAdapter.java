@@ -90,8 +90,8 @@ public class RecentNoteAdapter extends BaseAdapter {
     private void deleteNote(Note note){
         for (Image image : DBConnector.getImageByNoteId(note.getId())) {
             image.setNoteId(null);
-            if(image.getNoteId()==null && image.getVoiceId()== null &&
-                    DBConnector.isNeedUpload(image.getImagePath(), userId, serverName))
+            if(image.getNoteId()== null && image.getVoiceId()== null &&
+                    !DBConnector.isNeedUpload(image.getImagePath(), userId, serverName))
                 image.delete();
             else
                 image.save();

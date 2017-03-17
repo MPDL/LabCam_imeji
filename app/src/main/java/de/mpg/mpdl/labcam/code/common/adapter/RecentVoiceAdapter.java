@@ -143,7 +143,7 @@ public class RecentVoiceAdapter extends BaseAdapter {
         for (Image image : DBConnector.getImageByVoiceId(voice.getId())) {
             image.setVoiceId(null);
             if(image.getNoteId()==null && image.getVoiceId()== null &&
-                    DBConnector.isNeedUpload(image.getImagePath(), userId, serverName))
+                    !DBConnector.isNeedUpload(image.getImagePath(), userId, serverName))
                 image.delete();
             else
                 image.save();
