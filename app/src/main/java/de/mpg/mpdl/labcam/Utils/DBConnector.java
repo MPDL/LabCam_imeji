@@ -214,14 +214,26 @@ public class DBConnector {
                 .executeSingle();
     }
 
+    public static Note findExistNote(String noteContent,String userId, String serverName){
+        return new Select()
+                .from(Note.class)
+                .where("noteContent = ?", noteContent)
+                .where("userId = ?", userId)
+                .where("serverName = ?", serverName)
+                .executeSingle();
+    }
+
 
     public static void batchEditNote(List<Image> imageList, String noteContent, String userId, String serverName) {
 
         /** create new Note **/
-        Note newNote = new Note();  //PREPARE(CREATE) new NOTE
-        newNote.setNoteContent(noteContent);
-        newNote.setUserId(userId);
-        newNote.setServerName(serverName);
+        Note newNote = findExistNote(noteContent, userId, serverName);
+        if(newNote == null) {
+            newNote = new Note();
+            newNote.setNoteContent(noteContent);
+            newNote.setUserId(userId);
+            newNote.setServerName(serverName);
+        }
 
         newNote.setCreateTime(new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()));
         for (Image i : imageList)
