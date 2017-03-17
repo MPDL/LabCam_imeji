@@ -6,12 +6,14 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
+import de.mpg.mpdl.labcam.code.data.model.UserModel;
+
 /**
  * Created by allen on 27/08/15.
  */
 
 @Table(name = "DataItem")
-public class DataItem extends Model {
+public class DataItem {
 
     @Expose
     @Column(name = "filename")
@@ -35,7 +37,7 @@ public class DataItem extends Model {
 
     @Expose
     @Column(name = "createdBy")
-    private User createdBy;
+    private UserModel createdBy;
 
     //@Expose
     @Column(name = "metaData")
@@ -47,23 +49,6 @@ public class DataItem extends Model {
 
     @Column(name = "localPath")
     private String localPath;
-
-    public DataItem(){
-        super();
-    }
-
-    public DataItem(String filename, String createdDate, String fileUrl, String webResolutionUrlUrl,
-                    String thumbnailUrl, User createdBy, MetaData metadata,
-                    String collectionId) {
-        this.filename = filename;
-        this.createdDate = createdDate;
-        this.fileUrl = fileUrl;
-        this.webResolutionUrlUrl = webResolutionUrlUrl;
-        this.thumbnailUrl = thumbnailUrl;
-        this.createdBy = createdBy;
-        this.metadata = metadata;
-        this.collectionId = collectionId;
-    }
 
     public String getFilename() {
         return filename;
@@ -105,11 +90,11 @@ public class DataItem extends Model {
         this.thumbnailUrl = thumbnailUrl;
     }
 
-    public User getCreatedBy() {
+    public UserModel getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(User createdBy) {
+    public void setCreatedBy(UserModel createdBy) {
         this.createdBy = createdBy;
     }
 

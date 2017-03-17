@@ -1,6 +1,5 @@
 package de.mpg.mpdl.labcam.code.data.repository.impl;
 
-import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.data.net.RetrofitFactory;
 import de.mpg.mpdl.labcam.code.data.net.api.ImejiFolderApi;

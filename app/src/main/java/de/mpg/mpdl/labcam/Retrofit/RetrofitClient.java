@@ -7,8 +7,7 @@ import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
-import de.mpg.mpdl.labcam.Model.TO.MetadataProfileTO;
-import de.mpg.mpdl.labcam.Model.User;
+import de.mpg.mpdl.labcam.code.data.model.TO.MetadataProfileTO;
 
 import java.util.List;
 
@@ -30,22 +29,13 @@ public class RetrofitClient {
         REST_SERVER = restServer;
     }
 
-    /*
-    for items
-     */
-    public static void getItems(Callback<List<DataItem>> callback,
-                                String username,
-                                String password) {
-        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, username, password);
-        imejiAPI.getItems(callback);
-    }
     public static void uploadItem(TypedFile typedFile,
                                   String json,
                                   Callback<DataItem> callback,
                                   String APIkey) {
         ImejiAPI imejiAPI = ServiceGenerator.
             createService(ImejiAPI.class, REST_SERVER, APIkey);
-        imejiAPI.postItem(typedFile, json, callback);
+        imejiAPI.uploadItem(typedFile, json, callback);
     }
 
     public static void updateItem(String itemId, TypedFile typedFile,
@@ -57,17 +47,6 @@ public class RetrofitClient {
         imejiAPI.putItem(itemId, typedFile, json, callback);
     }
 
-    public static void deleteItem(String itemId,
-                                  Callback<Response> callback,
-                                  String username,
-                                  String password) {
-        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER,
-                username, password);
-        imejiAPI.deleteItemById(itemId, callback);
-    }
-
-
-
     /*
         for collection
      */
@@ -76,15 +55,6 @@ public class RetrofitClient {
         ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
 
         imejiAPI.getCollections(callback);
-    }
-
-
-
-    public static void getCollectionMessage(Callback<JsonObject> callback,
-                                            String APIkey) {
-        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
-
-        imejiAPI.getCollectionMessage(callback);
     }
 
     public static void getGrantCollectionMessage(Callback<CollectionMessage> callback,

@@ -1,4 +1,4 @@
-package de.mpg.mpdl.labcam.Model.TO;
+package de.mpg.mpdl.labcam.code.data.model.TO;
 
 import com.google.gson.annotations.Expose;
 

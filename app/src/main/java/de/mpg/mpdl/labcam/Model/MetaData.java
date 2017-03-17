@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Table(name = "MetaDataLocal")
 
-public class MetaData extends Model{
+public class MetaData {
 
     /*
     metadata: {

@@ -6,7 +6,7 @@ import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
-import de.mpg.mpdl.labcam.Model.TO.MetadataProfileTO;
+import de.mpg.mpdl.labcam.code.data.model.TO.MetadataProfileTO;
 
 import java.util.List;
 
@@ -32,12 +32,9 @@ public interface ImejiAPI {
      *  For items
     */
 
-    @GET("/items")
-    void getItems(Callback<List<DataItem>> callback);
-
     @Multipart
     @POST("/items?syntax=raw")
-    void postItem(@Part("file") TypedFile file,
+    void uploadItem(@Part("file") TypedFile file,
                   @Part("json") String json,
                   Callback<DataItem> callback);
 
@@ -49,20 +46,12 @@ public interface ImejiAPI {
                   Callback<DataItem> callback);
 
 
-
-    @DELETE("/items/{id}")
-    void deleteItemById(@Path("id") String itemId,
-                        Callback<Response> callback);
-
     /*
      *  For collections
     */
     //get all collections
     @GET(value = "/collections?size=10000")
     void getCollections(Callback<CollectionMessage> callback);
-
-    @GET(value = "/collections?size=10000")
-    void getCollectionMessage(Callback<JsonObject> callback);
 
     @GET(value = "/collections?size=10000")
     void getGrantedCollectionMessage(@Query("q") String q, Callback<CollectionMessage> callback);
