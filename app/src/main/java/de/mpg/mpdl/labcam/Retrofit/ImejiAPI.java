@@ -48,7 +48,7 @@ public interface ImejiAPI {
                   Callback<DataItem> callback);
 
     @Multipart
-    @POST("/items/{id}?syntax=raw")
+    @PUT("/items/{id}?syntax=raw")
     void putItem(@Path("id") String itemId,
                  @Part("file") TypedFile file,
                   @Part("json") String json,
