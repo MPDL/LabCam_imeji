@@ -1,37 +1,25 @@
-package de.mpg.mpdl.labcam.Model;
-
-import com.google.gson.annotations.Expose;
-
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
+package de.mpg.mpdl.labcam.code.data.model;
 
 import de.mpg.mpdl.labcam.Model.MessageModel.Person;
 
 /**
- * Created by allen on 27/08/15.
+ * Created by yingli on 3/17/17.
  */
 
-@Table(name = "User")
-public class User extends Model{
-
-    @Column(name="email")
+public class UserModel {
     private String email;
 
-    @Column(name="quota")
     private long quota;
 
-    @Column(name="apiKey")
     private String apiKey;
 
-    @Column(name="person")
     private Person person;
 
-    public User() {
+    public UserModel() {
         super();
     }
 
-    public User(String email, long quota, String apiKey, Person person) {
+    public UserModel(String email, long quota, String apiKey, Person person) {
         this.email = email;
         this.quota = quota;
         this.apiKey = apiKey;

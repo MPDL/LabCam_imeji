@@ -36,11 +36,6 @@ public interface ImejiAPI {
     @GET("/items")
     void getItems(Callback<List<DataItem>> callback);
 
-    //get one item by itemId
-    @GET("/items/{id}?syntax=raw")
-    List<DataItem> getItemById(@Path("id") String itemId,
-                               Callback<Response> callback);
-
     @Multipart
     @POST("/items?syntax=raw")
     void postItem(@Part("file") TypedFile file,
@@ -59,21 +54,6 @@ public interface ImejiAPI {
     @DELETE("/items/{id}")
     void deleteItemById(@Path("id") String itemId,
                         Callback<Response> callback);
-
-
-
-    /*
-     *  For users
-    */
-
-    //get all users
-    @GET("/users")
-    void getUsers(Callback<List<User>> callback);
-
-    //get one User by userId
-    @GET("/users/{userId}")
-    List<User> getUserById(@Path("userId") String userId,
-                           Callback<Response> callback);
 
 
     /**

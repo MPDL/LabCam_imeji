@@ -14,4 +14,10 @@ public class LabCam extends BaseApplication {
     public static Context getContext() {
         return mContext;
     }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mContext = getApplicationContext();
+    }
 }

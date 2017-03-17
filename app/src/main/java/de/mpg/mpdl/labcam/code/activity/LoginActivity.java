@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -24,9 +25,14 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.User;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
+import de.mpg.mpdl.labcam.code.base.BaseMvpActivity;
+import de.mpg.mpdl.labcam.code.data.model.UserModel;
+import de.mpg.mpdl.labcam.code.injection.component.DaggerUserComponent;
+import de.mpg.mpdl.labcam.code.injection.module.UserModule;
+import de.mpg.mpdl.labcam.code.mvp.presenter.LoginPresenter;
+import de.mpg.mpdl.labcam.code.mvp.view.LoginView;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.QRUtils;
-import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
@@ -37,9 +43,10 @@ import butterknife.BindView;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit2.adapter.rxjava.HttpException;
 
 
-public class LoginActivity extends BaseCompatActivity {
+public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements LoginView {
 
     @BindView(R.id.userName) EditText usernameView;
     @BindView(R.id.password) EditText passwordView;
@@ -213,7 +220,10 @@ public class LoginActivity extends BaseCompatActivity {
             if(serverURLView.getVisibility()==View.VISIBLE) {
                 PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.OTHER_SERVER, serverURL);
             }
-            RetrofitClient.login(username,password,callback_login);
+            String credentials = username + ":" + password;
+            String string = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+            PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.API_KEY, string);
+            mPresenter.basicLogin(this);
         }
 
     }
@@ -243,7 +253,7 @@ public class LoginActivity extends BaseCompatActivity {
                     PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.OTHER_SERVER, serverURL);
                 }
                 PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.COLLECTION_ID, APIkey);
-                RetrofitClient.apiLogin(APIkey,callback_login);
+                mPresenter.basicLogin(this);
 
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
@@ -319,51 +329,6 @@ public class LoginActivity extends BaseCompatActivity {
         Toast.makeText(activity,"Successfully login with QR code",Toast.LENGTH_LONG).show();
     }
 
-    Callback<User> callback_login = new Callback<User>() {
-        @Override
-        public void success(User user, Response response) {
-            String userCompleteName = "";
-            userCompleteName = user.getPerson().getCompleteName();
-            if(userCompleteName!="" && userCompleteName!=null){
-                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.USER_NAME, user.getPerson().getCompleteName());
-                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.FAMILY_NAME, user.getPerson().getFamilyName());
-                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.GIVEN_NAME, user.getPerson().getGivenName());
-                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.USER_ID, user.getPerson().getId());
-                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.EMAIL, user.getEmail());
-                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.API_KEY, user.getApiKey());
-                PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.SERVER_NAME, serverURL);
-                if(collectionId!=null&&collectionId!=""){   // login with qr code
-                    RetrofitClient.getCollectionById(collectionId, callback_collection, user.getApiKey());
-
-                    //create a new task for new selected collection
-                }else {
-                    Toast.makeText(activity,"Welcome "+userCompleteName,Toast.LENGTH_SHORT).show();
-                    accountLogin(user.getPerson().getId(),false);
-                }
-
-            }
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-
-            if(error.getResponse()==null){
-                Toast.makeText(activity, serverURL+ " please check your wifi connection", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            if(error.getResponse().getStatus()==401) {
-                Toast.makeText(activity, "username or password wrong", Toast.LENGTH_SHORT).show();
-                if(passwordView.getText().length()>0)
-                    passwordView.selectAll();
-
-            }else if(error.getResponse().getStatus()==404){
-                Toast.makeText(activity, "server not response", Toast.LENGTH_SHORT).show();
-
-            }
-        }
-    };
-
     Callback<ImejiFolder> callback_collection = new Callback<ImejiFolder>() {
         @Override
         public void success(ImejiFolder imejiFolder, Response response) {
@@ -379,4 +344,60 @@ public class LoginActivity extends BaseCompatActivity {
             Toast.makeText(activity,"The collectionId in QR code is not valid",Toast.LENGTH_LONG).show();
         }
     };
+
+    @Override
+    protected void injectComponent() {
+        DaggerUserComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .userModule(new UserModule())
+                .build()
+                .inject(this);
+        mPresenter.setView(this);
+    }
+
+    @Override
+    public void loginSuc(UserModel user) {
+        String userCompleteName = "";
+        userCompleteName = user.getPerson().getCompleteName();
+        if(userCompleteName!="" && userCompleteName!=null){
+            PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.USER_NAME, user.getPerson().getCompleteName());
+            PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.FAMILY_NAME, user.getPerson().getFamilyName());
+            PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.GIVEN_NAME, user.getPerson().getGivenName());
+            PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.USER_ID, user.getPerson().getId());
+            PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.EMAIL, user.getEmail());
+            PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.API_KEY, user.getApiKey());
+            PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.SERVER_NAME, serverURL);
+            if(collectionId!=null&&collectionId!=""){   // login with qr code
+                RetrofitClient.getCollectionById(collectionId, callback_collection, user.getApiKey());
+
+                //create a new task for new selected collection
+            }else {
+                Toast.makeText(activity,"Welcome "+userCompleteName,Toast.LENGTH_SHORT).show();
+                accountLogin(user.getPerson().getId(),false);
+            }
+
+        }
+    }
+
+    @Override
+    public void loginFail(Throwable e) {
+
+        PreferenceUtil.clearPrefs(activity, Constants.SHARED_PREFERENCES, Constants.API_KEY);
+
+        HttpException httpException = (HttpException)e;
+
+        switch (httpException.code()) {
+            case 401:
+                Toast.makeText(activity, "username or password wrong", Toast.LENGTH_SHORT).show();
+                if(passwordView.getText().length()>0)
+                    passwordView.selectAll();
+                return;
+            case 404:
+                Toast.makeText(activity, "server not response", Toast.LENGTH_SHORT).show();
+                return;
+            case 0:
+                Toast.makeText(activity, serverURL+ " please check your wifi connection", Toast.LENGTH_LONG).show();
+                return;
+        }
+    }
 }
