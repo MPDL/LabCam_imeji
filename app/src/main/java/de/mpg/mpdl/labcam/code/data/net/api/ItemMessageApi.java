@@ -15,7 +15,7 @@ import rx.Observable;
 public interface ItemMessageApi {
 
     //get all items by collection id
-    @GET("/collections/{id}/items")
+    @GET("collections/{id}/items")
     Observable<ItemMessage> getCollectionItems(@Path("id") String collectionId,
                                   @Query("size") int size,
                                   @Query("offset") int offset);
