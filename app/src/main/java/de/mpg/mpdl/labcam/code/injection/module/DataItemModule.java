@@ -14,8 +14,12 @@ import dagger.Provides;
 @Module
 public class DataItemModule {
     @Provides
-    DataItemService provideDataItemService(DataItemServiceImp service){ return service; }
+    DataItemService provideDataItemService(DataItemServiceImp service){
+        return service;
+    }
 
     @Provides
-    DataItemRepository provideDataItemRepository(DataItemRepositoryImpl repository){ return repository; }
+    DataItemRepository provideDataItemRepository(DataItemRepositoryImpl repository){
+        return repository;
+    }
 }

@@ -14,9 +14,13 @@ import dagger.Provides;
 @Module
 public class CollectionMessageModule {
     @Provides
-    CollectionMessageService provideCollectionMessageService(CollectionMessageServiceImp service){return  service; }
+    CollectionMessageService provideCollectionMessageService(CollectionMessageServiceImp service){
+        return  service;
+    }
 
     @Provides
-    CollectionMessageRepository provideCollectionMessageRepository(CollectionMessageRepositoryImpl repository){return  repository; }
+    CollectionMessageRepository provideCollectionMessageRepository(CollectionMessageRepositoryImpl repository){
+        return  repository;
+    }
 
 }

@@ -15,8 +15,12 @@ import dagger.Provides;
 @Module
 public class ProfileModule {
     @Provides
-    ProfileService provideProfileService(ProfileServiceImp service){ return service; }
+    ProfileService provideProfileService(ProfileServiceImp service){
+        return service;
+    }
 
     @Provides
-    ProfileRepository provideProfileRepository(ProfileRepositoryImpl repository) { return  repository; }
+    ProfileRepository provideProfileRepository(ProfileRepositoryImpl repository) {
+        return  repository;
+    }
 }
