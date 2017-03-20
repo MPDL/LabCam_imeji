@@ -8,10 +8,8 @@ import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.code.data.model.TO.MetadataProfileTO;
 
-import java.util.List;
-
 import retrofit.Callback;
-import retrofit.client.Response;
+
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
