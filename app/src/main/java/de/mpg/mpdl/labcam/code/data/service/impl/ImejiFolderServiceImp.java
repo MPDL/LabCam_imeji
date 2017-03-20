@@ -1,5 +1,7 @@
 package de.mpg.mpdl.labcam.code.data.service.impl;
 
+import com.google.gson.JsonObject;
+
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.data.repository.ImejiFolderRepository;
 import de.mpg.mpdl.labcam.code.data.service.ImejiFolderService;
@@ -25,5 +27,15 @@ public class ImejiFolderServiceImp extends ImejiFolderService{
     @Override
     public Observable<ImejiFolderModel> getCollectionById(String collectionId) {
         return imejiFolderRepository.getCollectionById(collectionId);
+    }
+
+    @Override
+    public Observable<ImejiFolderModel> createCollection(JsonObject jsonBody) {
+        return imejiFolderRepository.createCollection(jsonBody);
+    }
+
+    @Override
+    public Observable<ImejiFolderModel> updateCollection(String collectionId, JsonObject jsonObject) {
+        return imejiFolderRepository.updateCollection(collectionId, jsonObject);
     }
 }
