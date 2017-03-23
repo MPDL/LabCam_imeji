@@ -17,6 +17,10 @@ public class CollectionMessageServiceImp extends CollectionMessageService{
     @Inject
     CollectionMessageRepository collectionMessageRepository;
 
+    @Inject
+    public CollectionMessageServiceImp() {
+    }
+
     @Override
     public Observable<CollectionMessage> getCollections() {
         return collectionMessageRepository.getCollections();

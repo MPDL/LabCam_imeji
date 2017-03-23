@@ -18,6 +18,10 @@ public class DataItemServiceImp extends DataItemService{
     @Inject
     DataItemRepository dataItemRepository;
 
+    @Inject
+    public DataItemServiceImp() {
+    }
+
     @Override
     public Observable<DataItem> uploadItem(MultipartBody.Part[] img) {
         return dataItemRepository.uploadItem(img);

@@ -20,6 +20,10 @@ public class ProfileServiceImp extends ProfileService{
     @Inject
     ProfileRepository profileRepository;
 
+    @Inject
+    public ProfileServiceImp() {
+    }
+
     @Override
     public Observable<MetadataProfileTO> createProfile(JsonObject jsonObject) {
         return profileRepository.createProfile(jsonObject);
