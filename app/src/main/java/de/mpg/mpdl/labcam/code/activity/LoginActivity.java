@@ -19,12 +19,11 @@ import android.widget.Toast;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
-import de.mpg.mpdl.labcam.MainActivity;
-import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.code.base.BaseMvpActivity;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.data.model.UserModel;
 import de.mpg.mpdl.labcam.code.injection.component.DaggerUserComponent;
@@ -33,17 +32,13 @@ import de.mpg.mpdl.labcam.code.injection.module.UserModule;
 import de.mpg.mpdl.labcam.code.mvp.presenter.LoginPresenter;
 import de.mpg.mpdl.labcam.code.mvp.view.LoginView;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
-import de.mpg.mpdl.labcam.code.utils.QRUtils;
-import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
+import de.mpg.mpdl.labcam.code.utils.QRUtils;
 
 import java.text.DateFormat;
 import java.util.Date;
 
 import butterknife.BindView;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 import retrofit2.adapter.rxjava.HttpException;
 
 

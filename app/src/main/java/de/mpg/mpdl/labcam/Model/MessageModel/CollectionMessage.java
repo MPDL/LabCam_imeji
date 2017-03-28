@@ -4,7 +4,7 @@ package de.mpg.mpdl.labcam.Model.MessageModel;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import de.mpg.mpdl.labcam.Model.ImejiFolder;
+import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +32,10 @@ public class CollectionMessage {
 
     @Expose
     @SerializedName("results")
-    private List<ImejiFolder> results = new ArrayList<>();
+    private List<ImejiFolderModel> results = new ArrayList<>();
 
 
-    public CollectionMessage(int totalNumberOfResults, int numberOfResults, int offset, int size, String query, List<ImejiFolder> results) {
+    public CollectionMessage(int totalNumberOfResults, int numberOfResults, int offset, int size, String query, List<ImejiFolderModel> results) {
         this.totalNumberOfResults = totalNumberOfResults;
         this.numberOfResults = numberOfResults;
         this.offset = offset;
@@ -75,11 +75,11 @@ public class CollectionMessage {
         this.size = size;
     }
 
-    public List<ImejiFolder> getResults() {
+    public List<ImejiFolderModel> getResults() {
         return results;
     }
 
-    public void setResults(List<ImejiFolder> results) {
+    public void setResults(List<ImejiFolderModel> results) {
         this.results = results;
     }
 }

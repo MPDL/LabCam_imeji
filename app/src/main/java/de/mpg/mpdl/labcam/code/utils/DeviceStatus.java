@@ -24,6 +24,9 @@ import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.ExifThumbnailDirectory;
 import com.drew.metadata.exif.GpsDirectory;
 
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,9 +42,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
-
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 
 /**
  * Created by allen on 09/04/15.

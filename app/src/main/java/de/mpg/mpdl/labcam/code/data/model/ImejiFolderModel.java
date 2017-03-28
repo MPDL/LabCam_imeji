@@ -1,12 +1,17 @@
 package de.mpg.mpdl.labcam.code.data.model;
 
+import de.mpg.mpdl.labcam.Model.ImejiProfile;
+import de.mpg.mpdl.labcam.Model.MessageModel.Person;
+
+import java.util.List;
+
 /**
  * Created by yingli on 3/17/17.
  */
 
 public class ImejiFolderModel {
 
-    private String ImejiId;
+    public String id;
 
     private String title;
 
@@ -16,13 +21,53 @@ public class ImejiFolderModel {
 
     private String modifiedDate;
 
-    public String getImejiId() {
-        return ImejiId;
+    private CreatedByModel createdBy;
+
+    private List<Person> contributors;
+
+    private ImejiProfile profile;
+
+//    private String coverItemUrl;
+
+    public String getId() {
+        return id;
     }
 
-    public void setImejiId(String imejiId) {
-        ImejiId = imejiId;
+    public void setId(String id) {
+        this.id = id;
     }
+
+    public CreatedByModel getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(CreatedByModel createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public List<Person> getContributors() {
+        return contributors;
+    }
+
+    public void setContributors(List<Person> contributors) {
+        this.contributors = contributors;
+    }
+
+    public ImejiProfile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(ImejiProfile profile) {
+        this.profile = profile;
+    }
+//
+//    public String getCoverItemUrl() {
+//        return coverItemUrl;
+//    }
+//
+//    public void setCoverItemUrl(String coverItemUrl) {
+//        this.coverItemUrl = coverItemUrl;
+//    }
 
     public String getTitle() {
         return title;

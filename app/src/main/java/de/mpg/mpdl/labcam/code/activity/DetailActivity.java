@@ -15,10 +15,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
-import de.mpg.mpdl.labcam.code.common.fragment.RemoteListDialogFragment;
-import de.mpg.mpdl.labcam.code.common.adapter.ViewPagerAdapter;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
+import de.mpg.mpdl.labcam.code.common.adapter.ViewPagerAdapter;
+import de.mpg.mpdl.labcam.code.common.fragment.RemoteListDialogFragment;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.rxbus.EventSubscriber;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;

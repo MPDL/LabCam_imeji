@@ -19,8 +19,8 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import de.mpg.mpdl.labcam.code.activity.DetailActivity;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.code.activity.DetailActivity;
 import de.mpg.mpdl.labcam.code.activity.LocalImageActivity;
 
 import java.io.File;

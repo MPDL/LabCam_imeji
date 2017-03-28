@@ -8,12 +8,16 @@ import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.code.data.model.TO.MetadataProfileTO;
+import de.mpg.mpdl.labcam.code.data.net.RetrofitFactory;
+import de.mpg.mpdl.labcam.code.data.net.api.DataItemApi;
 
-import java.util.List;
+import java.util.Map;
 
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit.Callback;
-import retrofit.client.Response;
 import retrofit.mime.TypedFile;
+import rx.Observable;
 
 /**
  * Created by allen on 27/08/15.
@@ -27,6 +31,10 @@ public class RetrofitClient {
 
     public static void setRestServer(String restServer) {
         REST_SERVER = restServer;
+    }
+
+    public static Observable<DataItem> uploadItem(Map<String, RequestBody> partMap, MultipartBody.Part img) {
+       return RetrofitFactory.getInstance().create(DataItemApi.class).uploadItem(partMap, img);
     }
 
     public static void uploadItem(TypedFile typedFile,

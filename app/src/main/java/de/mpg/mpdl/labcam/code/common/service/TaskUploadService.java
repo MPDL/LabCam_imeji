@@ -9,9 +9,9 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
-import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 /**

@@ -6,13 +6,14 @@ import android.util.Log;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
+import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.LocalModel.Voice;
-import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.data.db.LiteOrmManager;
+import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -291,7 +292,6 @@ public class DBConnector {
 
     /************************************ refactoring **************************************/
 
-    //get all store
     public static Settings getSettingsByUserId(Context context, String userId){
         List<Settings> settingsList = LiteOrmManager.getInstance(context).queryByEqual("userId", userId, Settings.class);
         if(settingsList!=null && settingsList.size()>0){
@@ -300,4 +300,9 @@ public class DBConnector {
             return null;
     }
 
+    public static List<ImejiFolder> getUserFolders(){
+        return new Select()
+                .from(ImejiFolder.class)
+                .execute();
+    }
 }

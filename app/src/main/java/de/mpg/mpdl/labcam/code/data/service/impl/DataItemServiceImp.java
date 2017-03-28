@@ -4,9 +4,12 @@ import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.code.data.repository.DataItemRepository;
 import de.mpg.mpdl.labcam.code.data.service.DataItemService;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import rx.Observable;
 
 /**
@@ -23,7 +26,7 @@ public class DataItemServiceImp extends DataItemService{
     }
 
     @Override
-    public Observable<DataItem> uploadItem(MultipartBody.Part[] img) {
-        return dataItemRepository.uploadItem(img);
+    public Observable<DataItem> uploadItem(Map<String, RequestBody> map, MultipartBody.Part img) {
+        return dataItemRepository.uploadItem(map, img);
     }
 }

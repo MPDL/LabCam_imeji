@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.activeandroid.ActiveAndroid;
+
 import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
@@ -20,6 +21,7 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.code.common.adapter.FolderListAdapter;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.text.ParseException;
@@ -205,7 +207,18 @@ public class ImejiFragment extends Fragment {
             Log.i("callback_collection", "callback_collection success");
 
             List<ImejiFolder> folderList = new ArrayList<>();
-            folderList = collectionMessage.getResults();
+            for (ImejiFolderModel imejiFolderModel : collectionMessage.getResults()) {
+                ImejiFolder imejiFolder = new ImejiFolder();
+                imejiFolder.setImejiId(imejiFolderModel.getId());
+                imejiFolder.setContributors(imejiFolderModel.getContributors());
+                imejiFolder.setTitle(imejiFolder.getTitle());
+                imejiFolder.setDescription(imejiFolderModel.getDescription());
+                imejiFolder.setCoverItemUrl(imejiFolder.getCoverItemUrl());
+                imejiFolder.setModifiedDate(imejiFolder.getModifiedDate());
+                imejiFolder.setCreatedDate(imejiFolder.getCreatedDate());
+                folderList.add(imejiFolder);
+            }
+
             Collections.sort(folderList,new CustomComparator());
 
             // clear imeji folder list

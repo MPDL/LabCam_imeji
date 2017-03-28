@@ -3,7 +3,6 @@ package de.mpg.mpdl.labcam.Model;
 
 import com.google.gson.annotations.Expose;
 
-import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 

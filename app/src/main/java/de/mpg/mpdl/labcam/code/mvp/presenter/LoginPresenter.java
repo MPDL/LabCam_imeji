@@ -1,6 +1,5 @@
 package de.mpg.mpdl.labcam.code.mvp.presenter;
 
-import de.mpg.mpdl.labcam.Model.User;
 import de.mpg.mpdl.labcam.code.base.BaseAbstractPresenter;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
 import de.mpg.mpdl.labcam.code.base.BaseSubscriber;

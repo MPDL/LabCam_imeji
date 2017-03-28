@@ -13,18 +13,19 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import de.mpg.mpdl.labcam.MainActivity;
+import de.mpg.mpdl.labcam.code.activity.MainActivity;
 import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
-import de.mpg.mpdl.labcam.code.data.model.TO.MetadataProfileTO;
-import de.mpg.mpdl.labcam.code.data.model.TO.StatementTO;
+import de.mpg.mpdl.labcam.Model.NotificationID;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
-import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
-import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
-import de.mpg.mpdl.labcam.Model.NotificationID;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
+import de.mpg.mpdl.labcam.code.data.model.TO.MetadataProfileTO;
+import de.mpg.mpdl.labcam.code.data.model.TO.StatementTO;
+import de.mpg.mpdl.labcam.code.data.net.MultipartUtil;
+import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.BufferedReader;
@@ -32,8 +33,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -172,7 +176,13 @@ public class checkAndUpload {
         typedFile = new TypedFile("multipart/form-data", f);
         json = "{" + jsonPart1 + ", \"metadata\" : "+jsonPart2+"}";
         Log.v(TAG, "start uploading: " + imgPath);
-        RetrofitClient.uploadItem(typedFile, json, callback_upload, apiKey);
+
+        MultipartBody.Part body = MultipartUtil.prepareFilePart("img", imgPath);
+        HashMap<String, RequestBody> map = new HashMap<>();
+        RequestBody jsonBody = MultipartUtil.createPartFromString(json);
+        map.put("json", jsonBody);
+        RetrofitClient.uploadItem(map, body);
+//        RetrofitClient.uploadItem(typedFile, json, callback_upload, apiKey);
     }
 
     private boolean taskIsStopped (){
@@ -571,15 +581,6 @@ public class checkAndUpload {
         }
     };
 
-    Callback<DataItem> callback_update = new Callback<DataItem>() {
-        @Override
-        public void success(DataItem dataItem, Response response) {
-        }
-        @Override
-        public void failure(final RetrofitError error)  {
-        }
-
-    };
 
     Callback<DataItem> callback_upload = new Callback<DataItem>() {
         @Override

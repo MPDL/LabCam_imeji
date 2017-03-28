@@ -1,7 +1,6 @@
 package de.mpg.mpdl.labcam.code.activity;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,8 +11,8 @@ import com.activeandroid.query.Select;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.code.common.adapter.RecentNoteAdapter;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
+import de.mpg.mpdl.labcam.code.common.adapter.RecentNoteAdapter;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 

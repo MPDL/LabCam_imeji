@@ -21,16 +21,26 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
-import de.mpg.mpdl.labcam.code.activity.QRScannerActivity;
-import de.mpg.mpdl.labcam.code.common.service.ManualUploadService;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
+import de.mpg.mpdl.labcam.code.activity.QRScannerActivity;
+import de.mpg.mpdl.labcam.code.base.BaseActivity;
+import de.mpg.mpdl.labcam.code.base.BaseMvpDialogFragment;
 import de.mpg.mpdl.labcam.code.common.adapter.SettingsListAdapter;
 import de.mpg.mpdl.labcam.code.common.callback.CollectionIdInterface;
+import de.mpg.mpdl.labcam.code.common.service.ManualUploadService;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
+import de.mpg.mpdl.labcam.code.injection.component.DaggerCollectionComponent;
+import de.mpg.mpdl.labcam.code.injection.module.CollectionMessageModule;
+import de.mpg.mpdl.labcam.code.mvp.presenter.RemoteCollectionDialogPresenter;
+import de.mpg.mpdl.labcam.code.mvp.presenter.RemoteCollectionSettingsPresenter;
+import de.mpg.mpdl.labcam.code.mvp.view.RemoteCollectionDialogView;
+import de.mpg.mpdl.labcam.code.mvp.view.RemoteCollectionSettingsView;
+import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import org.json.JSONException;
@@ -42,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -52,7 +61,7 @@ import static de.mpg.mpdl.labcam.code.utils.BatchOperationUtils.addImages;
 /**
  * Created by yingli on 2/15/16.
  */
-public class RemoteListDialogFragment extends DialogFragment implements CollectionIdInterface {
+public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollectionDialogPresenter> implements RemoteCollectionDialogView, CollectionIdInterface {
 
     private static final String LOG_TAG = RemoteListDialogFragment.class.getSimpleName();
     private RemoteListDialogFragment remoteListDialogFragment = this;
@@ -71,7 +80,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
 
     private SettingsListAdapter adapter;
     private ListView listView;
-    private Activity activity;
+    private BaseActivity activity;
 
     private String collectionId;
     private String collectionName;
@@ -87,7 +96,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
         this.setCancelable(false);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_fragment_remote_list, null);
-        activity = this.getActivity();
+        activity = (BaseActivity) this.getActivity();
         currentTaskId = getArguments().getLong("taskId");
 
         apiKey = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
@@ -138,8 +147,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
         listView.setAdapter(adapter);
 
 
-        //updateFolder
-        RetrofitClient.getGrantCollectionMessage(callback, apiKey);
+//        RetrofitClient.getGrantCollectionMessage(callback, apiKey);
 
         b.setView(view);
         return b.create();
@@ -214,70 +222,7 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
         @Override
         public void success(CollectionMessage collectionMessage, Response response) {
 
-            Log.e(LOG_TAG,"collectionMessage success");
-            /** get collections **/
-            List<ImejiFolder> folderList = new ArrayList<>();
-            folderList = collectionMessage.getResults();
 
-            if(folderList.size()==0) {
-                // create dialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                // Set up the input
-                final EditText input = new EditText(activity);
-                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                builder.setView(input);
-                builder.setTitle("Create Collection")
-                        .setMessage("There is no collection available, create one by giving a name")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // create dialog and create collection
-                                pDialog = new ProgressDialog(activity);
-                                pDialog.setMessage("Loading...");
-                                pDialog.show();
-                                if (String.valueOf(input.getText()).equalsIgnoreCase("")) {
-                                    Toast.makeText(activity, "canceled create collection", Toast.LENGTH_SHORT).show();
-                                    pDialog.dismiss();
-                                    return;
-                                }
-                                RetrofitClient.createCollection(String.valueOf(input.getText()), "no description yet", createCollection_callback, apiKey);
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // do nothing
-                                new Delete().from(Task.class).where("Id = ?", currentTaskId).execute();
-                                remoteListDialogFragment.dismiss();
-                            }
-                        })
-                        .setIcon(R.drawable.error_alert)
-                        .show();
-            }
-
-            new Delete().from(ImejiFolder.class).execute();
-
-            ActiveAndroid.beginTransaction();
-            try {
-                collectionList.clear();
-                for(ImejiFolder folder : folderList){
-                    folder.setImejiId(folder.id);
-
-                    collectionList.add(folder);
-
-                    ImejiFolder imejiFolder = new ImejiFolder();
-                    imejiFolder.setTitle(folder.getTitle());
-                    imejiFolder.setImejiId(folder.id);
-                    imejiFolder.setContributors(folder.getContributors());
-                    imejiFolder.setCoverItemUrl(folder.getCoverItemUrl());
-                    imejiFolder.setModifiedDate(folder.getModifiedDate());
-                    imejiFolder.save();
-                }
-                ActiveAndroid.setTransactionSuccessful();
-            } finally{
-                ActiveAndroid.endTransaction();
-
-                adapter.notifyDataSetChanged();
-            }
 
         }
 
@@ -286,14 +231,9 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
             Log.v(LOG_TAG, "get list failed");
             Log.v(LOG_TAG, error.toString());
 
-            try {
-                collectionList.clear();
-                collectionList = new Select().from(ImejiFolder.class).execute();
-                Log.v(LOG_TAG, collectionList.size() + "");
-
-            }catch (Exception e){
-                Log.v(LOG_TAG,e.getMessage());
-            }
+            collectionList.clear();
+            collectionList = new Select().from(ImejiFolder.class).execute();
+            Log.v(LOG_TAG, collectionList.size() + "");
 
             adapter = new SettingsListAdapter(activity, collectionList,ie);
             listView.setAdapter(adapter);
@@ -383,5 +323,96 @@ public class RemoteListDialogFragment extends DialogFragment implements Collecti
                 // User cancelled the photo picking
             }
         }
+    }
+
+    @Override
+    protected void injectComponent() {
+        DaggerCollectionComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .collectionMessageModule(new CollectionMessageModule())
+                .build()
+                .inject(this);
+        mPresenter.setView(this);
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.dialog_fragment_remote_list;
+    }
+
+    @Override
+    protected void initContentView(Bundle savedInstanceState) {
+        //updateFolder
+        String q = "grant=\"upload\"";
+        mPresenter.getGrantedCollectionMessage(q, activity);
+    }
+
+    @Override
+    public void getCollectionsSuc(CollectionMessage collectionMessage) {
+        new Delete().from(ImejiFolder.class).execute();
+        collectionList.clear();
+
+        for (ImejiFolderModel imejiFolderModel : collectionMessage.getResults()) {
+            ImejiFolder imejiFolder = new ImejiFolder();
+            imejiFolder.setImejiId(imejiFolderModel.getId());  // parsed Id is ImejiId
+            imejiFolder.setContributors(imejiFolderModel.getContributors());
+            imejiFolder.setTitle(imejiFolderModel.getTitle());
+            imejiFolder.setDescription(imejiFolderModel.getDescription());
+            imejiFolder.setModifiedDate(imejiFolderModel.getModifiedDate());
+            imejiFolder.setCreatedDate(imejiFolderModel.getCreatedDate());
+            collectionList.add(imejiFolder);
+        }
+
+        if(collectionList.size()==0) {
+            // create dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            // Set up the input
+            final EditText input = new EditText(activity);
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+            builder.setTitle("Create Collection")
+                    .setMessage("There is no collection available, create one by giving a name")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // create dialog and create collection
+                            pDialog = new ProgressDialog(activity);
+                            pDialog.setMessage("Loading...");
+                            pDialog.show();
+                            if (String.valueOf(input.getText()).equalsIgnoreCase("")) {
+                                Toast.makeText(activity, "canceled create collection", Toast.LENGTH_SHORT).show();
+                                pDialog.dismiss();
+                                return;
+                            }
+                            RetrofitClient.createCollection(String.valueOf(input.getText()), "no description yet", createCollection_callback, apiKey);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // do nothing
+                            new Delete().from(Task.class).where("Id = ?", currentTaskId).execute();
+                            remoteListDialogFragment.dismiss();
+                        }
+                    })
+                    .setIcon(R.drawable.error_alert)
+                    .show();
+        }
+
+
+        ActiveAndroid.beginTransaction();
+        try {
+            for(ImejiFolder folder : collectionList){
+                folder.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+        } finally{
+            ActiveAndroid.endTransaction();
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void getCollectionsFail(Throwable e) {
+
     }
 }

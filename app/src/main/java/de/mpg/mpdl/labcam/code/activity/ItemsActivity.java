@@ -1,40 +1,30 @@
 package de.mpg.mpdl.labcam.code.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
-import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 import de.mpg.mpdl.labcam.code.base.BaseMvpActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.ServerFolderItemsAdapter;
 import de.mpg.mpdl.labcam.code.common.listener.EndlessRecyclerViewScrollListener;
-import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.injection.component.DaggerCollectionComponent;
 import de.mpg.mpdl.labcam.code.injection.module.ItemMessageModule;
 import de.mpg.mpdl.labcam.code.mvp.presenter.ItemsPresenter;
 import de.mpg.mpdl.labcam.code.mvp.view.ItemsView;
-import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 /**
  * Created by allen on 03/09/15.

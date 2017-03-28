@@ -2,17 +2,12 @@ package de.mpg.mpdl.labcam.code.mvp.view;
 
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.code.base.BaseView;
-import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 
 /**
- * Created by yingli on 3/23/17.
+ * Created by yingli on 3/28/17.
  */
 
-public interface RemoteCollectionSettingsView extends BaseView{
-
+public interface RemoteCollectionDialogView extends BaseView{
     void getCollectionsSuc(CollectionMessage model);
     void getCollectionsFail(Throwable e);
-
-    void createCollectionsSuc(ImejiFolderModel model);
-    void createCollectionsFail(Throwable e);
 }

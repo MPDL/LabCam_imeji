@@ -20,11 +20,11 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
-import de.mpg.mpdl.labcam.code.activity.ItemsActivity;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.code.common.widget.CustomImageDownaloder;
+import de.mpg.mpdl.labcam.code.activity.ItemsActivity;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.common.widget.CustomImageDownaloder;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.util.HashMap;

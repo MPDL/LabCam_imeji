@@ -22,11 +22,11 @@ import com.sch.rfview.AnimRFRecyclerView;
 import com.sch.rfview.decoration.DividerGridItemDecoration;
 import com.sch.rfview.manager.AnimRFGridLayoutManager;
 
-import de.mpg.mpdl.labcam.code.common.fragment.RemoteListDialogFragment;
-import de.mpg.mpdl.labcam.code.common.adapter.LocalAlbumAdapter;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.code.utils.ImageFileFilter;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
+import de.mpg.mpdl.labcam.code.common.adapter.LocalAlbumAdapter;
+import de.mpg.mpdl.labcam.code.common.fragment.RemoteListDialogFragment;
+import de.mpg.mpdl.labcam.code.utils.ImageFileFilter;
 
 import java.io.File;
 import java.util.ArrayList;

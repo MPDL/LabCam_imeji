@@ -1,52 +1,29 @@
-package de.mpg.mpdl.labcam.Model;
+package de.mpg.mpdl.labcam.code.data.model;
 
-import com.google.gson.annotations.Expose;
-
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-
-import de.mpg.mpdl.labcam.code.data.model.UserModel;
+import de.mpg.mpdl.labcam.Model.MetaData;
 
 /**
- * Created by allen on 27/08/15.
+ * Created by yingli on 3/23/17.
  */
 
-@Table(name = "DataItem")
-public class DataItem {
+public class DataItemModel {
 
-    @Expose
-    @Column(name = "filename")
     private String filename;
 
-    @Expose
-    @Column(name = "createdDate")
     private String createdDate;
 
-    @Expose
-    @Column(name = "fileUrl")
     private String fileUrl;
 
-    @Expose
-    @Column(name = "webResolutionUrlUrl")
     private String webResolutionUrlUrl;
 
-    @Expose
-    @Column(name = "thumbnailUrl")
     private String thumbnailUrl;
 
-    @Expose
-    @Column(name = "createdBy")
     private UserModel createdBy;
 
-    //@Expose
-    @Column(name = "metaData")
     private MetaData metadata;
 
-    @Expose
-    @Column(name = "collectionId")
     private String collectionId;
 
-    @Column(name = "localPath")
     private String localPath;
 
     public String getFilename() {
@@ -113,7 +90,6 @@ public class DataItem {
         this.collectionId = collectionId;
     }
 
-
     public String getLocalPath() {
         return localPath;
     }
@@ -121,6 +97,4 @@ public class DataItem {
     public void setLocalPath(String localPath) {
         this.localPath = localPath;
     }
-
-
 }

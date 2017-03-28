@@ -6,16 +6,16 @@ package de.mpg.mpdl.labcam.code.data.model;
 
 public class CreatedByModel {
 
-    private String fullname;
+    private String fullName;
 
     private String userId;
 
     public String getFullname() {
-        return fullname;
+        return fullName;
     }
 
     public void setFullname(String fullname) {
-        this.fullname = fullname;
+        this.fullName = fullname;
     }
 
     public String getUserId() {

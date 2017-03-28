@@ -1,6 +1,5 @@
 package de.mpg.mpdl.labcam.code.injection.component;
 
-import de.mpg.mpdl.labcam.Model.User;
 import de.mpg.mpdl.labcam.code.activity.LoginActivity;
 import de.mpg.mpdl.labcam.code.injection.PerActivity;
 import de.mpg.mpdl.labcam.code.injection.module.ActivityModule;

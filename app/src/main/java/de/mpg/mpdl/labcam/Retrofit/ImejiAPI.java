@@ -9,7 +9,6 @@ import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.code.data.model.TO.MetadataProfileTO;
 
 import retrofit.Callback;
-
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;

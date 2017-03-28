@@ -25,12 +25,12 @@ import android.widget.Toast;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.code.utils.BatchOperationUtils;
-import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
+import de.mpg.mpdl.labcam.code.utils.BatchOperationUtils;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.File;

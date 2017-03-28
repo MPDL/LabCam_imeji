@@ -9,15 +9,15 @@ import de.mpg.mpdl.labcam.code.base.BaseSubscriber;
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.data.service.CollectionMessageService;
 import de.mpg.mpdl.labcam.code.data.service.ImejiFolderService;
-import de.mpg.mpdl.labcam.code.mvp.view.RemoteCollectionSettingsView;
+import de.mpg.mpdl.labcam.code.mvp.view.MainView;
 
 import javax.inject.Inject;
 
 /**
- * Created by yingli on 3/23/17.
+ * Created by yingli on 3/28/17.
  */
 
-public class RemoteCollectionSettingsPresenter extends BaseAbstractPresenter<RemoteCollectionSettingsView> {
+public class MainPresenter extends BaseAbstractPresenter<MainView> {
     @Inject
     CollectionMessageService collectionMessageService;
 
@@ -25,7 +25,7 @@ public class RemoteCollectionSettingsPresenter extends BaseAbstractPresenter<Rem
     ImejiFolderService imejiFolderService;
 
     @Inject
-    public RemoteCollectionSettingsPresenter() {
+    public MainPresenter() {
     }
 
     public void getGrantedCollectionMessage(String q, BaseActivity act){
@@ -63,5 +63,4 @@ public class RemoteCollectionSettingsPresenter extends BaseAbstractPresenter<Rem
             }
         }, imejiFolderService.createCollection(jsonBody), act);
     }
-
 }

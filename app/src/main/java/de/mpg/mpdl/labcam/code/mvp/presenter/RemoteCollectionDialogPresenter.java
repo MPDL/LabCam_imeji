@@ -1,23 +1,20 @@
 package de.mpg.mpdl.labcam.code.mvp.presenter;
 
-import com.google.gson.JsonObject;
-
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.code.base.BaseAbstractPresenter;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
 import de.mpg.mpdl.labcam.code.base.BaseSubscriber;
-import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.data.service.CollectionMessageService;
 import de.mpg.mpdl.labcam.code.data.service.ImejiFolderService;
-import de.mpg.mpdl.labcam.code.mvp.view.RemoteCollectionSettingsView;
+import de.mpg.mpdl.labcam.code.mvp.view.RemoteCollectionDialogView;
 
 import javax.inject.Inject;
 
 /**
- * Created by yingli on 3/23/17.
+ * Created by yingli on 3/28/17.
  */
 
-public class RemoteCollectionSettingsPresenter extends BaseAbstractPresenter<RemoteCollectionSettingsView> {
+public class RemoteCollectionDialogPresenter extends BaseAbstractPresenter<RemoteCollectionDialogView> {
     @Inject
     CollectionMessageService collectionMessageService;
 
@@ -25,7 +22,7 @@ public class RemoteCollectionSettingsPresenter extends BaseAbstractPresenter<Rem
     ImejiFolderService imejiFolderService;
 
     @Inject
-    public RemoteCollectionSettingsPresenter() {
+    public RemoteCollectionDialogPresenter() {
     }
 
     public void getGrantedCollectionMessage(String q, BaseActivity act){
@@ -45,23 +42,4 @@ public class RemoteCollectionSettingsPresenter extends BaseAbstractPresenter<Rem
             }
         }, collectionMessageService.getGrantedCollectionMessage(q), act);
     }
-
-    public void createCollection(JsonObject jsonBody, BaseActivity act){
-        if (!checkNetWork()) {
-            return;
-        }
-        mView.showLoading();
-        imejiFolderService.execute(new BaseSubscriber<ImejiFolderModel>(mView) {
-            @Override
-            public void onNext(ImejiFolderModel model) {
-                mView.createCollectionsSuc(model);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                mView.createCollectionsFail(e);
-            }
-        }, imejiFolderService.createCollection(jsonBody), act);
-    }
-
 }

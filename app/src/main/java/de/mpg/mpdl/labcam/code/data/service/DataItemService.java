@@ -3,7 +3,10 @@ package de.mpg.mpdl.labcam.code.data.service;
 import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.code.base.BaseService;
 
+import java.util.Map;
+
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import rx.Observable;
 
 /**
@@ -11,5 +14,5 @@ import rx.Observable;
  */
 
 public abstract class DataItemService extends BaseService{
-    public abstract Observable<DataItem> uploadItem(MultipartBody.Part[] img);
+    public abstract Observable<DataItem> uploadItem(Map<String, RequestBody> map, MultipartBody.Part img);
 }

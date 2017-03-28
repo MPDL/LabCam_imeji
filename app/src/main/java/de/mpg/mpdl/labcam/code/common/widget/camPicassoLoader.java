@@ -5,7 +5,6 @@ import android.net.Uri;
 
 import com.squareup.picasso.UrlConnectionDownloader;
 
-import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.IOException;
