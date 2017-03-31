@@ -386,6 +386,17 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
         // set as MU destination
         collectionId = imejiFolder.getId();
         collectionName = imejiFolder.getTitle();
+
+        ImejiFolder createdFolder = new ImejiFolder();
+        createdFolder.setImejiId(imejiFolder.getId());  // parsed Id is ImejiId
+        createdFolder.setContributors(imejiFolder.getContributors());
+        createdFolder.setTitle(imejiFolder.getTitle());
+        createdFolder.setDescription(imejiFolder.getDescription());
+        createdFolder.setModifiedDate(imejiFolder.getModifiedDate());
+        createdFolder.setCreatedDate(imejiFolder.getCreatedDate());
+
+        collectionList.add(createdFolder);
+        adapter.notifyDataSetChanged();
         setMUCollection();
     }
 
