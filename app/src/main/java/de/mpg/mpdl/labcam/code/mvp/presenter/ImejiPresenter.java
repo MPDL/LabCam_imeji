@@ -32,7 +32,6 @@ public class ImejiPresenter extends BaseAbstractPresenter<ImejiView> {
         if (!checkNetWork()) {
             return;
         }
-        mView.showLoading();
         itemMessageService.execute(new BaseSubscriber<ItemMessage>(mView) {
             @Override
             public void onNext(ItemMessage model) {
@@ -51,7 +50,6 @@ public class ImejiPresenter extends BaseAbstractPresenter<ImejiView> {
         if (!checkNetWork()) {
             return;
         }
-        mView.showLoading();
         collectionMessageService.execute(new BaseSubscriber<CollectionMessage>(mView) {
             @Override
             public void onNext(CollectionMessage model) {

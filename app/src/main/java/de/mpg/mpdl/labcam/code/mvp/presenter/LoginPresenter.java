@@ -30,7 +30,6 @@ public class LoginPresenter extends BaseAbstractPresenter<LoginView> {
         if (!checkNetWork()) {
             return;
         }
-        mView.showLoading();
         userService.execute(new BaseSubscriber<UserModel>(mView) {
             @Override
             public void onNext(UserModel model) {
@@ -50,7 +49,6 @@ public class LoginPresenter extends BaseAbstractPresenter<LoginView> {
         if (!checkNetWork()) {
             return;
         }
-        mView.showLoading();
         imejiFolderService.execute(new BaseSubscriber<ImejiFolderModel>(mView) {
             @Override
             public void onNext(ImejiFolderModel model) {

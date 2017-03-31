@@ -25,16 +25,8 @@ import rx.Observable;
 public class RetrofitClient {
     private static String REST_SERVER;
 
-    public static String getRestServer() {
-        return REST_SERVER;
-    }
-
     public static void setRestServer(String restServer) {
         REST_SERVER = restServer;
-    }
-
-    public static Observable<DataItem> uploadItem(Map<String, RequestBody> partMap, MultipartBody.Part img) {
-       return RetrofitFactory.getInstance().create(DataItemApi.class).uploadItem(partMap, img);
     }
 
     public static void uploadItem(TypedFile typedFile,
@@ -46,15 +38,6 @@ public class RetrofitClient {
         imejiAPI.uploadItem(typedFile, json, callback);
     }
 
-    public static void getCollectionItems(String collectionId,
-                                          int offset,
-                                      Callback<ItemMessage> callback,
-                                      String APIkey) {
-        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
-
-        // Fetch and print a list of the items to this library.
-        imejiAPI.getCollectionItems(collectionId,10, offset, callback);
-    }
 
     //getCollectionById
     public static void getCollectionById(String collectionId,
@@ -64,21 +47,6 @@ public class RetrofitClient {
 
         // Fetch and print a list of the items to this library.
         imejiAPI.getCollectionById(collectionId, callback);
-    }
-
-    //createCollection
-    public static void createCollection(String title,
-                                        String description,
-                                         Callback<ImejiFolder> callback,
-                                         String APIkey) {
-        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
-
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("title",title);
-        jsonObject.addProperty("description",description);
-        System.out.println(jsonObject);
-        // Fetch and print a list of the items to this library.
-        imejiAPI.createCollection(jsonObject, callback);
     }
 
     /** meta data and profile **/

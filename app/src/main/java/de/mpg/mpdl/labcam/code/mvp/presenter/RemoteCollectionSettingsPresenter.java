@@ -32,7 +32,6 @@ public class RemoteCollectionSettingsPresenter extends BaseAbstractPresenter<Rem
         if (!checkNetWork()) {
             return;
         }
-        mView.showLoading();
         collectionMessageService.execute(new BaseSubscriber<CollectionMessage>(mView) {
             @Override
             public void onNext(CollectionMessage model) {
@@ -50,7 +49,6 @@ public class RemoteCollectionSettingsPresenter extends BaseAbstractPresenter<Rem
         if (!checkNetWork()) {
             return;
         }
-        mView.showLoading();
         imejiFolderService.execute(new BaseSubscriber<ImejiFolderModel>(mView) {
             @Override
             public void onNext(ImejiFolderModel model) {

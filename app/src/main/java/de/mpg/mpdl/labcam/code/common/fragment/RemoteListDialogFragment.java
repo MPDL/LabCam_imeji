@@ -1,5 +1,7 @@
 package de.mpg.mpdl.labcam.code.common.fragment;
 
+import com.google.gson.JsonObject;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -86,6 +88,8 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
 
     //taskId
     private Long currentTaskId;
+    private ProgressDialog pDialog = null;
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -142,9 +146,6 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
         listView = (ListView) view.findViewById(R.id.settings_remote_listView);
         adapter = new SettingsListAdapter(activity, collectionList,this);
         listView.setAdapter(adapter);
-
-
-//        RetrofitClient.getGrantCollectionMessage(callback, apiKey);
 
         b.setView(view);
         return b.create();
@@ -211,49 +212,6 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
         collectionId = collectionList.get(Id).getImejiId();
         collectionName = collectionList.get(Id).getTitle();
     }
-
-
-    //callbacks
-    private ProgressDialog pDialog = null;
-    Callback<CollectionMessage> callback = new Callback<CollectionMessage>() {
-        @Override
-        public void success(CollectionMessage collectionMessage, Response response) {
-
-
-
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-            Log.v(LOG_TAG, "get list failed");
-            Log.v(LOG_TAG, error.toString());
-
-            collectionList.clear();
-            collectionList = new Select().from(ImejiFolder.class).execute();
-            Log.v(LOG_TAG, collectionList.size() + "");
-
-            adapter = new SettingsListAdapter(activity, collectionList,ie);
-            listView.setAdapter(adapter);
-        }
-    };
-
-    Callback<ImejiFolder> createCollection_callback = new Callback<ImejiFolder>() {
-        @Override
-        public void success(ImejiFolder imejiFolder, Response response) {
-            Log.v(LOG_TAG, "createCollection_callback success");
-            pDialog.dismiss();
-            // set as MU destination
-            collectionId = imejiFolder.id;
-            collectionName = imejiFolder.getTitle();
-            setMUCollection();
-
-        }
-
-        @Override
-        public void failure(RetrofitError error) {
-            Log.v(LOG_TAG, error.getMessage());
-        }
-    };
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -381,7 +339,11 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
                                 pDialog.dismiss();
                                 return;
                             }
-                            RetrofitClient.createCollection(String.valueOf(input.getText()), "no description yet", createCollection_callback, apiKey);
+                            JsonObject jsonObject = new JsonObject();
+                            jsonObject.addProperty("title",String.valueOf(input.getText()));
+                            jsonObject.addProperty("description","no description yet");
+
+                            mPresenter.createCollection(jsonObject, activity);
                         }
                     })
                     .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -410,6 +372,25 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
 
     @Override
     public void getCollectionsFail(Throwable e) {
+        collectionList.clear();
+        collectionList = new Select().from(ImejiFolder.class).execute();
+        Log.v(LOG_TAG, collectionList.size() + "");
+
+        adapter = new SettingsListAdapter(activity, collectionList,ie);
+        listView.setAdapter(adapter);
+    }
+
+    @Override
+    public void createCollectionsSuc(ImejiFolderModel imejiFolder) {
+        pDialog.dismiss();
+        // set as MU destination
+        collectionId = imejiFolder.getId();
+        collectionName = imejiFolder.getTitle();
+        setMUCollection();
+    }
+
+    @Override
+    public void createCollectionsFail(Throwable e) {
 
     }
 }

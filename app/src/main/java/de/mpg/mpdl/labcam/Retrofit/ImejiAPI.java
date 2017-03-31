@@ -25,9 +25,6 @@ import retrofit.mime.TypedFile;
  */
 public interface ImejiAPI {
 
-    /*
-     *  For items
-    */
 
     @Multipart
     @POST("/items?syntax=raw")
@@ -35,43 +32,10 @@ public interface ImejiAPI {
                   @Part("json") String json,
                   Callback<DataItem> callback);
 
-    @Multipart
-    @POST("/items/{id}?syntax=raw")
-    void putItem(@Path("id") String itemId,
-                 @Part("file") TypedFile file,
-                  @Part("json") String json,
-                  Callback<DataItem> callback);
-
-
-    /*
-     *  For collections
-    */
-    //get all collections
-    @GET(value = "/collections?size=10000")
-    void getCollections(Callback<CollectionMessage> callback);
-
-    @GET(value = "/collections?size=10000")
-    void getGrantedCollectionMessage(@Query("q") String q, Callback<CollectionMessage> callback);
-
-    //get all items by collection id
-    @GET("/collections/{id}/items")
-    void getCollectionItems(@Path("id") String collectionId,
-                            @Query("size") int size,
-                            @Query("offset") int offset,
-                            Callback<ItemMessage> callback);
-
     //get collection by id
     @GET("/collections/{id}")
     void getCollectionById(@Path("id") String collectionId,
                            Callback<ImejiFolder> callback);
-
-    @POST("/collections")
-    void createCollection(@Body JsonObject jsonBody,
-                          Callback<ImejiFolder> callback) ;
-
-    /**
-     * uploading
-     */
 
     @POST("/profiles")
     void createProfile(@Body JsonObject jsonObject,

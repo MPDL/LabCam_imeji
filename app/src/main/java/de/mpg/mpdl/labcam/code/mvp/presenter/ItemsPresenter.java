@@ -25,7 +25,6 @@ public class ItemsPresenter extends BaseAbstractPresenter<ItemsView> {
         if (!checkNetWork()) {
             return;
         }
-        mView.showLoading();
         itemMessageService.execute(new BaseSubscriber<ItemMessage>(mView) {
             @Override
             public void onNext(ItemMessage model) {
