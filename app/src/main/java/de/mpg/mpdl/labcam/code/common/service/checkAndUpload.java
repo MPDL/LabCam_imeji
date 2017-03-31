@@ -13,13 +13,13 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import de.mpg.mpdl.labcam.code.activity.MainActivity;
 import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.NotificationID;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
+import de.mpg.mpdl.labcam.code.activity.MainActivity;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.data.model.TO.MetadataProfileTO;
@@ -112,9 +112,7 @@ public class checkAndUpload {
 
             /** start uploading **/
             getCollectionById();
-
         }
-
     }
 
     private void startUpload() {
@@ -181,8 +179,8 @@ public class checkAndUpload {
         HashMap<String, RequestBody> map = new HashMap<>();
         RequestBody jsonBody = MultipartUtil.createPartFromString(json);
         map.put("json", jsonBody);
-        RetrofitClient.uploadItem(map, body);
-//        RetrofitClient.uploadItem(typedFile, json, callback_upload, apiKey);
+//        RetrofitClient.uploadItem(map, body);
+        RetrofitClient.uploadItem(typedFile, json, callback_upload, apiKey);
     }
 
     private boolean taskIsStopped (){

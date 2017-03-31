@@ -92,7 +92,7 @@ public class MediaContentJobService extends JobService implements UploadResultRe
         userId =  PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
         serverName = PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
         //isAutoUpload
-        Settings settings = DBConnector.getSettingsByUserId(context, userId);
+        Settings settings = DBConnector.getSettingsByUserId(userId);
         // if auto is turned off
         if (settings == null){
             Log.e("cameraEvent","settings is null");

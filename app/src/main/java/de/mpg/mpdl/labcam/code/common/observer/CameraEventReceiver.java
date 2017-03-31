@@ -40,7 +40,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
         serverName = PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
         //isAutoUpload
-        Settings settings = DBConnector.getSettingsByUserId(context, userId);
+        Settings settings = DBConnector.getSettingsByUserId(userId);
         // if auto is turned off
         if (settings == null){
             Log.e("cameraEvent","settings is null");

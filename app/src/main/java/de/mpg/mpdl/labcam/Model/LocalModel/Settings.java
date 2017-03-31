@@ -2,19 +2,14 @@ package de.mpg.mpdl.labcam.Model.LocalModel;
 
 import com.google.gson.annotations.Expose;
 
+import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
-import com.litesuits.orm.db.annotation.PrimaryKey;
-import com.litesuits.orm.db.enums.AssignType;
 
 /**
  * Created by yingli on 3/1/16.
  */
-public class Settings {
+public class Settings extends Model{
 
-    @PrimaryKey(AssignType.AUTO_INCREMENT)
-    private int id;
-
-    @Expose
     @Column(name="userId")
     private String userId;
 
@@ -27,14 +22,6 @@ public class Settings {
     public Settings(String id, boolean isAutoUpload) {
         this.userId = id;
         this.isAutoUpload = isAutoUpload;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getUserId() {

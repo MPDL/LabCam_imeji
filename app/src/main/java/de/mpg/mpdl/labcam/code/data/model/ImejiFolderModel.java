@@ -27,7 +27,7 @@ public class ImejiFolderModel {
 
     private ImejiProfile profile;
 
-//    private String coverItemUrl;
+    private String coverItemUrl;
 
     public String getId() {
         return id;
@@ -99,5 +99,13 @@ public class ImejiFolderModel {
 
     public void setModifiedDate(String modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    public String getCoverItemUrl() {
+        return coverItemUrl;
+    }
+
+    public void setCoverItemUrl(String coverItemUrl) {
+        this.coverItemUrl = coverItemUrl;
     }
 }

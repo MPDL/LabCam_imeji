@@ -2,7 +2,6 @@ package de.mpg.mpdl.labcam.code.common.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,9 +36,7 @@ import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.injection.component.DaggerCollectionComponent;
 import de.mpg.mpdl.labcam.code.injection.module.CollectionMessageModule;
 import de.mpg.mpdl.labcam.code.mvp.presenter.RemoteCollectionDialogPresenter;
-import de.mpg.mpdl.labcam.code.mvp.presenter.RemoteCollectionSettingsPresenter;
 import de.mpg.mpdl.labcam.code.mvp.view.RemoteCollectionDialogView;
-import de.mpg.mpdl.labcam.code.mvp.view.RemoteCollectionSettingsView;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 

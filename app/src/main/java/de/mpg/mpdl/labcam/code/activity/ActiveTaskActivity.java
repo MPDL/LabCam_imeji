@@ -77,7 +77,7 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
 
                     taskList = DBConnector.getActiveTasks(userId, serverUrl);
 
-                    Settings settings = DBConnector.getSettingsByUserId(getApplicationContext(), userId);
+                    Settings settings = DBConnector.getSettingsByUserId(userId);
                     if(taskList==null){
                         Log.e("handler", "task list is empty");
                         return;
@@ -108,8 +108,7 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
 
         taskList = DBConnector.getActiveTasks(userId, serverUrl);
 
-        Settings settings = DBConnector.getSettingsByUserId(getApplicationContext(), userId);
-//        Settings settings = new Select().from(Settings.class).where("userId = ?", userId).executeSingle();
+        Settings settings = DBConnector.getSettingsByUserId(userId);
 
         // auTask only for delete
         Task auTask = new Task();

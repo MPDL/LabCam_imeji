@@ -46,35 +46,6 @@ public class RetrofitClient {
         imejiAPI.uploadItem(typedFile, json, callback);
     }
 
-    public static void updateItem(String itemId, TypedFile typedFile,
-                                  String json,
-                                  Callback<DataItem> callback,
-                                  String APIkey) {
-        ImejiAPI imejiAPI = ServiceGenerator.
-                createService(ImejiAPI.class, REST_SERVER, APIkey);
-        imejiAPI.putItem(itemId, typedFile, json, callback);
-    }
-
-    /*
-        for collection
-     */
-    public static void getCollections(Callback<CollectionMessage> callback,
-                                      String APIkey) {
-        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
-
-        imejiAPI.getCollections(callback);
-    }
-
-    public static void getGrantCollectionMessage(Callback<CollectionMessage> callback,
-                                            String APIkey) {
-        ImejiAPI imejiAPI = ServiceGenerator.createService(ImejiAPI.class, REST_SERVER, APIkey);
-
-        String q = "grant=\"upload\"";
-        imejiAPI.getGrantedCollectionMessage(q, callback);
-    }
-
-
-
     public static void getCollectionItems(String collectionId,
                                           int offset,
                                       Callback<ItemMessage> callback,

@@ -3,8 +3,6 @@ package de.mpg.mpdl.labcam.code.activity;
 import com.google.gson.JsonObject;
 
 import android.Manifest;
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
@@ -15,25 +13,19 @@ import android.content.Intent;
 import android.content.UriMatcher;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,10 +45,7 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
-import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
-import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 import de.mpg.mpdl.labcam.code.base.BaseMvpActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.TitleFragmentPagerAdapter;
 import de.mpg.mpdl.labcam.code.common.fragment.ImejiFragment;
@@ -68,7 +57,6 @@ import de.mpg.mpdl.labcam.code.common.service.MediaContentJobService;
 import de.mpg.mpdl.labcam.code.common.service.TaskUploadService;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
-import de.mpg.mpdl.labcam.code.data.db.LiteOrmManager;
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.injection.component.DaggerCollectionComponent;
 import de.mpg.mpdl.labcam.code.injection.module.CollectionMessageModule;
@@ -77,15 +65,11 @@ import de.mpg.mpdl.labcam.code.mvp.view.MainView;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 /**
  * Created by kiran on 25.08.15.
@@ -459,7 +443,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
     }
 
     private void setAutoUploadStatus(boolean isQRLogin, boolean isAUOn){
-        Settings settings = DBConnector.getSettingsByUserId(getApplicationContext(), userId);
+        Settings settings = DBConnector.getSettingsByUserId(userId);
         if(settings==null){
             settings = new Settings();  // no setting
         }
@@ -468,7 +452,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
             // login set true
             settings.setUserId(userId);
             settings.setIsAutoUpload(true);
-            LiteOrmManager.getInstance(getApplicationContext()).save(settings);
+            settings.save();
             autoUploadSwitch.setChecked(settings.isAutoUpload());
 
             // if auto is on in settings, enable choose collection
@@ -478,7 +462,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         }else { // set AUOff
             settings.setUserId(userId);
             settings.setIsAutoUpload(false);
-            LiteOrmManager.getInstance(getApplicationContext()).save(settings);
+            settings.save();
             autoUploadSwitch.setChecked(settings.isAutoUpload());
 
             chooseCollectionLayout.setEnabled(false);
@@ -506,7 +490,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         autoUploadSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                Settings settings = DBConnector.getSettingsByUserId(activity, userId);
+                Settings settings = DBConnector.getSettingsByUserId(userId);
                 //init settings
                 if (settings == null) {
                     settings = new Settings();
@@ -515,7 +499,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                 if (compoundButton.isChecked()) {
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(true);
-                    LiteOrmManager.getInstance(getApplicationContext()).save(settings);
+                    settings.save();
                     chooseCollectionLayout.setEnabled(true);
                     chooseCollectionLabel.setTextColor(getResources().getColor(R.color.dark_text));
                     collectionNameTextView.setTextColor(getResources().getColor(R.color.dark_text));
@@ -523,7 +507,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                 } else {
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(false);
-                    LiteOrmManager.getInstance(getApplicationContext()).save(settings);
+                    settings.save();
                     chooseCollectionLayout.setEnabled(false);
                     chooseCollectionLabel.setTextColor(getResources().getColor(R.color.grayDivider));
                     collectionNameTextView.setTextColor(getResources().getColor(R.color.grayDivider));
@@ -540,7 +524,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
 
         });
 
-        Settings settings = DBConnector.getSettingsByUserId(activity, userId);   // get old settings
+        Settings settings = DBConnector.getSettingsByUserId(userId);  // get old settings
         if(settings!=null && settings.isAutoUpload()){
             Toast.makeText(activity,"Automatic upload is active!",Toast.LENGTH_SHORT).show();
         }
@@ -730,7 +714,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
             }else if(resultCode == RESULT_OK){
 
                 // prepare settings
-                Settings settings = DBConnector.getSettingsByUserId(activity, userId);
+                Settings settings = DBConnector.getSettingsByUserId(userId);
                 if(settings==null){
                     settings = new Settings();
                 }
@@ -748,7 +732,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
 
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(true);
-                    LiteOrmManager.getInstance(getApplicationContext()).save(settings);
+                    settings.save();
 
                     // UI enable click
                     chooseCollectionLayout.setEnabled(true);
@@ -766,7 +750,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
 
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(false);
-                    LiteOrmManager.getInstance(getApplicationContext()).save(settings);
+                    settings.save();
 
                     // UI disable click
                     chooseCollectionLayout.setEnabled(false);
@@ -885,7 +869,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                 collectionNameTextView.setText(folderList.get(0).getTitle());
             }
 
-            Settings settings = DBConnector.getSettingsByUserId(activity, userId);   // get old settings
+            Settings settings = DBConnector.getSettingsByUserId(userId);   // get old settings
 
             //switch on
             if(settings.isAutoUpload()){
@@ -909,7 +893,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                 return;
             }
 
-            Settings settings = DBConnector.getSettingsByUserId(activity, userId);   // get old settings
+            Settings settings = DBConnector.getSettingsByUserId(userId);   // get old settings
 
             //set collection name
             if(settings!=null && settings.isAutoUpload())  // history AU is on
@@ -993,7 +977,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         collectionNameTextView.setText(imejiFolder.getTitle());
 
         pDialog.dismiss();
-        Settings settings = DBConnector.getSettingsByUserId(activity, userId); // get old settings
+        Settings settings = DBConnector.getSettingsByUserId(userId); // get old settings
 
         //switch on
         //check the previous status of automatic upload

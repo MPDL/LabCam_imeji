@@ -114,9 +114,6 @@ dependencies {
 
     //https://github.com/crazycodeboy/TakePhoto/
     compile 'com.jph.takephoto:takephoto_library:4.0.2'
-    //orm
-    //https://github.com/litesuits/android-lite-orm
-    compile files('libs/lite-orm-1.9.2.jar')
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
