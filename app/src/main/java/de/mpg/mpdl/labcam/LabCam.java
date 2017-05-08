@@ -1,6 +1,7 @@
 package de.mpg.mpdl.labcam;
 
 import android.content.Context;
+import android.support.multidex.MultiDex;
 
 import de.mpg.mpdl.labcam.code.base.BaseApplication;
 
@@ -18,6 +19,7 @@ public class LabCam extends BaseApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        MultiDex.install(this);
         mContext = getApplicationContext();
     }
 }

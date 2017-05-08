@@ -1,5 +1,6 @@
 package de.mpg.mpdl.labcam.code.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.tbruyelle.rxpermissions.RxPermissions;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
@@ -154,8 +156,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(activity, QRScannerActivity.class);
-                startActivityForResult(intent, INTENT_QR);
+                checkPermission();
             }
         });
 
@@ -334,6 +335,24 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
                 .build()
                 .inject(this);
         mPresenter.setView(this);
+    }
+
+    private void scanQR(){
+        Intent intent = new Intent(activity, QRScannerActivity.class);
+        startActivityForResult(intent, INTENT_QR);
+    }
+
+    private void checkPermission() {
+        RxPermissions rxp = new RxPermissions(activity);
+        rxp.request(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(granted -> {
+                    if (granted) {
+                        scanQR();
+                    }
+                    else {
+                        showToast(R.string.exception_no_photo_permission);
+                    }
+                });
     }
 
     @Override
