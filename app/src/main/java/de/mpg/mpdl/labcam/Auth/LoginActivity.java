@@ -1,6 +1,7 @@
 package de.mpg.mpdl.labcam.Auth;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
@@ -8,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -38,6 +40,7 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.Utils.DeviceStatus;
 import de.mpg.mpdl.labcam.Utils.QRUtils;
+import de.mpg.mpdl.labcam.Utils.ToastUtil;
 
 import org.eclipse.jetty.util.MultiMap;
 import org.eclipse.jetty.util.UrlEncoded;
@@ -74,6 +77,7 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences mPrefs;
     private View rootView;
     private static final int INTENT_QR = 1001;
+    private static final int CHECK_PERMISSION = 1;
     private String LOG_TAG = LoginActivity.class.getSimpleName();
 
     private String collectionId = null;
@@ -167,8 +171,7 @@ public class LoginActivity extends AppCompatActivity {
         scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(activity, QRScannerActivity.class);
-                startActivityForResult(intent, INTENT_QR);
+                checkPermission();
             }
         });
 
@@ -342,6 +345,48 @@ public class LoginActivity extends AppCompatActivity {
         // QR layout_login
         accountLogin(userId,true);
         Toast.makeText(activity,"Successfully login with QR code",Toast.LENGTH_LONG).show();
+    }
+
+    private void scanQr(){
+        Intent intent = new Intent(activity, QRScannerActivity.class);
+        startActivityForResult(intent, INTENT_QR);
+    }
+
+    /***********************************   permission   ****************************************/
+
+    private void checkPermission() {
+        // check permission for android > 6.0
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!(checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)||
+                    !(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+                requestCameraPermission();
+
+                return;
+            }
+        }
+        scanQr();
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void requestCameraPermission() {
+        requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, CHECK_PERMISSION);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CHECK_PERMISSION && grantResults.length >= 2) {
+            int firstGrantResult = grantResults[0];
+            int secondGrantResult = grantResults[1];
+            boolean granted = (firstGrantResult == PackageManager.PERMISSION_GRANTED) && (secondGrantResult == PackageManager.PERMISSION_GRANTED);
+            Log.i("permission", "onRequestPermissionsResult granted=" + granted);
+
+            if(granted) {
+                scanQr();
+            }else{
+                ToastUtil.showShortToast(this, "please grant CAMERA and WRITE_EXTERNAL_STORAGE permissions");
+            }
+        }
     }
 
     Callback<User> callback_login = new Callback<User>() {
