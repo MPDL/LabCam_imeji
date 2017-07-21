@@ -125,9 +125,11 @@ public class CollectionViewFragment extends BaseMvpFragment<ImejiPresenter> impl
                     detailCollectionInfo.add(description);
                     AddCollectionContainer(i-1, folder.getTitle(), collectionInfo, detailCollectionInfo, folder.getId());
                     List<URL> urlList = collectionListLocal.get(i-1).getImageUrls();
-                    for (int l = 0; l < urlList.size() && l < 5; l++){
-                        Log.v(LOG_TAG, "Adding Picture at" + Integer.toString(l));
-                        AddPicture(i-1, l, urlList.get(l));
+                    if(urlList!=null) {
+                        for (int l = 0; l < urlList.size() && l < 5; l++) {
+                            Log.v(LOG_TAG, "Adding Picture at" + Integer.toString(l));
+                            AddPicture(i - 1, l, urlList.get(l));
+                        }
                     }
                 }
             }
