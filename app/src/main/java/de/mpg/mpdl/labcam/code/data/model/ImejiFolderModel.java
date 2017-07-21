@@ -3,6 +3,7 @@ package de.mpg.mpdl.labcam.code.data.model;
 import de.mpg.mpdl.labcam.Model.ImejiProfile;
 import de.mpg.mpdl.labcam.Model.MessageModel.Person;
 
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -26,6 +27,8 @@ public class ImejiFolderModel {
     private List<Person> contributors;
 
     private ImejiProfile profile;
+
+    private List<URL> imageUrls;
 
     private String coverItemUrl;
 
@@ -60,14 +63,6 @@ public class ImejiFolderModel {
     public void setProfile(ImejiProfile profile) {
         this.profile = profile;
     }
-//
-//    public String getCoverItemUrl() {
-//        return coverItemUrl;
-//    }
-//
-//    public void setCoverItemUrl(String coverItemUrl) {
-//        this.coverItemUrl = coverItemUrl;
-//    }
 
     public String getTitle() {
         return title;
@@ -107,5 +102,13 @@ public class ImejiFolderModel {
 
     public void setCoverItemUrl(String coverItemUrl) {
         this.coverItemUrl = coverItemUrl;
+    }
+
+    public List<URL> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<URL> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 }

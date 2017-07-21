@@ -41,6 +41,17 @@
         <item name="android:textColorSecondary">@color/white</item>
     </style>
 
+    <style name="Widget.Button.Toggle" parent="android:Widget">
+        <item name="android:background">@drawable/collection_detail_toggle_background</item>
+        <item name="android:disabledAlpha">?android:attr/disabledAlpha</item>
+    </style>
+
+    <style name="toggleButton"  parent="AppTheme">
+        <item name="android:buttonStyleToggle">@style/Widget.Button.Toggle</item>
+        <item name="android:textOn"></item>
+        <item name="android:textOff"></item>
+    </style>
+
     <!--REFACTORING starts from here-->
 
     <style name="custom_line_h_style">

@@ -51,10 +51,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
 import static de.mpg.mpdl.labcam.code.utils.BatchOperationUtils.addImages;
 
 /**
