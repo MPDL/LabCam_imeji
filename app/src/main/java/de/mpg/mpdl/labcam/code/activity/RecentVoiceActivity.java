@@ -25,8 +25,6 @@ import butterknife.BindView;
  * Created by Yunqing on 20.12.16.
  */
 
-
-
 public class RecentVoiceActivity extends BaseCompatActivity {
 
     Activity activity = this;

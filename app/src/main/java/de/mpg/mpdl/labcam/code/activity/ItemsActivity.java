@@ -48,7 +48,6 @@ public class ItemsActivity extends BaseMvpActivity<ItemsPresenter> implements It
 
     private String dataCollectionId;
 
-    //pagination
     private int paging = 0;
 
     @Override

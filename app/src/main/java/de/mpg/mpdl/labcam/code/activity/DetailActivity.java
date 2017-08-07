@@ -259,7 +259,6 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
         Point size = new Point();
         display.getSize(size);
 
-//        viewPager = (ViewPager) rootView.findViewById(R.id.view_pager_detail_image);
         viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList, userId, serverName);
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setCurrentItem(positionInList);

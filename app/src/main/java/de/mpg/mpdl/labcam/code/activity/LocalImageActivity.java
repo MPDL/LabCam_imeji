@@ -398,9 +398,6 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
 
 
     /**upload methods**/
-     /*
-            upload the selected files
-        */
     private void uploadList(String[] imagePathArray) {
         newInstance( imagePathArray).show(this.getFragmentManager(), "remoteListDialog");
     }

@@ -40,28 +40,25 @@ public abstract class BaseDialogFragment extends DialogFragment{
     }
 
     /**
-     * 以无参数的模式启动Activity。
+     * start activity without parameters
      *
      * @param activityClass
      */
     public void startActivity(Class<? extends Activity> activityClass) {
         startActivity(getLocalIntent(activityClass, null));
-        //   me.overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 
     /**
-     * 以绑定参数的模式启动Activity。
+     * start activity with parameters
      *
      * @param activityClass
      */
     public void startActivity(Class<? extends Activity> activityClass, Bundle bd) {
         startActivity(getLocalIntent(activityClass, bd));
-        //    me.overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 
     /**
-     * 在底部显示一条toast信息,大约3秒钟时间。<br>
-     * 若想让toast显示时间较长，请调用showLongMessage
+     * Method show a toast, ca 3s.
      *
      * @param msg
      */
@@ -70,7 +67,7 @@ public abstract class BaseDialogFragment extends DialogFragment{
     }
 
     /**
-     * 以较长的时间来toast显示，大约5秒钟显示。
+     * Method show long toast, ca 5s.
      *
      * @param msg
      */
@@ -79,7 +76,7 @@ public abstract class BaseDialogFragment extends DialogFragment{
     }
 
     /**
-     * 显示消息提示，避免重复提示
+     * Method show toast (avoid duplicates)
      *
      * @param msg
      */
@@ -93,7 +90,7 @@ public abstract class BaseDialogFragment extends DialogFragment{
 
 
     /**
-     * 获取当前程序中的本地目标
+     * Method to get Local Intent
      *
      * @param localIntent
      * @return
@@ -182,7 +179,7 @@ public abstract class BaseDialogFragment extends DialogFragment{
 
     /**
      * this activity layout res
-     * 设置layout布局,在子类重写该方法.
+     * set layout resource file
      *
      * @return res layout xml id
      */

@@ -11,7 +11,7 @@ public interface BaseView {
     void onSuccess(String msg);
     void onThrowable(Throwable e);
 
-    //特殊处理Response
+    //Special Response
     void onSuccess();
 
 }

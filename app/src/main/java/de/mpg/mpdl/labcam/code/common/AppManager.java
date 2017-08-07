@@ -3,20 +3,21 @@ package de.mpg.mpdl.labcam.code.common;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.util.Log;
 
 import java.util.Stack;
 
 /**
- * 应用程序Activity管理类：用于Activity管理和应用程序退出
+ * Application Activity management
  */
 public class AppManager {
-	
+
 	private static Stack<Activity> activityStack;
 	private static AppManager instance;
-	
+
 	private AppManager(){}
 	/**
-	 * 单一实例
+	 * single instance
 	 */
 	public static AppManager getAppManager(){
 		if(instance==null){
@@ -25,7 +26,7 @@ public class AppManager {
 		return instance;
 	}
 	/**
-	 * 添加Activity到堆栈
+	 * add Activity to stack
 	 */
 	public void addActivity(Activity activity){
 		if(activityStack==null){
@@ -34,21 +35,21 @@ public class AppManager {
 		activityStack.add(activity);
 	}
 	/**
-	 * 获取当前Activity（堆栈中最后一个压入的）
+	 * get current Activity（last in stack）
 	 */
 	public Activity currentActivity(){
 		Activity activity=activityStack.lastElement();
 		return activity;
 	}
 	/**
-	 * 结束当前Activity（堆栈中最后一个压入的）
+	 * finish Activity（last in stack）
 	 */
 	public void finishActivity(){
 		Activity activity=activityStack.lastElement();
 		finishActivity(activity);
 	}
 	/**
-	 * 结束指定的Activity
+	 * finish this Activity
 	 */
 	public void finishActivity(Activity activity){
 		if(activity!=null){
@@ -56,7 +57,7 @@ public class AppManager {
 		}
 	}
 	/**
-	 * 结束指定类名的Activity
+	 * finish activity with name
 	 */
 	public void finishActivity(Class<?> cls){
 		for (Activity activity : activityStack) {
@@ -66,28 +67,30 @@ public class AppManager {
 		}
 	}
 	/**
-	 * 结束所有Activity
+	 * finish all Activity
 	 */
 	public void finishAllActivity(){
-	    if (activityStack != null) {
-	        for (int i = 0, size = activityStack.size(); i < size; i++){
-	            if (null != activityStack.get(i)){
-	                activityStack.get(i).finish();
-	            }
-	        }
-	        activityStack.clear();
-        }
+		if (activityStack != null) {
+			for (int i = 0, size = activityStack.size(); i < size; i++){
+				if (null != activityStack.get(i)){
+					activityStack.get(i).finish();
+				}
+			}
+			activityStack.clear();
+		}
 	}
 	/**
-	 * 退出应用程序
+	 * exit
 	 */
-    public void exitApp(Context context) {
+	public void exitApp(Context context) {
 		try {
 			finishAllActivity();
 			ActivityManager activityMgr= (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 			activityMgr.restartPackage(context.getPackageName());
 			System.exit(0);
-		} catch (Exception e) {	}
+		} catch (Exception e) {
+			Log.e("Activity Manager", "exiting app failed: " + e.toString());
+		}
 	}
-
 }
+

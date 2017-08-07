@@ -9,7 +9,7 @@ public class ToastUtils {
         public static boolean isShow = true;
 
         /**
-         * 短时间显示Toast
+         * Method show short Toast
          *
          * @param context
          * @param message
@@ -21,7 +21,7 @@ public class ToastUtils {
         }
 
         /**
-         * 短时间显示Toast
+         * Method show short Toast
          *
          * @param context
          * @param message
@@ -33,7 +33,7 @@ public class ToastUtils {
         }
 
         /**
-         * 长时间显示Toast
+         * Method show long Toast
          *
          * @param context
          * @param message
@@ -45,7 +45,7 @@ public class ToastUtils {
         }
 
         /**
-         * 长时间显示Toast
+         * Method show long Toast
          *
          * @param context
          * @param message
@@ -57,7 +57,7 @@ public class ToastUtils {
         }
 
         /**
-         * 自定义显示Toast时间
+         * Method show customised Toast
          *
          * @param context
          * @param message
@@ -70,7 +70,7 @@ public class ToastUtils {
         }
 
         /**
-         * 自定义显示Toast时间
+         * Method show customised Toast
          *
          * @param context
          * @param message

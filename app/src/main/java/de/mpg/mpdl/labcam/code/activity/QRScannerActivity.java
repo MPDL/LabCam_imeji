@@ -45,32 +45,6 @@ public class QRScannerActivity extends Activity implements ZXingScannerView.Resu
         intent.putExtra("QRText", rawResult.getText());
         activity.setResult(RESULT_OK, intent);
         finish();
-        // If you would like to resume scanning, call this method below:
-//        mScannerView.resumeCameraPreview(this);
     }
 
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        mScannerView.setResultHandler(this);
-//        mScannerView.startCamera();
-//    }
-//
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        mScannerView.stopCamera();
-//    }
-//
-//    @Override
-//    public void handleResult(Result rawResult) {
-////        Toast.makeText(this, "Contents = " + rawResult.getContents() +
-////                ", Format = " + rawResult.getBarcodeFormat().getName(), Toast.LENGTH_SHORT).show();
-//        //mScannerView.startCamera();
-//
-//        Intent intent = activity.getIntent();
-//        intent.putExtra("QRText", rawResult.getContents());
-//        activity.setResult(RESULT_OK, intent);
-//        finish();
-//    }
 }

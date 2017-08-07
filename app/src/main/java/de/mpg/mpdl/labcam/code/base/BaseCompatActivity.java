@@ -6,10 +6,6 @@ import android.support.annotation.Nullable;
 
 import butterknife.ButterKnife;
 
-
-/**
- * Created by jian on 16-10-13.
- */
 @SuppressLint("NewApi")
 public abstract class BaseCompatActivity extends BaseActivity {
     private static final String TAG = BaseActivity.class.getSimpleName();
@@ -32,7 +28,7 @@ public abstract class BaseCompatActivity extends BaseActivity {
 
     /**
      * this activity layout res
-     * 设置layout布局,在子类重写该方法.
+     * set layout resource file
      *
      * @return res layout xml id
      */
