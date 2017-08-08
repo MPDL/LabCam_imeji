@@ -34,7 +34,6 @@ public abstract class BaseCompatActivity extends BaseActivity {
      */
     protected abstract int getLayoutId();
 
-    //处理bundle数据
     protected abstract void initContentView(Bundle savedInstanceState);
 
 

@@ -105,11 +105,6 @@ public abstract class BaseMvpWithPhotoActivity<T extends BasePresenter> extends 
         PermissionManager.handlePermissionsResult(this, type, mInvokeParam, this);
     }
 
-    /**
-     * 获取TakePhoto实例
-     *
-     * @return
-     */
     public TakePhoto getTakePhoto() {
         if (mTakePhoto == null) {
             mTakePhoto = (TakePhoto) TakePhotoInvocationHandler.of(this).bind(new TakePhotoImpl(this, this));
@@ -121,17 +116,14 @@ public abstract class BaseMvpWithPhotoActivity<T extends BasePresenter> extends 
 
     @Override
     public void takeSuccess(TResult result) {
-//        Log.i("zj", "takeSuccess：" + result.getImage().getCompressPath());
     }
 
     @Override
     public void takeFail(TResult result, String msg) {
-//        Log.i("zj", "takeFail:" + msg);
     }
 
     @Override
     public void takeCancel() {
-       // showToast(R.string.msg_operation_canceled);
     }
 
     @Override
@@ -143,16 +135,10 @@ public abstract class BaseMvpWithPhotoActivity<T extends BasePresenter> extends 
         return type;
     }
 
-    /**
-     * 相册
-     */
     protected void callAlbum() {
         mTakePhoto.onPickFromGallery();
     }
 
-    /**
-     * 调用相机
-     */
     protected void callCamera() {
         createTempFile();
         mTakePhoto.onPickFromCapture(Uri.fromFile(mFileTemp));

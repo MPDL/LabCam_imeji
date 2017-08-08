@@ -31,7 +31,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     private String userId;
     private String serverName;
 
-    //remember selected positions
     public Set<Integer> positionSet = new HashSet<>();
 
     private OnItemClickListener onItemClickListener;
@@ -92,22 +91,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
         else
             holder.relativeLayout.setVisibility(View.INVISIBLE);
 
-        /*
-        if(image!=null && (image.getNoteId()!=null || image.getVoiceId()!=null)){
-            holder.relativeLayout.setVisibility(View.VISIBLE);
-            if(image.getNoteId()!=null){      // show notes
-                holder.noteImageView.setVisibility(View.VISIBLE);
-            }else holder.noteImageView.setVisibility(View.INVISIBLE);
-
-            if(image.getVoiceId()!=null){     // show voice
-                holder.voiceImageView.setVisibility(View.VISIBLE);
-            }else holder.voiceImageView.setVisibility(View.INVISIBLE);
-        }else {
-            holder.relativeLayout.setVisibility(View.INVISIBLE);
-        }
-
-        */
-
         Uri uri = Uri.fromFile(new File(filePath));
 
         Picasso.with(mContext)
@@ -139,8 +122,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
         }
     }
 
-
-
     public void remove(String str){
         mItems.remove(str);
         notifyDataSetChanged();
@@ -153,7 +134,6 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
 
     public void setPositionSet(Set<Integer> positionSet){
         this.positionSet = positionSet;
-        Log.e("positionSet",positionSet.size()+"");
         notifyDataSetChanged();
     }
 

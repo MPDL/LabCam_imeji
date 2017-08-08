@@ -27,11 +27,6 @@ import java.io.File;
 
 import javax.inject.Inject;
 
-
-/**
- * Created by Tcz on 16/9/1.
- */
-
 public abstract class BaseMvpWithPhotoFragment<T extends BasePresenter> extends BaseFragment implements
                                                                                              BaseView, TakePhoto.TakeResultListener, InvokeListener {
 
@@ -80,11 +75,6 @@ public abstract class BaseMvpWithPhotoFragment<T extends BasePresenter> extends 
         PermissionManager.handlePermissionsResult(getActivity(), type, mInvokeParam, this);
     }
 
-    /**
-     * 获取TakePhoto实例
-     *
-     * @return
-     */
     public TakePhoto getTakePhoto() {
         if (mTakePhoto == null) {
             mTakePhoto = (TakePhoto) TakePhotoInvocationHandler.of(this).bind(new TakePhotoImpl(this, this));
@@ -154,16 +144,10 @@ public abstract class BaseMvpWithPhotoFragment<T extends BasePresenter> extends 
 
     }
 
-    /**
-     * 相册
-     */
     protected void callAlbum() {
         mTakePhoto.onPickFromGallery();
     }
 
-    /**
-     * 调用相机
-     */
     protected void callCamera() {
         createTempFile();
         mTakePhoto.onPickFromCapture(Uri.fromFile(mFileTemp));

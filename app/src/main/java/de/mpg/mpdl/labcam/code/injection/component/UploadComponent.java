@@ -1,6 +1,6 @@
 package de.mpg.mpdl.labcam.code.injection.component;
 
-import de.mpg.mpdl.labcam.code.common.service.checkAndUpload;
+import de.mpg.mpdl.labcam.code.common.service.UploadService;
 import de.mpg.mpdl.labcam.code.injection.PerActivity;
 import de.mpg.mpdl.labcam.code.injection.module.ActivityModule;
 import de.mpg.mpdl.labcam.code.injection.module.DataItemModule;
@@ -14,5 +14,5 @@ import dagger.Component;
 @Component(dependencies = ApplicationComponent.class, modules = {ActivityModule.class,
         DataItemModule.class})
 public interface UploadComponent {
-    void inject(checkAndUpload baseActivity);
+    void inject(UploadService baseActivity);
 }

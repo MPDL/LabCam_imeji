@@ -364,10 +364,6 @@ public class DeviceStatus {
             if(bitMapOrig != rotatedBitmap)
                 bitMapOrig.recycle();
             bitMapOrig = null;
-
-            // ocr exception
-            ocr = OCRtextHandler.getText(context, rotatedBitmap);
-            Log.e(LOG_TAG, "ocr: " + ocr);
         }
         try {
             JSONObject jsonObject = new JSONObject();

@@ -31,10 +31,6 @@ public class BaseSubscriber<T> extends DefaultSubscriber<T> {
             int code  = ((Response) t).code();
             if( code == 200){
                 baseView.onSuccess();
-            }else if(code == 401){
-//                AuthExpiredEvent event = new AuthExpiredEvent();
-//                RxBus.getDefault().post(event);
-                baseView.onError("登录失效，请重新登录");
             }else{
                 handleError((Response)t);
             }
@@ -57,15 +53,14 @@ public class BaseSubscriber<T> extends DefaultSubscriber<T> {
         if (e instanceof BusinessException) {
 
         } else if (e instanceof ConnectException
-                || e instanceof SocketTimeoutException) {// 超时
-            baseView.onError("网络不畅，请稍后再试！");
-        } else if (e instanceof HttpException) {// server 异常
+                || e instanceof SocketTimeoutException) {
+            baseView.onError("time out");
+        } else if (e instanceof HttpException) {// server error
             httpExceptionHandling(e);
         } else if (e instanceof JSONException
                 || e instanceof ParseException) {
-            baseView.onError("数据解析异常");
+            baseView.onError("data parsing error");
         } else {
-//            baseView.onError("出了点小问题");
             onOtherError(e);
         }
         e.printStackTrace();
@@ -98,15 +93,11 @@ public class BaseSubscriber<T> extends DefaultSubscriber<T> {
     private void httpExceptionHandling(Throwable e){
         int code = ((HttpException) e).code();
         if(code == 401 ){
-            // TODO: 1/7/17 没有权限 跳转
-//            AuthExpiredEvent event = new AuthExpiredEvent();
-//            RxBus.getDefault().post(event);
-            toastErrorMessage(e);
-//            baseView.onError("登录失效，请重新登录");
+            //TODO: handle error 401, for example toastErrorMessage(e);
         }else if(code == 500 ){
-            baseView.onError("服务器出了点小问题，请稍后再试");
-        }else{ // 其他返回码 400, bla bla
-            toastErrorMessage(e);
+            //TODO: handle server error 500
+        }else{
+            //TODO: handle other error 400 401...
         }
     }
 

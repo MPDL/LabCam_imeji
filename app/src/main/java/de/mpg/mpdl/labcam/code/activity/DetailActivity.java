@@ -55,7 +55,6 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
 
     //user info
     private String serverName;
-    private String username;
     private String userId;
 
     private Subscription mNoteRefreshEventSub;
@@ -72,7 +71,6 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
         observeNoteRefresh();
         observeVoiceRefresh();
 
-        username = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_NAME, "");
         userId = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
         serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 

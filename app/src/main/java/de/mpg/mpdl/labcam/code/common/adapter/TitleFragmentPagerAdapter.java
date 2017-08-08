@@ -33,7 +33,7 @@ public class TitleFragmentPagerAdapter extends FragmentPagerAdapter {
     };
 
     /**
-     * titles是给TabLayout设置title用的
+     * titles is for setting fragment title
      *
      * @param fragmentManager
      * @param fragmentList
@@ -47,7 +47,7 @@ public class TitleFragmentPagerAdapter extends FragmentPagerAdapter {
     }
 
     /**
-     * 描述：获取数量.
+     * Method get Fragments number
      *
      * @return the count
      * @see android.support.v4.view.PagerAdapter#getCount()
@@ -58,7 +58,7 @@ public class TitleFragmentPagerAdapter extends FragmentPagerAdapter {
     }
 
     /**
-     * 描述：获取索引位置的Fragment.
+     * Method to get fragment aby index
      *
      * @param position the position
      * @return the item

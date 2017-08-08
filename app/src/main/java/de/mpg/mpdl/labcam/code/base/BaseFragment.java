@@ -36,50 +36,24 @@ public abstract class BaseFragment extends Fragment {
         return mContext;
     }
 
-    /**
-     * 以无参数的模式启动Activity。
-     *
-     * @param activityClass
-     */
     public void startActivity(Class<? extends Activity> activityClass) {
         startActivity(getLocalIntent(activityClass, null));
         //   me.overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 
-    /**
-     * 以绑定参数的模式启动Activity。
-     *
-     * @param activityClass
-     */
     public void startActivity(Class<? extends Activity> activityClass, Bundle bd) {
         startActivity(getLocalIntent(activityClass, bd));
         //    me.overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 
-    /**
-     * 在底部显示一条toast信息,大约3秒钟时间。<br>
-     * 若想让toast显示时间较长，请调用showLongMessage
-     *
-     * @param msg
-     */
     public void showMessage(Object msg) {
         Toast.makeText(getActivity(), msg + "", Toast.LENGTH_SHORT).show();
     }
 
-    /**
-     * 以较长的时间来toast显示，大约5秒钟显示。
-     *
-     * @param msg
-     */
     public void showLongMessage(String msg) {
         ToastUtils.showLongMessage(getActivity(), msg);
     }
 
-    /**
-     * 显示消息提示，避免重复提示
-     *
-     * @param msg
-     */
     public void showToast(String msg) {
         ToastUtils.showShortMessage(getActivity(), msg);
     }
@@ -88,13 +62,6 @@ public abstract class BaseFragment extends Fragment {
         ToastUtils.showLongMessage(getActivity(),msgId);
     }
 
-
-    /**
-     * 获取当前程序中的本地目标
-     *
-     * @param localIntent
-     * @return
-     */
     public Intent getLocalIntent(Class<? extends Context> localIntent, Bundle bd) {
         Intent intent = new Intent(getActivity(), localIntent);
         if (null != bd) {
@@ -102,7 +69,6 @@ public abstract class BaseFragment extends Fragment {
         }
         return intent;
     }
-
 
     protected Intent getBackOnNewIntent(){
         Intent intent = getActivity().getIntent();
@@ -126,16 +92,13 @@ public abstract class BaseFragment extends Fragment {
     protected ApplicationComponent getApplicationComponent() {
         return ((BaseApplication)getActivity().getApplication()).getApplicationComponent();
     }
-    /**
-     * Get an Activity module for dependency injection.
-     */
+
     protected ActivityModule getActivityModule() {
         return new ActivityModule(getActivity());
     }
 
     public void showLoading(String msg) {
         if (progressDialog == null) {
-//            progressDialog = CustomizedProgressDialog.createInstance(getActivity());
             progressDialog = new ProgressDialog(getContext());
         }
         progressDialog.setMessage(msg);
@@ -144,7 +107,6 @@ public abstract class BaseFragment extends Fragment {
 
     public void showLoading() {
         if (progressDialog == null) {
-//            progressDialog = CustomizedProgressDialog.createInstance(getActivity());
             progressDialog = new ProgressDialog(getContext());
         }
         progressDialog.setMessage("");
@@ -163,7 +125,6 @@ public abstract class BaseFragment extends Fragment {
             mRootView = inflater.inflate(getLayoutId(), container, false);
             ButterKnife.bind(this, mRootView);
         }
-        //缓存的rootView需要判断是否已经被加过parent， 如果有parent需要从parent删除，要不然会发生这个rootview已经有parent的错误。
         ViewGroup parent = (ViewGroup) mRootView.getParent();
         if (parent != null) {
             parent.removeView(mRootView);
@@ -177,15 +138,8 @@ public abstract class BaseFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    /**
-     * this activity layout res
-     * 设置layout布局,在子类重写该方法.
-     *
-     * @return res layout xml id
-     */
     protected abstract int getLayoutId();
 
-    //处理bundle数据
     protected abstract void initContentView(Bundle savedInstanceState);
 
 }

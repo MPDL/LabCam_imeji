@@ -71,9 +71,6 @@ public class SettingsListAdapter extends BaseAdapter {
         return position;
     }
 
-    /*
-        creates the view everytime the screen refreshes
-     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Log.v("getView");
@@ -97,43 +94,27 @@ public class SettingsListAdapter extends BaseAdapter {
         System.out.println("Adapter collectionId" + " " + collectionId);
 
         if(folderItems.size()>0) {
-
-            // getting item data for the row
             ImejiFolder collection = folderItems.get(position);
-
-            //checkBox
             if(collection.getImejiId().equals(collectionId)){
                 selectedPosition = position;
                 ie.setCollectionId(selectedPosition,true);
                 notifyDataSetChanged();
             }
-
-            //title
             title.setText(collection.getTitle());
-
-            // user
             if(collection.getContributors() != null) {
                 user.setText(collection.getContributors().get(0).getCompleteName());
             }
-            // date
             date.setText(String.valueOf(collection.getModifiedDate()).split("\\+")[0]);
         }
 
         checkBox.setChecked(position == selectedPosition);
         checkBox.setTag(position);
-
-
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
                 selectedPosition = (Integer)view.getTag();
-
                 ie.setCollectionId(selectedPosition,false);
-                //onclick place radioButton to selected position
                 collectionId = folderItems.get(selectedPosition).getImejiId();
-
                 notifyDataSetChanged();
 
             }

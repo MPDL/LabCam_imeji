@@ -74,15 +74,12 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-
-        //prepare data
         Point size = getPoint();
         String filePath = galleryItems.get(position);
 
-        //创建默认的ImageLoader配置参数
         ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(activity)
                 .imageDownloader(new CustomImageDownaloder(activity))
-                .writeDebugLogs() //打印log信息
+                .writeDebugLogs()
                 .build();
 
         ViewGroup.LayoutParams layoutParams = holder.imageView.getLayoutParams();
@@ -90,16 +87,9 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
         layoutParams.height = (size.y/4)+5;
         holder.imageView.setLayoutParams(layoutParams);
 
-        //Initialize ImageLoader with configuration.
-//        ImageSize targetSize = new ImageSize(size.x / 2, size.y/3);
-
         ImageLoader.getInstance().init(configuration);
 
-
-        //显示图片的配置
         DisplayImageOptions options = new DisplayImageOptions.Builder()
-//                .showImageOnLoading(R.drawable.progress_image)
-//                .showImageOnFail(R.drawable.error_alert)
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
                 .extraForDownloader(headers)

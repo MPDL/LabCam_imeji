@@ -255,7 +255,7 @@ public class TaskManagerAdapter extends BaseAdapter {
                                         Intent uploadIntent = new Intent(activity, TaskUploadService.class);
                                         activity.stopService(uploadIntent);
 
-                                        //TODO: delete all image with this taskId
+                                        //delete all image with this taskId
                                         String collectionID = task.getCollectionId();
                                         String collectionName = task.getCollectionName();
                                         String username = task.getUserName();
@@ -369,7 +369,6 @@ public class TaskManagerAdapter extends BaseAdapter {
                     if (currentTask.getUploadMode().equalsIgnoreCase("AU")) {
                         // start AU TaskUploadService
                         Intent uploadIntent = new Intent(activity, TaskUploadService.class);
-//                            uploadIntent.putExtra("isBusy",false);
                         activity.startService(uploadIntent);
                     } else {
                         // start ManualUploadService
@@ -388,12 +387,10 @@ public class TaskManagerAdapter extends BaseAdapter {
     private void deleteTask(Task task,int position){
         Long currentTaskId = task.getId();
         new Delete().from(Task.class).where("Id = ?", currentTaskId).execute();
-        //// TODO: 3/16/17 delete imgs in task
-        Log.e(TAG, "task delete clicked");
+        // delete imgs in task
         removeTaskInterface.remove(position);
         taskList.remove(task);
         notifyDataSetChanged();
-        /** if it is a Au, what to do? */
     }
 
     private void getUserInfo(){

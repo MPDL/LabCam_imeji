@@ -16,7 +16,7 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.TaskManagerAdapter;
 import de.mpg.mpdl.labcam.code.common.callback.RemoveTaskInterface;
-import de.mpg.mpdl.labcam.code.common.observer.dbObserver;
+import de.mpg.mpdl.labcam.code.common.observer.DatabaseObserver;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
@@ -43,7 +43,7 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
     // db observer handler
     static ContentResolver resolver;
     static Handler mHandler;
-    static de.mpg.mpdl.labcam.code.common.observer.dbObserver dbObserver;
+    static DatabaseObserver DatabaseObserver;
     static Uri uri;
 
     @Override
@@ -103,8 +103,8 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
                 }
             }
         };
-        dbObserver = new dbObserver(activity, mHandler);
-        resolver.registerContentObserver(uri, true, dbObserver);
+        DatabaseObserver = new DatabaseObserver(activity, mHandler);
+        resolver.registerContentObserver(uri, true, DatabaseObserver);
 
         taskList = DBConnector.getActiveTasks(userId, serverUrl);
 
@@ -131,13 +131,13 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
 
     @Override
     public void onPause() {
-        resolver.unregisterContentObserver(dbObserver);
+        resolver.unregisterContentObserver(DatabaseObserver);
         super.onPause();
     }
 
     @Override
     public void onResume() {
-        resolver.registerContentObserver(uri, true, dbObserver);
+        resolver.registerContentObserver(uri, true, DatabaseObserver);
         super.onResume();
     }
 

@@ -7,14 +7,23 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
+import de.mpg.mpdl.labcam.Model.LineAttributes;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.NotificationID;
 import de.mpg.mpdl.labcam.R;
@@ -26,16 +35,19 @@ import de.mpg.mpdl.labcam.code.data.model.TO.MetadataProfileTO;
 import de.mpg.mpdl.labcam.code.data.model.TO.StatementTO;
 import de.mpg.mpdl.labcam.code.data.net.MultipartUtil;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.utils.OCRHandler;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import de.mpg.mpdl.labcam.code.utils.ProfileUtil;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit.Callback;
@@ -48,9 +60,9 @@ import retrofit.mime.TypedFile;
  * Created by yingli on 7/26/16.
  */
 
-public class checkAndUpload {
+public class UploadService {
 
-    private static final String TAG = checkAndUpload.class.getSimpleName();
+    private static final String TAG = UploadService.class.getSimpleName();
 
     String currentImagePath;
     Task task;
@@ -81,7 +93,88 @@ public class checkAndUpload {
     Boolean[] checkTypeList = {false,false,false,false,false,false,false,false,false,false,false,false};
     boolean ocrIsOn = false;
 
-    public checkAndUpload(Context context, Long currentTaskId) {
+    private void getImageText(Uri imageUri, final Context context,
+                              TypedFile stateTypedFile, JSONObject stateJson) {
+        Bitmap bitmap;
+        OCRHandler.TaskParams params = null;
+        Log.e(TAG , "Setting up OCR params for image: " + imageUri.toString());
+        int imageHeight = 0;
+        int imageWidth = 0;
+        String rot = null;
+        try {
+            String path = imageUri.getPath();
+            ExifInterface exif = new ExifInterface(path);
+            rot = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+            Log.e(TAG , rot + " rotation ");
+        } catch (IOException e){
+            Log.e(TAG, "could not get file information");
+
+        }
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(new File(imageUri.getPath()).getAbsolutePath(), options);
+        imageHeight = options.outHeight;
+        imageWidth = options.outWidth;
+
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
+            if (rot != null && !rot.equals("0") || imageWidth > imageHeight){
+                {
+                    int rotInt = Integer.parseInt(rot);
+                    Log.e(TAG, "rotating image" + Integer.toString(imageWidth) + " " + Integer.toString(imageHeight));
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    int deg = 0;
+                    if (rotInt >= 2) {
+                        if (rotInt == 8) {
+                            deg = 90;
+                        } else if (rotInt == 3) {
+                            deg = 180;
+                        } else if (rotInt == 6) {
+                            deg = 270;
+                        }
+                        Log.e(TAG, "rotating by " + Integer.toString(360-deg));
+                        matrix.postRotate(360-deg);
+                    }
+                    bitmap =  Bitmap.createBitmap(bitmap, 0, 0, imageWidth, imageHeight, matrix, true);
+                }
+            }
+            params = new OCRHandler.TaskParams(bitmap, context.getApplicationContext());
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+            return;
+        }
+        OCRHandler.getText testAsyncTask = new OCRHandler.getText(new OCRHandler.FragmentCallback() {
+            @Override
+            public void onTaskDone(ArrayList<LineAttributes> lineAttributes) {
+                String text = null;
+                if (lineAttributes != null) {
+                    for (LineAttributes line : lineAttributes) {
+                        text = text + line.getText();
+                    }
+                }
+                try{
+                    if (text != null) {
+                        stateJson.put("OCR", text);
+                    }
+                    String jsonString = stateJson.toString();
+                    RetrofitClient.uploadItem(stateTypedFile, jsonString, callback_upload, apiKey);
+                    Log.e(TAG, "upload event fired");
+
+                } catch (org.json.JSONException e){
+                    Log.e(TAG, "JSON malformed, cannot procede");
+                }
+            }
+        });
+        if (params != null) {
+            testAsyncTask.execute(params);
+        } else {
+            Log.e(TAG, "Task params are empty");
+        }
+    }
+
+    public UploadService(Context context, Long currentTaskId) {
         this.context = context;
         this.currentTaskId = currentTaskId.toString();
     }
@@ -143,9 +236,6 @@ public class checkAndUpload {
         }
     }
 
-    /**
-     * upload a image (unit function)
-     */
     private void upload(String imgPath){
         if(taskIsStopped()){
             return;
@@ -179,7 +269,6 @@ public class checkAndUpload {
         HashMap<String, RequestBody> map = new HashMap<>();
         RequestBody jsonBody = MultipartUtil.createPartFromString(json);
         map.put("json", jsonBody);
-//        RetrofitClient.uploadItem(map, body);
         RetrofitClient.uploadItem(typedFile, json, callback_upload, apiKey);
     }
 
@@ -279,15 +368,14 @@ public class checkAndUpload {
         RetrofitClient.getCollectionById(collectionID,callback_get_collection,apiKey);
     }
 
-
-    /**
-     * callbacks
-     */
-
-
     Callback<ImejiFolder> callback_get_collection = new Callback<ImejiFolder>() {
         @Override
         public void success(ImejiFolder imejiFolder, Response response) {
+            /*FIXME this is not an appealing way to parse the collection data into JSON,
+              FIXME we need to wait until active android is replaced until the collections
+            can be parsed oorrectly from the database */
+
+
             if(imejiFolder.getProfile().getId()==null){
                 //store response
                 //Try to get response body
@@ -316,121 +404,12 @@ public class checkAndUpload {
                 //create new profile
                 String collectionTitle = imejiFolder.getTitle();
                 String jsonTitlePart = " \"title\" :"+" \""+ collectionTitle+" \"";
-                String jsonStatementsPart = "\n" +
-                        "      \"statements\": [\n" +
-                        "        {\n" +
-                        "          \"type\": \"http://imeji.org/terms/metadata#date\",\n" +
-                        "          \"labels\": [\n" +
-                        "            {\n" +
-                        "              \"value\": \"Creation Date\",\n" +
-                        "              \"lang\": \"en\"\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
-                        "          \"labels\": [\n" +
-                        "            {\n" +
-                        "              \"value\": \"Make\",\n" +
-                        "              \"lang\": \"en\"\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
-                        "          \"labels\": [\n" +
-                        "            {\n" +
-                        "              \"value\": \"Model\",\n" +
-                        "              \"lang\": \"en\"\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "          \"type\": \"http://imeji.org/terms/metadata#number\",\n" +
-                        "          \"labels\": [\n" +
-                        "            {\n" +
-                        "              \"value\": \"ISO Speed Ratings\",\n" +
-                        "              \"lang\": \"en\"\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "          \"type\": \"http://imeji.org/terms/metadata#geolocation\",\n" +
-                        "          \"labels\": [\n" +
-                        "            {\n" +
-                        "              \"value\": \"Geolocation\",\n" +
-                        "              \"lang\": \"en\"\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
-                        "          \"labels\": [\n" +
-                        "            {\n" +
-                        "              \"value\": \"GPS Version ID\",\n" +
-                        "              \"lang\": \"en\"\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
-                        "          \"labels\": [\n" +
-                        "            {\n" +
-                        "              \"value\": \"Sensing Method\",\n" +
-                        "              \"lang\": \"en\"\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        },\n" +                        "        {\n" +
-                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
-                        "          \"labels\": [\n" +
-                        "            {\n" +
-                        "              \"value\": \"Aperture Value\",\n" +
-                        "              \"lang\": \"en\"\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        },\n" +                        "        {\n" +
-                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
-                        "          \"labels\": [\n" +
-                        "            {\n" +
-                        "              \"value\": \"Color Space\",\n" +
-                        "              \"lang\": \"en\"\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        },\n" +                        "        {\n" +
-                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
-                        "          \"labels\": [\n" +
-                        "            {\n" +
-                        "              \"value\": \"Exposure Time\",\n" +
-                        "              \"lang\": \"en\"\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        },\n" +                        "        {\n" +
-                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
-                        "          \"labels\": [\n" +
-                        "            {\n" +
-                        "              \"value\": \"Note\",\n" +
-                        "              \"lang\": \"en\"\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        },\n" +
-                        "        {\n" +
-                        "          \"type\": \"http://imeji.org/terms/metadata#text\",\n" +
-                        "          \"labels\": [\n" +
-                        "            {\n" +
-                        "              \"value\": \"OCR\",\n" +
-                        "              \"lang\": \"en\"\n" +
-                        "            }\n" +
-                        "          ]\n" +
-                        "        }\n" +
-                        "      ]\n";
-
-
+                String jsonStatementsPart = ProfileUtil.profileJsonStatementsPart;
                 String jsonPostProfile = "{" + jsonTitlePart + ","+jsonStatementsPart+"}";
                 RetrofitClient.createProfile(jsonPostProfile,callback_create_profile,apiKey);
 
                 Log.e(TAG,"create new profile");
             }else {
-                //TODO: retrieve profile by ID
                 String profileId = imejiFolder.getProfile().getId();
                 RetrofitClient.getProfileById(profileId, callback_get_profile,apiKey);
 
@@ -473,7 +452,6 @@ public class checkAndUpload {
 
             collectionProfileStatementTOList = metadataProfileTO.getStatements();
 
-            //TODO: compare with our template
             for( int i = 0; i < labCamTemplateProfileLabels.length; i++)
             {
                 // "make"
@@ -548,7 +526,6 @@ public class checkAndUpload {
         @Override
         public void success(ImejiFolder imejiFolder, Response response) {
             Log.e(TAG,"callback_update_collection success");
-            //TODO : post item with MD
             for(int i=0; i<checkTypeList.length; i++){
                 checkTypeList[i]= true;
             }
@@ -558,7 +535,6 @@ public class checkAndUpload {
         @Override
         public void failure(RetrofitError error) {
             Log.e(TAG,"callback_update_collection failed");
-            // TODO: 8/3/16 delete profile by id ; post item without MD
             RetrofitClient.deleteProfileById(profileId,callback_delete_profile ,apiKey);
             for(int i=0; i<checkTypeList.length; i++){
                 checkTypeList[i]= false;
@@ -677,9 +653,6 @@ public class checkAndUpload {
                     case 422:
                         String jsonBody = new String(((TypedByteArray) error.getResponse().getBody()).getBytes());
                         if (jsonBody.contains("already exists")) {
-
-                            //TODO Update Item
-
                             // remove from task's imgPaths
                             task = DBConnector.getTaskById(currentTaskId, userId, serverName);
                             List<String> imgPaths = task.getImagePaths();

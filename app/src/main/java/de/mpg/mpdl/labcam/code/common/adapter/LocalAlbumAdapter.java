@@ -118,7 +118,6 @@ public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.Vi
 
     public void setPositionSet(Set<Integer> positionSet){
         this.positionSet = positionSet;
-        Log.e("positionSet",positionSet.size()+"");
         notifyDataSetChanged();
     }
 

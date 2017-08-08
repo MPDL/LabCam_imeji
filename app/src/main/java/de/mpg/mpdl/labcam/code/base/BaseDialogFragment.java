@@ -163,7 +163,6 @@ public abstract class BaseDialogFragment extends DialogFragment{
             mRootView = inflater.inflate(getLayoutId(), container, false);
             ButterKnife.bind(this, mRootView);
         }
-        //缓存的rootView需要判断是否已经被加过parent， 如果有parent需要从parent删除，要不然会发生这个rootview已经有parent的错误。
         ViewGroup parent = (ViewGroup) mRootView.getParent();
         if (parent != null) {
             parent.removeView(mRootView);
@@ -185,7 +184,6 @@ public abstract class BaseDialogFragment extends DialogFragment{
      */
     protected abstract int getLayoutId();
 
-    //处理bundle数据
     protected abstract void initContentView(Bundle savedInstanceState);
 
 }

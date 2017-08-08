@@ -41,7 +41,7 @@ import de.mpg.mpdl.labcam.code.activity.DetailActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.AlbumRecyclerAdapter;
 import de.mpg.mpdl.labcam.code.common.adapter.SectionedGridRecyclerViewAdapter;
 import de.mpg.mpdl.labcam.code.common.adapter.SimpleAdapter;
-import de.mpg.mpdl.labcam.code.common.observer.dbObserver;
+import de.mpg.mpdl.labcam.code.common.observer.DatabaseObserver;
 import de.mpg.mpdl.labcam.code.common.widget.CircleProgressBar;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
@@ -58,7 +58,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 
 import rx.Subscription;
 
@@ -98,31 +97,16 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
 
-
-    /**
-     * treeMap auto sort it by date (prepare data for timeline view)
-     * <imageDate,imagePath> **/
-
-    //TODO Question There is itemPathList variable in DetailActivity and LocalImageActivity
     ArrayList<String> sortedImageNameList;
-
-    TreeMap<Long, String> imageNameList = new TreeMap<>();
-
-    /**
-     *
-     * store the imagePathList of each album
-     */
     ArrayList<List<String[]>> imagePathListAllAlbums = new ArrayList<>();
     List<String> albumNameArrayList = new ArrayList<>();
     List<String> imageNameArrayList = new ArrayList<>();
     List<Long> imageDateArrayList = new ArrayList<>();
 
-    //user info
     private String username;
     private String userId;
     private String serverName;
 
-    //UI flag(timeLine/Album)
     private static TextView dateLabel = null;
     private static TextView albumLabel = null;
     private boolean isAlbum = false;
@@ -133,7 +117,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     // db observer handler
     static ContentResolver resolver;
     static Handler mHandler;
-    static de.mpg.mpdl.labcam.code.common.observer.dbObserver dbObserver;
+    static DatabaseObserver DatabaseObserver;
     static Uri uri;
 
     private Subscription mNoteRefreshEventSub;
@@ -248,8 +232,8 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         uri = Uri.parse("content://de.mpg.mpdl.labcam/tasks");
         resolver = getActivity().getContentResolver();
-        dbObserver = new dbObserver(getActivity(),mHandler);
-        resolver.registerContentObserver(uri, true, dbObserver);
+        DatabaseObserver = new DatabaseObserver(getActivity(),mHandler);
+        resolver.registerContentObserver(uri, true, DatabaseObserver);
 
         return rootView;
 
@@ -477,7 +461,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
 
@@ -699,7 +682,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     @Override
     public void onResume() {
-        resolver.registerContentObserver(uri, true, dbObserver);
+        resolver.registerContentObserver(uri, true, DatabaseObserver);
 
         isAlbum = PreferenceUtil.getBoolean(getActivity(), Constants.SHARED_PREFERENCES, Constants.IS_ALBUM, false);
 
@@ -732,7 +715,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     @Override
     public void onPause() {
-        resolver.unregisterContentObserver(dbObserver);
+        resolver.unregisterContentObserver(DatabaseObserver);
 
         checkPermission();
         loadTimeLinePicture();

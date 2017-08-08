@@ -79,11 +79,6 @@ public class BaseWithPhotoFragment extends Fragment implements TakePhoto.TakeRes
         PermissionManager.handlePermissionsResult(getActivity(), type, mInvokeParam, this);
     }
 
-    /**
-     * 获取TakePhoto实例
-     *
-     * @return
-     */
     public TakePhoto getTakePhoto() {
         if (mTakePhoto == null) {
             mTakePhoto = (TakePhoto) TakePhotoInvocationHandler.of(this).bind(new TakePhotoImpl(this, this));
@@ -124,50 +119,24 @@ public class BaseWithPhotoFragment extends Fragment implements TakePhoto.TakeRes
         return mContext;
     }
 
-    /**
-     * 以无参数的模式启动Activity。
-     *
-     * @param activityClass
-     */
     public void startActivity(Class<? extends Activity> activityClass) {
         startActivity(getLocalIntent(activityClass, null));
         //   me.overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 
-    /**
-     * 以绑定参数的模式启动Activity。
-     *
-     * @param activityClass
-     */
     public void startActivity(Class<? extends Activity> activityClass, Bundle bd) {
         startActivity(getLocalIntent(activityClass, bd));
         //    me.overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 
-    /**
-     * 在底部显示一条toast信息,大约3秒钟时间。<br>
-     * 若想让toast显示时间较长，请调用showLongMessage
-     *
-     * @param msg
-     */
     public void showMessage(Object msg) {
         Toast.makeText(getActivity(), msg + "", Toast.LENGTH_SHORT).show();
     }
 
-    /**
-     * 以较长的时间来toast显示，大约5秒钟显示。
-     *
-     * @param msg
-     */
     public void showLongMessage(String msg) {
         ToastUtils.showLongMessage(getActivity(), msg);
     }
 
-    /**
-     * 显示消息提示，避免重复提示
-     *
-     * @param msg
-     */
     public void showToast(String msg) {
         ToastUtils.showShortMessage(getActivity(), msg);
     }
@@ -176,12 +145,6 @@ public class BaseWithPhotoFragment extends Fragment implements TakePhoto.TakeRes
         ToastUtils.showLongMessage(getActivity(), msgId);
     }
 
-    /**
-     * 获取当前程序中的本地目标
-     *
-     * @param localIntent
-     * @return
-     */
     public Intent getLocalIntent(Class<? extends Context> localIntent, Bundle bd) {
         Intent intent = new Intent(getActivity(), localIntent);
         if (null != bd) {
@@ -214,9 +177,6 @@ public class BaseWithPhotoFragment extends Fragment implements TakePhoto.TakeRes
         return ((BaseApplication) getActivity().getApplication()).getApplicationComponent();
     }
 
-    /**
-     * Get an Activity module for dependency injection.
-     */
     protected ActivityModule getActivityModule() {
         return new ActivityModule(getActivity());
     }
@@ -245,16 +205,10 @@ public class BaseWithPhotoFragment extends Fragment implements TakePhoto.TakeRes
         }
     }
 
-    /**
-     * 相册
-     */
     protected void callAlbum() {
         mTakePhoto.onPickFromGallery();
     }
 
-    /**
-     * 调用相机
-     */
     protected void callCamera() {
         createTempFile();
         mTakePhoto.onPickFromCapture(Uri.fromFile(mFileTemp));

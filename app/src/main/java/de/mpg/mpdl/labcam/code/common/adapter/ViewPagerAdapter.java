@@ -112,8 +112,6 @@ public class ViewPagerAdapter extends PagerAdapter {
                     .load(uri)
                     .resize(size.x, size.y)
                     .centerInside()
-                            //.centerCrop()
-                            //.placeholder(R.drawable.progress_animation)
                     .into(imageView);
         }else {
             Picasso myPicasso = new Picasso.Builder(context).downloader(new camPicassoLoader(context)).build();
@@ -161,9 +159,6 @@ public class ViewPagerAdapter extends PagerAdapter {
         void onItemClick(View view, int position);
         void onItemLongClick(View view, int position);
     }
-
-
-    // ui VoicePanel
 
     private void initImageInfoLayout(View itemView, int position){
         // get Image object

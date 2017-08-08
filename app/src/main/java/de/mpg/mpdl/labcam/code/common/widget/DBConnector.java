@@ -242,7 +242,6 @@ public class DBConnector {
                 if (oldNote != null) {
                     oldNote.getImageIds().remove(image.getId().toString());
                     oldNote.save();
-                    //TODO modifiedDate ??
                     //remove note entry which has empty imageIds
                     if (oldNote.getImageIds().size() == 0) {
                         oldNote.delete();
@@ -278,7 +277,6 @@ public class DBConnector {
                 Voice oldVoice = getVoiceById(oldVoiceId, userId,serverName);
                 oldVoice.getImageIds().remove(image.getId().toString());
                 oldVoice.save();
-                //TODO modifiedDate ??
                 //remove voice entry which has empty imageIds
                 if (oldVoice.getImageIds().size() == 0)
                     oldVoice.delete();

@@ -25,10 +25,6 @@ import java.io.File;
 
 import butterknife.ButterKnife;
 
-
-/**
- * Created by jian on 16-10-13.
- */
 @SuppressLint("NewApi")
 public abstract class BaseCompatWithPhotoActivity extends BaseActivity implements TakePhoto.TakeResultListener, InvokeListener {
     private static final String TAG = BaseActivity.class.getSimpleName();
@@ -57,15 +53,8 @@ public abstract class BaseCompatWithPhotoActivity extends BaseActivity implement
         finish();
     }
 
-    /**
-     * this activity layout res
-     * 设置layout布局,在子类重写该方法.
-     *
-     * @return res layout xml id
-     */
     protected abstract int getLayoutId();
 
-    //处理bundle数据
     protected abstract void initContentView(Bundle savedInstanceState);
 
     @Override
@@ -122,16 +111,10 @@ public abstract class BaseCompatWithPhotoActivity extends BaseActivity implement
         return type;
     }
 
-    /**
-     * 相册
-     */
     protected void callAlbum() {
         mTakePhoto.onPickFromGallery();
     }
 
-    /**
-     * 调用相机
-     */
     protected void callCamera() {
         createTempFile();
         mTakePhoto.onPickFromCapture(Uri.fromFile(mFileTemp));

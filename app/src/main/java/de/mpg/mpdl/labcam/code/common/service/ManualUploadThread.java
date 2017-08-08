@@ -23,7 +23,7 @@ public class ManualUploadThread extends Thread {
     public void run() {
         //Code
         Log.i(TAG,"Thread --> startUpload()");
-        checkAndUpload checkMateData = new checkAndUpload(context, currentTaskId);
+        UploadService checkMateData = new UploadService(context, currentTaskId);
         checkMateData.run();
     }
 

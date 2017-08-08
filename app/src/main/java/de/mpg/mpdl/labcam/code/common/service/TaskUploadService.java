@@ -74,17 +74,13 @@ public class TaskUploadService extends Service {
 
         //set task
         task = DBConnector.getAuTask(userId, serverName);
-
         if (task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))) {
             return super.onStartCommand(intent, flags, startId);
         }
         //set currentTaskId
         currentTaskId = task.getId();
-        Log.i(TAG, "currentTaskId: " + currentTaskId);
         finishedNum = task.getFinishedItems();
-        Log.v("~~~", "onCreate getFinishedItems: " + finishedNum);
-
-        checkAndUpload checkMateData = new checkAndUpload(activity, currentTaskId);
+        UploadService checkMateData = new UploadService(activity, currentTaskId);
         checkMateData.run();
 
         return super.onStartCommand(intent, flags, startId);

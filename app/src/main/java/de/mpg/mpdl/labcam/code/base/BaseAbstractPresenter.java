@@ -6,11 +6,6 @@ import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 
 import javax.inject.Inject;
 
-
-/**
- * Created by jzhu on 2016/11/22.
- */
-
 public class BaseAbstractPresenter<T extends BaseView> implements BasePresenter<T> {
     @Inject
     Context mContext;
@@ -57,7 +52,6 @@ public class BaseAbstractPresenter<T extends BaseView> implements BasePresenter<
     public boolean checkNetWork() {
 
         if (!DeviceStatus.isNetworkAvailable(mContext)) {
-//            mView.onError(mContext.getResources().getString(R.string.exception_network));
             mView.onError("Network failure");
             return false;
         }
