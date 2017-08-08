@@ -35,7 +35,6 @@ import android.widget.Toast;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.code.activity.ActiveTaskActivity;
 import de.mpg.mpdl.labcam.code.activity.DetailActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.AlbumRecyclerAdapter;
@@ -59,6 +58,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 import rx.Subscription;
 
 import static de.mpg.mpdl.labcam.code.utils.BatchOperationUtils.noteDialogNewInstance;
@@ -799,7 +799,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             if(granted) {
                 prepareData();
             }else{
-                ToastUtil.showShortToast(getActivity(), "please grant CAMERA and WRITE_EXTERNAL_STORAGE permissions");
+                ToastUtils.showShortMessage(getActivity(), "please grant CAMERA and WRITE_EXTERNAL_STORAGE permissions");
             }
         }
     }

@@ -13,8 +13,8 @@ import android.widget.TextView;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Voice;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
+import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -94,7 +94,7 @@ public class RecentVoiceAdapter extends BaseAdapter {
         pauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtil.showLongToast(activity, "Pausing sound");
+                ToastUtils.showLongMessage(activity, "Pausing sound");
                 mediaPlayer.pause();
 
                 pauseButton.setEnabled(false);
@@ -105,7 +105,7 @@ public class RecentVoiceAdapter extends BaseAdapter {
         rewindButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtil.showLongToast(activity, "Playing sound");
+                ToastUtils.showLongMessage(activity, "Playing sound");
                 mediaPlayer.start();
 
                 pauseButton.setEnabled(true);
@@ -116,7 +116,7 @@ public class RecentVoiceAdapter extends BaseAdapter {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtil.showLongToast(activity, "Reseting sound");
+                ToastUtils.showLongMessage(activity, "Reseting sound");
                 try {
                     mediaPlayer.reset();
                     mediaPlayer.setDataSource(voice.getVoicePath());
@@ -134,7 +134,7 @@ public class RecentVoiceAdapter extends BaseAdapter {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtil.showLongToast(activity, "Deleting sound");
+                ToastUtils.showLongMessage(activity, "Deleting sound");
                 deleteVoice(voice);
             }
         });

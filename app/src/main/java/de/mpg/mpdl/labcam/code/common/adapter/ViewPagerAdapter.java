@@ -22,11 +22,11 @@ import com.squareup.picasso.Picasso;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Voice;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.common.widget.camPicassoLoader;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
+import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -250,7 +250,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         pauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtil.showLongToast(context, "Pausing sound");
+                ToastUtils.showLongMessage(context, "Pausing sound");
                 mediaPlayer.pause();
 
                 pauseButton.setEnabled(false);
@@ -261,7 +261,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         rewindButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtil.showLongToast(context, "Playing sound");
+                ToastUtils.showLongMessage(context, "Playing sound");
                 mediaPlayer.start();
 
                 pauseButton.setEnabled(true);
@@ -272,7 +272,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtil.showLongToast(context, "Reseting sound");
+                ToastUtils.showLongMessage(context, "Reseting sound");
                 try {
                     mediaPlayer.reset();
                     mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName).getVoicePath());
@@ -290,7 +290,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtil.showLongToast(context, "Deleting sound");
+                ToastUtils.showLongMessage(context, "Deleting sound");
                 voicePanelLayout.setVisibility(View.GONE);
                 deleteVoice(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName), position, image.getId());
             }

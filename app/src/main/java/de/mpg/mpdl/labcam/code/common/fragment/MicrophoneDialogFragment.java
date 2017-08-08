@@ -25,13 +25,13 @@ import android.widget.Toast;
 
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Utils.ToastUtil;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
 import de.mpg.mpdl.labcam.code.utils.BatchOperationUtils;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
+import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -223,7 +223,7 @@ public class MicrophoneDialogFragment extends DialogFragment{
                 recorder.stop();
             }catch(RuntimeException stopException){
                 //handle cleanup here
-                ToastUtil.showShortToast(getActivity(),"please try long click the record button");
+                ToastUtils.showShortMessage(getActivity(),"please try long click the record button");
                 recorder.reset();
                 recorder.release();
                 recorder = null;
@@ -264,7 +264,7 @@ public class MicrophoneDialogFragment extends DialogFragment{
 //                startRecording();
             }else{
                 getDialog().dismiss();
-                ToastUtil.showShortToast(getActivity(), "please grant RECORD_AUDIO and WRITE_EXTERNAL_STORAGE permissions");
+                ToastUtils.showShortMessage(getActivity(), "please grant RECORD_AUDIO and WRITE_EXTERNAL_STORAGE permissions");
             }
         }
     }
