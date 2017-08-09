@@ -66,17 +66,12 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
     private String userId;
     private String userName;
     private String apiKey;
-
     private String serverName;
 
-    //interface
     private CollectionIdInterface ie = this;
-
-
     private SettingsListAdapter adapter;
     private ListView listView;
     private BaseActivity activity;
-
     private String collectionId;
     private String collectionName;
     private List<ImejiFolder> collectionList = new ArrayList<ImejiFolder>();
@@ -236,11 +231,8 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
                     return;
                 }
 
-
                 try {
-
                     URL u = new URL(url);
-
                     String path = u.getPath();
                     String qrCollectionId = "";
                     if (path != null) {
@@ -252,7 +244,6 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
                             return;
                         }
 
-                        /** set choose **/
                         //create task if collection is selected
                         if (!qrCollectionId.equals("") && !qrCollectionId.equals(null)) {
                             Log.i("~qrCollectionId", qrCollectionId);
@@ -367,7 +358,16 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
     }
 
     @Override
+    public void noInternet() {
+        readLocalCollections();
+    }
+
+    @Override
     public void getCollectionsFail(Throwable e) {
+        readLocalCollections();
+    }
+
+    private void readLocalCollections(){
         collectionList.clear();
         collectionList = new Select().from(ImejiFolder.class).execute();
         Log.v(LOG_TAG, collectionList.size() + "");

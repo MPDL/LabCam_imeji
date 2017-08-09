@@ -11,6 +11,7 @@ import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 public interface RemoteCollectionDialogView extends BaseView{
     void getCollectionsSuc(CollectionMessage model);
     void getCollectionsFail(Throwable e);
+    void noInternet();
 
     void createCollectionsSuc(ImejiFolderModel model);
     void createCollectionsFail(Throwable e);

@@ -30,7 +30,7 @@ public class RemoteCollectionSettingsPresenter extends BaseAbstractPresenter<Rem
 
     public void getGrantedCollectionMessage(String q, BaseActivity act){
         if (!checkNetWork()) {
-            return;
+            mView.noInternet();
         }
         collectionMessageService.execute(new BaseSubscriber<CollectionMessage>(mView) {
             @Override

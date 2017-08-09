@@ -15,4 +15,6 @@ public interface RemoteCollectionSettingsView extends BaseView{
 
     void createCollectionsSuc(ImejiFolderModel model);
     void createCollectionsFail(Throwable e);
+
+    void noInternet();
 }

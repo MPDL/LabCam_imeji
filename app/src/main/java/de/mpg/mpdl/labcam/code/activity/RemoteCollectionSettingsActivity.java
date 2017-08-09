@@ -429,7 +429,16 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
     }
 
     @Override
+    public void noInternet() {
+        getLocalCollections();
+    }
+
+    @Override
     public void getCollectionsFail(Throwable e) {
+        getLocalCollections();
+    }
+
+    private void getLocalCollections(){
         collectionListLocal = DBConnector.getUserFolders();
 
         adapter = new SettingsListAdapter(activity, collectionListLocal,ie);
