@@ -9,12 +9,12 @@ import android.util.Log;
 
 import com.activeandroid.query.Select;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.code.common.service.ManualUploadService;
 import de.mpg.mpdl.labcam.code.common.service.TaskUploadService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**

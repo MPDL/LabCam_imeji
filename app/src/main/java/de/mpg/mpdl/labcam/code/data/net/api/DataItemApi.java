@@ -1,9 +1,8 @@
 package de.mpg.mpdl.labcam.code.data.net.api;
 
-import de.mpg.mpdl.labcam.Model.DataItem;
-
 import java.util.Map;
 
+import de.mpg.mpdl.labcam.Model.DataItem;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.http.Multipart;

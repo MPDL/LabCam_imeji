@@ -1,10 +1,10 @@
 package de.mpg.mpdl.labcam.code.data.model;
 
-import de.mpg.mpdl.labcam.Model.ImejiProfile;
-import de.mpg.mpdl.labcam.Model.MessageModel.Person;
-
 import java.net.URL;
 import java.util.List;
+
+import de.mpg.mpdl.labcam.Model.ImejiProfile;
+import de.mpg.mpdl.labcam.Model.MessageModel.Person;
 
 /**
  * Created by yingli on 3/17/17.

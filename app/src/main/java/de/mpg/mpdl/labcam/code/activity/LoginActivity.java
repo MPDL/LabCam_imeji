@@ -21,13 +21,17 @@ import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
+import java.text.DateFormat;
+import java.util.Date;
+
+import butterknife.BindView;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.code.base.BaseMvpActivity;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.data.model.UserModel;
+import de.mpg.mpdl.labcam.code.data.net.RetrofitFactory;
 import de.mpg.mpdl.labcam.code.injection.component.DaggerUserComponent;
 import de.mpg.mpdl.labcam.code.injection.module.ImejiFolderModule;
 import de.mpg.mpdl.labcam.code.injection.module.UserModule;
@@ -36,11 +40,6 @@ import de.mpg.mpdl.labcam.code.mvp.view.LoginView;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 import de.mpg.mpdl.labcam.code.utils.QRUtils;
-
-import java.text.DateFormat;
-import java.util.Date;
-
-import butterknife.BindView;
 import retrofit2.adapter.rxjava.HttpException;
 
 
@@ -83,7 +82,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
         /********************   if already have apiKey, jump over login steps ***********/
         if(!Key.equalsIgnoreCase("")){
             //login
-            RetrofitClient.setRestServer(serverURL);
+            RetrofitFactory.getInstance().changeServer(serverURL);
             Intent intent = new Intent(activity, MainActivity.class);
             startActivity(intent);
             finish();
@@ -189,7 +188,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
             serverURL = serverURLView.getText().toString();
         }else serverURL = DeviceStatus.BASE_URL;
 
-        RetrofitClient.setRestServer(serverURL);
+        RetrofitFactory.getInstance().changeServer(serverURL);
 
         Log.v(LOG_TAG,serverURL);
         usernameView.setError(null);
@@ -238,7 +237,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
                     serverURL = serverURLView.getText().toString();
                 }else serverURL = DeviceStatus.BASE_URL;
 
-                RetrofitClient.setRestServer(serverURL);
+                RetrofitFactory.getInstance().changeServer(serverURL);
 
                 Log.v(LOG_TAG,serverURL);
 
@@ -359,7 +358,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
     public void loginSuc(UserModel user) {
         String userCompleteName = "";
         userCompleteName = user.getPerson().getCompleteName();
-        if(userCompleteName!="" && userCompleteName!=null){
+//        if(userCompleteName!="" && userCompleteName!=null){
             PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.USER_NAME, user.getPerson().getCompleteName());
             PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.FAMILY_NAME, user.getPerson().getFamilyName());
             PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.GIVEN_NAME, user.getPerson().getGivenName());
@@ -376,7 +375,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
                 accountLogin(user.getPerson().getId(),false);
             }
 
-        }
+//        }
     }
 
     @Override

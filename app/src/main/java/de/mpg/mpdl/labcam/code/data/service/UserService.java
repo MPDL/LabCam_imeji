@@ -2,7 +2,6 @@ package de.mpg.mpdl.labcam.code.data.service;
 
 import de.mpg.mpdl.labcam.code.base.BaseService;
 import de.mpg.mpdl.labcam.code.data.model.UserModel;
-
 import rx.Observable;
 
 /**

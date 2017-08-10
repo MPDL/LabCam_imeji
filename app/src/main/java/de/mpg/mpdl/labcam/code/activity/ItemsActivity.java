@@ -10,6 +10,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
 import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.R;
@@ -20,11 +24,6 @@ import de.mpg.mpdl.labcam.code.injection.component.DaggerCollectionComponent;
 import de.mpg.mpdl.labcam.code.injection.module.ItemMessageModule;
 import de.mpg.mpdl.labcam.code.mvp.presenter.ItemsPresenter;
 import de.mpg.mpdl.labcam.code.mvp.view.ItemsView;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import butterknife.BindView;
 
 /**
  * Created by allen on 03/09/15.

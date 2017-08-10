@@ -1,8 +1,7 @@
 package de.mpg.mpdl.labcam.code.utils;
 
-import com.google.gson.Gson;
-
 import com.activeandroid.serializer.TypeSerializer;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -24,9 +24,7 @@ import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.drew.metadata.exif.ExifThumbnailDirectory;
 import com.drew.metadata.exif.GpsDirectory;
 
-import de.mpg.mpdl.labcam.Model.LocalModel.Image;
-import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
-
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,6 +41,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
 
+import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
+
 /**
  * Created by allen on 09/04/15.
  */
@@ -53,9 +54,27 @@ public class DeviceStatus {
     public static final String username = "";
     public static final String password = "";
  //   public static final String BASE_URL= "";
-    public static final String BASE_URL = "https://gluons.mpdl.mpg.de/imeji/rest/";
+    public static final String BASE_URL = "http://qa-imeji.mpdl.mpg.de/imeji/rest/";
 
 //    public static final String BASE_URL = "http://test-gluons.mpdl.mpg.de/imeji/rest/";
+
+    private static String[] labCamTemplateProfileLabels = {"Make",
+            "Model",
+            "ISO Speed Ratings",
+            "Creation Date",
+            "Geolocation",
+            "GPS Version ID",
+            "Sensing Method",
+            "Aperture Value",
+            "Color Space",
+            "Exposure Time",
+            "Note",
+            "OCR"};
+    private static String[] labCamTemplateProfileTypes ={"text",
+            "text",
+            "number",
+            "date", "geolocation", "text", "text", "text", "text", "text", "text", "text"};
+
 
     // Checks whether the device currently has a network connection
     public static boolean isNetworkEnabled(Activity activity) {
@@ -242,7 +261,7 @@ public class DeviceStatus {
 
     }
 
-    public static String metaDataJson(String imagePath, Boolean[] typeList, boolean ocrIsOn, Context context, String userId, String serverName){
+    public static String metaDataJson(String collectionId, String imagePath, Boolean[] typeList, boolean ocrIsOn, Context context, String userId, String serverName){
 
         String metaDataJsonStr = null;
 
@@ -252,7 +271,7 @@ public class DeviceStatus {
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(file);
 
-            metaDataJsonStr =  generateJsonStr(metadata, typeList, context, imagePath, ocrIsOn, userId, serverName);
+            metaDataJsonStr =  generateJsonStr(collectionId, metadata, typeList, context, imagePath, ocrIsOn, userId, serverName);
 
             print(metadata);
         } catch (ImageProcessingException e) {
@@ -265,12 +284,7 @@ public class DeviceStatus {
         return metaDataJsonStr;
     }
 
-
-    /**
-     * generate json string
-     * @param metadata
-     */
-    private static String generateJsonStr(Metadata metadata, Boolean[] typeList, Context context, String imagePath, boolean ocrIsOn, String userId, String serverName){
+    private static String generateJsonStr(String collectionId, Metadata metadata, Boolean[] typeList, Context context, String imagePath, boolean ocrIsOn, String userId, String serverName){
 
         String metaDataJsonStr = null;
 
@@ -367,39 +381,80 @@ public class DeviceStatus {
         }
         try {
             JSONObject jsonObject = new JSONObject();
+            jsonObject.put("collectionId", collectionId);
+            JSONArray mdArray = new JSONArray();
             if(typeList[0]){
-                jsonObject.put("Make", makeStr);
+                JSONObject mdObj = new JSONObject();
+                mdObj.put("index",labCamTemplateProfileLabels[0]);
+                mdObj.put(labCamTemplateProfileTypes[0], "make");
+                mdArray.put(mdObj);
             }
             if(typeList[1]){
-                jsonObject.put("Model", modelStr);
+                JSONObject mdObj = new JSONObject();
+                mdObj.put("index",labCamTemplateProfileLabels[1]);
+                mdObj.put(labCamTemplateProfileTypes[1], modelStr);
+                mdArray.put(mdObj);
             }
             if(typeList[2]){
-                jsonObject.put("ISO Speed Ratings", ISOSpeedRating);
+                JSONObject mdObj = new JSONObject();
+                mdObj.put("index",labCamTemplateProfileLabels[2]);
+                mdObj.put(labCamTemplateProfileTypes[2], ISOSpeedRating);
+                mdArray.put(mdObj);
             }
             if(typeList[3]){
-                jsonObject.put("Creation Date", CreationDateStr);
+                JSONObject mdObj = new JSONObject();
+                mdObj.put("index",labCamTemplateProfileLabels[3]);
+                mdObj.put(labCamTemplateProfileTypes[3], CreationDateStr);
+                mdArray.put(mdObj);
             }
             if(typeList[4]){
-                jsonObject.put("Geolocation", new JSONObject()
+                JSONObject mdObj = new JSONObject();
+                mdObj.put("index",labCamTemplateProfileLabels[4]);
+                mdObj.put(labCamTemplateProfileTypes[4], new JSONObject()
                         .put("name", "")
                         .put("longitude", latitudeStr)
                         .put("latitude", longitudeStr));
+                mdArray.put(mdObj);
+
             }if(typeList[5]){
-                jsonObject.put("GPS Version ID", GPSVersionIDStr);
+                JSONObject mdObj = new JSONObject();
+                mdObj.put("index",labCamTemplateProfileLabels[5]);
+                mdObj.put(labCamTemplateProfileTypes[5], GPSVersionIDStr);
+                mdArray.put(mdObj);
             }if(typeList[6]){
-                jsonObject.put("Sensing Method", SensingMethodStr);
+                JSONObject mdObj = new JSONObject();
+                mdObj.put("index",labCamTemplateProfileLabels[6]);
+                mdObj.put(labCamTemplateProfileTypes[6], SensingMethodStr);
+                mdArray.put(mdObj);
             }if(typeList[7]){
-                jsonObject.put("Aperture Value", ApertureValueStr);
+                JSONObject mdObj = new JSONObject();
+                mdObj.put("index",labCamTemplateProfileLabels[7]);
+                mdObj.put(labCamTemplateProfileTypes[7], SensingMethodStr);
+                mdArray.put(mdObj);
             }if(typeList[8]){
-                jsonObject.put("Color Space", ColorSpaceStr);
+                JSONObject mdObj = new JSONObject();
+                mdObj.put("index",labCamTemplateProfileLabels[8]);
+                mdObj.put(labCamTemplateProfileTypes[8], ColorSpaceStr);
+                mdArray.put(mdObj);
             }if(typeList[9]){
-                jsonObject.put("Exposure Time", ExposureTimeStr);
+                JSONObject mdObj = new JSONObject();
+                mdObj.put("index",labCamTemplateProfileLabels[9]);
+                mdObj.put(labCamTemplateProfileTypes[9], ExposureTimeStr);
+                mdArray.put(mdObj);
             }if(typeList[10]) {
-                jsonObject.put("Note", note);
+                JSONObject mdObj = new JSONObject();
+                mdObj.put("index",labCamTemplateProfileLabels[10]);
+                mdObj.put(labCamTemplateProfileTypes[10], note);
+                mdArray.put(mdObj);
             }if(typeList[11]){
-                    jsonObject.put("OCR", ocr);
+                JSONObject mdObj = new JSONObject();
+                mdObj.put("index",labCamTemplateProfileLabels[11]);
+                mdObj.put(labCamTemplateProfileTypes[11], ocr);
+                mdArray.put(mdObj);
             }
+//            jsonObject.put("metadata", mdArray);
             metaDataJsonStr = jsonObject.toString();
+            Log.e(LOG_TAG, metaDataJsonStr);
         } catch (JSONException e) {
             e.printStackTrace();
         }

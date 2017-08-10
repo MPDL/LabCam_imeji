@@ -15,6 +15,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import butterknife.BindView;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.ViewPagerAdapter;
@@ -25,13 +31,6 @@ import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
 import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import butterknife.BindView;
 import rx.Subscription;
 
 import static de.mpg.mpdl.labcam.code.utils.BatchOperationUtils.noteDialogNewInstance;

@@ -3,7 +3,6 @@ package de.mpg.mpdl.labcam.code.data.net.api;
 import com.google.gson.JsonObject;
 
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
-
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;

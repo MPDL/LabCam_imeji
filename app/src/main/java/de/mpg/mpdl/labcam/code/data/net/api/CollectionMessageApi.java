@@ -1,7 +1,6 @@
 package de.mpg.mpdl.labcam.code.data.net.api;
 
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
-
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 import rx.Observable;

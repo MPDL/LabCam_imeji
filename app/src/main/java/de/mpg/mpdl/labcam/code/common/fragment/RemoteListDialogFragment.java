@@ -1,7 +1,5 @@
 package de.mpg.mpdl.labcam.code.common.fragment;
 
-import com.google.gson.JsonObject;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -21,12 +19,21 @@ import android.widget.Toast;
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URL;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.Retrofit.RetrofitClient;
 import de.mpg.mpdl.labcam.code.activity.QRScannerActivity;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
 import de.mpg.mpdl.labcam.code.base.BaseMvpDialogFragment;
@@ -41,15 +48,6 @@ import de.mpg.mpdl.labcam.code.mvp.presenter.RemoteCollectionDialogPresenter;
 import de.mpg.mpdl.labcam.code.mvp.view.RemoteCollectionDialogView;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.URL;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import static de.mpg.mpdl.labcam.code.utils.BatchOperationUtils.addImages;
 
@@ -285,7 +283,7 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
     @Override
     protected void initContentView(Bundle savedInstanceState) {
         //updateFolder
-        String q = "grant=\"upload\"";
+        String q = "role=edit";
         mPresenter.getGrantedCollectionMessage(q, activity);
     }
 

@@ -10,6 +10,10 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import java.util.Iterator;
+import java.util.List;
+
+import butterknife.BindView;
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
@@ -20,11 +24,6 @@ import de.mpg.mpdl.labcam.code.common.observer.DatabaseObserver;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
-
-import java.util.Iterator;
-import java.util.List;
-
-import butterknife.BindView;
 
 public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTaskInterface {
 

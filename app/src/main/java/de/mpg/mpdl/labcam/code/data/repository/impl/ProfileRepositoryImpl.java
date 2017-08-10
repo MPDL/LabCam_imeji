@@ -2,13 +2,12 @@ package de.mpg.mpdl.labcam.code.data.repository.impl;
 
 import com.google.gson.JsonObject;
 
+import javax.inject.Inject;
+
 import de.mpg.mpdl.labcam.code.data.model.TO.MetadataProfileTO;
 import de.mpg.mpdl.labcam.code.data.net.RetrofitFactory;
 import de.mpg.mpdl.labcam.code.data.net.api.ProfileApi;
 import de.mpg.mpdl.labcam.code.data.repository.ProfileRepository;
-
-import javax.inject.Inject;
-
 import retrofit2.Response;
 import rx.Observable;
 

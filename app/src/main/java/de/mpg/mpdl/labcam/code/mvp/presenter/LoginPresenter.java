@@ -1,5 +1,7 @@
 package de.mpg.mpdl.labcam.code.mvp.presenter;
 
+import javax.inject.Inject;
+
 import de.mpg.mpdl.labcam.code.base.BaseAbstractPresenter;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
 import de.mpg.mpdl.labcam.code.base.BaseSubscriber;
@@ -8,8 +10,6 @@ import de.mpg.mpdl.labcam.code.data.model.UserModel;
 import de.mpg.mpdl.labcam.code.data.service.ImejiFolderService;
 import de.mpg.mpdl.labcam.code.data.service.UserService;
 import de.mpg.mpdl.labcam.code.mvp.view.LoginView;
-
-import javax.inject.Inject;
 
 /**
  * Created by yingli on 3/16/17.

@@ -2,6 +2,8 @@ package de.mpg.mpdl.labcam.code.mvp.presenter;
 
 import com.google.gson.JsonObject;
 
+import javax.inject.Inject;
+
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.code.base.BaseAbstractPresenter;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
@@ -10,8 +12,6 @@ import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.data.service.CollectionMessageService;
 import de.mpg.mpdl.labcam.code.data.service.ImejiFolderService;
 import de.mpg.mpdl.labcam.code.mvp.view.RemoteCollectionDialogView;
-
-import javax.inject.Inject;
 
 /**
  * Created by yingli on 3/28/17.

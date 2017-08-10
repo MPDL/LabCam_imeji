@@ -15,13 +15,13 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-import de.mpg.mpdl.labcam.R;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import de.mpg.mpdl.labcam.R;
 
 /**
  * Created by yingli on 4/7/16.

@@ -8,9 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import de.mpg.mpdl.labcam.R;
-
 import java.util.List;
+
+import de.mpg.mpdl.labcam.R;
 
 /**
  * Created by yingli on 2/7/17.

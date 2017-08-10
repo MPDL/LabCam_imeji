@@ -9,17 +9,16 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
 import de.mpg.mpdl.labcam.Model.LocalModel.Voice;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.base.BaseCompatActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.RecentVoiceAdapter;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import butterknife.BindView;
 
 /**
  * Created by Yunqing on 20.12.16.

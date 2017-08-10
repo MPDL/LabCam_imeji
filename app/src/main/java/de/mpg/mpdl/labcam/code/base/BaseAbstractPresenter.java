@@ -2,9 +2,9 @@ package de.mpg.mpdl.labcam.code.base;
 
 import android.content.Context;
 
-import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
-
 import javax.inject.Inject;
+
+import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 
 public class BaseAbstractPresenter<T extends BaseView> implements BasePresenter<T> {
     @Inject

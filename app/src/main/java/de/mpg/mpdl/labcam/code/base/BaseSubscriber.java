@@ -4,14 +4,13 @@ import android.net.ParseException;
 import android.text.TextUtils;
 import android.util.Log;
 
-import de.mpg.mpdl.labcam.code.data.exception.BusinessException;
-
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 
+import de.mpg.mpdl.labcam.code.data.exception.BusinessException;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import retrofit2.adapter.rxjava.HttpException;

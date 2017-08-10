@@ -17,10 +17,9 @@ package de.mpg.mpdl.labcam.code.injection.module;
 
 import android.app.Activity;
 
-import de.mpg.mpdl.labcam.code.injection.PerActivity;
-
 import dagger.Module;
 import dagger.Provides;
+import de.mpg.mpdl.labcam.code.injection.PerActivity;
 
 /**
  * A module to wrap the Activity state and expose it to the graph.

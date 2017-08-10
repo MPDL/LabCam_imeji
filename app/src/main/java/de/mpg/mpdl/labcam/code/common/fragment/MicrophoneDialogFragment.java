@@ -23,6 +23,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
@@ -32,12 +38,6 @@ import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
 import de.mpg.mpdl.labcam.code.utils.BatchOperationUtils;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 import de.mpg.mpdl.labcam.code.utils.ToastUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by yingli on 11/24/16.

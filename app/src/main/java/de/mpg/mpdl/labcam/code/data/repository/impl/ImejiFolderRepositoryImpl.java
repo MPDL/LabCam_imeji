@@ -2,13 +2,12 @@ package de.mpg.mpdl.labcam.code.data.repository.impl;
 
 import com.google.gson.JsonObject;
 
+import javax.inject.Inject;
+
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.data.net.RetrofitFactory;
 import de.mpg.mpdl.labcam.code.data.net.api.ImejiFolderApi;
 import de.mpg.mpdl.labcam.code.data.repository.ImejiFolderRepository;
-
-import javax.inject.Inject;
-
 import rx.Observable;
 
 /**

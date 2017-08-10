@@ -11,12 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import butterknife.ButterKnife;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.injection.component.ApplicationComponent;
 import de.mpg.mpdl.labcam.code.injection.module.ActivityModule;
 import de.mpg.mpdl.labcam.code.utils.ToastUtils;
-
-import butterknife.ButterKnife;
 
 /**
  * Created by yingli on 3/28/17.

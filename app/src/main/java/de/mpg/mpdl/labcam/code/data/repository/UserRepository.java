@@ -1,7 +1,6 @@
 package de.mpg.mpdl.labcam.code.data.repository;
 
 import de.mpg.mpdl.labcam.code.data.model.UserModel;
-
 import rx.Observable;
 
 /**

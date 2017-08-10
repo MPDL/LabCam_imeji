@@ -3,16 +3,16 @@ package de.mpg.mpdl.labcam.code.utils;
 import android.media.ExifInterface;
 import android.os.Bundle;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.code.common.fragment.MicrophoneDialogFragment;
 import de.mpg.mpdl.labcam.code.common.fragment.NoteDialogFragment;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by yingli on 3/3/17.

@@ -18,12 +18,11 @@ import com.jph.takephoto.permission.InvokeListener;
 import com.jph.takephoto.permission.PermissionManager;
 import com.jph.takephoto.permission.TakePhotoInvocationHandler;
 
-import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.code.common.widget.PhotoDialog;
-
 import java.io.File;
 
 import butterknife.ButterKnife;
+import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.code.common.widget.PhotoDialog;
 
 @SuppressLint("NewApi")
 public abstract class BaseCompatWithPhotoActivity extends BaseActivity implements TakePhoto.TakeResultListener, InvokeListener {

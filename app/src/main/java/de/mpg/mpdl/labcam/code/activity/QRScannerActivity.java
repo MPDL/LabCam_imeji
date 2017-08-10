@@ -1,11 +1,11 @@
 package de.mpg.mpdl.labcam.code.activity;
 
-import com.google.zxing.Result;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+
+import com.google.zxing.Result;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 

@@ -17,12 +17,12 @@ import com.jph.takephoto.permission.InvokeListener;
 import com.jph.takephoto.permission.PermissionManager;
 import com.jph.takephoto.permission.TakePhotoInvocationHandler;
 
-import de.mpg.mpdl.labcam.R;
-import de.mpg.mpdl.labcam.code.common.widget.PhotoDialog;
-
 import java.io.File;
 
 import javax.inject.Inject;
+
+import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.code.common.widget.PhotoDialog;
 
 
 public abstract class BaseMvpWithPhotoActivity<T extends BasePresenter> extends BaseCompatActivity implements

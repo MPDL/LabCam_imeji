@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import java.util.List;
+
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
@@ -20,8 +22,6 @@ import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
 import de.mpg.mpdl.labcam.code.utils.BatchOperationUtils;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
-
-import java.util.List;
 
 /**
  * Created by yingli on 11/24/16.

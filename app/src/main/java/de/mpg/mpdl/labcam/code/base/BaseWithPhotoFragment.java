@@ -25,14 +25,14 @@ import com.jph.takephoto.permission.InvokeListener;
 import com.jph.takephoto.permission.PermissionManager;
 import com.jph.takephoto.permission.TakePhotoInvocationHandler;
 
+import java.io.File;
+
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.common.widget.PhotoDialog;
 import de.mpg.mpdl.labcam.code.injection.component.ApplicationComponent;
 import de.mpg.mpdl.labcam.code.injection.module.ActivityModule;
 import de.mpg.mpdl.labcam.code.utils.ToastUtils;
-
-import java.io.File;
 
 
 public class BaseWithPhotoFragment extends Fragment implements TakePhoto.TakeResultListener, InvokeListener {

@@ -1,11 +1,10 @@
 package de.mpg.mpdl.labcam.code.data.service.impl;
 
+import javax.inject.Inject;
+
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.code.data.repository.CollectionMessageRepository;
 import de.mpg.mpdl.labcam.code.data.service.CollectionMessageService;
-
-import javax.inject.Inject;
-
 import rx.Observable;
 
 /**

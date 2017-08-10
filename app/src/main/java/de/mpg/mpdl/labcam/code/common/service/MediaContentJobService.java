@@ -16,6 +16,10 @@ import android.util.Log;
 
 import com.activeandroid.query.Select;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
@@ -24,10 +28,6 @@ import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by yingli on 2/14/17.

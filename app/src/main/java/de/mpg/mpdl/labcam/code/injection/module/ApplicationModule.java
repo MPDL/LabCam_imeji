@@ -2,12 +2,11 @@ package de.mpg.mpdl.labcam.code.injection.module;
 
 import android.content.Context;
 
-import de.mpg.mpdl.labcam.code.base.BaseApplication;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import de.mpg.mpdl.labcam.code.base.BaseApplication;
 
 @Module
 public class ApplicationModule {

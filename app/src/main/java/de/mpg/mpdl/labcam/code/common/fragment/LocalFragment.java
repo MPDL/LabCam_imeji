@@ -33,6 +33,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.activity.ActiveTaskActivity;
@@ -50,14 +57,6 @@ import de.mpg.mpdl.labcam.code.rxbus.event.NoteRefreshEvent;
 import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 import rx.Subscription;
 

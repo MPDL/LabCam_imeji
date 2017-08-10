@@ -2,7 +2,6 @@ package de.mpg.mpdl.labcam.code.data.net.api;
 
 
 import de.mpg.mpdl.labcam.code.data.model.UserModel;
-
 import retrofit2.http.POST;
 import rx.Observable;
 

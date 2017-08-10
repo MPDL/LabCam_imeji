@@ -1,12 +1,11 @@
 package de.mpg.mpdl.labcam.code.data.repository.impl;
 
+import javax.inject.Inject;
+
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.code.data.net.RetrofitFactory;
 import de.mpg.mpdl.labcam.code.data.net.api.ItemMessageApi;
 import de.mpg.mpdl.labcam.code.data.repository.ItemMessageRepository;
-
-import javax.inject.Inject;
-
 import rx.Observable;
 
 /**

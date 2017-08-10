@@ -1,4 +1,5 @@
 package de.mpg.mpdl.labcam.code.common.fragment;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -19,23 +20,20 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import butterknife.OnTouch;
-import de.mpg.mpdl.labcam.code.activity.DetailActivity;
-import rx.Observable;
-
 import butterknife.BindView;
+import butterknife.OnTouch;
 import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.Model.MessageModel.Person;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.code.activity.DetailActivity;
 import de.mpg.mpdl.labcam.code.activity.ItemsActivity;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
 import de.mpg.mpdl.labcam.code.base.BaseMvpFragment;
@@ -48,6 +46,7 @@ import de.mpg.mpdl.labcam.code.mvp.presenter.ImejiPresenter;
 import de.mpg.mpdl.labcam.code.mvp.view.ImejiView;
 import de.mpg.mpdl.labcam.code.utils.FastImageLoader;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
+import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
 

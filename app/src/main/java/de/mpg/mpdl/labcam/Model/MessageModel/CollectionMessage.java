@@ -4,10 +4,10 @@ package de.mpg.mpdl.labcam.Model.MessageModel;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 
 /**
  * Created by yingli on 1/11/16.

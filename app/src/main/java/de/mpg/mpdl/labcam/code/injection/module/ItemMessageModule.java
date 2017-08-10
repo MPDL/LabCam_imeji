@@ -1,12 +1,11 @@
 package de.mpg.mpdl.labcam.code.injection.module;
 
+import dagger.Module;
+import dagger.Provides;
 import de.mpg.mpdl.labcam.code.data.repository.ItemMessageRepository;
 import de.mpg.mpdl.labcam.code.data.repository.impl.ItemMessageRepositoryImpl;
 import de.mpg.mpdl.labcam.code.data.service.ItemMessageService;
 import de.mpg.mpdl.labcam.code.data.service.impl.ItemMessageServiceImp;
-
-import dagger.Module;
-import dagger.Provides;
 
 /**
  * Created by yingli on 3/20/17.

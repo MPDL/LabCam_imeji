@@ -5,10 +5,10 @@ import android.net.Uri;
 
 import com.squareup.picasso.UrlConnectionDownloader;
 
-import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
+
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 /**
  * Created by yingli on 4/11/16.

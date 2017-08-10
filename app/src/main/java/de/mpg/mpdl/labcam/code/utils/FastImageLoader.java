@@ -1,4 +1,5 @@
 package de.mpg.mpdl.labcam.code.utils;
+
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
@@ -10,12 +11,12 @@ import android.os.StrictMode;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 
-import de.mpg.mpdl.labcam.code.common.fragment.CollectionViewFragment;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import de.mpg.mpdl.labcam.code.common.fragment.CollectionViewFragment;
 
 
 public class FastImageLoader extends Application {

@@ -1,13 +1,13 @@
 package de.mpg.mpdl.labcam.code.mvp.presenter;
 
+import javax.inject.Inject;
+
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.code.base.BaseAbstractPresenter;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
 import de.mpg.mpdl.labcam.code.base.BaseSubscriber;
 import de.mpg.mpdl.labcam.code.data.service.ItemMessageService;
 import de.mpg.mpdl.labcam.code.mvp.view.ItemsView;
-
-import javax.inject.Inject;
 
 /**
  * Created by yingli on 3/20/17.

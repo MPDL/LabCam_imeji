@@ -3,7 +3,6 @@ package de.mpg.mpdl.labcam.code.common.observer;
 import android.content.Context;
 import android.database.ContentObserver;
 import android.os.Handler;
-import android.util.Log;
 
 public class DatabaseObserver extends ContentObserver {
 

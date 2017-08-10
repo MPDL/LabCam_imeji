@@ -1,7 +1,5 @@
 package de.mpg.mpdl.labcam.code.activity;
 
-import com.google.gson.JsonObject;
-
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.app.job.JobInfo;
@@ -38,8 +36,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.activeandroid.query.Delete;
+import com.google.gson.JsonObject;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import butterknife.BindView;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
@@ -64,12 +68,6 @@ import de.mpg.mpdl.labcam.code.mvp.presenter.MainPresenter;
 import de.mpg.mpdl.labcam.code.mvp.view.MainView;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import butterknife.BindView;
 
 /**
  * Created by kiran on 25.08.15.
@@ -545,7 +543,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
     }
 
     private void updateFolder(){
-        String q = "grant=\"upload\"";
+        String q = "role=edit";
         mPresenter.getGrantedCollectionMessage(q, activity);
     }
 

@@ -1,12 +1,11 @@
 package de.mpg.mpdl.labcam.code.data.repository.impl;
 
+import javax.inject.Inject;
+
 import de.mpg.mpdl.labcam.code.data.model.UserModel;
 import de.mpg.mpdl.labcam.code.data.net.RetrofitFactory;
 import de.mpg.mpdl.labcam.code.data.net.api.UserApi;
 import de.mpg.mpdl.labcam.code.data.repository.UserRepository;
-
-import javax.inject.Inject;
-
 import rx.Observable;
 
 /**

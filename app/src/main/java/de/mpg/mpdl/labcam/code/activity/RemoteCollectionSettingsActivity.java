@@ -1,7 +1,5 @@
 package de.mpg.mpdl.labcam.code.activity;
 
-import com.google.gson.JsonObject;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -20,7 +18,13 @@ import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
+import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import butterknife.BindView;
 import de.mpg.mpdl.labcam.Model.ImejiFolder;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
@@ -39,12 +43,6 @@ import de.mpg.mpdl.labcam.code.mvp.view.RemoteCollectionSettingsView;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 import de.mpg.mpdl.labcam.code.utils.QRUtils;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import butterknife.BindView;
 
 public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteCollectionSettingsPresenter> implements RemoteCollectionSettingsView, CollectionIdInterface{
 
@@ -81,7 +79,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
     }
 
     private void updateFolder(){
-        String q = "grant=\"upload\"";
+        String q = "role=edit";
         mPresenter.getGrantedCollectionMessage(q, activity);
     }
 

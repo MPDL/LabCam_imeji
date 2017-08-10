@@ -3,7 +3,6 @@ package de.mpg.mpdl.labcam.code.data.repository;
 import com.google.gson.JsonObject;
 
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
-
 import rx.Observable;
 
 
