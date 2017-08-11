@@ -1,6 +1,5 @@
 package de.mpg.mpdl.labcam.code.common.service;
 
-import android.accounts.NetworkErrorException;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -18,7 +17,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.NotificationID;
 import de.mpg.mpdl.labcam.R;
@@ -35,7 +33,6 @@ import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
-import retrofit2.adapter.rxjava.HttpException;
 
 /**
  * Created by yingli on 7/26/16.
@@ -153,11 +150,9 @@ public class UploadService {
 
         imageFile = MultipartUtil.prepareFilePart("file",imgPath);
         Log.v(TAG, "start uploading: " + imgPath);
-        MultipartBody.Part body = MultipartUtil.prepareFilePart("img", imgPath);
         HashMap<String, RequestBody> map = new HashMap<>();
         //upload item with new API
-        json = "{\'collectionId\':\'nphXUBnqYj3T7rWG\',\'metadata\':[]}";
-        Call<okhttp3.ResponseBody> call = uploadRepository.uploadItem(imageFile, json);
+        Call<okhttp3.ResponseBody> call = uploadRepository.uploadItem(imageFile, MultipartUtil.createPartFromString(json));
         call.enqueue(new retrofit2.Callback<okhttp3.ResponseBody>() {
             @Override
             public void onResponse(Call<okhttp3.ResponseBody> call, retrofit2.Response<okhttp3.ResponseBody> response) {

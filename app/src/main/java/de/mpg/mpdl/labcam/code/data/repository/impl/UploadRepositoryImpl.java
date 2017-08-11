@@ -3,8 +3,10 @@ package de.mpg.mpdl.labcam.code.data.repository.impl;
 import javax.inject.Inject;
 
 import de.mpg.mpdl.labcam.code.data.net.RetrofitFactory;
+import de.mpg.mpdl.labcam.code.data.net.api.UploadApi;
 import de.mpg.mpdl.labcam.code.data.repository.UploadRepository;
 import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 
@@ -20,7 +22,7 @@ public class UploadRepositoryImpl implements UploadRepository{
     }
 
     @Override
-    public Call<ResponseBody> uploadItem(MultipartBody.Part file, String json) {
-        return RetrofitFactory.getInstance().create(RetrofitFactory.ImejiAPI.class).uploadItem(file, json);
+    public Call<ResponseBody> uploadItem(MultipartBody.Part file, RequestBody json) {
+        return RetrofitFactory.getInstance().create(UploadApi.class).uploadItem(file, json);
     }
 }

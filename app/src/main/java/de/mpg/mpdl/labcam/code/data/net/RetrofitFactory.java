@@ -17,19 +17,13 @@ import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 import okhttp3.Interceptor;
-import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Multipart;
-import retrofit2.http.POST;
-import retrofit2.http.Part;
 
 public class RetrofitFactory {
 
@@ -143,16 +137,4 @@ public class RetrofitFactory {
         return gson;
     }
 
-    /**
-     * Created by allen on 27/08/15.
-     */
-    public static interface ImejiAPI {
-        @Multipart
-        @POST("items")
-        Call<ResponseBody> uploadItem(
-                @Part MultipartBody.Part file,
-                @Part("json") String json
-        );
-
-    }
 }
