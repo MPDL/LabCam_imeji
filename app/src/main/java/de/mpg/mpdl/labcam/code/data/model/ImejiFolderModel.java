@@ -3,7 +3,6 @@ package de.mpg.mpdl.labcam.code.data.model;
 import java.net.URL;
 import java.util.List;
 
-import de.mpg.mpdl.labcam.Model.ImejiProfile;
 import de.mpg.mpdl.labcam.Model.MessageModel.Person;
 
 /**
@@ -25,8 +24,6 @@ public class ImejiFolderModel {
     private CreatedByModel createdBy;
 
     private List<Person> contributors;
-
-    private ImejiProfile profile;
 
     private List<URL> imageUrls;
 
@@ -54,14 +51,6 @@ public class ImejiFolderModel {
 
     public void setContributors(List<Person> contributors) {
         this.contributors = contributors;
-    }
-
-    public ImejiProfile getProfile() {
-        return profile;
-    }
-
-    public void setProfile(ImejiProfile profile) {
-        this.profile = profile;
     }
 
     public String getTitle() {
