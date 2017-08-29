@@ -142,7 +142,7 @@ public class ItemsActivity extends BaseMvpActivity<ItemsPresenter> implements It
         // Deserialize API response and then construct new objects to append to the adapter
         // Add the new objects to the data source for the adapter
         for (DataItem item : dataListLocal) {
-            imagePathList.add(item.getWebResolutionUrlUrl());
+            imagePathList.add(item.getFileUrl());
         }
 
         if(paging == 0){

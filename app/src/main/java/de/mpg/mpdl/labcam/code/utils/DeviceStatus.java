@@ -6,9 +6,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.location.LocationManager;
+import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
@@ -41,6 +44,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
 
+import de.mpg.mpdl.labcam.Model.LineAttributes;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 
@@ -56,7 +60,7 @@ public class DeviceStatus {
  //   public static final String BASE_URL= "";
     public static final String BASE_URL = "http://qa-imeji.mpdl.mpg.de/imeji/rest/";
 
-//    public static final String BASE_URL = "http://test-gluons.mpdl.mpg.de/imeji/rest/";
+//    public static final String BASE_URL = "https://test-gluons.mpdl.mpg.de/imeji/rest/";
 
     private static String[] labCamTemplateProfileLabels = {"Make",
             "Model",
@@ -410,10 +414,8 @@ public class DeviceStatus {
             if(typeList[4]){
                 JSONObject mdObj = new JSONObject();
                 mdObj.put("index",labCamTemplateProfileLabels[4]);
-                mdObj.put(labCamTemplateProfileTypes[4], new JSONObject()
-                        .put("name", "")
-                        .put("longitude", latitudeStr)
-                        .put("latitude", longitudeStr));
+                mdObj.put("longitude", latitudeStr);
+                mdObj.put("latitude", longitudeStr);
                 mdArray.put(mdObj);
 
             }if(typeList[5]){
@@ -429,7 +431,7 @@ public class DeviceStatus {
             }if(typeList[7]){
                 JSONObject mdObj = new JSONObject();
                 mdObj.put("index",labCamTemplateProfileLabels[7]);
-                mdObj.put(labCamTemplateProfileTypes[7], SensingMethodStr);
+                mdObj.put(labCamTemplateProfileTypes[7], ApertureValueStr);
                 mdArray.put(mdObj);
             }if(typeList[8]){
                 JSONObject mdObj = new JSONObject();
@@ -452,7 +454,7 @@ public class DeviceStatus {
                 mdObj.put(labCamTemplateProfileTypes[11], ocr);
                 mdArray.put(mdObj);
             }
-//            jsonObject.put("metadata", mdArray);
+            jsonObject.put("metadata", mdArray);
             metaDataJsonStr = jsonObject.toString();
             Log.e(LOG_TAG, metaDataJsonStr);
         } catch (JSONException e) {
@@ -540,6 +542,5 @@ public class DeviceStatus {
         }
         return false;
     }
-
 
 }

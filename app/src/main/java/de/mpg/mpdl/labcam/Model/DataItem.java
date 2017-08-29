@@ -37,9 +37,13 @@ public class DataItem {
     @Column(name = "createdBy")
     private UserModel createdBy;
 
-    //@Expose
-    @Column(name = "metaData")
-    private MetaData metadata;
+//    //@Expose
+//    @Column(name = "metaData")
+//    private MetaData metadata;
+
+    @Expose
+    @Column(name = "mimetype")
+    private String mimetype;
 
     @Expose
     @Column(name = "collectionId")
@@ -96,12 +100,21 @@ public class DataItem {
         this.createdBy = createdBy;
     }
 
-    public MetaData getMetadata() {
-        return metadata;
+//    public MetaData getMetadata() {
+//        return metadata;
+//    }
+//
+//    public void setMetadata(MetaData metadata) {
+//        this.metadata = metadata;
+//    }
+
+
+    public String getMimetype() {
+        return mimetype;
     }
 
-    public void setMetadata(MetaData metadata) {
-        this.metadata = metadata;
+    public void setMimetype(String mimetype) {
+        this.mimetype = mimetype;
     }
 
     public String getCollectionId() {

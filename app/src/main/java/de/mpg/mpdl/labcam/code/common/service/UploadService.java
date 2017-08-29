@@ -4,19 +4,27 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import de.mpg.mpdl.labcam.Model.LineAttributes;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.Model.NotificationID;
 import de.mpg.mpdl.labcam.R;
@@ -28,10 +36,10 @@ import de.mpg.mpdl.labcam.code.data.repository.UploadRepository;
 import de.mpg.mpdl.labcam.code.injection.component.DaggerUploadComponent;
 import de.mpg.mpdl.labcam.code.injection.module.UploadModule;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
+import de.mpg.mpdl.labcam.code.utils.OCRHandler;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 
 /**
@@ -60,7 +68,7 @@ public class UploadService {
     private String collectionID;
 
     //compare labCam template profile
-    Boolean[] checkTypeList = {false,false,false,false,false,false,false,false,false,false,false,false};
+    Boolean[] checkTypeList = {true,true,true,true,true,true,true,true,true,true,true,false};
 
     boolean ocrIsOn = false;
 
@@ -102,10 +110,6 @@ public class UploadService {
     }
 
     private void startUpload() {
-        for (int i = 0;i <checkTypeList.length; i++) {
-            Log.e(TAG, checkTypeList[i]+"" +
-                    "");
-        }
         if(!taskIsStopped()){
 
             // waitingImages is a list join waiting (and failed)
@@ -124,12 +128,12 @@ public class UploadService {
 
             if (waitingImgPathList != null && waitingImgPathList.size() > 0) {             // whether task is finished or still have img for uploading
                 currentImagePath = waitingImgPathList.get(0);                                // important: set currentImageId
-                upload(waitingImgPathList.get(0));
+                prepareDate(waitingImgPathList.get(0));
             }
         }
     }
 
-    private void upload(String imgPath){
+    private void prepareDate(String imgPath){
         if(taskIsStopped()){
             return;
         }
@@ -150,8 +154,24 @@ public class UploadService {
 
         imageFile = MultipartUtil.prepareFilePart("file",imgPath);
         Log.v(TAG, "start uploading: " + imgPath);
-        HashMap<String, RequestBody> map = new HashMap<>();
-        //upload item with new API
+
+        if (ocrIsOn){
+            try {
+                Uri imageUri = Uri.fromFile(f);
+                getImageText(imageUri, context);
+            } catch(Throwable t){
+                Log.e(TAG, "could not parse malformed JSON, aborting");
+                upload(null);
+            }
+        }
+    }
+
+    private void upload(String ocr){
+        if(ocr!=null){
+            checkTypeList[checkTypeList.length-1] = true;
+        }else {
+            checkTypeList[checkTypeList.length-1] = false;
+        }
         Call<okhttp3.ResponseBody> call = uploadRepository.uploadItem(imageFile, MultipartUtil.createPartFromString(json));
         call.enqueue(new retrofit2.Callback<okhttp3.ResponseBody>() {
             @Override
@@ -180,7 +200,7 @@ public class UploadService {
                                 return;
                             }
 
-                            upload(currentImagePath);
+                            prepareDate(currentImagePath);
                         }
                     } else {
 
@@ -344,7 +364,7 @@ public class UploadService {
             // continue anyway
             if(task.getImagePaths()!=null && task.getImagePaths().size()>0){
                 currentImagePath = task.getImagePaths().get(0);
-                upload(currentImagePath);
+                prepareDate(currentImagePath);
             }
         }else {
             if(task.getUploadMode().equalsIgnoreCase("AU")){
@@ -418,5 +438,79 @@ public class UploadService {
 
         newAUTask.save();
 
+    }
+
+    private void getImageText(Uri imageUri, final Context context) {
+        String TAG = "OCR";
+        Bitmap bitmap;
+        OCRHandler.TaskParams params = null;
+        Log.e(TAG , "Setting up OCR params for image: " + imageUri.toString());
+        int imageHeight = 0;
+        int imageWidth = 0;
+        String rot = null;
+        try {
+            String path = imageUri.getPath();
+            ExifInterface exif = new ExifInterface(path);
+            rot = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+            Log.e(TAG , rot + " rotation ");
+        } catch (IOException e){
+            Log.e(TAG, "could not get file information");
+
+        }
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(new File(imageUri.getPath()).getAbsolutePath(), options);
+        imageHeight = options.outHeight;
+        imageWidth = options.outWidth;
+
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
+            if (rot != null && !rot.equals("0") || imageWidth > imageHeight){
+                {
+                    int rotInt = Integer.parseInt(rot);
+                    Log.e(TAG, "rotating image" + Integer.toString(imageWidth) + " " + Integer.toString(imageHeight));
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    int deg = 0;
+                    if (rotInt >= 2) {
+                        if (rotInt == 8) {
+                            deg = 90;
+                        } else if (rotInt == 3) {
+                            deg = 180;
+                        } else if (rotInt == 6) {
+                            deg = 270;
+                        }
+                        Log.e(TAG, "rotating by " + Integer.toString(360-deg));
+                        matrix.postRotate(360-deg);
+                    }
+                    bitmap =  Bitmap.createBitmap(bitmap, 0, 0, imageWidth, imageHeight, matrix, true);
+                }
+            }
+            params = new OCRHandler.TaskParams(bitmap, context.getApplicationContext());
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+            return;
+        }
+        OCRHandler.getText testAsyncTask = new OCRHandler.getText(new OCRHandler.FragmentCallback() {
+            @Override
+            public void onTaskDone(ArrayList<LineAttributes> lineAttributes) {
+                String text = null;
+                if (lineAttributes != null) {
+                    for (LineAttributes line : lineAttributes) {
+                        text = text + line.getText();
+                    }
+                }
+                Log.e(TAG, text);
+                upload(text);
+                return;
+            }
+        });
+        if (params != null) {
+            testAsyncTask.execute(params);
+        } else {
+            Log.e(TAG, "Task params are empty");
+        }
+        return;
     }
 }

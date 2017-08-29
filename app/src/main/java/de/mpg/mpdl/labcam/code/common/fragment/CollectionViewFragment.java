@@ -1,6 +1,7 @@
 package de.mpg.mpdl.labcam.code.common.fragment;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -20,11 +21,18 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnTouch;
@@ -38,6 +46,7 @@ import de.mpg.mpdl.labcam.code.activity.ItemsActivity;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
 import de.mpg.mpdl.labcam.code.base.BaseMvpFragment;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.common.widget.CustomImageDownaloder;
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.injection.component.DaggerCollectionComponent;
 import de.mpg.mpdl.labcam.code.injection.module.CollectionMessageModule;
@@ -77,6 +86,8 @@ public class CollectionViewFragment extends BaseMvpFragment<ImejiPresenter> impl
     BaseActivity activity;
     ScrollView globalView;
     private boolean syncComplete = false;
+    private Map<String, String> headers = new HashMap<>();
+    DisplayImageOptions options;
 
     @BindView(R.id.base_scroll_container)
     ScrollView rootView;
@@ -141,8 +152,6 @@ public class CollectionViewFragment extends BaseMvpFragment<ImejiPresenter> impl
     public Float dens;
 
     private List<ImejiFolderModel> collectionListLocal = new ArrayList<>();
-    private List<List<URL>> thumbNailUrls = new ArrayList<>();
-    private int index;
 
 
     Observer<PassUrls> urlListObserver = new Observer<PassUrls>() {
@@ -195,6 +204,22 @@ public class CollectionViewFragment extends BaseMvpFragment<ImejiPresenter> impl
     @Override
     protected void initContentView(Bundle savedInstanceState) {
         activity = (BaseActivity) getActivity();
+        String apiKey = PreferenceUtil.getString(activity, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
+        this.headers.put("Authorization","Bearer "+apiKey);
+
+        ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(activity)
+                .imageDownloader(new CustomImageDownaloder(activity))
+                .writeDebugLogs()
+                .build();
+
+        ImageLoader.getInstance().init(configuration);
+        options = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .extraForDownloader(headers)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .showImageOnFail(R.drawable.error_alert)
+                .build();
     }
 
     @Override
@@ -202,10 +227,6 @@ public class CollectionViewFragment extends BaseMvpFragment<ImejiPresenter> impl
         return R.layout.activity_layout_test;
     }
 
-    @Override
-    public void getItemsFail(Throwable e) {
-        Log.e(LOG_TAG, e.toString());
-    }
 
     @Override
     public void getCollectionsFail(Throwable e) {}
@@ -228,7 +249,15 @@ public class CollectionViewFragment extends BaseMvpFragment<ImejiPresenter> impl
         String id = null;
         for (DataItem image : imageItems){
             id = image.getCollectionId();
-            String urlString = image.getWebResolutionUrlUrl();
+            if(!image.getMimetype().contains("image")){ // only show image files
+                continue;
+            }
+            String urlString = image.getFileUrl();
+            if(null!=urlString) {
+                Log.e(LOG_TAG, urlString);
+            }else {
+                Log.e(LOG_TAG, "null fileUrl");
+            }
             try {
                 URL currUrl = new URL(urlString);
                 urlBuffer.add(currUrl);
@@ -241,6 +270,11 @@ public class CollectionViewFragment extends BaseMvpFragment<ImejiPresenter> impl
         urlsObj.setUrlList(urlBuffer);
         Observable<PassUrls> urlObservable = Observable.just(urlsObj);
         Subscription mySubscription = urlObservable.subscribe(urlListObserver);
+    }
+
+    @Override
+    public void getItemsFail(Throwable e) {
+        Log.e(LOG_TAG, e.toString());
     }
 
     private void downSynchCollections(){
@@ -419,6 +453,7 @@ public class CollectionViewFragment extends BaseMvpFragment<ImejiPresenter> impl
                 getImageAsync(imageWidth, imageHeight, collectionPosition, imagePosition,
                         bitmapURL, apiKey);
 
+
                 //Static - Do not change (Adjust in formatting section if needed)
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(imageWidth + 10,
                         imageHeight + 5);
@@ -429,6 +464,7 @@ public class CollectionViewFragment extends BaseMvpFragment<ImejiPresenter> impl
                 }
 
                 imageView.setLayoutParams(params);
+
                 layout.addView(imageView);
 
                 TextView metaTextView = new TextView(getContext());

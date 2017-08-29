@@ -38,8 +38,7 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
     private Activity activity;
     private ArrayList<String> galleryItems;
     private String apiKey;
-    private Map<String, String> headers = new HashMap<String,String>() {
-    };
+    private Map<String, String> headers = new HashMap<String,String>() {};
     public ServerFolderItemsAdapter(Activity activity, ArrayList<String> galleryItems) {
         this.activity = activity;
         this.galleryItems = galleryItems;
