@@ -47,11 +47,6 @@ public class ImejiFolder extends Model {
     //@Column(name = "contributors")
     private List<Person> contributors;
 
-    @Expose
-    //@Column(name = "profile")
-    private ImejiProfile profile;
-
-
 //    @Column(name = "items")
     private List<DataItem> items;
 
@@ -97,14 +92,6 @@ public class ImejiFolder extends Model {
 
     public void setContributors(List<Person> contributors) {
         this.contributors = contributors;
-    }
-
-    public ImejiProfile getProfile() {
-        return profile;
-    }
-
-    public void setProfile(ImejiProfile profile) {
-        this.profile = profile;
     }
 
     public String getCoverItemUrl() {
