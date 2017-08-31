@@ -52,7 +52,7 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
 import de.mpg.mpdl.labcam.code.base.BaseMvpActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.TitleFragmentPagerAdapter;
-import de.mpg.mpdl.labcam.code.common.fragment.CollectionViewFragment;
+import de.mpg.mpdl.labcam.code.common.fragment.CollectionViewNewFragment;
 import de.mpg.mpdl.labcam.code.common.fragment.LocalFragment;
 import de.mpg.mpdl.labcam.code.common.observer.NetChangeObserver;
 import de.mpg.mpdl.labcam.code.common.observer.NetWorkStateReceiver;
@@ -374,7 +374,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
 
         List<Fragment> fragments = new ArrayList<Fragment>(2);
         fragments.add(new LocalFragment());
-        fragments.add(new CollectionViewFragment());
+        fragments.add(new CollectionViewNewFragment());
 
         TitleFragmentPagerAdapter adapter = new TitleFragmentPagerAdapter(getSupportFragmentManager(), fragments, this);
         viewPager.setAdapter(adapter);

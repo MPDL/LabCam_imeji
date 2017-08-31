@@ -50,47 +50,12 @@
                 android:text="SmallTextView"
                 android:layout_below="@id/big_text_view"/>
 
-            <ListView android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/mainListView"
-                android:visibility="gone"
-                android:layout_below="@id/small_text_view">
-            </ListView>
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="none"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="14dp"
-                android:id="@+id/horz_container"
-                android:layout_below="@id/mainListView">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:id="@+id/inner_container">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:id="@+id/nested_linear">
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:id="@+id/meta_text_container">
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </HorizontalScrollView>
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_below="@id/small_text_view"
+            android:id="@+id/item_rv">
+        </android.support.v7.widget.RecyclerView>
 
         </RelativeLayout>
 

@@ -1,6 +1,5 @@
 package de.mpg.mpdl.labcam.code.data.model;
 
-import java.net.URL;
 import java.util.List;
 
 import de.mpg.mpdl.labcam.Model.MessageModel.Person;
@@ -25,7 +24,7 @@ public class ImejiFolderModel {
 
     private List<Person> contributors;
 
-    private List<URL> imageUrls;
+    private List<String> imageUrls;
 
     private String coverItemUrl;
 
@@ -93,11 +92,11 @@ public class ImejiFolderModel {
         this.coverItemUrl = coverItemUrl;
     }
 
-    public List<URL> getImageUrls() {
+    public List<String> getImageUrls() {
         return imageUrls;
     }
 
-    public void setImageUrls(List<URL> imageUrls) {
+    public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
     }
 }

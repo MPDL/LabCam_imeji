@@ -1,35 +1,28 @@
 package de.mpg.mpdl.labcam.code.common.fragment;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
-import de.mpg.mpdl.labcam.Model.CreatedBy;
 import de.mpg.mpdl.labcam.Model.DataItem;
 import de.mpg.mpdl.labcam.Model.MessageModel.CollectionMessage;
 import de.mpg.mpdl.labcam.Model.MessageModel.ItemMessage;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
 import de.mpg.mpdl.labcam.code.base.BaseMvpFragment;
-import de.mpg.mpdl.labcam.code.common.widget.Constants;
-import de.mpg.mpdl.labcam.code.common.widget.CustomImageDownaloder;
-import de.mpg.mpdl.labcam.code.data.model.UserModel;
+import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.injection.component.DaggerCollectionComponent;
 import de.mpg.mpdl.labcam.code.injection.module.CollectionMessageModule;
 import de.mpg.mpdl.labcam.code.injection.module.ItemMessageModule;
 import de.mpg.mpdl.labcam.code.mvp.presenter.ImejiPresenter;
 import de.mpg.mpdl.labcam.code.mvp.view.ImejiView;
-import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
+import rx.Observable;
+import rx.Observer;
+import rx.Subscription;
 
 /**
  * author : yingli
@@ -43,8 +36,9 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
     RecyclerView mRecyclerView;
 
     BaseActivity activity;
-    private Map<String, String> headers = new HashMap<>();
-    DisplayImageOptions options;
+    CollectionAdapter mCollectionAdapter;
+    private boolean syncComplete = false;
+    public Float dens;
 
     @Override
     protected void injectComponent() {
@@ -65,45 +59,101 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
     @Override
     protected void initContentView(Bundle savedInstanceState) {
         activity = (BaseActivity) getActivity();
-        String apiKey = PreferenceUtil.getString(activity, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
-        this.headers.put("Authorization","Bearer "+apiKey);
 
-        ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(activity)
-                .imageDownloader(new CustomImageDownaloder(activity))
-                .writeDebugLogs()
-                .build();
+        mCollectionAdapter = new CollectionAdapter(collectionListLocal);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
+        mRecyclerView.setAdapter(mCollectionAdapter);
 
-        ImageLoader.getInstance().init(configuration);
-        options = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .extraForDownloader(headers)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .showImageOnFail(R.drawable.error_alert)
-                .build();
+    }
 
-        //todo: mock a ItemMessage
-        ItemMessage itemMessage = mockItemMessage();
-        //todo: collection recycleview
-
-
-
-        //todo: detail horizontal recycleview
+    private void downSynchCollections(){
+        if (syncComplete == false)
+            mPresenter.getCollectionMessage(activity);
     }
 
     @Override
-    public void getItemsSuc(ItemMessage model) {
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            dens = getContext().getResources().getDisplayMetrics().density;
+            downSynchCollections();
+        }
+    }
+
+    @Override
+    public void getItemsSuc(ItemMessage itemMessage) {
+        List<DataItem> imageItems = itemMessage.getResults();
+        List<String> urlList = new ArrayList<>();
+        String id = null;
+        for (DataItem imageItem : imageItems) {
+            urlList.add(imageItem.getFileUrl());
+        }
+        CollectionViewNewFragment.PassUrls urlsObj = new CollectionViewNewFragment.PassUrls();
+        urlsObj.setImejiId(imageItems.get(0).getCollectionId());
+        urlsObj.setUrlList(urlList);
+        Observable<CollectionViewNewFragment.PassUrls> urlObservable = Observable.just(urlsObj);
+        Subscription mySubscription = urlObservable.subscribe(urlListObserver);
 
     }
+
+    private class PassUrls{
+        private List<String> urlList;
+        private String imejiId;
+
+        public List<String> getUrlList() {
+            return urlList;
+        }
+
+        public void setUrlList(List<String> urlList) {
+            this.urlList = urlList;
+        }
+
+        public String getImejiId() {
+            return imejiId;
+        }
+
+        public void setImejiId(String imejiId) {
+            this.imejiId = imejiId;
+        }
+    }
+
+    Observer<CollectionViewNewFragment.PassUrls> urlListObserver = new Observer<CollectionViewNewFragment.PassUrls>() {
+        @Override
+        public void onCompleted() {
+        }
+
+        @Override
+        public void onError(Throwable e) {
+        }
+
+        @Override
+        public void onNext(CollectionViewNewFragment.PassUrls urlsObj) {
+            //NOTE how to keep the order?
+            List<String> urlList = urlsObj.getUrlList();
+            String id = urlsObj.getImejiId();
+
+            for (ImejiFolderModel collectionModel : collectionListLocal){
+                if (collectionModel.getId().equals(id)){
+                    collectionModel.setImageUrls(urlList);
+                }
+            }
+            mCollectionAdapter.notifyDataSetChanged();
+        }
+    };
 
     @Override
     public void getItemsFail(Throwable e) {
 
     }
 
+    private List<ImejiFolderModel> collectionListLocal = new ArrayList<>();
     @Override
-    public void getCollectionsSuc(CollectionMessage model) {
-
+    public void getCollectionsSuc(CollectionMessage collectionMessage) {
+        for (ImejiFolderModel collectionModel : collectionMessage.getResults()) {
+            collectionListLocal.add(collectionModel);
+            mPresenter.getCollectionItems(collectionModel.getId(), 10, 0, activity);
+        }
+        mCollectionAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -111,20 +161,4 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
 
     }
 
-    private ItemMessage mockItemMessage(){
-        ItemMessage itemMessage = new ItemMessage();
-        List<DataItem> dataItemList = new ArrayList<>();
-        DataItem dataItem = new DataItem();
-        dataItem.setCollectionId("nphXUBnqYj3T7rWG");
-        dataItem.setFileUrl("http://qa-imeji.mpdl.mpg.de/imeji/file?itemId=THwGADFaFw2me9WG&resolution=original");
-        dataItem.setFilename("WechatIMG72.jpeg");
-        dataItem.setMimetype("image/jpeg");
-        dataItem.setCreatedDate("2017-08-10T14:31:00 +0200");
-        dataItem.setCreatedBy(new CreatedBy("Unknown User", "kr9ELkkh2irTXwh9"));
-
-        dataItemList.add(dataItem);
-        dataItemList.add(dataItem);
-        itemMessage.setResults(dataItemList);
-        return itemMessage;
-    }
 }

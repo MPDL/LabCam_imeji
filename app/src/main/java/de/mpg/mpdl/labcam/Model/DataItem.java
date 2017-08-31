@@ -4,8 +4,6 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.google.gson.annotations.Expose;
 
-import de.mpg.mpdl.labcam.code.data.model.UserModel;
-
 /**
  * Created by allen on 27/08/15.
  */
