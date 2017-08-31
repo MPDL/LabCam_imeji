@@ -149,6 +149,7 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
     private List<ImejiFolderModel> collectionListLocal = new ArrayList<>();
     @Override
     public void getCollectionsSuc(CollectionMessage collectionMessage) {
+        collectionListLocal.clear();
         for (ImejiFolderModel collectionModel : collectionMessage.getResults()) {
             collectionListLocal.add(collectionModel);
             mPresenter.getCollectionItems(collectionModel.getId(), 10, 0, activity);

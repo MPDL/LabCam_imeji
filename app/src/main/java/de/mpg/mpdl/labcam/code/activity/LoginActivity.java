@@ -371,7 +371,21 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
 
                 //create a new task for new selected collection
             }else {
-                Toast.makeText(activity,"Welcome "+userCompleteName,Toast.LENGTH_SHORT).show();
+                StringBuffer stringBuffer = new StringBuffer();
+                stringBuffer.append("Welcome ");
+                if(userCompleteName!=null) {
+                    stringBuffer.append(userCompleteName);
+                    Toast.makeText(activity, stringBuffer.toString(), Toast.LENGTH_SHORT).show();
+                }else {
+                    if(user.getPerson().getFamilyName()!=null){
+                        stringBuffer.append(user.getPerson().getFamilyName());
+                    }
+                    if(user.getPerson().getGivenName()!=null){
+                        stringBuffer.append(" ");
+                        stringBuffer.append(user.getPerson().getGivenName());
+                    }
+                    Toast.makeText(activity, stringBuffer.toString(), Toast.LENGTH_SHORT).show();
+                }
                 accountLogin(user.getPerson().getId(),false);
             }
 
