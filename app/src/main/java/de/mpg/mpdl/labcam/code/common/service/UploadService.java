@@ -163,6 +163,8 @@ public class UploadService {
                 Log.e(TAG, "could not parse malformed JSON, aborting");
                 upload(null);
             }
+        }else {
+            upload(null);
         }
     }
 
