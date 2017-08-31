@@ -26,20 +26,8 @@ public class DataItem {
     private String fileUrl;
 
     @Expose
-    @Column(name = "webResolutionUrlUrl")
-    private String webResolutionUrlUrl;
-
-    @Expose
-    @Column(name = "thumbnailUrl")
-    private String thumbnailUrl;
-
-    @Expose
     @Column(name = "createdBy")
-    private UserModel createdBy;
-
-//    //@Expose
-//    @Column(name = "metaData")
-//    private MetaData metadata;
+    private CreatedBy createdBy;
 
     @Expose
     @Column(name = "mimetype")
@@ -76,38 +64,13 @@ public class DataItem {
         this.fileUrl = fileUrl;
     }
 
-    public String getWebResolutionUrlUrl() {
-        return webResolutionUrlUrl;
-    }
-
-    public void setWebResolutionUrlUrl(String webResolutionUrlUrl) {
-        this.webResolutionUrlUrl = webResolutionUrlUrl;
-    }
-
-    public String getThumbnailUrl() {
-        return thumbnailUrl;
-    }
-
-    public void setThumbnailUrl(String thumbnailUrl) {
-        this.thumbnailUrl = thumbnailUrl;
-    }
-
-    public UserModel getCreatedBy() {
+    public CreatedBy getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(UserModel createdBy) {
+    public void setCreatedBy(CreatedBy createdBy) {
         this.createdBy = createdBy;
     }
-
-//    public MetaData getMetadata() {
-//        return metadata;
-//    }
-//
-//    public void setMetadata(MetaData metadata) {
-//        this.metadata = metadata;
-//    }
-
 
     public String getMimetype() {
         return mimetype;
@@ -125,7 +88,6 @@ public class DataItem {
         this.collectionId = collectionId;
     }
 
-
     public String getLocalPath() {
         return localPath;
     }
@@ -133,6 +95,4 @@ public class DataItem {
     public void setLocalPath(String localPath) {
         this.localPath = localPath;
     }
-
-
 }
