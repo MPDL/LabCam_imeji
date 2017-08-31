@@ -12,6 +12,8 @@ import com.bumptech.glide.GifRequestBuilder;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -20,6 +22,9 @@ import com.bumptech.glide.signature.StringSignature;
 
 import java.io.File;
 
+import de.mpg.mpdl.labcam.LabCam;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import jp.wasabeef.glide.transformations.GrayscaleTransformation;
@@ -54,7 +59,10 @@ public class ImageLoader {
      * @param listener
      */
     public static void loadStringRes(ImageView view, String imageUrl, ImageLoadConfig config, ImageLoadConfig.LoaderListener listener) {
-        load(view.getContext(), view, imageUrl, config, listener);
+        String authorization = "Bearer "+ PreferenceUtil.getString(LabCam.getContext(), Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
+        GlideUrl glideUrl = new GlideUrl(imageUrl, new LazyHeaders.Builder()
+        .addHeader("Authorization", authorization).build());
+        load(view.getContext(), view, glideUrl, config, listener);
     }
 
     public static void loadFile(ImageView view, File file, ImageLoadConfig config, ImageLoadConfig.LoaderListener listener) {
@@ -298,46 +306,4 @@ public class ImageLoader {
         clearDiskCache(context);
         Glide.get(context).clearMemory();
     }
-    /**
-     * 获取缓存大小
-     *
-     * @param context
-     * @return
-     */
-//    public static synchronized long getDiskCacheSize(Context context) {
-//        long size = 0L;
-//        File cacheDir = PathUtils.getDiskCacheDir(context, CacheConfig.IMG_DIR);
-//
-//        if (cacheDir != null && cacheDir.exists()) {
-//            File[] files = cacheDir.listFiles();
-//            if (files != null) {
-//                File[] arr$ = files;
-//                int len$ = files.length;
-//
-//                for (int i$ = 0; i$ < len$; ++i$) {
-//                    File imageCache = arr$[i$];
-//                    if (imageCache.isFile()) {
-//                        size += imageCache.length();
-//                    }
-//                }
-//            }
-//        }
-//
-//        return size;
-//    }
-
-//    public static void clearTarget(Context context, String uri) {
-//        if (SimpleGlideModule.cache != null && uri != null) {
-//            SimpleGlideModule.cache.delete(new StringSignature(uri));
-//            Glide.get(context).clearMemory();
-//        }
-//    }
-//
-//    public static void clearTarget(View view) {
-//        Glide.clear(view);
-//    }
-//
-//    public static File getTarget(Context context, String uri) {
-//        return SimpleGlideModule.cache != null && uri != null ? SimpleGlideModule.cache.get(new StringSignature(uri)) : null;
-//    }
 }
