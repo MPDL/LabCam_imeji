@@ -24,10 +24,6 @@ public class DataItem {
     private String fileUrl;
 
     @Expose
-    @Column(name = "createdBy")
-    private CreatedBy createdBy;
-
-    @Expose
     @Column(name = "mimetype")
     private String mimetype;
 
@@ -60,14 +56,6 @@ public class DataItem {
 
     public void setFileUrl(String fileUrl) {
         this.fileUrl = fileUrl;
-    }
-
-    public CreatedBy getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(CreatedBy createdBy) {
-        this.createdBy = createdBy;
     }
 
     public String getMimetype() {
