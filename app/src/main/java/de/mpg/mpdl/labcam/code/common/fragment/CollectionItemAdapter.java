@@ -1,5 +1,7 @@
 package de.mpg.mpdl.labcam.code.common.fragment;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,7 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.mpg.mpdl.labcam.LabCam;
 import de.mpg.mpdl.labcam.R;
+import de.mpg.mpdl.labcam.code.activity.DetailActivity;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.moudle.glide.ImageLoader;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
@@ -30,7 +34,7 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
 
     List<String> mItemsList = new ArrayList<>();
     private Map<String, String> headers = new HashMap<>();
-    DisplayImageOptions options;
+    Context context;
 
     public CollectionItemAdapter(List<String> mItemsList) {
         this.mItemsList = mItemsList;
@@ -38,10 +42,11 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
 
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        context = parent.getContext();
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.collection_item_cell, parent, false);
 
-        String apiKey = PreferenceUtil.getString(parent.getContext(), Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
+        String apiKey = PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
         this.headers.put("Authorization","Bearer "+apiKey);
 
         return new ItemViewHolder(itemView);
@@ -63,12 +68,22 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
         return mItemsList!=null? mItemsList.size() : 0;
     }
 
-    static class ItemViewHolder extends RecyclerView.ViewHolder{
+    class ItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView mImageView;
 
         public ItemViewHolder(View itemView) {
             super(itemView);
             mImageView = (ImageView) itemView.findViewById(R.id.collection_image);
+            mImageView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent showDetailIntent = new Intent(context, DetailActivity.class);
+            ArrayList itemPathList = new ArrayList(mItemsList);
+            showDetailIntent.putStringArrayListExtra("itemPathList", itemPathList);
+            showDetailIntent.putExtra("positionInList",getAdapterPosition());
+            context.startActivity(showDetailIntent);
         }
     }
 }
