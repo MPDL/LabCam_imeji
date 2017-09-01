@@ -44,7 +44,13 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
     public void onBindViewHolder(CollectionViewHolder holder, int position) {
         ImejiFolderModel mCollection = collectionList.get(position);
         holder.titleTextView.setText(mCollection.getTitle());
-        holder.authorTextView.setText(mCollection.getCreatedBy().getFullname() + mCollection.getCreatedDate());
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("CreatedBy: ");
+        stringBuffer.append(mCollection.getContributors().get(0).getFamilyName());
+        stringBuffer.append(" on: ");
+        stringBuffer.append(mCollection.getCreatedDate());
+        holder.authorTextView.setText(stringBuffer.toString());
+        holder.descriptionTextView.setText(mCollection.getDescription()!=null? mCollection.getDescription():"no description yet");
 
         holder.recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         holder.recyclerView.setAdapter(new CollectionItemAdapter(mCollection.getImageUrls()));
@@ -59,6 +65,7 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
 
         TextView titleTextView;
         TextView authorTextView;
+        TextView descriptionTextView;
         RecyclerView recyclerView;
         ToggleButton toggleButton;
         TextView.OnClickListener titleClickListener;
@@ -69,6 +76,7 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
             super(itemView);
             titleTextView = (TextView) itemView.findViewById(R.id.big_text_view);
             authorTextView = (TextView) itemView.findViewById(R.id.small_text_view);
+            descriptionTextView = (TextView) itemView.findViewById(R.id.description_tv);
             recyclerView = (RecyclerView) itemView.findViewById(R.id.item_rv);
             toggleButton = (ToggleButton) itemView.findViewById(R.id.collection_expand_button);
 
@@ -80,9 +88,9 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
 
             toggleChangeListerner = (buttonView, isChecked) -> {
                 if (isChecked) {
-                    recyclerView.setVisibility(View.GONE);
+                    descriptionTextView.setVisibility(View.VISIBLE);
                 } else {
-                    recyclerView.setVisibility(View.VISIBLE);
+                    descriptionTextView.setVisibility(View.GONE);
                 }
             };
 

@@ -34,8 +34,7 @@
                 style="@style/toggleButton"
                 android:background="@drawable/collection_detail_toggle_button"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-            />
+                android:layout_alignParentRight="true" />
 
 
             <TextView
@@ -50,12 +49,19 @@
                 android:text="SmallTextView"
                 android:layout_below="@id/big_text_view"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_below="@id/small_text_view"
-            android:id="@+id/item_rv">
-        </android.support.v7.widget.RecyclerView>
+            <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_below="@id/small_text_view"
+                android:id="@+id/item_rv">
+            </android.support.v7.widget.RecyclerView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/description_tv"
+                android:layout_below="@id/item_rv"
+                android:textSize="10sp"/>
 
         </RelativeLayout>
 
