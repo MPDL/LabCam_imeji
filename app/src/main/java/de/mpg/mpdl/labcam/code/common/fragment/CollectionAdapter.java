@@ -13,6 +13,7 @@ import android.widget.ToggleButton;
 
 import java.util.List;
 
+import de.mpg.mpdl.labcam.Model.MessageModel.Person;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.activity.ItemsActivity;
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
@@ -44,13 +45,19 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
     public void onBindViewHolder(CollectionViewHolder holder, int position) {
         ImejiFolderModel mCollection = collectionList.get(position);
         holder.titleTextView.setText(mCollection.getTitle());
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("CreatedBy: ");
-        stringBuffer.append(mCollection.getContributors().get(0).getFamilyName());
-        stringBuffer.append(" on: ");
-        stringBuffer.append(mCollection.getCreatedDate());
-        holder.authorTextView.setText(stringBuffer.toString());
-        holder.descriptionTextView.setText(mCollection.getDescription()!=null? mCollection.getDescription():"no description yet");
+        StringBuilder nameSb = new StringBuilder();
+        nameSb.append("by: ");
+        Person person = mCollection.getContributors().get(0);
+        nameSb.append(person.getGivenName()!=null? person.getGivenName():"");
+        nameSb.append(person.getFamilyName()!=null? person.getFamilyName():"");
+        holder.authorTextView.setText(nameSb.toString());
+        StringBuilder descriptionSb = new StringBuilder();
+        descriptionSb.append("Creation date: ");
+        descriptionSb.append(mCollection.getCreatedDate()+"\n");
+        descriptionSb.append("Last modification date: ");
+        descriptionSb.append(mCollection.getModifiedDate()+"\n");
+        descriptionSb.append(mCollection.getDescription()!=null? mCollection.getDescription():"");
+        holder.descriptionTextView.setText(descriptionSb.toString());
 
         holder.recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
         holder.recyclerView.setAdapter(new CollectionItemAdapter(mCollection.getImageUrls()));

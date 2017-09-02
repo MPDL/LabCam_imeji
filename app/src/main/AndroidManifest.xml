@@ -48,6 +48,7 @@
                            de.mpg.mpdl.labcam.Model.CreatedBy,
                            de.mpg.mpdl.labcam.Model.DataItem,
                            de.mpg.mpdl.labcam.Model.ImejiProfile,
+                           de.mpg.mpdl.labcam.Model.ImejiFolder,
                            de.mpg.mpdl.labcam.Model.MetaData,
                            de.mpg.mpdl.labcam.Model.Organization,
                            de.mpg.mpdl.labcam.Model.User,

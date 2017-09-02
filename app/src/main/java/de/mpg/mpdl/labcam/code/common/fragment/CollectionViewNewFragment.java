@@ -86,7 +86,11 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
         List<String> urlList = new ArrayList<>();
         String id = null;
         for (DataItem imageItem : imageItems) {
-            urlList.add(imageItem.getFileUrl());
+            String orgUrl = imageItem.getFileUrl();
+            String preUrl = new StringBuilder()
+                    .append(orgUrl.substring(0, orgUrl.lastIndexOf("&")))
+                    .append("&resolution=preview").toString();
+            urlList.add(preUrl);
         }
         CollectionViewNewFragment.PassUrls urlsObj = new CollectionViewNewFragment.PassUrls();
         urlsObj.setImejiId(imageItems.get(0).getCollectionId());
@@ -134,7 +138,7 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
 
             for (ImejiFolderModel collectionModel : collectionListLocal){
                 if (collectionModel.getId().equals(id)){
-                    collectionModel.setImageUrls(urlList);
+                    collectionModel.setImageUrls(urlList.size()>3 ? urlList.subList(0,3): urlList);
                 }
             }
             mCollectionAdapter.notifyDataSetChanged();

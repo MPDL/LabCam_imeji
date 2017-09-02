@@ -168,9 +168,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         super.onDestroy();
         NetWorkStateReceiver.unRegisterNetStateObserver(this); //deRegister NetStateObserver
 
-        new Delete().
-                from(ImejiFolder.class)
-                .execute();
+        new Delete().from(ImejiFolder.class).execute();
         hidePDialog();
     }
 
