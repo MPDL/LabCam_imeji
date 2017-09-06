@@ -2,22 +2,17 @@ package de.mpg.mpdl.labcam.code.common.fragment;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import de.mpg.mpdl.labcam.LabCam;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.activity.DetailActivity;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
@@ -35,9 +30,25 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
     List<String> mItemsList = new ArrayList<>();
     private Map<String, String> headers = new HashMap<>();
     Context context;
+    RecyclerView mRecyclerView;
 
-    public CollectionItemAdapter(List<String> mItemsList) {
-        this.mItemsList = mItemsList;
+    private boolean isLoading;
+    private int visibleThreshold = 3;
+    private int lastVisibleItem, totalItemCount;
+
+    private OnLoadMoreListener mOnLoadMoreListener;
+
+    public CollectionItemAdapter(List<String> ItemsList, RecyclerView recyclerView) {
+        this.mItemsList = ItemsList;
+        this.mRecyclerView = recyclerView;
+    }
+
+    /**
+     * Method set CollectionItemAdapter's OnLoadMoreListener
+     * @param listener
+     */
+    public void setOnLoadMoreListener(OnLoadMoreListener listener){
+        this.mOnLoadMoreListener = listener;
     }
 
     @Override
@@ -45,9 +56,23 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
         context = parent.getContext();
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.collection_item_cell, parent, false);
-
         String apiKey = PreferenceUtil.getString(context, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
         this.headers.put("Authorization","Bearer "+apiKey);
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                totalItemCount = recyclerView.getAdapter().getItemCount();
+                lastVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
+                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                    if (mOnLoadMoreListener != null) {
+                        mOnLoadMoreListener.onLoadMore();
+                    }
+                    isLoading = true;
+                }
+            }
+        });
 
         return new ItemViewHolder(itemView);
     }
@@ -85,5 +110,13 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
             showDetailIntent.putExtra("positionInList",getAdapterPosition());
             context.startActivity(showDetailIntent);
         }
+    }
+
+    public interface OnLoadMoreListener{
+        void onLoadMore();
+    }
+
+    public void setLoaded(){
+        isLoading = false;
     }
 }

@@ -2,12 +2,13 @@ package de.mpg.mpdl.labcam.code.common.fragment;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -59,8 +60,24 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
         descriptionSb.append(mCollection.getDescription()!=null? mCollection.getDescription():"");
         holder.descriptionTextView.setText(descriptionSb.toString());
 
-        holder.recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-        holder.recyclerView.setAdapter(new CollectionItemAdapter(mCollection.getImageUrls()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+        holder.recyclerView.setLayoutManager(linearLayoutManager);
+        List<String> pItemList = mCollection.getImageUrls()!=null && mCollection.getImageUrls().size()>3?
+                mCollection.getImageUrls().subList(0,3) : mCollection.getImageUrls();
+        CollectionItemAdapter adapter = new CollectionItemAdapter(pItemList, holder.recyclerView);
+        List<String> pAllItemList = mCollection.getImageUrls();
+        if(pItemList!=null) {
+            adapter.setOnLoadMoreListener(new CollectionItemAdapter.OnLoadMoreListener() {
+                @Override
+                public void onLoadMore() {
+                    if (pItemList == null) return;
+                    adapter.notifyDataSetChanged();
+                    adapter.setLoaded();
+                }
+            });
+        }
+
+        holder.recyclerView.setAdapter(adapter);
     }
 
     @Override

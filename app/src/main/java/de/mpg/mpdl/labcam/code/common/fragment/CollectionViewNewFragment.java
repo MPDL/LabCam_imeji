@@ -23,6 +23,8 @@ import de.mpg.mpdl.labcam.code.mvp.view.ImejiView;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * author : yingli
@@ -95,7 +97,10 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
         CollectionViewNewFragment.PassUrls urlsObj = new CollectionViewNewFragment.PassUrls();
         urlsObj.setImejiId(imageItems.get(0).getCollectionId());
         urlsObj.setUrlList(urlList);
-        Observable<CollectionViewNewFragment.PassUrls> urlObservable = Observable.just(urlsObj);
+
+        Observable<CollectionViewNewFragment.PassUrls> urlObservable = Observable.just(urlsObj)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
         Subscription mySubscription = urlObservable.subscribe(urlListObserver);
 
     }
@@ -138,7 +143,7 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
 
             for (ImejiFolderModel collectionModel : collectionListLocal){
                 if (collectionModel.getId().equals(id)){
-                    collectionModel.setImageUrls(urlList.size()>3 ? urlList.subList(0,3): urlList);
+                    collectionModel.setImageUrls(urlList);
                 }
             }
             mCollectionAdapter.notifyDataSetChanged();
