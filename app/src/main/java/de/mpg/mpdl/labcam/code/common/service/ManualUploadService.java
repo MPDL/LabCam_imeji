@@ -48,7 +48,6 @@ public class ManualUploadService extends Service {
 
         // prepare taskId
         try {
-
             Long currentTaskId = intent.getLongExtra("currentTaskId", 1L);
             if(!taskIdList.contains(currentTaskId)) {
                 taskIdList.add(currentTaskId);

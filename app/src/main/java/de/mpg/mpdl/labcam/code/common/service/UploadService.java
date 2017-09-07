@@ -40,6 +40,8 @@ import de.mpg.mpdl.labcam.code.utils.OCRHandler;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 import okhttp3.MultipartBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 
 /**
@@ -128,21 +130,31 @@ public class UploadService {
 
             if (waitingImgPathList != null && waitingImgPathList.size() > 0) {             // whether task is finished or still have img for uploading
                 currentImagePath = waitingImgPathList.get(0);                                // important: set currentImageId
-                prepareDate(waitingImgPathList.get(0));
+                prepareMetaData(waitingImgPathList.get(0));
             }
         }
     }
 
-    private void prepareDate(String imgPath){
+    private void prepareMetaData(String imgPath){
         if(taskIsStopped()){
             return;
         }
 
         File f = new File(imgPath);
         if(f.exists() && !f.isDirectory()) {
-            // do something
             Log.i(TAG,collectionID+": file exist");
-            json = DeviceStatus.metaDataJson(collectionID, imgPath, checkTypeList, ocrIsOn, context, userId, serverName);
+
+            if (ocrIsOn){
+                checkTypeList[checkTypeList.length-1] = true;
+                Uri imageUri = Uri.fromFile(f);
+                getImageText(imageUri, context);
+
+            }else {
+                // prepare metaData without ocr text
+                checkTypeList[checkTypeList.length-1] = false;
+                prepareBody(imgPath, "");
+            }
+
         }else {
             Log.i(TAG, "file not exist: " + imgPath);
 
@@ -151,29 +163,9 @@ public class UploadService {
 
             return;
         }
-
-        imageFile = MultipartUtil.prepareFilePart("file",imgPath);
-        Log.v(TAG, "start uploading: " + imgPath);
-
-        if (ocrIsOn){
-            try {
-                Uri imageUri = Uri.fromFile(f);
-                getImageText(imageUri, context);
-            } catch(Throwable t){
-                Log.e(TAG, "could not parse malformed JSON, aborting");
-                upload(null);
-            }
-        }else {
-            upload(null);
-        }
     }
 
-    private void upload(String ocr){
-        if(ocr!=null){
-            checkTypeList[checkTypeList.length-1] = true;
-        }else {
-            checkTypeList[checkTypeList.length-1] = false;
-        }
+    private void upload(){
         Call<okhttp3.ResponseBody> call = uploadRepository.uploadItem(imageFile, MultipartUtil.createPartFromString(json));
         call.enqueue(new retrofit2.Callback<okhttp3.ResponseBody>() {
             @Override
@@ -202,7 +194,7 @@ public class UploadService {
                                 return;
                             }
 
-                            prepareDate(currentImagePath);
+                            prepareMetaData(currentImagePath);
                         }
                     } else {
 
@@ -243,72 +235,29 @@ public class UploadService {
                         return;
                     }
                     // error kinds: "network", 403, 422, 404,  other
-                    if (response == null) {
-                        if (String.valueOf(response.errorBody()).contains("NETWORK")) {
-                            Log.d(TAG,"network error");
-                        }
-                    } else {
-                        int statusCode = response.code();
-                        switch (statusCode){
-                            case 403:
-                                // set TASK state failed, print log
-                                task.setState(String.valueOf(DeviceStatus.state.FAILED));
-                                task.setEndDate(DeviceStatus.dateNow());
-                                task.save();
-                                Log.e(TAG, collectionID + "forbidden");
-                                Handler handler_403=new Handler(Looper.getMainLooper());
-                                handler_403.post(new Runnable() {
-                                    public void run() {
-                                        Toast.makeText(context, "Unauthorized to upload", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                return;
-                            case 422:
-                                if (String.valueOf(response.errorBody()).contains("already exists")) {
-                                    // remove from task's imgPaths
-                                    task = DBConnector.getTaskById(currentTaskId, userId, serverName);
-                                    List<String> imgPaths = task.getImagePaths();
-                                    if(imgPaths.contains(currentImagePath)){
-                                        imgPaths.remove(currentImagePath);
-                                    }
-                                    task.setImagePaths(imgPaths);
-                                    Log.d(TAG, "setImagePaths+callback+422");
-                                    task.setFinishedItems(task.getTotalItems()- task.getImagePaths().size());
-                                    task.save();
-
-                                }else if(String.valueOf(response.errorBody()).contains("Invalid collection")){
-                                    task.setState(String.valueOf(DeviceStatus.state.FAILED));
-                                    task.setEndDate(DeviceStatus.dateNow());
-                                    task.save();
-                                    Handler handler_422=new Handler(Looper.getMainLooper());
-                                    handler_422.post(new Runnable() {
-                                        public void run() {
-                                            Toast.makeText(context, "Invalid collection", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                    return;
+                    int statusCode = response.code();
+                    String errStr = "";
+                    try {
+                        errStr = (response.errorBody()).string();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    switch (statusCode){
+                        case 403:
+                            // set TASK state failed, print log
+                            task.setState(String.valueOf(DeviceStatus.state.FAILED));
+                            task.setEndDate(DeviceStatus.dateNow());
+                            task.save();
+                            Log.e(TAG, collectionID + "forbidden");
+                            Handler handler_403=new Handler(Looper.getMainLooper());
+                            handler_403.post(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(context, "Unauthorized to upload", Toast.LENGTH_SHORT).show();
                                 }
-                                break;
-                            case 404:
-                                if (String.valueOf(response.errorBody()).contains("Not Found")) {
-                                    // set currentImage state finished, print log
-                                    Log.d("error_404", "Not Found");
-
-                                    task.setState(String.valueOf(DeviceStatus.state.FAILED));
-                                    task.setEndDate(DeviceStatus.dateNow());
-                                    task.save();
-                                    Log.d(TAG, collectionID + "collection not found");
-                                    Handler  handler=new Handler(Looper.getMainLooper());
-                                    handler.post(new Runnable() {
-                                        public void run() {
-                                            Toast.makeText(context, "collection not found", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                                    return;
-                                }
-                                break;
-                            default:
-                                // 400 401 500 ...
+                            });
+                            return;
+                        case 422:
+                            if (errStr.contains("already exists")) {
                                 // remove from task's imgPaths
                                 task = DBConnector.getTaskById(currentTaskId, userId, serverName);
                                 List<String> imgPaths = task.getImagePaths();
@@ -316,15 +265,57 @@ public class UploadService {
                                     imgPaths.remove(currentImagePath);
                                 }
                                 task.setImagePaths(imgPaths);
-                                ToastUtils.showShortMessage(context, "error: "+statusCode);
                                 task.setFinishedItems(task.getTotalItems()- task.getImagePaths().size());
                                 task.save();
 
-                        }
+                            }else if(errStr.contains("Invalid collection")){
+                                task.setState(String.valueOf(DeviceStatus.state.FAILED));
+                                task.setEndDate(DeviceStatus.dateNow());
+                                task.save();
+                                Handler handler_422=new Handler(Looper.getMainLooper());
+                                handler_422.post(new Runnable() {
+                                    public void run() {
+                                        Toast.makeText(context, "Invalid collection", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                return;
+                            }
+                            break;
+                        case 404:
+                            if (errStr.contains("Not Found")) {
+                                // set currentImage state finished, print log
+                                Log.d("error_404", "Not Found");
+
+                                task.setState(String.valueOf(DeviceStatus.state.FAILED));
+                                task.setEndDate(DeviceStatus.dateNow());
+                                task.save();
+                                Log.d(TAG, collectionID + "collection not found");
+                                Handler  handler=new Handler(Looper.getMainLooper());
+                                handler.post(new Runnable() {
+                                    public void run() {
+                                        Toast.makeText(context, "collection not found", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                return;
+                            }
+                            break;
+                        default:
+                            // 400 401 500 ...
+                            // remove from task's imgPaths
+                            task = DBConnector.getTaskById(currentTaskId, userId, serverName);
+                            List<String> imgPaths = task.getImagePaths();
+                            if(imgPaths.contains(currentImagePath)){
+                                imgPaths.remove(currentImagePath);
+                            }
+                            task.setImagePaths(imgPaths);
+                            ToastUtils.showShortMessage(context, "error: "+statusCode);
+                            task.setFinishedItems(task.getTotalItems()- task.getImagePaths().size());
+                            task.save();
+
                     }
-                    // continue upload
-                    uploadNext();
                 }
+                // continue upload
+                uploadNext();
             }
 
             @Override
@@ -366,7 +357,7 @@ public class UploadService {
             // continue anyway
             if(task.getImagePaths()!=null && task.getImagePaths().size()>0){
                 currentImagePath = task.getImagePaths().get(0);
-                prepareDate(currentImagePath);
+                prepareMetaData(currentImagePath);
             }
         }else {
             if(task.getUploadMode().equalsIgnoreCase("AU")){
@@ -445,19 +436,18 @@ public class UploadService {
     private void getImageText(Uri imageUri, final Context context) {
         String TAG = "OCR";
         Bitmap bitmap;
+        String imagePath = imageUri.getPath();
         OCRHandler.TaskParams params = null;
         Log.e(TAG , "Setting up OCR params for image: " + imageUri.toString());
         int imageHeight = 0;
         int imageWidth = 0;
         String rot = null;
         try {
-            String path = imageUri.getPath();
-            ExifInterface exif = new ExifInterface(path);
+            ExifInterface exif = new ExifInterface(imagePath);
             rot = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
             Log.e(TAG , rot + " rotation ");
         } catch (IOException e){
             Log.e(TAG, "could not get file information");
-
         }
 
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -497,14 +487,14 @@ public class UploadService {
         OCRHandler.getText testAsyncTask = new OCRHandler.getText(new OCRHandler.FragmentCallback() {
             @Override
             public void onTaskDone(ArrayList<LineAttributes> lineAttributes) {
-                String text = null;
+                String text = "";
                 if (lineAttributes != null) {
                     for (LineAttributes line : lineAttributes) {
                         text = text + line.getText();
                     }
                 }
                 Log.e(TAG, text);
-                upload(text);
+                prepareBody(imagePath, text);
                 return;
             }
         });
@@ -514,5 +504,12 @@ public class UploadService {
             Log.e(TAG, "Task params are empty");
         }
         return;
+    }
+
+    private void prepareBody(String imgPath, String ocrText){
+        json = DeviceStatus.metaDataJson(collectionID, imgPath, checkTypeList, ocrText, userId, serverName);
+        imageFile = MultipartUtil.prepareFilePart("file",imgPath);
+        Log.v(TAG, "start uploading: " + imgPath);
+        upload();
     }
 }

@@ -6,9 +6,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.location.LocationManager;
+import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
@@ -41,6 +44,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
 
+import de.mpg.mpdl.labcam.Model.LineAttributes;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 
@@ -261,7 +265,7 @@ public class DeviceStatus {
 
     }
 
-    public static String metaDataJson(String collectionId, String imagePath, Boolean[] typeList, boolean ocrIsOn, Context context, String userId, String serverName){
+    public static String metaDataJson(String collectionId, String imagePath, Boolean[] typeList, String ocrText, String userId, String serverName){
 
         String metaDataJsonStr = null;
 
@@ -271,7 +275,7 @@ public class DeviceStatus {
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(file);
 
-            metaDataJsonStr =  generateJsonStr(collectionId, metadata, typeList, context, imagePath, ocrIsOn, userId, serverName);
+            metaDataJsonStr =  generateJsonStr(collectionId, metadata, typeList, imagePath, ocrText, userId, serverName);
 
             print(metadata);
         } catch (ImageProcessingException e) {
@@ -284,7 +288,7 @@ public class DeviceStatus {
         return metaDataJsonStr;
     }
 
-    private static String generateJsonStr(String collectionId, Metadata metadata, Boolean[] typeList, Context context, String imagePath, boolean ocrIsOn, String userId, String serverName){
+    private static String generateJsonStr(String collectionId, Metadata metadata, Boolean[] typeList, String imagePath, String ocrText, String userId, String serverName){
 
         String metaDataJsonStr = null;
 
@@ -348,37 +352,6 @@ public class DeviceStatus {
         // if image object not exist, there is no note.
         if(image!=null && image.getNoteId() != null && DBConnector.getNoteById(image.getNoteId(), userId, serverName) != null)
             note = DBConnector.getNoteById(image.getNoteId(), userId, serverName).getNoteContent();
-
-        if(ocrIsOn) {
-            if(exifThumbnailDirectory!=null){
-                String orientationStr = exifThumbnailDirectory.getString(exifThumbnailDirectory.TAG_ORIENTATION);
-                if(orientationStr==null){
-                    Log.i(LOG_TAG, "no orientation information");
-                }else if(orientationStr.contains("1")){
-                    orientation = 0;
-                }else if(orientationStr.contains("6")){
-                    orientation = 90;
-                }else if(orientationStr.contains("3")){
-                    orientation = 180;
-                }else if(orientationStr.contains("8")){
-                    orientation = 270;
-                }
-
-            }
-
-            int e1 = Log.e(LOG_TAG, "orientation: " + orientation);
-
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            Bitmap bitMapOrig = BitmapFactory.decodeFile(imagePath, options);
-
-            Matrix matrix = new Matrix();
-            matrix.postRotate(orientation);
-            Bitmap rotatedBitmap = Bitmap.createBitmap(bitMapOrig, 0, 0, bitMapOrig.getWidth(), bitMapOrig.getHeight(), matrix, true);
-            if(bitMapOrig != rotatedBitmap)
-                bitMapOrig.recycle();
-            bitMapOrig = null;
-        }
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("collectionId", collectionId);
@@ -447,7 +420,7 @@ public class DeviceStatus {
             }if(typeList[11]){
                 JSONObject mdObj = new JSONObject();
                 mdObj.put("index",labCamTemplateProfileLabels[11]);
-                mdObj.put(labCamTemplateProfileTypes[11], ocr);
+                mdObj.put(labCamTemplateProfileTypes[11], ocrText);
                 mdArray.put(mdObj);
             }
             jsonObject.put("metadata", mdArray);
