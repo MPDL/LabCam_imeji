@@ -46,7 +46,7 @@ public class ImejiPresenter extends BaseAbstractPresenter<ImejiView> {
         }, itemMessageService.getCollectionItems(collectionId, size, offset), act);
     }
 
-    public void getCollectionMessage(BaseActivity act){
+    public void getCollectionMessage(String q, int size, int offset, BaseActivity act){
         if (!checkNetWork()) {
             return;
         }
@@ -60,6 +60,6 @@ public class ImejiPresenter extends BaseAbstractPresenter<ImejiView> {
             public void onError(Throwable e) {
                 mView.getCollectionsFail(e);
             }
-        }, collectionMessageService.getCollections(), act);
+        }, collectionMessageService.getCollections(q, size, offset), act);
     }
 }

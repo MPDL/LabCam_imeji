@@ -9,7 +9,9 @@ import rx.Observable;
 
 public interface CollectionMessageRepository {
 
-    Observable<CollectionMessage> getCollections();
+    Observable<CollectionMessage> getCollections(String q,
+                                                 int size,
+                                                 int offset);
 
     Observable<CollectionMessage> getGrantedCollectionMessage(String q);
 }

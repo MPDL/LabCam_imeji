@@ -2,10 +2,8 @@ package de.mpg.mpdl.labcam.code.common.fragment;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,8 +28,16 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
     private List<ImejiFolderModel> collectionList;
     private Context context;
 
-    public CollectionAdapter(List<ImejiFolderModel> collectionList) {
+    private int visibleThreshold = 3;
+    private boolean isLoading;
+    private RecyclerView mRecyclerView;
+    private OnLoadMoreCollectionListener onLoadMoreCollectionListener;
+    private CollectionItemAdapter.OnLoadMoreListener onLoadMoreItemListener;
+
+    public CollectionAdapter(List<ImejiFolderModel> collectionList, RecyclerView recyclerView, CollectionItemAdapter.OnLoadMoreListener listener) {
         this.collectionList = collectionList;
+        this.mRecyclerView = recyclerView;
+        this.onLoadMoreItemListener = listener;
     }
 
     @Override
@@ -39,6 +45,26 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
         context = parent.getContext();
         View itemView = LayoutInflater.from(context)
                 .inflate(R.layout.collection_container_template, parent, false);
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(!isLoading && dy>0){
+                    int lastVisibleItem, totalItemCount;
+                    LinearLayoutManager linearLayoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
+                    totalItemCount = linearLayoutManager.getItemCount();
+                    lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                    if (totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                        if (onLoadMoreCollectionListener != null) {
+                            onLoadMoreCollectionListener.onLoadMore();
+                        }
+                        isLoading = true;
+                    }
+                }
+            }
+        });
+
         return new CollectionViewHolder(itemView);
     }
 
@@ -62,21 +88,8 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
         holder.recyclerView.setLayoutManager(linearLayoutManager);
-        List<String> pItemList = mCollection.getImageUrls()!=null && mCollection.getImageUrls().size()>3?
-                mCollection.getImageUrls().subList(0,3) : mCollection.getImageUrls();
-        CollectionItemAdapter adapter = new CollectionItemAdapter(pItemList, holder.recyclerView);
-        List<String> pAllItemList = mCollection.getImageUrls();
-        if(pItemList!=null) {
-            adapter.setOnLoadMoreListener(new CollectionItemAdapter.OnLoadMoreListener() {
-                @Override
-                public void onLoadMore() {
-                    if (pItemList == null) return;
-                    adapter.notifyDataSetChanged();
-                    adapter.setLoaded();
-                }
-            });
-        }
-
+        CollectionItemAdapter adapter = new CollectionItemAdapter(mCollection.getImageUrls(), holder.recyclerView, position);
+        adapter.setOnLoadMoreListener(onLoadMoreItemListener);
         holder.recyclerView.setAdapter(adapter);
     }
 
@@ -93,7 +106,7 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
         RecyclerView recyclerView;
         ToggleButton toggleButton;
         TextView.OnClickListener titleClickListener;
-        ToggleButton.OnCheckedChangeListener toggleChangeListerner;
+        ToggleButton.OnCheckedChangeListener toggleChangeListener;
 
 
         public CollectionViewHolder(View itemView) {
@@ -110,7 +123,7 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
                 context.startActivity(showItemsIntent);
             };
 
-            toggleChangeListerner = (buttonView, isChecked) -> {
+            toggleChangeListener = (buttonView, isChecked) -> {
                 if (isChecked) {
                     descriptionTextView.setVisibility(View.VISIBLE);
                 } else {
@@ -119,7 +132,23 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
             };
 
             titleTextView.setOnClickListener(titleClickListener);
-            toggleButton.setOnCheckedChangeListener(toggleChangeListerner);
+            toggleButton.setOnCheckedChangeListener(toggleChangeListener);
         }
+    }
+
+    public interface OnLoadMoreCollectionListener{
+        void onLoadMore();
+    }
+
+    /**
+     * Method set CollectionAdapter's OnLoadMoreListener
+     * @param listener
+     */
+    public void setOnLoadMoreListener(OnLoadMoreCollectionListener listener){
+        this.onLoadMoreCollectionListener = listener;
+    }
+
+    public void setLoaded(){
+        isLoading = false;
     }
 }

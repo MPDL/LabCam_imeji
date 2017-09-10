@@ -34,13 +34,15 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
 
     private boolean isLoading;
     private int visibleThreshold = 3;
-    private int lastVisibleItem, totalItemCount;
+    int mListNum;
+    private CollectionItemAdapter adapter = this;
 
     private OnLoadMoreListener mOnLoadMoreListener;
 
-    public CollectionItemAdapter(List<String> ItemsList, RecyclerView recyclerView) {
+    public CollectionItemAdapter(List<String> ItemsList, RecyclerView recyclerView, int listNum) {
         this.mItemsList = ItemsList;
         this.mRecyclerView = recyclerView;
+        this.mListNum = listNum;
     }
 
     /**
@@ -63,13 +65,17 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                totalItemCount = recyclerView.getAdapter().getItemCount();
-                lastVisibleItem = ((LinearLayoutManager) recyclerView.getLayoutManager()).findLastVisibleItemPosition();
-                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
-                    if (mOnLoadMoreListener != null) {
-                        mOnLoadMoreListener.onLoadMore();
+                int lastVisibleItem, totalItemCount;
+                if(dx>0) {
+                    LinearLayoutManager linearLayoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
+                    totalItemCount = linearLayoutManager.getItemCount();
+                    lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+                    if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                        if (mOnLoadMoreListener != null) {
+                            mOnLoadMoreListener.onLoadMore(mListNum, adapter);
+                        }
+                        isLoading = true;
                     }
-                    isLoading = true;
                 }
             }
         });
@@ -113,7 +119,7 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
     }
 
     public interface OnLoadMoreListener{
-        void onLoadMore();
+        void onLoadMore(int listNum, CollectionItemAdapter adapter);
     }
 
     public void setLoaded(){

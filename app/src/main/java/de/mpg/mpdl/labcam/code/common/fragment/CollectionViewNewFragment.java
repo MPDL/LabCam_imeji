@@ -1,6 +1,7 @@
 package de.mpg.mpdl.labcam.code.common.fragment;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -39,6 +40,7 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
 
     BaseActivity activity;
     CollectionAdapter mCollectionAdapter;
+    CollectionItemAdapter currentItemAdapter;
     private boolean syncComplete = false;
     public Float dens;
 
@@ -62,15 +64,34 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
     protected void initContentView(Bundle savedInstanceState) {
         activity = (BaseActivity) getActivity();
 
-        mCollectionAdapter = new CollectionAdapter(collectionListLocal);
+        CollectionItemAdapter.OnLoadMoreListener listener = new CollectionItemAdapter.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(int listNum, CollectionItemAdapter adapter) {
+                ImejiFolderModel collection = collectionList.get(listNum);
+                int index = collection.getImageUrls().size()-1;
+                currentItemAdapter = adapter;
+                mPresenter.getCollectionItems(collection.getId(), index+3, 0, activity);
+            }
+        };
+
+        mCollectionAdapter = new CollectionAdapter(collectionList, mRecyclerView, listener);
+        mCollectionAdapter.setOnLoadMoreListener(new CollectionAdapter.OnLoadMoreCollectionListener() {
+            @Override
+            public void onLoadMore() {
+                int index = collectionList.size();
+                mPresenter.getCollectionMessage("", 10, index, activity);
+            }
+        });
         mRecyclerView.setLayoutManager(new LinearLayoutManager(activity));
         mRecyclerView.setAdapter(mCollectionAdapter);
 
     }
 
     private void downSynchCollections(){
-        if (syncComplete == false)
-            mPresenter.getCollectionMessage(activity);
+        if (syncComplete == false) {
+            collectionList.clear();
+            mPresenter.getCollectionMessage("", 10, 0, activity);
+        }
     }
 
     @Override
@@ -141,7 +162,7 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
             List<String> urlList = urlsObj.getUrlList();
             String id = urlsObj.getImejiId();
 
-            for (ImejiFolderModel collectionModel : collectionListLocal){
+            for (ImejiFolderModel collectionModel : collectionList){
                 if (collectionModel.getId().equals(id)){
                     collectionModel.setImageUrls(urlList);
                 }
@@ -155,15 +176,15 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
 
     }
 
-    private List<ImejiFolderModel> collectionListLocal = new ArrayList<>();
+    private List<ImejiFolderModel> collectionList = new ArrayList<>();
     @Override
     public void getCollectionsSuc(CollectionMessage collectionMessage) {
-        collectionListLocal.clear();
         for (ImejiFolderModel collectionModel : collectionMessage.getResults()) {
-            collectionListLocal.add(collectionModel);
-            mPresenter.getCollectionItems(collectionModel.getId(), 10, 0, activity);
+            collectionList.add(collectionModel);
+            mPresenter.getCollectionItems(collectionModel.getId(), 3, 0, activity);
         }
         mCollectionAdapter.notifyDataSetChanged();
+        mCollectionAdapter.setLoaded();
     }
 
     @Override

@@ -10,7 +10,7 @@ import rx.Observable;
 
 public abstract class CollectionMessageService extends BaseService{
 
-    public abstract Observable<CollectionMessage> getCollections();
+    public abstract Observable<CollectionMessage> getCollections(String q, int size, int offset);
 
     public abstract Observable<CollectionMessage> getGrantedCollectionMessage(String q);
 }

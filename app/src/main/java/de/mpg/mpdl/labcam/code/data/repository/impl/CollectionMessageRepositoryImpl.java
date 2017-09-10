@@ -18,8 +18,10 @@ public class CollectionMessageRepositoryImpl implements CollectionMessageReposit
     public CollectionMessageRepositoryImpl(){}
 
     @Override
-    public Observable<CollectionMessage> getCollections() {
-        return RetrofitFactory.getInstance().create(CollectionMessageApi.class).getCollections();
+    public Observable<CollectionMessage> getCollections(String q,
+                                                        int size,
+                                                        int offset) {
+        return RetrofitFactory.getInstance().create(CollectionMessageApi.class).getCollections(q, size, offset);
     }
 
     @Override

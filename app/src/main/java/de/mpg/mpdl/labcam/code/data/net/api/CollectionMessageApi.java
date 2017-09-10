@@ -11,8 +11,10 @@ import rx.Observable;
 
 public interface CollectionMessageApi {
 
-    @GET("collections?size=10000")
-    Observable<CollectionMessage> getCollections();
+    @GET("collections")
+    Observable<CollectionMessage> getCollections(@Query("q") String q,
+                                                 @Query("size") int size,
+                                                 @Query("offset") int offset);
 
     @GET("collections?size=10000")
     Observable<CollectionMessage> getGrantedCollectionMessage(@Query("q") String q);

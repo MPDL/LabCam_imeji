@@ -21,8 +21,8 @@ public class CollectionMessageServiceImp extends CollectionMessageService{
     }
 
     @Override
-    public Observable<CollectionMessage> getCollections() {
-        return collectionMessageRepository.getCollections();
+    public Observable<CollectionMessage> getCollections(String q, int size, int offset) {
+        return collectionMessageRepository.getCollections(q, size, offset);
     }
 
     @Override

@@ -264,7 +264,7 @@ public class CollectionViewFragment extends BaseMvpFragment<ImejiPresenter> impl
 
     private void downSynchCollections(){
         if (syncComplete == false)
-            mPresenter.getCollectionMessage(activity);
+            mPresenter.getCollectionMessage("", 10, 0, activity);
     }
 
     @Override
