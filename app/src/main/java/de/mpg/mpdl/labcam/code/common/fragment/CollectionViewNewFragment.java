@@ -40,7 +40,6 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
 
     BaseActivity activity;
     CollectionAdapter mCollectionAdapter;
-    CollectionItemAdapter currentItemAdapter;
     private boolean syncComplete = false;
     public Float dens;
 
@@ -68,9 +67,12 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
             @Override
             public void onLoadMore(int listNum, CollectionItemAdapter adapter) {
                 ImejiFolderModel collection = collectionList.get(listNum);
-                int index = collection.getImageUrls().size()-1;
-                currentItemAdapter = adapter;
-                mPresenter.getCollectionItems(collection.getId(), index+3, 0, activity);
+                int index = collection.getImageUrls().size();
+                int end = index+3<=collectionCompleteList.get(listNum).getImageUrls().size()?
+                        index+3 : collectionCompleteList.get(listNum).getImageUrls().size();
+                collection.setImageUrls(collectionCompleteList.get(listNum).getImageUrls().subList(0,end));
+                adapter.notifyDataSetChanged();
+                adapter.setLoaded();
             }
         };
 
@@ -164,9 +166,16 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
 
             for (ImejiFolderModel collectionModel : collectionList){
                 if (collectionModel.getId().equals(id)){
+                    collectionModel.setImageUrls(urlList.subList(0,3));
+                }
+            }
+
+            for (ImejiFolderModel collectionModel : collectionCompleteList){
+                if (collectionModel.getId().equals(id)){
                     collectionModel.setImageUrls(urlList);
                 }
             }
+
             mCollectionAdapter.notifyDataSetChanged();
         }
     };
@@ -177,11 +186,15 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
     }
 
     private List<ImejiFolderModel> collectionList = new ArrayList<>();
+    private List<ImejiFolderModel> collectionCompleteList = new ArrayList<>();
     @Override
     public void getCollectionsSuc(CollectionMessage collectionMessage) {
         for (ImejiFolderModel collectionModel : collectionMessage.getResults()) {
             collectionList.add(collectionModel);
-            mPresenter.getCollectionItems(collectionModel.getId(), 3, 0, activity);
+            ImejiFolderModel model = new ImejiFolderModel();
+            model.setId(collectionModel.getId());
+            collectionCompleteList.add(model);
+            mPresenter.getCollectionItems(collectionModel.getId(), 100, 0, activity);
         }
         mCollectionAdapter.notifyDataSetChanged();
         mCollectionAdapter.setLoaded();
