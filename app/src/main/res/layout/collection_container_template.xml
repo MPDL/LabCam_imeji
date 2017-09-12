@@ -64,7 +64,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/description_tv"
                 android:layout_below="@id/item_rv"
-                android:textSize="10sp"/>
+                android:textSize="10sp"
+                android:visibility="gone"/>
 
         </RelativeLayout>
 
