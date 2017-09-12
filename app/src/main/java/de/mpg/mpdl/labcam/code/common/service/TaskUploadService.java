@@ -80,8 +80,8 @@ public class TaskUploadService extends Service {
         //set currentTaskId
         currentTaskId = task.getId();
         finishedNum = task.getFinishedItems();
-        UploadService checkMateData = new UploadService(activity, currentTaskId);
-        checkMateData.run();
+        UploadService service = new UploadService(activity, currentTaskId);
+        service.run();
 
         return super.onStartCommand(intent, flags, startId);
     }

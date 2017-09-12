@@ -3,15 +3,10 @@ package de.mpg.mpdl.labcam.code.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.location.LocationManager;
-import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
@@ -44,8 +39,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.TimeZone;
 
-import de.mpg.mpdl.labcam.Model.LineAttributes;
+import de.mpg.mpdl.labcam.LabCam;
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
+import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 
 /**
@@ -265,7 +261,7 @@ public class DeviceStatus {
 
     }
 
-    public static String metaDataJson(String collectionId, String imagePath, Boolean[] typeList, String ocrText, String userId, String serverName){
+    public static String metaDataJson(String collectionId, String imagePath, Boolean[] typeList, boolean addLicense, String ocrText, String userId, String serverName){
 
         String metaDataJsonStr = null;
 
@@ -275,7 +271,7 @@ public class DeviceStatus {
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(file);
 
-            metaDataJsonStr =  generateJsonStr(collectionId, metadata, typeList, imagePath, ocrText, userId, serverName);
+            metaDataJsonStr =  generateJsonStr(collectionId, metadata, typeList,addLicense, imagePath, ocrText, userId, serverName);
 
             print(metadata);
         } catch (ImageProcessingException e) {
@@ -288,7 +284,7 @@ public class DeviceStatus {
         return metaDataJsonStr;
     }
 
-    private static String generateJsonStr(String collectionId, Metadata metadata, Boolean[] typeList, String imagePath, String ocrText, String userId, String serverName){
+    private static String generateJsonStr(String collectionId, Metadata metadata, Boolean[] typeList, boolean addLicense, String imagePath, String ocrText, String userId, String serverName){
 
         String metaDataJsonStr = null;
 
@@ -424,12 +420,29 @@ public class DeviceStatus {
                 mdArray.put(mdObj);
             }
             jsonObject.put("metadata", mdArray);
+            jsonObject = addLicenseJson(addLicense, jsonObject);
             metaDataJsonStr = jsonObject.toString();
             Log.e(LOG_TAG, metaDataJsonStr);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return metaDataJsonStr;
+    }
+
+    private static JSONObject addLicenseJson(boolean addLicense, JSONObject jsonObject){
+        if(addLicense){
+            try {
+                JSONObject licenseObj = new JSONObject()
+                        .put("name", "Copyright " +
+                                PreferenceUtil.getString(LabCam.getContext(), Constants.SHARED_PREFERENCES,Constants.GIVEN_NAME, "")+
+                                PreferenceUtil.getString(LabCam.getContext(), Constants.SHARED_PREFERENCES,Constants.FAMILY_NAME, ""));
+
+                jsonObject.put("licenses", new JSONArray().put(licenseObj));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return jsonObject;
     }
 
     // print metadata for function 'metaDataJson'

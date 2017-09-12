@@ -71,7 +71,7 @@ public class UploadService {
 
     //compare labCam template profile
     Boolean[] checkTypeList = {true,true,true,true,true,true,true,true,true,true,true,false};
-
+    boolean addLicense = false;
     boolean ocrIsOn = false;
 
     public UploadService(Context context, Long currentTaskId) {
@@ -279,6 +279,8 @@ public class UploadService {
                                     }
                                 });
                                 return;
+                            }else if(errStr.contains("Items must have a license to be released")){
+                                addLicense = true;
                             }
                             break;
                         case 404:
@@ -507,7 +509,7 @@ public class UploadService {
     }
 
     private void prepareBody(String imgPath, String ocrText){
-        json = DeviceStatus.metaDataJson(collectionID, imgPath, checkTypeList, ocrText, userId, serverName);
+        json = DeviceStatus.metaDataJson(collectionID, imgPath, checkTypeList, addLicense, ocrText, userId, serverName);
         imageFile = MultipartUtil.prepareFilePart("file",imgPath);
         Log.v(TAG, "start uploading: " + imgPath);
         upload();

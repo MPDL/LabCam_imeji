@@ -73,6 +73,7 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
                 collection.setImageUrls(collectionCompleteList.get(listNum).getImageUrls().subList(0,end));
                 adapter.notifyDataSetChanged();
                 adapter.setLoaded();
+                adapter.getItemCount();
             }
         };
 
