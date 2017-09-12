@@ -315,9 +315,9 @@ public class UploadService {
                             task.save();
 
                     }
+                    // continue upload
+                    uploadNext();
                 }
-                // continue upload
-                uploadNext();
             }
 
             @Override
