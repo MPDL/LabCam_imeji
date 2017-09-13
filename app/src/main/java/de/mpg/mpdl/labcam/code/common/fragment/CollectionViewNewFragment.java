@@ -167,7 +167,11 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
 
             for (ImejiFolderModel collectionModel : collectionList){
                 if (collectionModel.getId().equals(id)){
-                    collectionModel.setImageUrls(urlList.subList(0,3));
+                    if(urlList.size()>=3) {
+                        collectionModel.setImageUrls(urlList.subList(0, 3));
+                    }else {
+                        collectionModel.setImageUrls(urlList);
+                    }
                 }
             }
 
