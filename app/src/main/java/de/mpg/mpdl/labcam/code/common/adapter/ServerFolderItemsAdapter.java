@@ -14,11 +14,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +22,7 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.activity.DetailActivity;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.common.widget.CustomImageDownaloder;
+import de.mpg.mpdl.labcam.code.moudle.glide.ImageLoader;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 
@@ -75,37 +71,16 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         Point size = getPoint();
         String filePath = galleryItems.get(position);
-
-        ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(activity)
-                .imageDownloader(new CustomImageDownaloder(activity))
-                .writeDebugLogs()
-                .build();
+        String preUrl = new StringBuilder()
+                .append(filePath.substring(0, filePath.lastIndexOf("&")))
+                .append("&resolution=preview").toString();
 
         ViewGroup.LayoutParams layoutParams = holder.imageView.getLayoutParams();
         layoutParams.width = (size.x / 2)-6;
         layoutParams.height = (size.y/4)+5;
         holder.imageView.setLayoutParams(layoutParams);
 
-        ImageLoader.getInstance().init(configuration);
-
-        DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .extraForDownloader(headers)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .build();
-
-
-        ImageLoader.getInstance().loadImage(filePath, options, new SimpleImageLoadingListener() {
-
-            @Override
-            public void onLoadingComplete(String imageUri, View view,
-                                          Bitmap loadedImage) {
-                super.onLoadingComplete(imageUri, view, loadedImage);
-                holder.imageView.setImageBitmap(loadedImage);
-            }
-
-        });
+        ImageLoader.loadStringRes(holder.imageView, preUrl, ImageLoader.defConfig, null);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
