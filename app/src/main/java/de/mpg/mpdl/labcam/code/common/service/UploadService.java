@@ -40,8 +40,6 @@ import de.mpg.mpdl.labcam.code.utils.OCRHandler;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 import okhttp3.MultipartBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 
 /**
@@ -443,11 +441,11 @@ public class UploadService {
         Log.e(TAG , "Setting up OCR params for image: " + imageUri.toString());
         int imageHeight = 0;
         int imageWidth = 0;
-        String rot = null;
+        String orientation = null;
         try {
             ExifInterface exif = new ExifInterface(imagePath);
-            rot = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
-            Log.e(TAG , rot + " rotation ");
+            orientation = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+            Log.e(TAG , orientation + " orientation ");
         } catch (IOException e){
             Log.e(TAG, "could not get file information");
         }
@@ -459,24 +457,24 @@ public class UploadService {
         imageWidth = options.outWidth;
 
         try {
+
             bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
-            if (rot != null && !rot.equals("0") || imageWidth > imageHeight){
+            if (orientation != null){
                 {
-                    int rotInt = Integer.parseInt(rot);
+                    int orientInt = Integer.parseInt(orientation);
                     Log.e(TAG, "rotating image" + Integer.toString(imageWidth) + " " + Integer.toString(imageHeight));
                     Matrix matrix = new Matrix();
-                    matrix.postRotate(90);
                     int deg = 0;
-                    if (rotInt >= 2) {
-                        if (rotInt == 8) {
-                            deg = 90;
-                        } else if (rotInt == 3) {
-                            deg = 180;
-                        } else if (rotInt == 6) {
+                    if (orientInt >= 2) {
+                        if (orientInt == 8) {
                             deg = 270;
+                        } else if (orientInt == 3) {
+                            deg = 180;
+                        } else if (orientInt == 6) {
+                            deg = 90;
                         }
-                        Log.e(TAG, "rotating by " + Integer.toString(360-deg));
-                        matrix.postRotate(360-deg);
+                        Log.e(TAG, "rotating by " + Integer.toString(deg));
+                        matrix.postRotate(deg);
                     }
                     bitmap =  Bitmap.createBitmap(bitmap, 0, 0, imageWidth, imageHeight, matrix, true);
                 }
