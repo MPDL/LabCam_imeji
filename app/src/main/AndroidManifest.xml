@@ -42,6 +42,7 @@
             android:name="AA_DB_VERSION"
             android:value="3" />
 
+        <!--
         <meta-data
             android:name="AA_MODELS"
             android:value="de.mpg.mpdl.labcam.Model.Collection,
@@ -60,6 +61,7 @@
                            de.mpg.mpdl.labcam.Model.LocalModel.Voice,
                            de.mpg.mpdl.labcam.Model.MessageModel.Person,"
             />
+            -->
 
         <meta-data android:name="AA_SERIALIZERS"
                    android:value="de.mpg.mpdl.labcam.Utils.ListGsonSerializer" />
