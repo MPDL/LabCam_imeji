@@ -33,7 +33,7 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
     RecyclerView mRecyclerView;
 
     private boolean isLoading;
-    private int visibleThreshold = 3;
+    private int visibleThreshold = 1;
     int mListNum;
     private CollectionItemAdapter adapter = this;
 
@@ -65,12 +65,12 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                int lastVisibleItem, totalItemCount;
-                if(dx>0) {
+                if(!isLoading && dx>0) {
+                    int lastVisibleItem, totalItemCount;
                     LinearLayoutManager linearLayoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
                     totalItemCount = linearLayoutManager.getItemCount();
                     lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-                    if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                    if (totalItemCount <= (lastVisibleItem + visibleThreshold)) {
                         if (mOnLoadMoreListener != null) {
                             mOnLoadMoreListener.onLoadMore(mListNum, adapter);
                         }
@@ -118,8 +118,17 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
         }
     }
 
+    public List<String> getDataset(){
+        return mItemsList;
+    }
+
+    public void setDataSet(List<String> newDataSet){
+        this.mItemsList = newDataSet;
+        notifyDataSetChanged();
+    }
+
     public interface OnLoadMoreListener{
-        void onLoadMore(int listNum, CollectionItemAdapter adapter);
+        void onLoadMore(int listNum,  CollectionItemAdapter adapter);
     }
 
     public void setLoaded(){

@@ -66,14 +66,20 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
         CollectionItemAdapter.OnLoadMoreListener listener = new CollectionItemAdapter.OnLoadMoreListener() {
             @Override
             public void onLoadMore(int listNum, CollectionItemAdapter adapter) {
-                ImejiFolderModel collection = collectionList.get(listNum);
-                int index = collection.getImageUrls().size();
-                int end = index+3<=collectionCompleteList.get(listNum).getImageUrls().size()?
-                        index+3 : collectionCompleteList.get(listNum).getImageUrls().size();
-                collection.setImageUrls(collectionCompleteList.get(listNum).getImageUrls().subList(0,end));
-                adapter.notifyDataSetChanged();
-                adapter.setLoaded();
-                adapter.getItemCount();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        int index = adapter.getDataset().size();
+                        int end = index+3<=collectionCompleteList.get(listNum).getImageUrls().size()?
+                                index+3 : collectionCompleteList.get(listNum).getImageUrls().size();
+
+                        adapter.setDataSet(collectionCompleteList.get(listNum).getImageUrls().subList(0,end));
+                        adapter.setLoaded();
+                    }
+                }, 2000);
+
+
             }
         };
 
