@@ -52,7 +52,7 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
 import de.mpg.mpdl.labcam.code.base.BaseMvpActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.TitleFragmentPagerAdapter;
-import de.mpg.mpdl.labcam.code.common.fragment.CollectionViewNewFragment;
+import de.mpg.mpdl.labcam.code.module.CollectionFragmentModule.CollectionViewNewFragment;
 import de.mpg.mpdl.labcam.code.common.fragment.LocalFragment;
 import de.mpg.mpdl.labcam.code.common.observer.NetChangeObserver;
 import de.mpg.mpdl.labcam.code.common.observer.NetWorkStateReceiver;

@@ -1,4 +1,4 @@
-package de.mpg.mpdl.labcam.code.common.fragment;
+package de.mpg.mpdl.labcam.code.module.CollectionFragmentModule;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -77,7 +77,7 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
                         adapter.setDataSet(collectionCompleteList.get(listNum).getImageUrls().subList(0,end));
                         adapter.setLoaded();
                     }
-                }, 2000);
+                }, 500);
 
 
             }

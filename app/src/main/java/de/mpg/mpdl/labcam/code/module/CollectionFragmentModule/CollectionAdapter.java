@@ -1,4 +1,4 @@
-package de.mpg.mpdl.labcam.code.common.fragment;
+package de.mpg.mpdl.labcam.code.module.CollectionFragmentModule;
 
 import android.content.Context;
 import android.content.Intent;

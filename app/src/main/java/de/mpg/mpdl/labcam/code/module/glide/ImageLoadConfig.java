@@ -1,4 +1,4 @@
-package de.mpg.mpdl.labcam.code.moudle.glide;
+package de.mpg.mpdl.labcam.code.module.glide;
 
 /**
  * Created by jian on 16-9-12.

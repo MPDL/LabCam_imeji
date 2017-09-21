@@ -3,7 +3,6 @@ package de.mpg.mpdl.labcam.code.common.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,8 +20,7 @@ import java.util.Map;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.activity.DetailActivity;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
-import de.mpg.mpdl.labcam.code.common.widget.CustomImageDownaloder;
-import de.mpg.mpdl.labcam.code.moudle.glide.ImageLoader;
+import de.mpg.mpdl.labcam.code.module.glide.ImageLoader;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 
 

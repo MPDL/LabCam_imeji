@@ -1,4 +1,4 @@
-package de.mpg.mpdl.labcam.code.moudle.glide;
+package de.mpg.mpdl.labcam.code.module.glide;
 
 import android.content.Context;
 import android.graphics.Bitmap;
