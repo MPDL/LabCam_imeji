@@ -17,7 +17,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
-import com.activeandroid.query.Delete;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
@@ -356,7 +355,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
     @Override
     public void getCollectionsSuc(CollectionMessage collectionMessage) {
 
-        new Delete().from(ImejiFolder.class).execute();
+        DBConnector.deleteAllImejiFolders();
         collectionListLocal.clear();
 
         for (ImejiFolderModel imejiFolderModel : collectionMessage.getResults()) {   // imejiFolderModel to imejiFolder (active android)
@@ -372,7 +371,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
 
         if(collectionListLocal.size()==0){
             // first delete AutoTask
-            new Delete().from(Task.class).where("uploadMode = ?", "AU").execute();
+            DBConnector.deleteAuTask();
             // create dialog
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             // Set up the input

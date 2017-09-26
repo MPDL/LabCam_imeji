@@ -35,7 +35,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.activeandroid.query.Delete;
 import com.google.gson.JsonObject;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
@@ -52,7 +51,6 @@ import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.base.BaseActivity;
 import de.mpg.mpdl.labcam.code.base.BaseMvpActivity;
 import de.mpg.mpdl.labcam.code.common.adapter.TitleFragmentPagerAdapter;
-import de.mpg.mpdl.labcam.code.module.CollectionFragmentModule.CollectionViewNewFragment;
 import de.mpg.mpdl.labcam.code.common.fragment.LocalFragment;
 import de.mpg.mpdl.labcam.code.common.observer.NetChangeObserver;
 import de.mpg.mpdl.labcam.code.common.observer.NetWorkStateReceiver;
@@ -64,6 +62,7 @@ import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.injection.component.DaggerCollectionComponent;
 import de.mpg.mpdl.labcam.code.injection.module.CollectionMessageModule;
+import de.mpg.mpdl.labcam.code.module.CollectionFragmentModule.CollectionViewNewFragment;
 import de.mpg.mpdl.labcam.code.mvp.presenter.MainPresenter;
 import de.mpg.mpdl.labcam.code.mvp.view.MainView;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
@@ -168,7 +167,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         super.onDestroy();
         NetWorkStateReceiver.unRegisterNetStateObserver(this); //deRegister NetStateObserver
 
-        new Delete().from(ImejiFolder.class).execute();
+        DBConnector.deleteAllImejiFolders();
         hidePDialog();
     }
 
@@ -239,7 +238,6 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         Toast.makeText(this, "Press back again to quit the application", Toast.LENGTH_SHORT).show();
 
         new Handler().postDelayed(new Runnable() {
-
             @Override
             public void run() {
                 doubleBackToExitPressedOnce = false;
@@ -287,19 +285,12 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         initInstances();
-
         chooseCollection(); //choose collection
-
         checkRecent();
-
         checkRecentNote();
-
         checkRecentVoice();
-
         setUserInfoText();    // exception in
-
         initAutoSwitch();
-
         initOcrSwitch();
 
         if(isQRLogin) { // login with qr
@@ -310,9 +301,10 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         }
 
         setLogout();
+        checkUnfinishedTasks();
+    }
 
-        /**************************************************  check upload not finished task ***************************************************/
-
+    private void checkUnfinishedTasks(){
         List<Task> activeTaskList = DBConnector.getActiveTasks(userId, serverUrl);
         boolean isFinished = true;
 
@@ -358,7 +350,6 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
     @Override
     public void OnDisConnect() {
 //        Toast.makeText(this, "network disconnect...", Toast.LENGTH_LONG).show();
-
     }
 
     @Override
@@ -527,6 +518,10 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
     }
 
     private void initOcrSwitch(){
+
+        boolean isOcrOn = PreferenceUtil.getBoolean(activity, Constants.SHARED_PREFERENCES, Constants.OCR_IS_ON, false);
+        ocrSwitch.setChecked(isOcrOn);
+
         ocrSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -802,7 +797,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
 
         if(folderList.size()==0){
             // first delete AutoTask
-            new Delete().from(Task.class).where("uploadMode = ?", "AU").execute();
+            DBConnector.deleteAuTask();
             collectionNameTextView.setText("none");
             // create dialog
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -843,22 +838,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         }
         else if(folderList.size()==1){
 
-            DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
-
-            Task task = new Task();                                 //new a AU Task
-            task.setUploadMode("AU");
-            task.setCollectionId(folderList.get(0).id);
-            task.setState(String.valueOf(DeviceStatus.state.WAITING));
-            task.setUserName(username);
-            task.setUserId(userId);
-            task.setServerName(serverUrl);
-            task.setTotalItems(0);
-            task.setFinishedItems(0);
-
-            Long now = new Date().getTime();
-            task.setStartDate(String.valueOf(now));
-            task.setCollectionName(folderList.get(0).getTitle());
-            task.save();
+            createAUTask(folderList.get(0).id ,folderList.get(0).getTitle());
 
             //set selected collection name text
             if(folderList.get(0).getTitle()!=null) {
@@ -952,25 +932,11 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
 
     @Override
     public void createCollectionsSuc(ImejiFolderModel imejiFolder) {
-        DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
-
-        Task task = new Task();                                 //new a AU Task
-        task.setUploadMode("AU");
-        task.setCollectionId(imejiFolder.getId());
-        task.setState(String.valueOf(DeviceStatus.state.WAITING));
-        task.setUserName(username);
-        task.setUserId(userId);
-        task.setServerName(serverUrl);
-        task.setTotalItems(0);
-        task.setFinishedItems(0);
-
-        Long now = new Date().getTime();
-        task.setStartDate(String.valueOf(now));
-        task.setCollectionName(imejiFolder.getTitle());
-        task.save();
 
         //set selected collection name text
         collectionNameTextView.setText(imejiFolder.getTitle());
+
+        createAUTask(imejiFolder.getId(), imejiFolder.getTitle());
 
         pDialog.dismiss();
         Settings settings = DBConnector.getSettingsByUserId(userId); // get old settings
@@ -995,6 +961,25 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
     @Override
     public void createCollectionsFail(Throwable e) {
 
+    }
+
+    private void createAUTask(String collectionId, String collectionName){
+        DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
+
+        Task task = new Task();                                 //new a AU Task
+        task.setUploadMode("AU");
+        task.setCollectionId(collectionId);
+        task.setState(String.valueOf(DeviceStatus.state.WAITING));
+        task.setUserName(username);
+        task.setUserId(userId);
+        task.setServerName(serverUrl);
+        task.setTotalItems(0);
+        task.setFinishedItems(0);
+
+        Long now = new Date().getTime();
+        task.setStartDate(String.valueOf(now));
+        task.setCollectionName(collectionName);
+        task.save();
     }
 }
 

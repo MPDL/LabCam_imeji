@@ -17,8 +17,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.activeandroid.query.Delete;
-
 import java.util.Date;
 import java.util.List;
 
@@ -386,7 +384,8 @@ public class TaskManagerAdapter extends BaseAdapter {
 
     private void deleteTask(Task task,int position){
         Long currentTaskId = task.getId();
-        new Delete().from(Task.class).where("Id = ?", currentTaskId).execute();
+        DBConnector.deleteTaskById(currentTaskId);
+
         // delete imgs in task
         removeTaskInterface.remove(position);
         taskList.remove(task);

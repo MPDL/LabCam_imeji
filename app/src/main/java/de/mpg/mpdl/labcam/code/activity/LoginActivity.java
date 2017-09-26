@@ -16,19 +16,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.activeandroid.query.Delete;
-import com.activeandroid.query.Select;
 import com.tbruyelle.rxpermissions.RxPermissions;
-
 import java.text.DateFormat;
 import java.util.Date;
-
 import butterknife.BindView;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.base.BaseMvpActivity;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.data.model.UserModel;
 import de.mpg.mpdl.labcam.code.data.net.RetrofitFactory;
@@ -271,9 +267,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
     private void createTask(){
         String username = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_NAME, "");
         String userId = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
-
-
-        Task latestTask = new Select().from(Task.class).where("userId = ?",userId).where("uploadMode = ?","AU").executeSingle();
+        Task latestTask = DBConnector.getAuTask(userId, serverURL);
 
         if(latestTask==null){
             Log.v("create Task","no task in database");
@@ -299,7 +293,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
         }else if(!latestTask.getCollectionId().equals(collectionId)) {
             // last AuTask exist delete and create new
             Log.v("collectionID",collectionId);
-            new Delete().from(Task.class).where("uploadMode = ?", "AU").execute();
+            DBConnector.deleteAuTask();
 
             Task task = new Task();
             task.setUploadMode("AU");

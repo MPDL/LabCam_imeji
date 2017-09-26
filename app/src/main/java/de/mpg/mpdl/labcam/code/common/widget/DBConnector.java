@@ -33,6 +33,7 @@ public class DBConnector {
                 .from(Task.class)
                 .where("userId = ?", userId)
                 .where("serverName = ?", serverName)
+                .orderBy("startDate DESC")
                 .execute();
     }
 
@@ -112,6 +113,16 @@ public class DBConnector {
                 .execute();
     }
 
+    public static List<Task> getActiveManualTasks(String userId, String serverName){
+        return new Select().
+                from(Task.class)
+                .where("uploadMode = ?", "MU")
+                .where("userId = ?", userId)
+                .where("serverName = ?", serverName)
+                .where("state != ?", String.valueOf(DeviceStatus.state.FINISHED))
+                .execute();
+    }
+
     //delete finished tasks
     public static void deleteFinishedAUTasks(String userId, String serverName){
 
@@ -146,6 +157,13 @@ public class DBConnector {
         Log.v(LOG_TAG,num +"_finished");
     }
 
+    public static void deleteAuTask(){
+        new Delete().from(Task.class).where("uploadMode = ?", "AU").execute();
+    }
+
+    public static void deleteTaskById(Long taskId){
+        new Delete().from(Task.class).where("Id = ?", taskId).execute();
+    }
     /** IMAGE **/
 
     //get latest(createTime) image
@@ -299,5 +317,9 @@ public class DBConnector {
         return new Select()
                 .from(ImejiFolder.class)
                 .execute();
+    }
+
+    public static void deleteAllImejiFolders(){
+        new Delete().from(ImejiFolder.class).execute();
     }
 }

@@ -13,9 +13,6 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
-
-import com.activeandroid.query.Select;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -141,9 +138,7 @@ public class MediaContentJobService extends JobService implements UploadResultRe
         newImage.save();
 
         //get current Task id
-
-        Task task = new Select().from(Task.class).where("uploadMode = ?","AU").orderBy("startDate DESC").executeSingle();
-
+        Task task = DBConnector.getAuTask(userId, serverName);
         task.setTotalItems(task.getTotalItems() + 1);
         List<String> imagePaths = task.getImagePaths();
         imagePaths.add(imagePath);

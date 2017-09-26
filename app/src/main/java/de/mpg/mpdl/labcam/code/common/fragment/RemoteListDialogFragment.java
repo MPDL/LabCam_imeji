@@ -17,7 +17,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
-import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.google.gson.JsonObject;
 
@@ -41,6 +40,7 @@ import de.mpg.mpdl.labcam.code.common.adapter.SettingsListAdapter;
 import de.mpg.mpdl.labcam.code.common.callback.CollectionIdInterface;
 import de.mpg.mpdl.labcam.code.common.service.ManualUploadService;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
+import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 import de.mpg.mpdl.labcam.code.injection.component.DaggerCollectionComponent;
 import de.mpg.mpdl.labcam.code.injection.module.CollectionMessageModule;
@@ -289,7 +289,7 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
 
     @Override
     public void getCollectionsSuc(CollectionMessage collectionMessage) {
-        new Delete().from(ImejiFolder.class).execute();
+        DBConnector.deleteAllImejiFolders();
         collectionList.clear();
 
         for (ImejiFolderModel imejiFolderModel : collectionMessage.getResults()) {
@@ -334,7 +334,7 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
                     .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // do nothing
-                            new Delete().from(Task.class).where("Id = ?", currentTaskId).execute();
+                            DBConnector.deleteTaskById(currentTaskId);
                             remoteListDialogFragment.dismiss();
                         }
                     })

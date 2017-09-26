@@ -74,7 +74,7 @@ public class TaskUploadService extends Service {
 
         //set task
         task = DBConnector.getAuTask(userId, serverName);
-        if (task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))) {
+        if (task==null || task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))) {
             return super.onStartCommand(intent, flags, startId);
         }
         //set currentTaskId

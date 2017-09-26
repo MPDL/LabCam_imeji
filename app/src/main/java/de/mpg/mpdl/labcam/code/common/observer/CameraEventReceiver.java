@@ -8,13 +8,9 @@ import android.media.ExifInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-
-import com.activeandroid.query.Select;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Settings;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
@@ -93,7 +89,7 @@ public class CameraEventReceiver extends BroadcastReceiver implements UploadResu
 
         //get current Task id
 
-        Task task = new Select().from(Task.class).where("uploadMode = ?","AU").orderBy("startDate DESC").executeSingle();
+        Task task = DBConnector.getAuTask(userId, serverName);
 
         task.setTotalItems(task.getTotalItems() + 1);
         List<String> imagePaths = task.getImagePaths();
