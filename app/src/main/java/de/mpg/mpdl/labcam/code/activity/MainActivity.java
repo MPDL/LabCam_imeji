@@ -24,6 +24,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -258,6 +259,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
             }
         }
 
+
         //user info
         email = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.EMAIL, "");
         username = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.FAMILY_NAME, "")
@@ -285,11 +287,11 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         initInstances();
-        chooseCollection(); //choose collection
         checkRecent();
         checkRecentNote();
         checkRecentVoice();
         setUserInfoText();    // exception in
+        chooseCollection(); //choose collection
         initAutoSwitch();
         initOcrSwitch();
 
@@ -536,6 +538,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
     }
 
     private void updateFolder(){
+
         String q = "role=edit";
         mPresenter.getGrantedCollectionMessage(q, activity);
     }
@@ -838,7 +841,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         }
         else if(folderList.size()==1){
 
-            createAUTask(folderList.get(0).id ,folderList.get(0).getTitle());
+            createAUTask(folderList.get(0).getImejiId() ,folderList.get(0).getTitle());
 
             //set selected collection name text
             if(folderList.get(0).getTitle()!=null) {
@@ -862,7 +865,6 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
             }
         }
         else {  // Col > 1
-
             if(!isLoginCall){   // callback from switch
                 Intent settingsIntent = new Intent(activity, RemoteCollectionSettingsActivity.class);
                 startActivityForResult(settingsIntent,PICK_COLLECTION_REQUEST);
@@ -878,8 +880,9 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                 //col wasValue
                 Task auTask = DBConnector.getAuTask(userId,serverUrl);
                 if(auTask!=null && auTask.getCollectionId() !=null) {   // col wasValue not null
+                    Log.d("logAuTask", auTask.getCollectionId());
                     for(int i = 0; i<folderList.size(); i++){           // col wasValue still valid on server
-                        if(auTask.getCollectionId().equalsIgnoreCase(folderList.get(i).id)){
+                        if(auTask.getCollectionId().equalsIgnoreCase(folderList.get(i).getImejiId())){
                             isValid = true;
                         }
                         collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
@@ -893,7 +896,8 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                     // old collection not valid
                     Task task = DBConnector.getAuTask(userId, serverUrl);
                     if(task!=null){
-                        task.delete();}
+                        task.delete();
+                    }
 
                     new AlertDialog.Builder(activity)
                             .setTitle("Notice")
