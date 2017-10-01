@@ -153,11 +153,6 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
     }
 
     @Override
-    public void onResume(){
-        super.onResume();
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         hidePDialog();
@@ -736,15 +731,11 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                 else{
                     collectionNameTextView.setText("none");
 
-                    if(settings.isAutoUpload()){
-                        autoUploadSwitch.setChecked(true);
-                    }else{
-                        autoUploadSwitch.setChecked(false);
-                    }
-
                     settings.setUserId(userId);
                     settings.setIsAutoUpload(false);
                     settings.save();
+
+                    autoUploadSwitch.setChecked(false);
 
                     // UI disable click
                     chooseCollectionLayout.setEnabled(false);
