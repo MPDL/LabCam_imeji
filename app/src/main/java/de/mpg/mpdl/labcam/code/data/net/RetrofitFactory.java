@@ -16,6 +16,7 @@ import de.mpg.mpdl.labcam.LabCam;
 import de.mpg.mpdl.labcam.code.common.widget.Constants;
 import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
 import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
+import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -44,14 +45,19 @@ public class RetrofitFactory {
 
     }
 
-    public void changeServer(String address) {
-        retrofit = new Retrofit.Builder()
-                .baseUrl(address)
+    public boolean changeServer(String address) {
+        try {
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(address)
 //                .addConverterFactory(GsonConverterFactory.create(buildGson()))
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .client(genericClient())
-                .build();
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                    .client(genericClient())
+                    .build();
+        }catch (Exception e){
+            return false;
+        }
+        return true;
     }
 
     public static RetrofitFactory getInstance() {
