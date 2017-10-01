@@ -390,6 +390,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
     public void loginFail(Throwable e) {
 
         PreferenceUtil.clearPrefs(activity, Constants.SHARED_PREFERENCES, Constants.API_KEY);
+        collectionId = null;
 
         HttpException httpException = (HttpException)e;
 
