@@ -16,11 +16,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.util.Date;
+
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 import butterknife.BindView;
 import de.mpg.mpdl.labcam.Model.LocalModel.Task;
 import de.mpg.mpdl.labcam.R;
@@ -185,7 +189,6 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
         if(serverURLView.getVisibility()==View.VISIBLE) {
             serverURL = serverURLView.getText().toString();
         }else serverURL = DeviceStatus.BASE_URL;
-
         if(!RetrofitFactory.getInstance().changeServer(serverURL)){
             showLongMessage("unable to resolve host "+ serverURL);
             return;
@@ -396,7 +399,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
 
         PreferenceUtil.clearPrefs(activity, Constants.SHARED_PREFERENCES, Constants.API_KEY);
         collectionId = null;
-        if(e instanceof UnknownHostException){
+        if(e instanceof UnknownHostException || e instanceof SSLPeerUnverifiedException){
             showLongMessage("hostname is unknown");
             return;
         }

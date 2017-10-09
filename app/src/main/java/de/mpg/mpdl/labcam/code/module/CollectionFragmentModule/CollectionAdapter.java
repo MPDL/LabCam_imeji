@@ -75,9 +75,9 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
         StringBuilder nameSb = new StringBuilder();
         nameSb.append("by: ");
         Person person = mCollection.getContributors().get(0);
-        nameSb.append(person.getGivenName()!=null? person.getGivenName():"");
-        nameSb.append(" ");
         nameSb.append(person.getFamilyName()!=null? person.getFamilyName():"");
+        nameSb.append(", ");
+        nameSb.append(person.getGivenName()!=null? person.getGivenName():"");
         holder.authorTextView.setText(nameSb.toString());
         StringBuilder descriptionSb = new StringBuilder();
         descriptionSb.append("Creation date: ");
