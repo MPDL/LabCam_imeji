@@ -26,6 +26,7 @@ import de.mpg.mpdl.labcam.code.data.model.ImejiFolderModel;
 public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.CollectionViewHolder>{
 
     private List<ImejiFolderModel> collectionList;
+    private List<ImejiFolderModel> completeList;
     private Context context;
 
     private int visibleThreshold = 3;
@@ -34,10 +35,11 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
     private OnLoadMoreCollectionListener onLoadMoreCollectionListener;
     private CollectionItemAdapter.OnLoadMoreListener onLoadMoreItemListener;
 
-    public CollectionAdapter(List<ImejiFolderModel> collectionList, RecyclerView recyclerView, CollectionItemAdapter.OnLoadMoreListener listener) {
+    public CollectionAdapter(List<ImejiFolderModel> collectionList, List<ImejiFolderModel> completeList, RecyclerView recyclerView, CollectionItemAdapter.OnLoadMoreListener listener) {
         this.collectionList = collectionList;
         this.mRecyclerView = recyclerView;
         this.onLoadMoreItemListener = listener;
+        this.completeList = completeList;
     }
 
     @Override
@@ -89,7 +91,7 @@ public class CollectionAdapter extends RecyclerView.Adapter<CollectionAdapter.Co
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
         holder.recyclerView.setLayoutManager(linearLayoutManager);
-        CollectionItemAdapter adapter = new CollectionItemAdapter(mCollection.getImageUrls(), holder.recyclerView, position);
+        CollectionItemAdapter adapter = new CollectionItemAdapter(mCollection.getImageUrls(), completeList.get(position).getImageUrls(), holder.recyclerView, position);
         adapter.setOnLoadMoreListener(onLoadMoreItemListener);
         holder.recyclerView.setAdapter(adapter);
     }

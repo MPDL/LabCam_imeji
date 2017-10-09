@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -45,6 +46,7 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
     private static final String LOG_TAG = DetailActivity.class.getSimpleName();
     private Activity activity = this;
     private List<String> itemPathList;
+    private List<String> completeList;
     private ViewPagerAdapter viewPagerAdapter;
     boolean isLocalImage;
     int positionInList;
@@ -77,6 +79,7 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
         Bundle extras = intent.getExtras();
         if (extras != null) {
             itemPathList = extras.getStringArrayList("itemPathList");
+            completeList = extras.getStringArrayList("completeList");
             isLocalImage = extras.getBoolean("isLocalImage");
             positionInList = extras.getInt("positionInList");
 
@@ -256,7 +259,29 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
         Point size = new Point();
         display.getSize(size);
 
-        viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList, userId, serverName);
+        ViewPagerAdapter.OnLoadMoreDetailListener onLoadMoreDetailListener = new ViewPagerAdapter.OnLoadMoreDetailListener() {
+            @Override
+            public void onLoadMore(int position) {
+                if(completeList==null || completeList.size()==0){
+                    return;
+                }
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        int index = position;
+                        int end = index+3<=completeList.size()?
+                                index+3 : completeList.size();
+
+                        viewPagerAdapter.setDataSet(completeList.subList(0,end));
+                        viewPager.setCurrentItem(index+1);
+                        viewPagerAdapter.setLoaded();
+                    }
+                }, 500);
+            }
+        };
+
+        viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList, onLoadMoreDetailListener, userId, serverName);
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setCurrentItem(positionInList);
         if(isLocalImage) {

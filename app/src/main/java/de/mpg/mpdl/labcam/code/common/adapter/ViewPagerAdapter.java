@@ -31,6 +31,7 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Voice;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.common.widget.camPicassoLoader;
+import de.mpg.mpdl.labcam.code.module.glide.ImageLoader;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
 import de.mpg.mpdl.labcam.code.utils.ToastUtils;
@@ -47,7 +48,11 @@ public class ViewPagerAdapter extends PagerAdapter {
     private String userId;
     private String serverName;
     boolean isLocalImage;
+    private boolean isLoading;
+    private ViewPagerAdapter adapter;
+
     private OnItemClickListener onItemClickListener;
+    private OnLoadMoreDetailListener onLoadMoreDetailListener;
 
     public Set<Integer> positionSet = new HashSet<>();
 
@@ -60,13 +65,16 @@ public class ViewPagerAdapter extends PagerAdapter {
         notifyDataSetChanged();
     }
 
-    public ViewPagerAdapter(Context context, Point size,boolean isLocalImage, List<String> imagePathList, String userId, String serverName) {
+    public ViewPagerAdapter(Context context, Point size, boolean isLocalImage, List<String> imagePathList,
+                            OnLoadMoreDetailListener onLoadMoreDetailListener, String userId, String serverName) {
         this.context = context;
         this.size = size;
         this.isLocalImage = isLocalImage;
         this.imagePathList = imagePathList;
         this.userId = userId;
         this.serverName = serverName;
+        this.onLoadMoreDetailListener = onLoadMoreDetailListener;
+        this.adapter = this;
     }
 
     @Override
@@ -91,8 +99,12 @@ public class ViewPagerAdapter extends PagerAdapter {
         TextView imageNameTextView = (TextView) itemView.findViewById(R.id.tv_image_detail_name);
         String fileName = "";
         if(imagePathList.get(position)!=null){
-            String[] imgPathSplit = imagePathList.get(position).split("/");
-            fileName = imgPathSplit[imgPathSplit.length-1];
+            if(!isLocalImage){
+                fileName = getOriginalUrl(imagePathList.get(position));
+            } else {
+                String[] imgPathSplit = imagePathList.get(position).split("/");
+                fileName = imgPathSplit[imgPathSplit.length-1];
+            }
         }
         imageNameTextView.setText(fileName);
 
@@ -114,11 +126,7 @@ public class ViewPagerAdapter extends PagerAdapter {
                     .centerInside()
                     .into(imageView);
         }else {
-            Picasso myPicasso = new Picasso.Builder(context).downloader(new camPicassoLoader(context)).build();
-            myPicasso.load(imagePathList.get(position))
-                    .resize(size.x, size.y)
-                    .centerInside()
-                    .error(R.drawable.error_alert).into(imageView);
+            ImageLoader.loadStringRes(imageView, getOriginalUrl(imagePathList.get(position)), ImageLoader.defConfig, null);
         }
 
         if (onItemClickListener!=null){
@@ -139,6 +147,35 @@ public class ViewPagerAdapter extends PagerAdapter {
         }
 
         initImageInfoLayout(itemView, position);  // init notes and voice
+
+
+        ((ViewPager) container).setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    if(!isLoading) {
+                        int lastVisibleItem, totalItemCount, visibleThreshold;
+                        visibleThreshold = 1;
+                        totalItemCount = adapter.getCount();
+                        lastVisibleItem = position;
+                        if (totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                            if (onLoadMoreDetailListener != null) {
+                                onLoadMoreDetailListener.onLoadMore(position);
+                            }
+                            isLoading = true;
+                        }
+                    }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         ((ViewPager) container).addView(itemView);
         return itemView;
@@ -319,6 +356,27 @@ public class ViewPagerAdapter extends PagerAdapter {
 
         VoiceRefreshEvent voiceRefreshEvent = new VoiceRefreshEvent(imagePathList.get(position));
         RxBus.getDefault().post(voiceRefreshEvent);
+    }
+
+    public void setDataSet(List<String> newDataSet){
+        this.imagePathList = newDataSet;
+        notifyDataSetChanged();
+    }
+
+    public interface OnLoadMoreDetailListener {
+        void onLoadMore(int position);
+    }
+
+    public void setLoaded(){
+        isLoading = false;
+    }
+
+    private String getOriginalUrl(String url){
+        String preUrl = url;
+        String oriUrl = new StringBuilder()
+                .append(preUrl.substring(0, preUrl.lastIndexOf("&")))
+                .append("&resolution=original").toString();
+        return oriUrl;
     }
 
 }

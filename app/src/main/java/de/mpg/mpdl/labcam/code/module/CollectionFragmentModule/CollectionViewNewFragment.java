@@ -83,7 +83,7 @@ public class CollectionViewNewFragment extends BaseMvpFragment<ImejiPresenter> i
             }
         };
 
-        mCollectionAdapter = new CollectionAdapter(collectionList, mRecyclerView, listener);
+        mCollectionAdapter = new CollectionAdapter(collectionList, collectionCompleteList, mRecyclerView, listener);
         mCollectionAdapter.setOnLoadMoreListener(new CollectionAdapter.OnLoadMoreCollectionListener() {
             @Override
             public void onLoadMore() {

@@ -29,6 +29,7 @@ import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAdapter.ItemViewHolder>{
 
     List<String> mItemsList = new ArrayList<>();
+    List<String> completeList = new ArrayList<>();
     private Map<String, String> headers = new HashMap<>();
     Context context;
     RecyclerView mRecyclerView;
@@ -40,10 +41,11 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
 
     private OnLoadMoreListener mOnLoadMoreListener;
 
-    public CollectionItemAdapter(List<String> ItemsList, RecyclerView recyclerView, int listNum) {
+    public CollectionItemAdapter(List<String> ItemsList, List<String> completeList, RecyclerView recyclerView, int listNum) {
         this.mItemsList = ItemsList;
         this.mRecyclerView = recyclerView;
         this.mListNum = listNum;
+        this.completeList = completeList;
     }
 
     /**
@@ -113,7 +115,9 @@ public class CollectionItemAdapter extends RecyclerView.Adapter<CollectionItemAd
         public void onClick(View v) {
             Intent showDetailIntent = new Intent(context, DetailActivity.class);
             ArrayList itemPathList = new ArrayList(mItemsList);
+            ArrayList cList = new ArrayList(completeList);
             showDetailIntent.putStringArrayListExtra("itemPathList", itemPathList);
+            showDetailIntent.putStringArrayListExtra("completeList", cList);
             showDetailIntent.putExtra("positionInList",getAdapterPosition());
             context.startActivity(showDetailIntent);
         }
