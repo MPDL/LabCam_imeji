@@ -100,7 +100,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         String fileName = "";
         if(imagePathList.get(position)!=null){
             if(!isLocalImage){
-                fileName = getOriginalUrl(imagePathList.get(position));
+                fileName = imagePathList.get(position);
             } else {
                 String[] imgPathSplit = imagePathList.get(position).split("/");
                 fileName = imgPathSplit[imgPathSplit.length-1];
@@ -126,7 +126,7 @@ public class ViewPagerAdapter extends PagerAdapter {
                     .centerInside()
                     .into(imageView);
         }else {
-            ImageLoader.loadStringRes(imageView, getOriginalUrl(imagePathList.get(position)), ImageLoader.defConfig, null);
+            ImageLoader.loadStringRes(imageView, imagePathList.get(position), ImageLoader.defConfig, null);
         }
 
         if (onItemClickListener!=null){
@@ -371,12 +371,6 @@ public class ViewPagerAdapter extends PagerAdapter {
         isLoading = false;
     }
 
-    private String getOriginalUrl(String url){
-        String preUrl = url;
-        String oriUrl = new StringBuilder()
-                .append(preUrl.substring(0, preUrl.lastIndexOf("&")))
-                .append("&resolution=original").toString();
-        return oriUrl;
-    }
+
 
 }
