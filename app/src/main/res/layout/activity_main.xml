@@ -265,6 +265,7 @@
                     android:layout_marginRight="10dp"
                     android:gravity="right"
                     android:id="@+id/collection_name"
+                    android:maxLines="2"
                     android:text=""
                     android:enabled="false"
                     android:textColor="@color/grayDivider"
