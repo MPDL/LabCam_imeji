@@ -266,6 +266,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
     public void accountLogin(String userId, boolean isQRLogin) {
         Intent intent = new Intent(activity, MainActivity.class);
         intent.putExtra("isQRLogin", isQRLogin);
+        intent.putExtra("isLogin", true);
         startActivity(intent);
         // layout_login out of stack
         finish();

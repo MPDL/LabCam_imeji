@@ -105,6 +105,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
     private String userId;
     private String serverUrl;
     boolean isQRLogin = false;  //login with qr
+    boolean isLogin = false;
     boolean isLoginCall = true;  //from onCreate callback
     boolean isDestroyByCamera = false;   //Camera destroy activity
 
@@ -265,6 +266,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         Bundle args = this.getIntent().getExtras();         // get isQRLogin from extra
         try {
             isQRLogin = args.getBoolean("isQRLogin", false);
+            isLogin = args.getBoolean("isLogin", false);
         } catch(NullPointerException e) {
             e.printStackTrace();
         }
@@ -298,7 +300,9 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         }
 
         setLogout();
-        checkUnfinishedTasks();
+        if(isLogin) {
+            checkUnfinishedTasks();
+        }
     }
 
     private void checkUnfinishedTasks(){
