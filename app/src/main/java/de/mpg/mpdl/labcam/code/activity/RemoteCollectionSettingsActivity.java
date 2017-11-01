@@ -60,7 +60,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
     private String apiKey;
     private String collectionId = "";
     private String collectionName;
-    private String serverUrl;
+    private String serverName;
     boolean isNone = true;
 
     private SettingsListAdapter adapter;
@@ -85,7 +85,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
     private void createTask(String collectionID){
 
         // get AU task
-        latestTask = DBConnector.getAuTask(userId,serverUrl);
+        latestTask = DBConnector.getAuTask(userId, serverName);
         //   case 1: create first task
         if(latestTask==null){
             Log.v("create Task", "no task in database");
@@ -100,7 +100,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
             task.setUserId(userId);
             task.setTotalItems(0);
             task.setFinishedItems(0);
-            task.setServerName(serverUrl);
+            task.setServerName(serverName);
 
             Long now = new Date().getTime();
             task.setStartDate(String.valueOf(now));
@@ -153,7 +153,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
         }
     }
 
-//    apiKey  LOG_TAG activity userId serverUrl collectionID
+//    apiKey  LOG_TAG activity userId serverName collectionID
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -167,7 +167,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
                 if (qrCollectionId != null && !qrCollectionId.equals("")) {
                     Log.i("~qrCollectionId", qrCollectionId);
 
-                    DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
+                    DBConnector.deleteFinishedAUTasks(userId, serverName);             //delete all AU Task if finished
                     collectionId = qrCollectionId;
                     /**create Task**/
                     createTask(qrCollectionId);
@@ -194,7 +194,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
         if (!collectionId.equals(null) && !("").equals(collectionId)) {
             Log.i("~collectionID", collectionId);
 
-            DBConnector.deleteFinishedAUTasks(userId, serverUrl);             //delete all AU Task if finished
+            DBConnector.deleteFinishedAUTasks(userId, serverName);             //delete all AU Task if finished
 
             /**create Task**/
             createTask(collectionId);
@@ -254,7 +254,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
                                     task.setState(String.valueOf(DeviceStatus.state.WAITING));
                                     task.setUserName(username);
                                     task.setUserId(userId);
-                                    task.setServerName(serverUrl);
+                                    task.setServerName(serverName);
 
                                     Long now = new Date().getTime();
                                     task.setStartDate(String.valueOf(now));
@@ -313,7 +313,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
         username = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_NAME, "");
         userId = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
         apiKey = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
-        serverUrl = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
+        serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
         /** scan QR **/
         Button qrCodeImageView = (Button) findViewById(R.id.im_qr_scan);
@@ -326,7 +326,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
         });
 
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-        adapter = new SettingsListAdapter(activity, collectionListLocal,this);
+        adapter = new SettingsListAdapter(activity, collectionListLocal,getSelectedCollectionId(), this);
         listView.setAdapter(adapter);
     }
 
@@ -438,7 +438,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
     private void getLocalCollections(){
         collectionListLocal = DBConnector.getUserFolders();
 
-        adapter = new SettingsListAdapter(activity, collectionListLocal,ie);
+        adapter = new SettingsListAdapter(activity, collectionListLocal, getSelectedCollectionId(), ie);
         listView.setAdapter(adapter);
     }
 
@@ -452,5 +452,9 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
 
     @Override
     public void createCollectionsFail(Throwable e) {
+    }
+
+    private String getSelectedCollectionId(){
+        return DBConnector.getAuTask(userId, serverName).getCollectionId();
     }
 }

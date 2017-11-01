@@ -62,6 +62,18 @@ public class DBConnector {
                 .executeSingle();
     }
 
+    // Get last Non-AU task
+    public static Task getLastTask(String userId, String serverName) {
+        String mode = "AU";
+        return new Select()
+                .from(Task.class)
+                .where("uploadMode != ?", mode)
+                .where("userId = ?", userId)
+                .where("serverName = ?", serverName)
+                .orderBy("startDate DESC")
+                .executeSingle();
+    }
+
     // get Task by TaskId
     public static Task getTaskById(String taskId, String userId, String serverName) {
         return new Select()

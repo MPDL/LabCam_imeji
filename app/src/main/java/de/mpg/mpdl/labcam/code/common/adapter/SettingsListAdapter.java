@@ -34,26 +34,15 @@ public class SettingsListAdapter extends BaseAdapter {
 
     private String collectionId;
     private CollectionIdInterface ie;
+    private String uploadMode= "";
 
     //selected collection
 
-    public SettingsListAdapter(Activity activity, List<ImejiFolder> folderItems,CollectionIdInterface ie) {
+    public SettingsListAdapter(Activity activity, List<ImejiFolder> folderItems, String selectedCollectionId, CollectionIdInterface ie) {
         this.activity = activity;
         this.folderItems = folderItems;
+        this.collectionId = selectedCollectionId;
         this.ie = ie;
-        String lastCollectionId ="";
-
-        String userId = PreferenceUtil.getString(activity, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
-        String serverName = PreferenceUtil.getString(activity, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
-
-        try {
-            lastCollectionId = DBConnector.getAuTask(userId, serverName).getCollectionId();
-        }catch (NullPointerException e){
-            e.printStackTrace();
-        }
-
-        if(lastCollectionId!=null && !lastCollectionId.equalsIgnoreCase("")){
-            collectionId = lastCollectionId;}
     }
 
     @Override
@@ -122,6 +111,30 @@ public class SettingsListAdapter extends BaseAdapter {
 
 
         return convertView;
+    }
+
+    public void setUploadMode(String mode){
+        uploadMode = mode;
+        selectCollection();
+    }
+
+    private void selectCollection(){
+        String lastCollectionId ="";
+        String userId = PreferenceUtil.getString(activity, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        String serverName = PreferenceUtil.getString(activity, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
+        try {
+            if("AU".equalsIgnoreCase(uploadMode)) {
+                lastCollectionId = DBConnector.getAuTask(userId, serverName).getCollectionId();
+            }else {
+                lastCollectionId = DBConnector.getLastTask(userId, serverName).getCollectionId();
+            }
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
+        if(lastCollectionId!=null && !lastCollectionId.equalsIgnoreCase("")){
+            collectionId = lastCollectionId;
+        }
     }
 
 }

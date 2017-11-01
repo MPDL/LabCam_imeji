@@ -133,7 +133,7 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
 
         //remote folder list
         listView = (ListView) view.findViewById(R.id.settings_remote_listView);
-        adapter = new SettingsListAdapter(activity, collectionList,this);
+        adapter = new SettingsListAdapter(activity, collectionList, getSelectedCollectionId(), this);
         listView.setAdapter(adapter);
 
         b.setView(view);
@@ -370,7 +370,7 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
         collectionList = new Select().from(ImejiFolder.class).execute();
         Log.v(LOG_TAG, collectionList.size() + "");
 
-        adapter = new SettingsListAdapter(activity, collectionList,ie);
+        adapter = new SettingsListAdapter(activity, collectionList, getSelectedCollectionId(), ie);
         listView.setAdapter(adapter);
     }
 
@@ -397,5 +397,9 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
     @Override
     public void createCollectionsFail(Throwable e) {
 
+    }
+
+    private String getSelectedCollectionId(){
+        return DBConnector.getLastTask(userId, serverName).getCollectionId();
     }
 }
