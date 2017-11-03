@@ -455,6 +455,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
     }
 
     private String getSelectedCollectionId(){
-        return DBConnector.getAuTask(userId, serverName).getCollectionId();
+        Task AuTask = DBConnector.getAuTask(userId, serverName);
+        return AuTask!=null? AuTask.getCollectionId():"";
     }
 }

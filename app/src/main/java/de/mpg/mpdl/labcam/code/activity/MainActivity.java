@@ -393,8 +393,22 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         });
         Task task = DBConnector.getAuTask(userId,serverUrl);
         if(task!=null && task.getCollectionName()!=null){
-            collectionNameTextView.setText(task.getCollectionName());
+            collectionNameTextView.setText(shortenString(task.getCollectionName()));
         }
+    }
+
+    private String shortenString (String originStr){
+        String resultStr = "";
+        if(originStr==null){
+            return resultStr;
+        }
+
+        if(originStr.length()>10){
+            resultStr = originStr.substring(0,6)+"...";
+        }else {
+            resultStr = originStr;
+        }
+        return resultStr;
     }
 
     private void checkRecent(){
@@ -715,7 +729,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                 Task lastAUTask = DBConnector.getAuTask(userId, serverUrl);
 
                 if(lastAUTask!= null){
-                    collectionNameTextView.setText(lastAUTask.getCollectionName());
+                    collectionNameTextView.setText(shortenString(lastAUTask.getCollectionName()));
 
                     if(settings.isAutoUpload()){
                         autoUploadSwitch.setChecked(true);
@@ -840,7 +854,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
 
             //set selected collection name text
             if(folderList.get(0).getTitle()!=null) {
-                collectionNameTextView.setText(folderList.get(0).getTitle());
+                collectionNameTextView.setText(shortenString(folderList.get(0).getTitle()));
             }
 
             Settings settings = DBConnector.getSettingsByUserId(userId);   // get old settings
@@ -880,7 +894,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                         if(auTask.getCollectionId().equalsIgnoreCase(folderList.get(i).getImejiId())){
                             isValid = true;
                         }
-                        collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
+                        collectionNameTextView.setText(shortenString(auTask.getCollectionName()));     // collection name from autoTask
                         setAutoUploadStatus(false,true);
                     }
                 }
@@ -917,7 +931,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
             }else {   // history AU is off or not set
                 Task auTask = DBConnector.getAuTask(userId,serverUrl);
                 if(auTask!=null) {   // col wasValue not null
-                    collectionNameTextView.setText(auTask.getCollectionName());     // collection name from autoTask
+                    collectionNameTextView.setText(shortenString(auTask.getCollectionName()));     // collection name from autoTask
                 }
                 setAutoUploadStatus(false,false);
             }
@@ -933,7 +947,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
     public void createCollectionsSuc(ImejiFolderModel imejiFolder) {
 
         //set selected collection name text
-        collectionNameTextView.setText(imejiFolder.getTitle());
+        collectionNameTextView.setText(shortenString(imejiFolder.getTitle()));
 
         createAUTask(imejiFolder.getId(), imejiFolder.getTitle());
 
