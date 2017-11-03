@@ -400,6 +400,7 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
     }
 
     private String getSelectedCollectionId(){
-        return DBConnector.getLastTask(userId, serverName).getCollectionId();
+        Task LastTask = DBConnector.getLastTask(userId, serverName);
+        return LastTask!=null? LastTask.getCollectionId():"";
     }
 }
