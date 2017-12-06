@@ -26,7 +26,6 @@ import de.mpg.mpdl.labcam.code.common.widget.PhotoDialog;
 
 @SuppressLint("NewApi")
 public abstract class BaseCompatWithPhotoActivity extends BaseActivity implements TakePhoto.TakeResultListener, InvokeListener {
-    private static final String TAG = BaseActivity.class.getSimpleName();
 
     protected InvokeParam mInvokeParam;
 

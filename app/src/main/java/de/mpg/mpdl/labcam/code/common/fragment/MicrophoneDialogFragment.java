@@ -45,21 +45,21 @@ import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 
 public class MicrophoneDialogFragment extends DialogFragment{
 
-    private final String LOG_TAG = MicrophoneDialogFragment.class.getSimpleName().toString();
+    private static final String LOG_TAG = MicrophoneDialogFragment.class.getSimpleName();
     private static final String AUDIO_RECORDER_FILE_EXT_3GP = ".3gp";
     private static final String AUDIO_RECORDER_FILE_EXT_MP4 = ".mp4";
     private static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
     private MediaRecorder recorder = null;
     private int currentFormat = 0;
-    private int output_formats[] = { MediaRecorder.OutputFormat.MPEG_4, MediaRecorder.OutputFormat.THREE_GPP };
-    private String file_exts[] = { AUDIO_RECORDER_FILE_EXT_MP4, AUDIO_RECORDER_FILE_EXT_3GP };
+    private int[] outFormats = { MediaRecorder.OutputFormat.MPEG_4, MediaRecorder.OutputFormat.THREE_GPP };
+    private String[] fileExts = { AUDIO_RECORDER_FILE_EXT_MP4, AUDIO_RECORDER_FILE_EXT_3GP };
 
     private String fileFullName = null;
     private String userId;
     private String serverName;
 
-    static TextView voiceTextView;
-    static TextView hintTextView;
+    private TextView voiceTextView;
+    private TextView hintTextView;
     Button voiceImageView;
 
     @Override
@@ -130,10 +130,7 @@ public class MicrophoneDialogFragment extends DialogFragment{
                         }
                 );
 
-//        // hint text
         hintTextView = (TextView) view.findViewById(R.id.text_view_voice_hint);
-//        textView.setHeight(squareWidth/5);
-
         checkPermission();
 
         // record voice
@@ -155,6 +152,8 @@ public class MicrophoneDialogFragment extends DialogFragment{
                     case MotionEvent.ACTION_UP:
                         Log.d(LOG_TAG, "stop Recording");
                         stopRecording();
+                        break;
+                    default:
                         break;
                 }
                 return false;
@@ -180,14 +179,14 @@ public class MicrophoneDialogFragment extends DialogFragment{
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 
-        return (file.getAbsolutePath() + "/" + timeStamp + file_exts[currentFormat]);
+        return (file.getAbsolutePath() + "/" + timeStamp + fileExts[currentFormat]);
     }
 
     private void startRecording(){
         fileFullName = getFilename();  // pick a file name
         recorder = new MediaRecorder();
         recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        recorder.setOutputFormat(output_formats[currentFormat]);
+        recorder.setOutputFormat(outFormats[currentFormat]);
         recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         recorder.setOutputFile(fileFullName);
         recorder.setOnErrorListener(errorListener);
@@ -196,10 +195,8 @@ public class MicrophoneDialogFragment extends DialogFragment{
         try {
             recorder.prepare();
             recorder.start();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IllegalStateException | IOException  e) {
+            Log.e(LOG_TAG, "got an Exception", e);
         }
     }
 
@@ -260,9 +257,7 @@ public class MicrophoneDialogFragment extends DialogFragment{
             boolean granted = (firstGrantResult == PackageManager.PERMISSION_GRANTED) && (secondGrantResult == PackageManager.PERMISSION_GRANTED);
             Log.i("permission", "onRequestPermissionsResult granted=" + granted);
 
-            if(granted) {
-//                startRecording();
-            }else{
+            if(!granted) {
                 getDialog().dismiss();
                 ToastUtils.showShortMessage(getActivity(), "please grant RECORD_AUDIO and WRITE_EXTERNAL_STORAGE permissions");
             }

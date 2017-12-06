@@ -26,6 +26,7 @@ public class ImejiPresenter extends BaseAbstractPresenter<ImejiView> {
 
     @Inject
     public ImejiPresenter() {
+        // required constructor
     }
 
     public void getCollectionItems(String collectionId, int size, int offset, BaseActivity act) {

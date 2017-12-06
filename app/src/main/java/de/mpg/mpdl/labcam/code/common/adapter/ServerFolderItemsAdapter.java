@@ -27,7 +27,7 @@ import de.mpg.mpdl.labcam.code.utils.PreferenceUtil;
 /**
  * Created by yingli on 4/25/16.
  */
-public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderItemsAdapter.ViewHolder>  {
+public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderItemsAdapter.CollectionItemViewHolder>  {
 
     private Activity activity;
     private ArrayList<String> galleryItems;
@@ -51,26 +51,26 @@ public class ServerFolderItemsAdapter extends RecyclerView.Adapter<ServerFolderI
         return size;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class CollectionItemViewHolder extends RecyclerView.ViewHolder {
         public final ImageView imageView;
 
-        public ViewHolder(View view) {
+        public CollectionItemViewHolder(View view) {
             super(view);
             imageView = (ImageView) view.findViewById(R.id.image_view);
         }
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public CollectionItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(activity).inflate(R.layout.gallery_grid_cell, parent, false);
-        return new ViewHolder(view);    }
+        return new CollectionItemViewHolder(view);    }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final CollectionItemViewHolder holder, final int position) {
         Point size = getPoint();
         String filePath = galleryItems.get(position);
         String preUrl = new StringBuilder()
-                .append(filePath.substring(0, filePath.lastIndexOf("&")))
+                .append(filePath.substring(0, filePath.lastIndexOf('&')))
                 .append("&resolution=preview").toString();
 
         ViewGroup.LayoutParams layoutParams = holder.imageView.getLayoutParams();

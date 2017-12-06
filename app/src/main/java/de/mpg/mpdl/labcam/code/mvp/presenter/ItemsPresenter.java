@@ -19,6 +19,7 @@ public class ItemsPresenter extends BaseAbstractPresenter<ItemsView> {
 
     @Inject
     public ItemsPresenter() {
+        // required constructor
     }
 
     public void getCollectionItems(String collectionId, int size, int offset, BaseActivity act) {

@@ -30,19 +30,17 @@ public abstract class BaseFragment extends Fragment {
         this.mContext = context;
     }
 
-
+    @Override
     public Context getContext(){
         return mContext;
     }
 
     public void startActivity(Class<? extends Activity> activityClass) {
         startActivity(getLocalIntent(activityClass, null));
-        //   me.overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 
     public void startActivity(Class<? extends Activity> activityClass, Bundle bd) {
         startActivity(getLocalIntent(activityClass, bd));
-        //    me.overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 
     public void showMessage(Object msg) {

@@ -8,8 +8,6 @@ import butterknife.ButterKnife;
 
 @SuppressLint("NewApi")
 public abstract class BaseCompatActivity extends BaseActivity {
-    private static final String TAG = BaseActivity.class.getSimpleName();
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

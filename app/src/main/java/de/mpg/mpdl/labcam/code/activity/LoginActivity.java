@@ -20,7 +20,6 @@ import android.widget.Toast;
 import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.net.UnknownHostException;
-import java.text.DateFormat;
 import java.util.Date;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
@@ -60,12 +59,9 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
     @BindView(R.id.qr_scanner)  Button scan;
     private BaseMvpActivity activity = this;
 
-    private String username;
-    private String password;
     private String serverURL;
-    private View rootView;
     private static final int INTENT_QR = 1001;
-    private String LOG_TAG = LoginActivity.class.getSimpleName();
+    private static final String LOG_TAG = LoginActivity.class.getSimpleName();
 
     private String collectionId = null;
     private String collectionName = "for auto upload, please set a collection";
@@ -77,12 +73,12 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
 
     @Override
     protected void initContentView(Bundle savedInstanceState) {
-        String Key = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
+        String savedApiKey = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.API_KEY, "");
         serverURL =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
         String otherServerUrl = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.OTHER_SERVER, "");
 
         /********************   if already have apiKey, jump over login steps ***********/
-        if(!Key.equalsIgnoreCase("")){
+        if(!savedApiKey.equalsIgnoreCase("")){
             //login
             RetrofitFactory.getInstance().changeServer(serverURL);
             Intent intent = new Intent(activity, MainActivity.class);
@@ -90,9 +86,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
             finish();
             return;
         }
-        /********************************************************************************/
 
-        rootView = getWindow().getDecorView().findViewById(android.R.id.content);
         usernameView.setText(PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.EMAIL, "")); // set last user email
         serverURLView.setText(otherServerUrl);
 
@@ -122,9 +116,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
                 gluonsLabel.setBackground(null);
                 serverURLView.setVisibility(View.VISIBLE);
 
-                if(serverURL.equalsIgnoreCase(DeviceStatus.BASE_URL)){
-//                    serverURLView.setText("https://");
-                }else {
+                if(!serverURL.equalsIgnoreCase(DeviceStatus.BASE_URL)){
                     serverURLView.setText(otherServerUrl);
                 }
             }
@@ -183,8 +175,8 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
         boolean cancel = false;
         View focusView = null;
 
-        username = usernameView.getText().toString();
-        password = passwordView.getText().toString();
+        String username = usernameView.getText().toString();
+        String password = passwordView.getText().toString();
 
         if(serverURLView.getVisibility()==View.VISIBLE) {
             serverURL = serverURLView.getText().toString();
@@ -234,7 +226,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
 
             if (resultCode == Activity.RESULT_OK) {
 
-                String APIkey = QRUtils.processQRCode(data, activity, LOG_TAG, null).getAPIkey();
+                String apiKey = QRUtils.processQRCode(data, activity, LOG_TAG, null).getAPIkey();
                 collectionId = QRUtils.processQRCode(data, activity, LOG_TAG, null).getQrCollectionId();
 
                 if(serverURLView.getVisibility()==View.VISIBLE) {
@@ -246,13 +238,13 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
                 Log.v(LOG_TAG,serverURL);
 
                     //get collection
-                PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.API_KEY, APIkey);
+                PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.API_KEY, apiKey);
                 PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.SERVER_NAME, serverURL);
 
                 if(serverURLView.getVisibility()==View.VISIBLE) {
                     PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.OTHER_SERVER, serverURL);
                 }
-                PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.COLLECTION_ID, APIkey);
+                PreferenceUtil.setString(this,Constants.SHARED_PREFERENCES,Constants.COLLECTION_ID, apiKey);
                 mPresenter.basicLogin(this);
 
 
@@ -291,9 +283,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
             task.setFinishedItems(0);
             task.setServerName(serverURL);
 
-            String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
-            Log.v("now", now+"");
             task.setStartDate(String.valueOf(now));
             task.setCollectionName(collectionName);
 
@@ -314,9 +304,7 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
             task.setFinishedItems(0);
             task.setServerName(serverURL);
 
-            String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             Long now = new Date().getTime();
-            Log.v("now", now+"");
             task.setStartDate(String.valueOf(now));
             task.setCollectionName(collectionName);
 
@@ -361,7 +349,6 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
     public void loginSuc(UserModel user) {
         String userCompleteName = "";
         userCompleteName = user.getPerson().getCompleteName();
-//        if(userCompleteName!="" && userCompleteName!=null){
             PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.USER_NAME, user.getPerson().getCompleteName());
             PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.FAMILY_NAME, user.getPerson().getFamilyName());
             PreferenceUtil.setString(getApplicationContext(),Constants.SHARED_PREFERENCES,Constants.GIVEN_NAME, user.getPerson().getGivenName());
@@ -374,25 +361,23 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
 
                 //create a new task for new selected collection
             }else {
-                StringBuffer stringBuffer = new StringBuffer();
-                stringBuffer.append("Welcome ");
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("Welcome ");
                 if(userCompleteName!=null) {
-                    stringBuffer.append(userCompleteName);
-                    Toast.makeText(activity, stringBuffer.toString(), Toast.LENGTH_SHORT).show();
+                    stringBuilder.append(userCompleteName);
+                    Toast.makeText(activity, stringBuilder.toString(), Toast.LENGTH_SHORT).show();
                 }else {
                     if(user.getPerson().getFamilyName()!=null){
-                        stringBuffer.append(user.getPerson().getFamilyName());
+                        stringBuilder.append(user.getPerson().getFamilyName());
                     }
                     if(user.getPerson().getGivenName()!=null){
-                        stringBuffer.append(" ");
-                        stringBuffer.append(user.getPerson().getGivenName());
+                        stringBuilder.append(" ");
+                        stringBuilder.append(user.getPerson().getGivenName());
                     }
-                    Toast.makeText(activity, stringBuffer.toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, stringBuilder.toString(), Toast.LENGTH_SHORT).show();
                 }
                 accountLogin(user.getPerson().getId(),false);
             }
-
-//        }
     }
 
     @Override
@@ -418,6 +403,8 @@ public class LoginActivity extends BaseMvpActivity<LoginPresenter> implements Lo
                     return;
                 case 0:
                     Toast.makeText(activity, serverURL+ " please check your wifi connection", Toast.LENGTH_LONG).show();
+                    return;
+                default:
                     return;
             }
     }

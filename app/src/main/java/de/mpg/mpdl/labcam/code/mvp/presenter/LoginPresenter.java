@@ -24,6 +24,7 @@ public class LoginPresenter extends BaseAbstractPresenter<LoginView> {
 
     @Inject
     public LoginPresenter() {
+        // required constructor
     }
 
     public void basicLogin(BaseActivity act) {

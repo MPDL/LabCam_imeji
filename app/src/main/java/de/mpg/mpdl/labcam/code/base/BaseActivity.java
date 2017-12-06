@@ -149,7 +149,6 @@ public class BaseActivity extends RxAppCompatActivity {
 
     public void showLoading(String msg) {
         if (progressDialog == null) {
-//            progressDialog = CustomizedProgressDialog.createInstance(this);
             progressDialog = new ProgressDialog(this);
         }
         progressDialog.setMessage(msg);

@@ -23,8 +23,8 @@ import com.google.gson.JsonObject;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -57,7 +57,7 @@ import static de.mpg.mpdl.labcam.code.utils.BatchOperationUtils.addImages;
 public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollectionDialogPresenter> implements RemoteCollectionDialogView, CollectionIdInterface {
 
     private static final String LOG_TAG = RemoteListDialogFragment.class.getSimpleName();
-    private RemoteListDialogFragment remoteListDialogFragment = this;
+    private RemoteListDialogFragment dialogFragment = this;
     private static final int INTENT_QR = 1001;
 
     //user
@@ -72,7 +72,7 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
     private BaseActivity activity;
     private String collectionId;
     private String collectionName;
-    private List<ImejiFolder> collectionList = new ArrayList<ImejiFolder>();
+    private List<ImejiFolder> collectionList = new ArrayList<>();
     private String[] imagePathArray;
 
     //taskId
@@ -143,9 +143,7 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
 
     private Long createTask(String[] imagePathArray){
 
-        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
         Long now = new Date().getTime();
-
         Task task = new Task();
         task.setTotalItems(imagePathArray.length);
         task.setFinishedItems(0);
@@ -197,9 +195,9 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
     }
 
     @Override
-    public void setCollectionId(int Id, boolean isSet) {
-        collectionId = collectionList.get(Id).getImejiId();
-        collectionName = collectionList.get(Id).getTitle();
+    public void setCollectionId(int id, boolean isSet) {
+        collectionId = collectionList.get(id).getImejiId();
+        collectionName = collectionList.get(id).getTitle();
     }
 
     @Override
@@ -209,15 +207,12 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
 
             if (resultCode == Activity.RESULT_OK) {
                 Bundle bundle = data.getExtras();
-                String QRText = bundle.getString("QRText");
-                Log.v(LOG_TAG, QRText);
-                String APIkey = "";
                 String url = "";
                 try {
-                    JSONObject jsonObject = new JSONObject(QRText);
-                    APIkey = jsonObject.getString("key");
-                    Log.v("APIkey",APIkey);
-                    if(!apiKey.equals(APIkey)){
+                    String qrText = bundle.getString("QRText");
+                    JSONObject jsonObject = new JSONObject(qrText);
+                    String qrApiKey = jsonObject.getString("key");
+                    if(!apiKey.equals(qrApiKey)){
                         Toast.makeText(activity,"this folder doesn't look like yours",Toast.LENGTH_LONG).show();
                         return;
                     }
@@ -229,35 +224,39 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
                     return;
                 }
 
+                URL u;
                 try {
-                    URL u = new URL(url);
-                    String path = u.getPath();
-                    String qrCollectionId = "";
-                    if (path != null) {
-                        try {
-                            qrCollectionId = path.substring(path.lastIndexOf("/") + 1);
-                            Log.i(LOG_TAG,qrCollectionId);
-                        }catch (Exception e){
-                            Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
-                            return;
-                        }
+                   u = new URL(url);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                    Toast.makeText(activity,"url not legal",Toast.LENGTH_LONG).show();
+                    return;
+                }
 
-                        //create task if collection is selected
-                        if (!qrCollectionId.equals("") && !qrCollectionId.equals(null)) {
-                            Log.i("~qrCollectionId", qrCollectionId);
-                            collectionId = qrCollectionId;
-                            //set and save
-                            setMUCollection();
-
-                        } else {
-                            Toast.makeText(getActivity(), "collection setting not changed", Toast.LENGTH_LONG).show();
-                        }
-
+                String path = u.getPath();
+                String qrCollectionId = "";
+                if (path != null) {
+                    try {
+                        qrCollectionId = path.substring(path.lastIndexOf('/') + 1);
+                        Log.i(LOG_TAG,qrCollectionId);
+                    }catch (Exception e){
+                        Toast.makeText(activity,"qrCode not legal",Toast.LENGTH_LONG).show();
+                        return;
                     }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    //create task if collection is selected
+                    if (qrCollectionId!=null && !qrCollectionId.equals("")) {
+                        collectionId = qrCollectionId;
+                        //set and save
+                        setMUCollection();
+
+                    } else {
+                        Toast.makeText(getActivity(), "collection setting not changed", Toast.LENGTH_LONG).show();
+                    }
+
                 }
+
+
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // User cancelled the photo picking
@@ -303,7 +302,7 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
             collectionList.add(imejiFolder);
         }
 
-        if(collectionList.size()==0) {
+        if(collectionList.isEmpty()) {
             // create dialog
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             // Set up the input
@@ -335,7 +334,7 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
                         public void onClick(DialogInterface dialog, int which) {
                             // do nothing
                             DBConnector.deleteTaskById(currentTaskId);
-                            remoteListDialogFragment.dismiss();
+                            dialogFragment.dismiss();
                         }
                     })
                     .setIcon(R.drawable.error_alert)
@@ -396,11 +395,11 @@ public class RemoteListDialogFragment extends BaseMvpDialogFragment<RemoteCollec
 
     @Override
     public void createCollectionsFail(Throwable e) {
-
+        //createCollectionsFail
     }
 
     private String getSelectedCollectionId(){
-        Task LastTask = DBConnector.getLastTask(userId, serverName);
-        return LastTask!=null? LastTask.getCollectionId():"";
+        Task lastTask = DBConnector.getLastTask(userId, serverName);
+        return lastTask!=null? lastTask.getCollectionId():"";
     }
 }

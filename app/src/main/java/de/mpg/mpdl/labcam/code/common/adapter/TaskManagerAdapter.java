@@ -33,7 +33,7 @@ import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
  */
 public class TaskManagerAdapter extends BaseAdapter {
 
-    private static String TAG = TaskManagerAdapter.class.getSimpleName();
+    private static final String TAG = TaskManagerAdapter.class.getSimpleName();
     SharedPreferences mPref;
     String userId;
     String serverName;
@@ -82,7 +82,6 @@ public class TaskManagerAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View view, ViewGroup viewGroup) {
-
 
         if (inflater == null)
             inflater = (LayoutInflater) activity
@@ -151,9 +150,6 @@ public class TaskManagerAdapter extends BaseAdapter {
             }
         }
 
-//        Log.e("<><>", phrase+"");
-//        printTaskLog(phrase, task);
-
         //collection error
         if(task.getState().equalsIgnoreCase(String.valueOf(DeviceStatus.state.FAILED))){
             if(task.getUploadMode().equalsIgnoreCase("AU")){
@@ -166,15 +162,11 @@ public class TaskManagerAdapter extends BaseAdapter {
         RelativeLayout progressLayout = (RelativeLayout) view.findViewById(R.id.layout_progress);
         RelativeLayout toolButtonLayout = (RelativeLayout) view.findViewById(R.id.layout_stop_delete);
         RelativeLayout errorLayout = (RelativeLayout) view.findViewById(R.id.layout_error);
-//        Button clearButton = (Button) view.findViewById(R.id.btn_clear);
-
-
 
         switch (phrase){
             case AU_WAITING:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.GONE);
-//                clearButton.setVisibility(View.GONE);
                 errorLayout.setVisibility(View.GONE);
                 Log.v(TAG,"AU_WAITING");
 
@@ -182,7 +174,6 @@ public class TaskManagerAdapter extends BaseAdapter {
             case AU_UPLOADING:
                 progressLayout.setVisibility(View.VISIBLE);
                 toolButtonLayout.setVisibility(View.VISIBLE);
-//                clearButton.setVisibility(View.GONE);
                 errorLayout.setVisibility(View.GONE);
                 Log.v(TAG, "AU_UPLOADING");
 
@@ -190,7 +181,6 @@ public class TaskManagerAdapter extends BaseAdapter {
             case AU_FINISH:
                 progressLayout.setVisibility(View.GONE);
                 toolButtonLayout.setVisibility(View.GONE);
-//                clearButton.setVisibility(View.GONE);
                 errorLayout.setVisibility(View.GONE);
                 Log.v(TAG, "AU_FINISH");
 
@@ -198,7 +188,6 @@ public class TaskManagerAdapter extends BaseAdapter {
             case MU_UPLOADING:
                 progressLayout.setVisibility(View.VISIBLE);
                 toolButtonLayout.setVisibility(View.VISIBLE);
-//                clearButton.setVisibility(View.GONE);
                 errorLayout.setVisibility(View.GONE);
                 Log.v(TAG, "MU_UPLOADING");
 
@@ -223,15 +212,8 @@ public class TaskManagerAdapter extends BaseAdapter {
                 errorLayout.setVisibility(View.VISIBLE);
                 Log.v(TAG, "MU_FAILED");
                 break;
-
-        }
-
-        if(maxNum == 0||currentNum == maxNum){
-            //show clear for MU
-            if(task.getUploadMode().equalsIgnoreCase("AU")){
-                //AU
-            }
-
+            default:
+                break;
         }
 
         //DeleteTask

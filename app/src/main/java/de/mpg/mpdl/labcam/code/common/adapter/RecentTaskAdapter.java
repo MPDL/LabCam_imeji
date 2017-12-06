@@ -18,10 +18,7 @@ import de.mpg.mpdl.labcam.code.utils.DeviceStatus;
  * Created by yingli on 6/7/16.
  */
 public class RecentTaskAdapter extends BaseAdapter {
-
-    private static String TAG = RecentTaskAdapter.class.getSimpleName();
     private LayoutInflater inflater;
-
     private Activity activity;
     private List<Task> taskList;
 

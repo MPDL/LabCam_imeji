@@ -29,8 +29,6 @@ public class RecentNoteActivity extends BaseCompatActivity {
 
     Activity activity = this;
     RecentNoteAdapter recentNoteAdapter = null;
-    private String userId;
-    private String serverName;
 
     //ui elements
     @BindView(R.id.listView_recent_text_notes)
@@ -48,8 +46,8 @@ public class RecentNoteActivity extends BaseCompatActivity {
     @Override
     protected void initContentView(Bundle savedInstanceState) {
 
-        userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
-        serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
+        String userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        String serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
         noteList = new Select().from(Note.class).where("userId = ?", userId).where("serverName = ?", serverName).orderBy("createTime DESC").execute();
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar_recent_task);
@@ -62,7 +60,7 @@ public class RecentNoteActivity extends BaseCompatActivity {
         recentTextListView.setAdapter(recentNoteAdapter);
 
         //Display either "no recent upload" or the listView of uploaded tasks
-        if(noteList.size() == 0) {
+        if(noteList.isEmpty()) {
             noRecentTextView.setVisibility(View.VISIBLE);
             recentTextListView.setVisibility(View.GONE);
         }else {

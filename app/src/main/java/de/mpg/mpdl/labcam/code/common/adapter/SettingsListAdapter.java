@@ -80,9 +80,7 @@ public class SettingsListAdapter extends BaseAdapter {
         RadioButton checkBox = (RadioButton) convertView.findViewById(R.id.radio_button);
         TextView date = (TextView) convertView.findViewById(R.id.setting_item_date);
 
-        System.out.println("Adapter collectionId" + " " + collectionId);
-
-        if(folderItems.size()>0) {
+        if(!folderItems.isEmpty()) {
             ImejiFolder collection = folderItems.get(position);
             if(collection.getImejiId().equals(collectionId)){
                 selectedPosition = position;

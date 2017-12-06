@@ -2,12 +2,9 @@ package de.mpg.mpdl.labcam.code.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -50,28 +47,24 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
     @BindView(R.id.title)
     TextView titleView;
 
-    private final String LOG_TAG = LocalImageActivity.class.getSimpleName();
+    private static final String LOG_TAG = LocalImageActivity.class.getSimpleName();
 
     private String folderPath;
     private int dataCounter = 6; // initialize this value as 6, in order to correct display items
 
-    private ArrayList<String> itemPathList = new ArrayList<String>();
+    private ArrayList<String> itemPathList = new ArrayList<>();
     private ArrayList<String> datas = new ArrayList<>();
-    public Set<Integer> positionSet = new HashSet<>();
+    private Set<Integer> positionSet = new HashSet<>();
 
     private Activity activity = this;
 
-    private View rootView;
-    private View headerView;
-    private View footerView;
-
     //actionMode
     private android.support.v7.view.ActionMode actionMode;
-    android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
+    android.support.v7.view.ActionMode.Callback actionModeCallback = this;
     private AnimRFRecyclerView recyclerView;
-    public LocalAlbumAdapter localAlbumAdapter;
+    private LocalAlbumAdapter localAlbumAdapter;
 
-    private Handler mHandler = new Handler();
+    private Handler loadmoreHandler = new Handler();
 
     @Override
     protected int getLayoutId() {
@@ -80,13 +73,9 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
 
     @Override
     protected void initContentView(Bundle savedInstanceState) {
-        rootView = findViewById(android.R.id.content);
         // load more and refresh
-        headerView = LayoutInflater.from(activity).inflate(R.layout.header_view, null);
-        footerView = LayoutInflater.from(activity).inflate(R.layout.footer_view, null);
-
+        View footerView = LayoutInflater.from(activity).inflate(R.layout.footer_view, null);
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -101,10 +90,6 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
             }
         }
 
-        String[] albums = new String[]{MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
-        Uri images = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
-        //final String CompleteCameraFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/" + title;
         File folder = new File(folderPath);
         //listing all the files
         File[] folderFiles = folder.listFiles();
@@ -177,15 +162,10 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
             @Override
             public void onItemLongClick(View view, int position) {
                 if (actionMode == null) {
-                    actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
+                    actionMode = ((AppCompatActivity) activity).startSupportActionMode(actionModeCallback);
                 }
             }
         });
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -206,11 +186,11 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
             Log.v(LOG_TAG, "selected");
             // create
             if(actionMode==null){
-                actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
+                actionMode = ((AppCompatActivity) activity).startSupportActionMode(actionModeCallback);
                 for(int i = 0; i<itemPathList.size(); i++){
                     positionSet.add(i);
                 }
-                if (positionSet.size() == 0) {
+                if (positionSet.isEmpty()) {
                     Log.e(LOG_TAG, "addOrRemove() is called");
                     actionMode.finish();
                 } else {
@@ -230,7 +210,7 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         } else {
             positionSet.add(position);
         }
-        if (positionSet.size() == 0) {
+        if (positionSet.isEmpty()) {
             Log.e(LOG_TAG, "addOrRemove() is called");
             actionMode.finish();
         } else {
@@ -291,26 +271,25 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
     }
 
     private void batchOperation(int operationType){
-        if(positionSet.size()!=0) {
-            Log.v(LOG_TAG, " "+positionSet.size());
+        if(!positionSet.isEmpty()) {
             List imagePathList = new ArrayList();
-            //TODO: Question why convert itemPathList to imagePathList
             for (Integer i : positionSet) {
                 imagePathList.add(itemPathList.get(i));
             }
-            if (imagePathList != null) {
-                String[] imagePathArray = (String[]) imagePathList.toArray(new String[imagePathList.size()]);
-                switch (operationType){
-                    case R.id.item_upload_local:
-                        uploadList(imagePathArray);
-                        break;
-                    case R.id.item_microphone_local:
-                        showVoiceDialog(imagePathArray);
-                        break;
-                    case R.id.item_notes_local:
-                        showNoteDialog(imagePathArray);
-                        break;
-                }
+            String[] imagePathArray = (String[]) imagePathList.toArray(new String[imagePathList.size()]);
+
+            switch (operationType){
+                case R.id.item_upload_local:
+                    uploadList(imagePathArray);
+                    break;
+                case R.id.item_microphone_local:
+                    showVoiceDialog(imagePathArray);
+                    break;
+                case R.id.item_notes_local:
+                    showNoteDialog(imagePathArray);
+                    break;
+                default:
+                    break;
             }
             imagePathList.clear();
         }
@@ -336,31 +315,6 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
         recyclerView.getAdapter().notifyDataSetChanged();
     }
 
-    /**
-     * 添加数据
-     */
-    private void addData() {
-        if (datas == null) {
-            datas = new ArrayList<>();
-            dataCounter = 0;
-        }
-
-        for (int i = 0; i < 6; i++) {
-            if(datas.size() >=  itemPathList.size()){
-                return;
-            }
-            datas.add(itemPathList.get(dataCounter));
-            dataCounter = dataCounter +1;
-        }
-    }
-
-    public void newData() {
-        datas.clear();
-        for (int i = 0; i < 6; i++) {
-            datas.add(itemPathList.get(i));
-        }
-    }
-
     class MyRunnable implements Runnable {
 
         boolean isRefresh;
@@ -374,24 +328,45 @@ public class LocalImageActivity extends BaseCompatActivity implements android.su
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Log.w(LOG_TAG, "Interrupted!", e);
+                Thread.currentThread().interrupt();
             }
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (isRefresh) {
-                        newData();
-                        Log.e(LOG_TAG, "refreshComplete:"+datas.size());
-                        refreshComplete();
-                        recyclerView.refreshComplate();
-                    } else {
-                        addData();
-                        Log.e(LOG_TAG, "loadMoreComplete:"+ datas.size());
-                        loadMoreComplete();
-                        recyclerView.loadMoreComplate();
-                    }
+
+            loadmoreHandler.post(() -> {
+                if (isRefresh) {
+                    newData();
+                    Log.e(LOG_TAG, "refreshComplete:"+datas.size());
+                    refreshComplete();
+                    recyclerView.refreshComplate();
+                } else {
+                    addData();
+                    Log.e(LOG_TAG, "loadMoreComplete:"+ datas.size());
+                    loadMoreComplete();
+                    recyclerView.loadMoreComplate();
                 }
             });
+        }
+
+        private void addData() {
+            if (datas == null) {
+                datas = new ArrayList<>();
+                dataCounter = 0;
+            }
+
+            for (int i = 0; i < 6; i++) {
+                if(datas.size() >=  itemPathList.size()){
+                    return;
+                }
+                datas.add(itemPathList.get(dataCounter));
+                dataCounter = dataCounter +1;
+            }
+        }
+
+        public void newData() {
+            datas.clear();
+            for (int i = 0; i < 6; i++) {
+                datas.add(itemPathList.get(i));
+            }
         }
     }
 

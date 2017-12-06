@@ -26,6 +26,7 @@ public class RemoteCollectionDialogPresenter extends BaseAbstractPresenter<Remot
 
     @Inject
     public RemoteCollectionDialogPresenter() {
+        // required constructor
     }
 
     public void getGrantedCollectionMessage(String q, BaseActivity act){

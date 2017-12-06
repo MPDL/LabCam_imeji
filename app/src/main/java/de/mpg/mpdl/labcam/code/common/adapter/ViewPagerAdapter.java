@@ -30,7 +30,6 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Voice;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
-import de.mpg.mpdl.labcam.code.common.widget.camPicassoLoader;
 import de.mpg.mpdl.labcam.code.module.glide.ImageLoader;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
@@ -54,7 +53,7 @@ public class ViewPagerAdapter extends PagerAdapter {
     private OnItemClickListener onItemClickListener;
     private OnLoadMoreDetailListener onLoadMoreDetailListener;
 
-    public Set<Integer> positionSet = new HashSet<>();
+    private Set<Integer> positionSet = new HashSet<>();
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
@@ -153,9 +152,9 @@ public class ViewPagerAdapter extends PagerAdapter {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                     if(!isLoading) {
-                        int lastVisibleItem, totalItemCount, visibleThreshold;
-                        visibleThreshold = 1;
-                        totalItemCount = adapter.getCount();
+                        int lastVisibleItem;
+                        int visibleThreshold = 1;
+                        int totalItemCount = adapter.getCount();
                         lastVisibleItem = position;
                         if (totalItemCount <= (lastVisibleItem + visibleThreshold)) {
                             if (onLoadMoreDetailListener != null) {
@@ -168,12 +167,12 @@ public class ViewPagerAdapter extends PagerAdapter {
 
             @Override
             public void onPageSelected(int position) {
-
+                // onPageSelected
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
-
+                // onPageScrollStateChanged
             }
         });
 
@@ -205,7 +204,7 @@ public class ViewPagerAdapter extends PagerAdapter {
             RelativeLayout voicePanelLayout = (RelativeLayout) itemView.findViewById(R.id.layout_voice_panel);
 
             if(image.getNoteId()!=null){      // show notes
-                initNotePanel(itemView, image, notePanelLayout);
+                initNotePanel(itemView, image);
                 notePanelLayout.setVisibility(View.VISIBLE);
             }else notePanelLayout.setVisibility(View.GONE);
 
@@ -216,7 +215,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         }
     }
 
-    private void initNotePanel(View itemView, final Image image, final View notePanelLayout){
+    private void initNotePanel(View itemView, final Image image){
         final RelativeLayout editNoteButtonLayout = (RelativeLayout) itemView.findViewById(R.id.layout_edit_note_button);
         final TextView noteTextView = (TextView) itemView.findViewById(R.id.tv_notes_detail);
         final EditText noteEditText = (EditText) itemView.findViewById(R.id.et_notes_detail);
@@ -239,7 +238,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         saveTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Image> selectedImageList = new ArrayList<Image>(); // selected ImageList
+                List<Image> selectedImageList = new ArrayList<>(); // selected ImageList
                 selectedImageList.add(image);
 
                 DBConnector.batchEditNote(selectedImageList, String.valueOf(noteEditText.getText()), userId, serverName);
@@ -350,7 +349,7 @@ public class ViewPagerAdapter extends PagerAdapter {
         voice.setImageIds(imageIds);
         voice.save();
 
-        if(voice.getImageIds().size()==0){
+        if(voice.getImageIds().isEmpty()){
             voice.delete();
         }
 

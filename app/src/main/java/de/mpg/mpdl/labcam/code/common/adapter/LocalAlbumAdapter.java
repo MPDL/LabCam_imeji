@@ -16,7 +16,6 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,12 +25,11 @@ import de.mpg.mpdl.labcam.R;
 /**
  * Created by yingli on 4/7/16.
  */
-public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.ViewHolder> {
+public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.LocalAlbumViewHolder> {
 
 
     private Activity activity;
     private List<String> galleryItems;
-    private HashMap<Integer, Boolean> mSelection = new HashMap<Integer, Boolean>();
     public Set<Integer> positionSet = new HashSet<>();
 
     public LocalAlbumAdapter(Activity activity, List<String> galleryItems) {
@@ -56,11 +54,11 @@ public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.Vi
         return size;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class LocalAlbumViewHolder extends RecyclerView.ViewHolder {
         public final ImageView imageView;
         public final ImageView checkMark;
 
-        public ViewHolder(View view) {
+        public LocalAlbumViewHolder(View view) {
             super(view);
             imageView = (ImageView) view.findViewById(R.id.image_view);
             checkMark = (ImageView) view.findViewById(R.id.gallery_grid_check_mark);
@@ -68,12 +66,12 @@ public class LocalAlbumAdapter extends RecyclerView.Adapter<LocalAlbumAdapter.Vi
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public LocalAlbumViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(activity).inflate(R.layout.gallery_grid_cell, parent, false);
-        return new ViewHolder(view);    }
+        return new LocalAlbumViewHolder(view);    }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(LocalAlbumViewHolder holder, final int position) {
 
         //prepare data
         Point size = getPoint();

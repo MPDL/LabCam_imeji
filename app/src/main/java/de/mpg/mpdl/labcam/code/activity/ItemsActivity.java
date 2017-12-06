@@ -39,7 +39,7 @@ public class ItemsActivity extends BaseMvpActivity<ItemsPresenter> implements It
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    private final String LOG_TAG = ItemsActivity.class.getSimpleName();
+    private static final String LOG_TAG = ItemsActivity.class.getSimpleName();
     private BaseMvpActivity activity = this;
 
     private ArrayList<String> imagePathList = new ArrayList<>();
@@ -130,11 +130,8 @@ public class ItemsActivity extends BaseMvpActivity<ItemsPresenter> implements It
 
     @Override
     public void getItemsSuc(ItemMessage model) {
-        List<DataItem> dataList = new ArrayList<>();
-
         //load all data from imeji
-        List<DataItem> dataListLocal = new ArrayList<DataItem>();
-        dataListLocal = model.getResults();
+        List<DataItem> dataListLocal = model.getResults();
 
         if(paging == 0){
             imagePathList.clear();

@@ -30,6 +30,7 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
     @BindView(R.id.listView_task)
     ListView taskManagerListView;
 
+    private static final String LOG_TAG = ActiveTaskActivity.class.getSimpleName();
     private Activity activity = this;
     //user info
     private String userId;
@@ -41,8 +42,8 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
 
     // db observer handler
     static ContentResolver resolver;
-    static Handler mHandler;
-    static DatabaseObserver DatabaseObserver;
+    static Handler dbHandler;
+    static DatabaseObserver databaseObserver;
     static Uri uri;
 
     @Override
@@ -60,31 +61,45 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
 
         uri = Uri.parse("content://de.mpg.mpdl.labcam/tasks");
         resolver = activity.getContentResolver();
-
         userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
         serverUrl = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
+        dbObserverHandler();
 
-        /** handler observer **/
-        mHandler = new Handler(){
+        taskList = DBConnector.getActiveTasks(userId, serverUrl);
+        Settings settings = DBConnector.getSettingsByUserId(userId);
+
+        // auTask only for delete
+        Task auTask = new Task();
+        for(Task task:taskList){
+            // auto task, autoUpload switch off
+            if (task!=null && settings!=null
+                    && task.getUploadMode().equalsIgnoreCase("AU")
+                    && task.getTotalItems()== 0 ) {
+                auTask = task;
+            }
+        }
+        taskList.remove(auTask);
+        taskManagerAdapter = new TaskManagerAdapter(this.activity,taskList,this);
+        taskManagerAdapter.notifyDataSetChanged();
+        taskManagerListView.setAdapter(taskManagerAdapter);
+    }
+
+    private void dbObserverHandler(){
+        dbHandler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
 
                 if(msg.what==1234){
-                    Log.v("~~~", "1234~~~");
-
                     taskList = DBConnector.getActiveTasks(userId, serverUrl);
-
                     Settings settings = DBConnector.getSettingsByUserId(userId);
                     if(taskList==null){
-                        Log.e("handler", "task list is empty");
                         return;
                     }
 
                     // settings not null, auto task exist
                     if(settings!=null) {
-
                         // get autoTask and remove from list
                         Iterator<Task> taskIterator = taskList.iterator();
                         while (taskIterator.hasNext()) {
@@ -95,48 +110,24 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
                             }
                         }
                     }
-
-                    if(taskList!=null){
-                        taskManagerAdapter.notifyDataSetChanged();
-                    }
+                    taskManagerAdapter.notifyDataSetChanged();
                 }
             }
         };
-        DatabaseObserver = new DatabaseObserver(activity, mHandler);
-        resolver.registerContentObserver(uri, true, DatabaseObserver);
 
-        taskList = DBConnector.getActiveTasks(userId, serverUrl);
-
-        Settings settings = DBConnector.getSettingsByUserId(userId);
-
-        // auTask only for delete
-        Task auTask = new Task();
-        for(Task task:taskList){
-            /** exception **/
-            if(task!=null&& settings!=null){
-                // auto task, autoUpload switch off
-                if (task.getUploadMode().equalsIgnoreCase("AU") && task.getTotalItems()== 0 ) {
-                    auTask = task;
-                }
-            }
-
-
-        }
-        taskList.remove(auTask);
-        taskManagerAdapter = new TaskManagerAdapter(this.activity,taskList,this);
-        taskManagerAdapter.notifyDataSetChanged();
-        taskManagerListView.setAdapter(taskManagerAdapter);
+        databaseObserver = new DatabaseObserver(activity, dbHandler);
+        resolver.registerContentObserver(uri, true, databaseObserver);
     }
 
     @Override
     public void onPause() {
-        resolver.unregisterContentObserver(DatabaseObserver);
+        resolver.unregisterContentObserver(databaseObserver);
         super.onPause();
     }
 
     @Override
     public void onResume() {
-        resolver.registerContentObserver(uri, true, DatabaseObserver);
+        resolver.registerContentObserver(uri, true, databaseObserver);
         super.onResume();
     }
 
@@ -151,7 +142,7 @@ public class ActiveTaskActivity extends BaseCompatActivity implements RemoveTask
             taskList.remove(position);
             taskManagerAdapter.notifyDataSetChanged();
         }catch (IndexOutOfBoundsException e){
-            e.printStackTrace();
+            Log.e(LOG_TAG, "got an IndexOutOfBoundsException", e);
         }
 
     }

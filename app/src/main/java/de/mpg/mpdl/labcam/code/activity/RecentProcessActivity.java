@@ -31,10 +31,6 @@ public class RecentProcessActivity extends BaseCompatActivity {
     TextView noRecentTaskView;
     List<Task> taskList =new ArrayList<>();
 
-    //user info
-    private String userId;
-    private String serverName;
-
     @Override
     protected int getLayoutId() {
         return R.layout.activity_recent_process;
@@ -42,8 +38,8 @@ public class RecentProcessActivity extends BaseCompatActivity {
 
     @Override
     protected void initContentView(Bundle savedInstanceState) {
-        userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
-        serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
+        String userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        String serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar_recent_task);
         setSupportActionBar(toolbar);
@@ -59,7 +55,7 @@ public class RecentProcessActivity extends BaseCompatActivity {
         recentTaskListView.setAdapter(recentTaskAdapter);
 
         //Display either "no recent upload" or the listview of uploaded tasks
-        if(taskList.size() == 0) {
+        if(taskList.isEmpty()) {
             noRecentTaskView.setVisibility(View.VISIBLE);
             recentTaskListView.setVisibility(View.GONE);
         }else {

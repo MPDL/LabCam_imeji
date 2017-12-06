@@ -96,6 +96,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
     DrawerLayout drawerLayout;  //drawer
     ActionBarDrawerToggle drawerToggle;
 
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     public static final int PICK_COLLECTION_REQUEST = 1997;
     private static final int TASK_CODE = 2016;
     public static final int MY_BACKGROUND_JOB = 0;
@@ -104,6 +105,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
     private String username;
     private String userId;
     private String serverUrl;
+    private String destroyByCamera = "isDestroyByCamera";
     boolean isQRLogin = false;  //login with qr
     boolean isLogin = false;
     boolean isLoginCall = true;  //from onCreate callback
@@ -234,12 +236,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         this.doubleBackToExitPressedOnce = true;
         Toast.makeText(this, "Press back again to quit the application", Toast.LENGTH_SHORT).show();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                doubleBackToExitPressedOnce = false;
-            }
-        }, 3000);
+        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 3000);
     }
 
     @Override
@@ -249,12 +246,9 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
 
     @Override
     protected void initContentView(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey("isDestroyByCamera")) {
-                isDestroyByCamera = savedInstanceState.getBoolean("isDestroyByCamera");
-            }
+        if (savedInstanceState != null && savedInstanceState.containsKey(destroyByCamera)) {
+            isDestroyByCamera = savedInstanceState.getBoolean(destroyByCamera);
         }
-
 
         //user info
         email = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.EMAIL, "");
@@ -268,7 +262,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
             isQRLogin = args.getBoolean("isQRLogin", false);
             isLogin = args.getBoolean("isLogin", false);
         } catch(NullPointerException e) {
-            e.printStackTrace();
+            Log.e(LOG_TAG, "have a NullPointer exception", e);
         }
 
         // register NetStateObserver
@@ -309,7 +303,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         List<Task> activeTaskList = DBConnector.getActiveTasks(userId, serverUrl);
         boolean isFinished = true;
 
-        if(activeTaskList.size()>0){
+        if(!activeTaskList.isEmpty()){
             for (Task task : activeTaskList) {
                 if(task.getUploadMode().equalsIgnoreCase("AU") && task.getTotalItems() == 0){
                     isFinished = true;
@@ -332,6 +326,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                     })
                     .setNegativeButton("Ignore", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
+                            //ignore by close dialog
                         }
                     })
                     .setIcon(R.drawable.error_alert)
@@ -341,28 +336,26 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         }
     }
 
-    // monitor network when Connect
     @Override
     public void OnConnect() {
-//        Toast.makeText(this, "network Connect...", Toast.LENGTH_LONG).show();
+        // monitor network when Connect
     }
 
-    // monitor network when DisConnect
     @Override
     public void OnDisConnect() {
-//        Toast.makeText(this, "network disconnect...", Toast.LENGTH_LONG).show();
+        // monitor network when DisConnect
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
 
-        outState.putBoolean("isDestroyByCamera", true);
+        outState.putBoolean(destroyByCamera, true);
         super.onSaveInstanceState(outState);
     }
 
     private void initInstances() {
 
-        List<Fragment> fragments = new ArrayList<Fragment>(2);
+        List<Fragment> fragments = new ArrayList<>(2);
         fragments.add(new LocalFragment());
         fragments.add(new CollectionViewNewFragment());
 
@@ -412,13 +405,10 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
     }
 
     private void checkRecent(){
-        RelativeLayout chooseCollectionLayout = (RelativeLayout) findViewById(R.id.layout_recent_processes);
-        chooseCollectionLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent recentIntent = new Intent(activity, RecentProcessActivity.class);
-                startActivity(recentIntent);
-            }
+        RelativeLayout selectCollectionLayout = (RelativeLayout) findViewById(R.id.layout_recent_processes);
+        selectCollectionLayout.setOnClickListener(view -> {
+            Intent recentIntent = new Intent(activity, RecentProcessActivity.class);
+            startActivity(recentIntent);
         });
     }
 
@@ -610,20 +600,19 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                                         task.save();
                                     }
                                     // for manual task
-                                    if(manualTasks.size()>0){
+                                    if(!manualTasks.isEmpty()){
                                         for(Task task:manualTasks){
                                             task.setState(String.valueOf(DeviceStatus.state.STOPPED));
                                             task.save();
                                         }
                                     }
 
-
                                     // stop old upload process
-                                    Intent AUIntent = new Intent(activity, TaskUploadService.class);
-                                    stopService(AUIntent);
+                                    Intent auIntent = new Intent(activity, TaskUploadService.class);
+                                    stopService(auIntent);
 
-                                    Intent MUIntent = new Intent(activity, ManualUploadService.class);
-                                    stopService(MUIntent);
+                                    Intent muIntent = new Intent(activity, ManualUploadService.class);
+                                    stopService(muIntent);
 
                                     //delete sharedPreference(move to logout callback after backend implementation)
                                     PreferenceUtil.clearPrefs(activity, Constants.SHARED_PREFERENCES, Constants.API_KEY);
@@ -647,11 +636,11 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                 }else {
 
                     // stop old upload process
-                    Intent AUIntent = new Intent(activity, TaskUploadService.class);
-                    stopService(AUIntent);
+                    Intent auIntent = new Intent(activity, TaskUploadService.class);
+                    stopService(auIntent);
 
-                    Intent MUIntent = new Intent(activity, ManualUploadService.class);
-                    stopService(MUIntent);
+                    Intent muIntent = new Intent(activity, ManualUploadService.class);
+                    stopService(muIntent);
 
                     //delete sharedPreference(move to logout callback after backend implementation)
                     PreferenceUtil.clearPrefs(activity, Constants.SHARED_PREFERENCES, Constants.API_KEY);
@@ -667,7 +656,6 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
                 }
             }
         });
-
     }
 
     //set user info textView(name email)
@@ -712,14 +700,11 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         if (requestCode == PICK_COLLECTION_REQUEST) {
             if(resultCode == RemoteCollectionSettingsActivity.INTENT_NONE) {
                 // get isNone, collectionId is not valid anymore
-                if(data.getBooleanExtra("isNone",false)){
-                    // set collection name none
-                    if(collectionNameTextView!=null){
-                        collectionNameTextView.setText("none");
-                    }
+                if(data.getBooleanExtra("isNone",false)
+                        && collectionNameTextView!=null){
+                    collectionNameTextView.setText("none");
                 }
             }else if(resultCode == RESULT_OK){
-
                 // prepare settings
                 Settings settings = DBConnector.getSettingsByUserId(userId);
                 if(settings==null){
@@ -807,7 +792,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
             folderList.add(imejiFolder);
         }
 
-        if(folderList.size()==0){
+        if(folderList.isEmpty()){
             // first delete AutoTask
             DBConnector.deleteAuTask();
             collectionNameTextView.setText("none");
@@ -862,14 +847,9 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
             //switch on
             if(settings.isAutoUpload()){
                 autoUploadSwitch.setChecked(true);
+                setAutoUploadStatus(false,true);
             }else{
                 autoUploadSwitch.setChecked(false);
-            }
-
-            if(settings!=null && settings.isAutoUpload())  // history AU is on
-            {
-                setAutoUploadStatus(false,true);
-            }else {                                        // history AU is off or not set
                 setAutoUploadStatus(false,false);
             }
         }
@@ -940,7 +920,7 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
 
     @Override
     public void getCollectionsFail(Throwable e) {
-
+        //getCollectionsFail
     }
 
     @Override
@@ -958,22 +938,16 @@ public class MainActivity extends BaseMvpActivity<MainPresenter> implements Main
         //check the previous status of automatic upload
         if(settings.isAutoUpload()) {
             autoUploadSwitch.setChecked(true);
+            setAutoUploadStatus(false,true);
         }else{
             autoUploadSwitch.setChecked(false);
-        }
-
-        if(settings!=null && settings.isAutoUpload())  // history AU is on
-        {
-            setAutoUploadStatus(false,true);
-        }else {                                        // history AU is off or not set
             setAutoUploadStatus(false,false);
         }
-
     }
 
     @Override
     public void createCollectionsFail(Throwable e) {
-
+        //createCollectionsFail
     }
 
     private void createAUTask(String collectionId, String collectionName){

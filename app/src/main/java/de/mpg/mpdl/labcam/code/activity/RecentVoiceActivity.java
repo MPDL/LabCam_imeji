@@ -28,8 +28,6 @@ public class RecentVoiceActivity extends BaseCompatActivity {
 
     Activity activity = this;
     RecentVoiceAdapter recentVoiceAdapter = null;
-    private String userId;
-    private String serverName;
 
     //ui elements
     @BindView(R.id.listView_recent_voice)
@@ -45,8 +43,8 @@ public class RecentVoiceActivity extends BaseCompatActivity {
 
     @Override
     protected void initContentView(Bundle savedInstanceState) {
-        userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
-        serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
+        String userId =  PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.USER_ID, "");
+        String serverName = PreferenceUtil.getString(this, Constants.SHARED_PREFERENCES, Constants.SERVER_NAME, "");
         voiceList =new Select().from(Voice.class).where("userId = ?", userId).where("serverName = ?", serverName).orderBy("createTime DESC")
                 .execute();
 

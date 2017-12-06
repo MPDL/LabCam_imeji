@@ -26,6 +26,7 @@ public class RemoteCollectionSettingsPresenter extends BaseAbstractPresenter<Rem
 
     @Inject
     public RemoteCollectionSettingsPresenter() {
+        // required constructor
     }
 
     public void getGrantedCollectionMessage(String q, BaseActivity act){

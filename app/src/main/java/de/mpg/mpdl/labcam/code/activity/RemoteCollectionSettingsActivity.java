@@ -50,7 +50,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
-    private final String LOG_TAG = RemoteCollectionSettingsActivity.class.getSimpleName();
+    private static final String LOG_TAG = RemoteCollectionSettingsActivity.class.getSimpleName();
     private BaseMvpActivity activity = this;
     private static final int INTENT_QR = 1001;
     public static final int INTENT_NONE = 7991;
@@ -64,7 +64,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
     boolean isNone = true;
 
     private SettingsListAdapter adapter;
-    private List<ImejiFolder> collectionListLocal = new ArrayList<ImejiFolder>();
+    private List<ImejiFolder> collectionListLocal = new ArrayList<>();
 
     Task latestTask;
     Task task;
@@ -89,23 +89,23 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
         //   case 1: create first task
         if(latestTask==null){
             Log.v("create Task", "no task in database");
-            Task task = new Task();
+            Task firstAuTask = new Task();
 
             getCollectionNameById(collectionID);
-            task.setUploadMode("AU");
-            task.setCollectionId(collectionID);
-            task.setCollectionName(collectionName);
-            task.setState(String.valueOf(DeviceStatus.state.WAITING));
-            task.setUserName(username);
-            task.setUserId(userId);
-            task.setTotalItems(0);
-            task.setFinishedItems(0);
-            task.setServerName(serverName);
+            firstAuTask.setUploadMode("AU");
+            firstAuTask.setCollectionId(collectionID);
+            firstAuTask.setCollectionName(collectionName);
+            firstAuTask.setState(String.valueOf(DeviceStatus.state.WAITING));
+            firstAuTask.setUserName(username);
+            firstAuTask.setUserId(userId);
+            firstAuTask.setTotalItems(0);
+            firstAuTask.setFinishedItems(0);
+            firstAuTask.setServerName(serverName);
 
             Long now = new Date().getTime();
-            task.setStartDate(String.valueOf(now));
+            firstAuTask.setStartDate(String.valueOf(now));
 
-            task.save();
+            firstAuTask.save();
             Log.v(LOG_TAG, "finish");
 
             Intent intent = new Intent();
@@ -182,23 +182,18 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
     }
 
     @Override
-    public void setCollectionId(int Id,boolean isSet) {
-        collectionId = collectionListLocal.get(Id).getImejiId();
-        collectionName = collectionListLocal.get(Id).getTitle();
+    public void setCollectionId(int index,boolean isSet) {
+        collectionId = collectionListLocal.get(index).getImejiId();
+        collectionName = collectionListLocal.get(index).getTitle();
 
         // collection not changed
         if(isSet){
             return;
         }
 
-        if (!collectionId.equals(null) && !("").equals(collectionId)) {
-            Log.i("~collectionID", collectionId);
-
+        if (collectionId!=null && !("").equals(collectionId)) {
             DBConnector.deleteFinishedAUTasks(userId, serverName);             //delete all AU Task if finished
-
-            /**create Task**/
             createTask(collectionId);
-
         }
     }
 
@@ -338,6 +333,8 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
                 setResult(RESULT_OK, intent);
                 finish();
                 break;
+            default:
+                break;
         }
         return true;
     }
@@ -369,7 +366,7 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
             collectionListLocal.add(imejiFolder);
         }
 
-        if(collectionListLocal.size()==0){
+        if(collectionListLocal.isEmpty()){
             // first delete AutoTask
             DBConnector.deleteAuTask();
             // create dialog
@@ -451,11 +448,10 @@ public class RemoteCollectionSettingsActivity extends BaseMvpActivity<RemoteColl
     }
 
     @Override
-    public void createCollectionsFail(Throwable e) {
-    }
+    public void createCollectionsFail(Throwable e) {}
 
     private String getSelectedCollectionId(){
-        Task AuTask = DBConnector.getAuTask(userId, serverName);
-        return AuTask!=null? AuTask.getCollectionId():"";
+        Task auTask = DBConnector.getAuTask(userId, serverName);
+        return auTask!=null? auTask.getCollectionId():"";
     }
 }

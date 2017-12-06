@@ -170,11 +170,6 @@ public abstract class BaseDialogFragment extends DialogFragment{
         return mRootView;
     }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
     /**
      * this activity layout res
      * set layout resource file

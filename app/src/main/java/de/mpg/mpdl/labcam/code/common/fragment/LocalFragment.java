@@ -79,11 +79,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     //ui elements
     //active task bar
-    private static TextView titleTaskTextView = null;
-    private static TextView numActiveTextView = null;
-    private static CircleProgressBar mCircleProgressBar = null;
-    private static RelativeLayout activeTaskLayout = null;
-    private static TextView percentTextView = null;
+    private TextView titleTaskTextView = null;
+    private TextView numActiveTextView = null;
+    private CircleProgressBar mCircleProgressBar = null;
+    private RelativeLayout activeTaskLayout = null;
+    private TextView percentTextView = null;
 
     android.support.v7.app.ActionBar actionBar;
 
@@ -94,7 +94,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     SectionedGridRecyclerViewAdapter mSectionedAdapter;
     SimpleAdapter simpleAdapter;
 
-    android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
+    android.support.v7.view.ActionMode.Callback actionModeCallback = this;
 
     ArrayList<String> sortedImageNameList;
     ArrayList<List<String[]>> imagePathListAllAlbums = new ArrayList<>();
@@ -102,12 +102,11 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     List<String> imageNameArrayList = new ArrayList<>();
     List<Long> imageDateArrayList = new ArrayList<>();
 
-    private String username;
     private String userId;
     private String serverName;
 
-    private static TextView dateLabel = null;
-    private static TextView albumLabel = null;
+    private TextView dateLabel = null;
+    private TextView albumLabel = null;
     private boolean isAlbum = false;
 
     private OnFragmentInteractionListener mListener;
@@ -116,7 +115,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     // db observer handler
     static ContentResolver resolver;
     static Handler mHandler;
-    static DatabaseObserver DatabaseObserver;
+    static DatabaseObserver databaseObserver;
     static Uri uri;
 
     private Subscription mNoteRefreshEventSub;
@@ -129,7 +128,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        username = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.USER_NAME,"");
         userId = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.USER_ID,"");
         serverName = PreferenceUtil.getString(getActivity(), Constants.SHARED_PREFERENCES, Constants.SERVER_NAME,"");
     }
@@ -231,114 +229,88 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
         uri = Uri.parse("content://de.mpg.mpdl.labcam/tasks");
         resolver = getActivity().getContentResolver();
-        DatabaseObserver = new DatabaseObserver(getActivity(),mHandler);
-        resolver.registerContentObserver(uri, true, DatabaseObserver);
+        databaseObserver = new DatabaseObserver(getActivity(),mHandler);
+        resolver.registerContentObserver(uri, true, databaseObserver);
 
         return rootView;
 
     }
 
     private void renderStatusBar(){
+        List<Task> activeTasks = DBConnector.getActiveTasks(userId, serverName);  // not finished
+        List<Task> waitingTasks = DBConnector.getUserWaitingTasks(userId, serverName); // waiting
+        List<Task> stoppedTasks = DBConnector.getUserStoppedTasks(userId, serverName); // stopped
+        Task mostRecentTask = DBConnector.getLatestFinishedTask(userId, serverName);  // last task
+
+        int numActivate;
+
+        numActivate = activeTasks.size();  // waiting, stop, failed tasks
+
+        if(numActivate > 0){
+            // remove always waiting auTask
+            Task auTask = DBConnector.getAuTask(userId,serverName);
+            if(auTask!=null && String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState()) &&  auTask.getTotalItems()==auTask.getFinishedItems())
+                numActivate --;
+        }
+        if(numActivate == 0)
         {
-
-            List<Task> activeTasks = DBConnector.getActiveTasks(userId, serverName);  // not finished
-            List<Task> waitingTasks = DBConnector.getUserWaitingTasks(userId, serverName); // waiting
-            List<Task> stoppedTasks = DBConnector.getUserStoppedTasks(userId, serverName); // stopped
-            Task mostRecentTask = DBConnector.getLatestFinishedTask(userId, serverName);  // last task
-
-            int num_activate = 0;
-
-            num_activate = activeTasks.size();  // waiting, stop, failed tasks
-
-            if(num_activate > 0){
-                // remove always waiting auTask
-                Task auTask = DBConnector.getAuTask(userId,serverName);
-                if(auTask!=null && String.valueOf(DeviceStatus.state.WAITING).equalsIgnoreCase(auTask.getState()) &&  auTask.getTotalItems()==auTask.getFinishedItems())
-                    num_activate --;
+            if(mostRecentTask!=null && !DeviceStatus.twoDateWithinSecounds(DeviceStatus.longToDate(mostRecentTask.getEndDate()), DeviceStatus.longToDate(DeviceStatus.dateNow()))){
+                activeTaskLayout.setVisibility(View.GONE);
+                return;
             }
-            if(num_activate == 0)
-            {
-                if(mostRecentTask!=null && !DeviceStatus.twoDateWithinSecounds(DeviceStatus.longToDate(mostRecentTask.getEndDate()), DeviceStatus.longToDate(DeviceStatus.dateNow()))){
-                    activeTaskLayout.setVisibility(View.GONE);
-                    return;
-                }
-                //execute the task
-                numActiveTextView.setText("0");
+            //execute the task
+            numActiveTextView.setText("0");
 
-                percentTextView.setText(100+"%");
-                mCircleProgressBar.setProgress(100);
+            percentTextView.setText(100+"%");
+            mCircleProgressBar.setProgress(100);
 
-                new Handler().postDelayed(new Runnable() {
+            new Handler().postDelayed(() -> {
+                Log.e(LOG_TAG, "no task  is null");
+                activeTaskLayout.setVisibility(View.GONE);
+                return;
 
-                    public void run() {
-                        Log.e(LOG_TAG, "no task  is null");
-                        activeTaskLayout.setVisibility(View.GONE);
-                        return;
+            }, 1000);
+        }
 
-                    }
+        if(!waitingTasks.isEmpty()){
+            activeTaskLayout.setVisibility(View.VISIBLE);
+            Task task = waitingTasks.get(0);
 
-                }, 1000);
+            //
+            if(task.getTotalItems()==0){
+                return;
             }
 
-            for(Task task:waitingTasks){
-                Log.e(LOG_TAG,"waitingTasks~~~~~~~");
-                Log.e(LOG_TAG,"mode:"+task.getUploadMode());
-                Log.e(LOG_TAG,"state:"+task.getState());
-                Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
-                Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
-            }
-            for(Task task:stoppedTasks){
-                Log.e(LOG_TAG,"stoppedTasks~~~~~~~");
-                Log.e(LOG_TAG,"mode:"+task.getUploadMode());
-                Log.e(LOG_TAG,"state:"+task.getState());
-                Log.e(LOG_TAG,"getFinishedItems:"+task.getFinishedItems());
-                Log.e(LOG_TAG,"getTotalItems:"+task.getTotalItems());
-            }
-
-
-            if(waitingTasks.size()>0){
-                activeTaskLayout.setVisibility(View.VISIBLE);
-                Task task = waitingTasks.get(0);
-
-                //
-                if(task.getTotalItems()==0){
-                    return;
-                }
-//                        String titleTaskInfo = task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName();
-
-
-                if(task.getUploadMode().equalsIgnoreCase("AU")){
-                    // AU
-                    titleTaskTextView.setText("Automatic upload to " + task.getCollectionName());
-                }else {
-                    titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
-                }
-
-                numActiveTextView.setText(num_activate+"");
-
-                int percent = (task.getFinishedItems()*100)/task.getTotalItems();
-                percentTextView.setText(percent+"%");
-                mCircleProgressBar.setProgress(percent);
-            }else if(stoppedTasks.size()>0){
-                activeTaskLayout.setVisibility(View.VISIBLE);
-
-                Task task = stoppedTasks.get(0);
-
-                //
-                if(task.getTotalItems()==0){
-                    return;
-                }
+            if(task.getUploadMode().equalsIgnoreCase("AU")){
+                // AU
+                titleTaskTextView.setText("Automatic upload to " + task.getCollectionName());
+            }else {
                 titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
-                numActiveTextView.setText(num_activate+"");
-
-                int percent = (task.getFinishedItems()*100)/task.getTotalItems();
-                percentTextView.setText(percent+"%");
-                mCircleProgressBar.setProgress(percent);
             }
+
+            numActiveTextView.setText(numActivate+"");
+
+            int percent = (task.getFinishedItems()*100)/task.getTotalItems();
+            percentTextView.setText(percent+"%");
+            mCircleProgressBar.setProgress(percent);
+        }else if(!stoppedTasks.isEmpty()){
+            activeTaskLayout.setVisibility(View.VISIBLE);
+
+            Task task = stoppedTasks.get(0);
+
+            //
+            if(task.getTotalItems()==0){
+                return;
+            }
+            titleTaskTextView.setText(task.getTotalItems() + " selected photo(s) uploading to " + task.getCollectionName());
+            numActiveTextView.setText(numActivate+"");
+
+            int percent = (task.getFinishedItems()*100)/task.getTotalItems();
+            percentTextView.setText(percent+"%");
+            mCircleProgressBar.setProgress(percent);
         }
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -418,7 +390,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             // if not contain, add
             positionSet.add(position);
         }
-        if (positionSet.size() == 0) {
+        if (positionSet.isEmpty()) {
             // if none is selected, quit choose mode
             Log.e(LOG_TAG, "addOrRemove() is called");
             actionMode.finish();
@@ -427,27 +399,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             actionMode.setTitle(positionSet.size() + " selected photos");
         }
     }
-
-
-    private void addOrRemoveAlbum(int position) {
-        if (albumPositionSet.contains(position)) {
-            // if contain, remove
-            albumPositionSet.remove(position);
-        } else {
-            // if not contain, add
-            albumPositionSet.add(position);
-        }
-        if (albumPositionSet.size() == 0) {
-            // if none is selected, quit choose mode
-            Log.e(LOG_TAG,"addOrRemoveAlbum() is called");
-            actionMode.finish();
-        } else {
-            // set action mode tile
-            actionMode.setTitle(albumPositionSet.size() + " selected albums");
-        }
-    }
-
-
 
     /**
      * This interface must be implemented by activities that contain this
@@ -629,7 +580,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
             @Override
             public void onItemLongClick(View view, int position) {
                 if (actionMode == null) {
-                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(ActionModeCallback);
+                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallback);
                 }
             }
         });
@@ -681,7 +632,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     @Override
     public void onResume() {
-        resolver.registerContentObserver(uri, true, DatabaseObserver);
+        resolver.registerContentObserver(uri, true, databaseObserver);
 
         isAlbum = PreferenceUtil.getBoolean(getActivity(), Constants.SHARED_PREFERENCES, Constants.IS_ALBUM, false);
 
@@ -714,7 +665,7 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     @Override
     public void onPause() {
-        resolver.unregisterContentObserver(DatabaseObserver);
+        resolver.unregisterContentObserver(databaseObserver);
 
         checkPermission();
         loadTimeLinePicture();
@@ -726,29 +677,30 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
     }
 
     private void batchOperation(int operationType){
-        if(positionSet.size()!=0) {
+        if(!positionSet.isEmpty()) {
             Log.v(LOG_TAG, " "+positionSet.size());
             List imagePathList = new ArrayList();
             for (Integer i : positionSet) {
                 imagePathList.add(sortedImageNameList.get(i));
             }
-            if (imagePathList != null) {
-                String[] imagePathArray = (String[]) imagePathList.toArray(new String[imagePathList.size()]);
-                switch (operationType){
-                    case R.id.item_upload_local:
-                        uploadList(imagePathArray);
-                        break;
-                    case R.id.item_microphone_local:
-                        showVoiceDialog(imagePathArray);
-                        break;
-                    case R.id.item_notes_local:
-                        showNoteDialog(imagePathArray);
-                        break;
-                }
+            String[] imagePathArray = (String[]) imagePathList.toArray(new String[imagePathList.size()]);
+
+            switch (operationType){
+                case R.id.item_upload_local:
+                    uploadList(imagePathArray);
+                    break;
+                case R.id.item_microphone_local:
+                    showVoiceDialog(imagePathArray);
+                    break;
+                case R.id.item_notes_local:
+                    showNoteDialog(imagePathArray);
+                    break;
+                default:
+                    break;
             }
             imagePathList.clear();
 
-        }else if(albumPositionSet.size()!=0){
+        }else if(!albumPositionSet.isEmpty()){
             Toast.makeText(getActivity(),"albums upload",Toast.LENGTH_SHORT).show();
             // upload albums
             ArrayList<String> imagePathListForAlbumTask = new ArrayList<>();
@@ -759,20 +711,21 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
                     imagePathListForAlbumTask.add(imageStrArray[1]);
                 }
             }
-            if (imagePathListForAlbumTask != null) {
-                String[] imagePathArray = (String[]) imagePathListForAlbumTask.toArray(new String[imagePathListForAlbumTask.size()]);
-                switch (operationType){
-                    case R.id.item_upload_local:
-                        uploadList(imagePathArray);
-                        break;
-                    case R.id.item_microphone_local:
-                        showVoiceDialog(imagePathArray);
-                        break;
-                    case R.id.item_notes_local:
-                        showNoteDialog(imagePathArray);
-                        break;
+            String[] imagePathArray = imagePathListForAlbumTask.toArray(new String[imagePathListForAlbumTask.size()]);
+
+            switch (operationType){
+                case R.id.item_upload_local:
+                    uploadList(imagePathArray);
+                    break;
+                case R.id.item_microphone_local:
+                    showVoiceDialog(imagePathArray);
+                    break;
+                case R.id.item_notes_local:
+                    showNoteDialog(imagePathArray);
+                    break;
+                default:
+                    break;
                 }
-            }
             imagePathListForAlbumTask.clear();
         }
     }

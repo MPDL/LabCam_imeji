@@ -50,9 +50,9 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
     private ViewPagerAdapter viewPagerAdapter;
     boolean isLocalImage;
     int positionInList;
-    public Set<Integer> positionSet = new HashSet<>();
+    private Set<Integer> positionSet = new HashSet<>();
     private android.support.v7.view.ActionMode actionMode;
-    android.support.v7.view.ActionMode.Callback ActionModeCallback = this;
+    android.support.v7.view.ActionMode.Callback actionModeCallback = this;
 
     //user info
     private String serverName;
@@ -85,18 +85,6 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
 
             forceRefresh();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_detail, menu);
-        return true;
     }
 
     @Override
@@ -177,7 +165,7 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
 
             positionSet.add(position);
         }
-        if (positionSet.size() == 0) {
+        if (positionSet.isEmpty()) {
 
             actionMode.finish();
         } else {
@@ -190,26 +178,25 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
     }
 
     private void batchOperation(int operationType){
-        if(positionSet.size()!=0) {
-            Log.v(LOG_TAG, " "+positionSet.size());
+        if(!positionSet.isEmpty()) {
             List imagePathList = new ArrayList();
-            //TODO: Question why convert itemPathList to imagePathList
             for (Integer i : positionSet) {
                 imagePathList.add(itemPathList.get(i));
             }
-            if (imagePathList != null) {
-                String[] imagePathArray = (String[]) imagePathList.toArray(new String[imagePathList.size()]);
-                switch (operationType){
-                    case R.id.item_upload_local:
-                        uploadList(imagePathArray);
-                        break;
-                    case R.id.item_microphone_local:
-                        showVoiceDialog(imagePathArray);
-                        break;
-                    case R.id.item_notes_local:
-                        showNoteDialog(imagePathArray);
-                        break;
-                }
+            String[] imagePathArray = (String[]) imagePathList.toArray(new String[imagePathList.size()]);
+
+            switch (operationType){
+                case R.id.item_upload_local:
+                    uploadList(imagePathArray);
+                    break;
+                case R.id.item_microphone_local:
+                    showVoiceDialog(imagePathArray);
+                    break;
+                case R.id.item_notes_local:
+                    showNoteDialog(imagePathArray);
+                    break;
+                default:
+                    break;
             }
             imagePathList.clear();
         }
@@ -259,26 +246,20 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
         Point size = new Point();
         display.getSize(size);
 
-        ViewPagerAdapter.OnLoadMoreDetailListener onLoadMoreDetailListener = new ViewPagerAdapter.OnLoadMoreDetailListener() {
-            @Override
-            public void onLoadMore(int position) {
-                if(completeList==null || completeList.size()==0){
-                    return;
-                }
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        int index = position;
-                        int end = index+3<=completeList.size()?
-                                index+3 : completeList.size();
-
-                        viewPagerAdapter.setDataSet(completeList.subList(0,end));
-                        viewPager.setCurrentItem(index+1);
-                        viewPagerAdapter.setLoaded();
-                    }
-                }, 500);
+        ViewPagerAdapter.OnLoadMoreDetailListener onLoadMoreDetailListener = position -> {
+            if(completeList==null || completeList.isEmpty()){
+                return;
             }
+
+            new Handler().postDelayed(() -> {
+                int index = position;
+                int end = index+3<=completeList.size()?
+                        index+3 : completeList.size();
+
+                viewPagerAdapter.setDataSet(completeList.subList(0,end));
+                viewPager.setCurrentItem(index+1);
+                viewPagerAdapter.setLoaded();
+            }, 500);
         };
 
         viewPagerAdapter = new ViewPagerAdapter(this,size,isLocalImage,itemPathList, onLoadMoreDetailListener, userId, serverName);
@@ -297,7 +278,7 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
                 @Override
                 public void onItemLongClick(View view, int position) {
                     if (actionMode == null) {
-                        actionMode = ((AppCompatActivity) activity).startSupportActionMode(ActionModeCallback);
+                        actionMode = ((AppCompatActivity) activity).startSupportActionMode(actionModeCallback);
                     }
                 }
             });

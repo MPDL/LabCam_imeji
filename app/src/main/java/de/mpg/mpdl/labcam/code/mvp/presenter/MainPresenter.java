@@ -26,6 +26,7 @@ public class MainPresenter extends BaseAbstractPresenter<MainView> {
 
     @Inject
     public MainPresenter() {
+        // required constructor
     }
 
     public void getGrantedCollectionMessage(String q, BaseActivity act){

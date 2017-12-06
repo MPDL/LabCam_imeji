@@ -36,16 +36,16 @@ import me.grantland.widget.AutofitHelper;
 
 public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdapter.AlbumRecyclerViewHolder> {
 
-    private final String LOG_TAG = AlbumRecyclerAdapter.class.getSimpleName();
+    private static final String LOG_TAG = AlbumRecyclerAdapter.class.getSimpleName();
     private Activity activity;
 
     // all albums
     private ArrayList<List<String[]>> galleryList;
-    static ArrayList<String> itemPathList = new ArrayList<String>();
+    static ArrayList<String> itemPathList = new ArrayList<>();
     Point size;
 
     // album positionSet
-    public Set<Integer> albumPositionSet = new HashSet<>();
+    private Set<Integer> albumPositionSet = new HashSet<>();
 
     private OnItemClickListener onItemClickListener;
 
@@ -81,7 +81,7 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
         display.getSize(size);
 
         if (size.x > size.y) {
-            holder.imageView.getLayoutParams().height = size.x / 3;
+            holder.imageView1.getLayoutParams().height = size.x / 3;
         } else {
             holder.itemView.getLayoutParams().height = size.y / 3;
         }
@@ -104,35 +104,35 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
             pixels = (int) (size.x * 2 / 3 + 80 * scale + 0.5f);
         }
 
-        RelativeLayout.LayoutParams re_param = new RelativeLayout.LayoutParams(
+        RelativeLayout.LayoutParams reParam = new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, pixels);
-        re_param.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        holder.cell.setLayoutParams(re_param);
+        reParam.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        holder.cell.setLayoutParams(reParam);
 
-        ViewGroup.LayoutParams li_param = holder.Layout_layer_1.getLayoutParams();
-        li_param.height = size.x / 3;
-        holder.Layout_layer_1.setLayoutParams(li_param);
-        ViewGroup.LayoutParams li_2_param = holder.Layout_layer_2.getLayoutParams();
-        li_2_param.height = size.x / 3;
-        holder.Layout_layer_2.setLayoutParams(li_2_param);
+        ViewGroup.LayoutParams liParam1 = holder.layoutLayer1.getLayoutParams();
+        liParam1.height = size.x / 3;
+        holder.layoutLayer1.setLayoutParams(liParam1);
+        ViewGroup.LayoutParams liParam2 = holder.layoutLayer2.getLayoutParams();
+        liParam2.height = size.x / 3;
+        holder.layoutLayer2.setLayoutParams(liParam2);
 
         // get current album
 
         final List<ImageView> imageViewList = new ArrayList<>();
-        imageViewList.add(holder.imageView);
-        imageViewList.add(holder.imageView_2);
-        imageViewList.add(holder.imageView_3);
-        imageViewList.add(holder.imageView_4);
-        imageViewList.add(holder.imageView_5);
-        imageViewList.add(holder.imageView_6);
+        imageViewList.add(holder.imageView1);
+        imageViewList.add(holder.imageView2);
+        imageViewList.add(holder.imageView3);
+        imageViewList.add(holder.imageView4);
+        imageViewList.add(holder.imageView5);
+        imageViewList.add(holder.imageView6);
 
         List<TextView> textViewList = new ArrayList<>();
-        textViewList.add(holder.textView_num_1);
-        textViewList.add(holder.textView_num_2);
-        textViewList.add(holder.textView_num_3);
-        textViewList.add(holder.textView_num_4);
-        textViewList.add(holder.textView_num_5);
-        textViewList.add(holder.textView_num_6);
+        textViewList.add(holder.textView1);
+        textViewList.add(holder.textView2);
+        textViewList.add(holder.textView3);
+        textViewList.add(holder.textView4);
+        textViewList.add(holder.textView5);
+        textViewList.add(holder.textView6);
 
         // first set everything invisible
         for (int i = 0; i <6 ; i++ ){
@@ -166,7 +166,7 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
                     public void onClick(View view) {
                         // go to photo detail
                         boolean isLocalImage = true;
-                        int image_position = 0;
+                        int imagePosition = 0;
                         Intent showDetailIntent = new Intent(activity, DetailActivity.class);
                         itemPathList.clear();
                         for (String[] imageStr : gallery) {
@@ -175,25 +175,27 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
 
                         switch (view.getId()){
                             case R.id.album_pic_1:
-                                image_position = 0;
+                                imagePosition = 0;
                                 break;
                             case R.id.album_pic_2:
-                                image_position = 1;
+                                imagePosition = 1;
                                 break;
                             case R.id.album_pic_3:
-                                image_position = 2;
+                                imagePosition = 2;
                                 break;
                             case R.id.album_pic_4:
-                                image_position = 3;
+                                imagePosition = 3;
                                 break;
                             case R.id.album_pic_5:
-                                image_position = 4;
+                                imagePosition = 4;
+                                break;
+                            default:
                                 break;
                         }
 
                         showDetailIntent.putStringArrayListExtra("itemPathList", itemPathList);
                         Log.e(LOG_TAG, itemPathList.size()+"");
-                        showDetailIntent.putExtra("positionInList",image_position);
+                        showDetailIntent.putExtra("positionInList",imagePosition);
                         showDetailIntent.putExtra("isLocalImage", isLocalImage);
                         activity.startActivity(showDetailIntent);
                     }
@@ -219,7 +221,7 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
         }
 
 
-        if (gallery.size() > 0) {
+        if (!gallery.isEmpty()) {
             holder.title.setText(gallery.get(0)[0]);
             holder.title.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -264,57 +266,50 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
 
     public static class AlbumRecyclerViewHolder extends RecyclerView.ViewHolder {
 
-        protected ImageView imageView;
-        protected ImageView imageView_2;
-        protected ImageView imageView_3;
-        protected ImageView imageView_4;
-        protected ImageView imageView_5;
-        protected ImageView imageView_6;
+        protected ImageView imageView1;
+        protected ImageView imageView2;
+        protected ImageView imageView3;
+        protected ImageView imageView4;
+        protected ImageView imageView5;
+        protected ImageView imageView6;
 
-        protected TextView textView_num_1;
-        protected TextView textView_num_2;
-        protected TextView textView_num_3;
-        protected TextView textView_num_4;
-        protected TextView textView_num_5;
-        protected TextView textView_num_6;
+        protected TextView textView1;
+        protected TextView textView2;
+        protected TextView textView3;
+        protected TextView textView4;
+        protected TextView textView5;
+        protected TextView textView6;
 
         protected RelativeLayout cell;
-        protected LinearLayout Layout_layer_1;
-        protected LinearLayout Layout_layer_2;
-
+        protected LinearLayout layoutLayer1;
+        protected LinearLayout layoutLayer2;
 
         protected ImageView checkMark;
-        //        protected TextView number;
         protected TextView title;
-//        protected TextView date;
 
 
         public AlbumRecyclerViewHolder(View itemView) {
             super(itemView);
             cell = (RelativeLayout) itemView.findViewById(R.id.relOne);
-            Layout_layer_1 = (LinearLayout) itemView.findViewById(R.id.layout_first_layer_text);
-            Layout_layer_2 = (LinearLayout) itemView.findViewById(R.id.layout_second_layer_text);
+            layoutLayer1 = (LinearLayout) itemView.findViewById(R.id.layout_first_layer_text);
+            layoutLayer2 = (LinearLayout) itemView.findViewById(R.id.layout_second_layer_text);
 
-            imageView = (ImageView) itemView.findViewById(R.id.album_pic_1);
-            imageView_2 = (ImageView) itemView.findViewById(R.id.album_pic_2);
-            imageView_3 = (ImageView) itemView.findViewById(R.id.album_pic_3);
-            imageView_4 = (ImageView) itemView.findViewById(R.id.album_pic_4);
-            imageView_5 = (ImageView) itemView.findViewById(R.id.album_pic_5);
-            imageView_6 = (ImageView) itemView.findViewById(R.id.album_pic_6);
+            imageView1 = (ImageView) itemView.findViewById(R.id.album_pic_1);
+            imageView2 = (ImageView) itemView.findViewById(R.id.album_pic_2);
+            imageView3 = (ImageView) itemView.findViewById(R.id.album_pic_3);
+            imageView4 = (ImageView) itemView.findViewById(R.id.album_pic_4);
+            imageView5 = (ImageView) itemView.findViewById(R.id.album_pic_5);
+            imageView6 = (ImageView) itemView.findViewById(R.id.album_pic_6);
 
-            textView_num_1 = (TextView) itemView.findViewById(R.id.album_tv_1);
-            textView_num_2 = (TextView) itemView.findViewById(R.id.album_tv_2);
-            textView_num_3 = (TextView) itemView.findViewById(R.id.album_tv_3);
-            textView_num_4 = (TextView) itemView.findViewById(R.id.album_tv_4);
-            textView_num_5 = (TextView) itemView.findViewById(R.id.album_tv_5);
-            textView_num_6 = (TextView) itemView.findViewById(R.id.album_tv_6);
+            textView1 = (TextView) itemView.findViewById(R.id.album_tv_1);
+            textView2 = (TextView) itemView.findViewById(R.id.album_tv_2);
+            textView3 = (TextView) itemView.findViewById(R.id.album_tv_3);
+            textView4 = (TextView) itemView.findViewById(R.id.album_tv_4);
+            textView5 = (TextView) itemView.findViewById(R.id.album_tv_5);
+            textView6 = (TextView) itemView.findViewById(R.id.album_tv_6);
 
             checkMark = (ImageView) itemView.findViewById(R.id.album_check_mark);
-//            number = (TextView) itemView.findViewById(R.id.list_item_num);
             title = (TextView) itemView.findViewById(R.id.tv_album_title);
-//            date = (TextView) itemView.findViewById(R.id.list_item_date);
-
-
         }
     }
 
@@ -332,10 +327,9 @@ public class AlbumRecyclerAdapter extends RecyclerView.Adapter<AlbumRecyclerAdap
     private String getAlbumPath(String str) {
         if(null!=str&&str.length()>0)
         {
-            int endIndex = str.lastIndexOf("/");
+            int endIndex = str.lastIndexOf('/');
             if (endIndex != -1) {
-                String newstr = str.substring(0, endIndex); // not forgot to put check if(endIndex != -1)
-                return newstr;
+                return str.substring(0, endIndex);
             }else return null;
         }else return null;
 

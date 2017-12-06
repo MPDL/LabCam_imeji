@@ -23,16 +23,14 @@ public class SectionedGridRecyclerViewAdapter extends RecyclerView.Adapter<Recyc
     private boolean mValid = true;
     private int mSectionResourceId;
     private int mTextResourceId;
-    private LayoutInflater mLayoutInflater;
     private RecyclerView.Adapter mBaseAdapter;
-    private SparseArray<Section> mSections = new SparseArray<Section>();
+    private SparseArray<Section> mSections = new SparseArray<>();
     private RecyclerView mRecyclerView;
 
 
     public SectionedGridRecyclerViewAdapter(Context context, int sectionResourceId, int textResourceId,RecyclerView recyclerView,
                                             RecyclerView.Adapter baseAdapter) {
 
-        mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mSectionResourceId = sectionResourceId;
         mTextResourceId = textResourceId;
         mBaseAdapter = baseAdapter;

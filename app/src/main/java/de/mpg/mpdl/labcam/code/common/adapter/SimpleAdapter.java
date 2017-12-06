@@ -30,7 +30,7 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.SimpleView
     private String userId;
     private String serverName;
 
-    public Set<Integer> positionSet = new HashSet<>();
+    private Set<Integer> positionSet = new HashSet<>();
 
     private OnItemClickListener onItemClickListener;
 
