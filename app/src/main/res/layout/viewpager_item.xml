@@ -113,7 +113,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/btn_pause_voice"
                 android:background="@drawable/voice_pause_white"
-                android:layout_alignParentBottom="true"/>
+                android:layout_alignParentBottom="true"
+                android:visibility="gone"/>
 
 
             <ImageButton
@@ -130,7 +131,8 @@
                 android:id="@+id/btn_reset_voice"
                 android:background="@drawable/voice_stop_white"
                 android:layout_toRightOf="@+id/btn_rewind_voice"
-                android:layout_alignParentBottom="true"/>
+                android:layout_alignParentBottom="true"
+                android:visibility="gone"/>
 
             <ImageButton
                 android:layout_width="wrap_content"

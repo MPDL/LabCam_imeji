@@ -289,32 +289,47 @@ public class ViewPagerAdapter extends PagerAdapter {
         final ImageButton deleteButton = (ImageButton) itemView.findViewById(R.id.btn_delete_voice);
         final ImageButton resetButton = (ImageButton) itemView.findViewById(R.id.btn_reset_voice);
 
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                pauseButton.setEnabled(true);
+                pauseButton.setVisibility(View.GONE);
+                rewindButton.setEnabled(true);
+                rewindButton.setVisibility(View.VISIBLE);
+                resetButton.setVisibility(View.GONE);
+            }
+        });
+
         pauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtils.showLongMessage(context, "Pausing sound");
                 mediaPlayer.pause();
 
                 pauseButton.setEnabled(false);
+                pauseButton.setVisibility(View.GONE);
                 rewindButton.setEnabled(true);
+                rewindButton.setVisibility(View.VISIBLE);
+                resetButton.setVisibility(View.VISIBLE);
             }
         });
 
         rewindButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtils.showLongMessage(context, "Playing sound");
                 mediaPlayer.start();
 
                 pauseButton.setEnabled(true);
+                pauseButton.setVisibility(View.VISIBLE);
                 rewindButton.setEnabled(false);
+                rewindButton.setVisibility(View.GONE);
+                resetButton.setVisibility(View.VISIBLE);
             }
         });
 
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtils.showLongMessage(context, "Reseting sound");
+                ToastUtils.showShortMessage(context, "Reseting sound");
                 try {
                     mediaPlayer.reset();
                     mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName).getVoicePath());
@@ -325,7 +340,10 @@ public class ViewPagerAdapter extends PagerAdapter {
                 }
 
                 pauseButton.setEnabled(true);
+                pauseButton.setVisibility(View.GONE);
                 rewindButton.setEnabled(true);
+                rewindButton.setVisibility(View.VISIBLE);
+                resetButton.setVisibility(View.GONE);
             }
         });
 
