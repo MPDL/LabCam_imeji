@@ -98,14 +98,8 @@ public class MicrophoneDialogFragment extends DialogFragment{
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 // save note
-                                Log.d("LY", "save clicked");
-                                if(fileFullName==null)
-                                {
-                                    return;
-                                }
-
+                                if(fileFullName==null) return;
                                 List<Image> selectedImageList = BatchOperationUtils.addImages(imagePathArray, null, userId, serverName);  // init images in db
-
                                 DBConnector.batchEditVoice(selectedImageList, fileFullName, userId, serverName);
 
                                 VoiceRefreshEvent voiceRefreshEvent = new VoiceRefreshEvent(imagePathArray[imagePathArray.length-1]);

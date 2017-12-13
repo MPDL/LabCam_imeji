@@ -678,7 +678,6 @@ public class LocalFragment extends Fragment implements android.support.v7.view.A
 
     private void batchOperation(int operationType){
         if(!positionSet.isEmpty()) {
-            Log.v(LOG_TAG, " "+positionSet.size());
             List imagePathList = new ArrayList();
             for (Integer i : positionSet) {
                 imagePathList.add(sortedImageNameList.get(i));

@@ -47,41 +47,43 @@
             android:visibility="gone">
 
             <!--notes-->
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="40dp"
                 android:id="@+id/layout_edit_note_button"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
                 android:background="@color/white_shadow"
+                android:layout_marginBottom="16dp"
                 android:visibility="gone">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="48dp"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:layout_gravity="center"
+                    android:gravity="center"
                     android:text="CANCEL"
                     android:id="@+id/tv_cancel_edit_note"
                     android:textColor="@color/primary"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="48dp"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
                     android:layout_alignParentRight="true"
+                    android:gravity="center"
                     android:text="SAVE"
                     android:id="@+id/tv_save_edit_note"
                     android:textColor="@color/primary"/>
 
-            </RelativeLayout>
+            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_notes_detail"
-                android:minLines="3"
+                android:minLines="2"
                 android:textColor="@color/white"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="52dp"
                 android:layout_below="@id/layout_edit_note_button"
                 android:visibility="gone"/>
 
@@ -89,9 +91,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/et_notes_detail"
-                android:minLines="3"
+                android:minLines="2"
                 android:textColor="@color/white"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="52dp"
                 android:visibility="gone"/>
 
 

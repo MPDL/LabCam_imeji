@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -34,6 +35,7 @@ import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
 import de.mpg.mpdl.labcam.code.module.glide.ImageLoader;
 import de.mpg.mpdl.labcam.code.rxbus.RxBus;
 import de.mpg.mpdl.labcam.code.rxbus.event.VoiceRefreshEvent;
+import de.mpg.mpdl.labcam.code.utils.KeyboardUtils;
 import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 
 /**
@@ -41,6 +43,7 @@ import de.mpg.mpdl.labcam.code.utils.ToastUtils;
  */
 public class ViewPagerAdapter extends PagerAdapter {
 
+    private static final String TAG = ViewPagerAdapter.class.getSimpleName();
     Context context;
     LayoutInflater inflater;
     Point size;
@@ -217,7 +220,7 @@ public class ViewPagerAdapter extends PagerAdapter {
     }
 
     private void initNotePanel(View itemView, final Image image){
-        final RelativeLayout editNoteButtonLayout = (RelativeLayout) itemView.findViewById(R.id.layout_edit_note_button);
+        final LinearLayout editNoteButtonLayout = (LinearLayout) itemView.findViewById(R.id.layout_edit_note_button);
         final TextView noteTextView = (TextView) itemView.findViewById(R.id.tv_notes_detail);
         final EditText noteEditText = (EditText) itemView.findViewById(R.id.et_notes_detail);
         final TextView cancelTextView = (TextView) itemView.findViewById(R.id.tv_cancel_edit_note);
@@ -231,8 +234,10 @@ public class ViewPagerAdapter extends PagerAdapter {
         cancelTextView.setOnClickListener(new View.OnClickListener() {  //
             @Override
             public void onClick(View v) {
-                // do nothing
-                ((Activity)context).finish();
+                KeyboardUtils.hideKeyboard(v);
+                editNoteButtonLayout.setVisibility(View.GONE);
+                noteEditText.setVisibility(View.GONE);
+                noteTextView.setVisibility(View.VISIBLE);
             }
         });
 
@@ -243,7 +248,7 @@ public class ViewPagerAdapter extends PagerAdapter {
                 selectedImageList.add(image);
 
                 DBConnector.batchEditNote(selectedImageList, String.valueOf(noteEditText.getText()), userId, serverName);
-
+                KeyboardUtils.hideKeyboard(v);
                 editNoteButtonLayout.setVisibility(View.GONE);
                 noteEditText.setVisibility(View.GONE);
 
@@ -275,7 +280,7 @@ public class ViewPagerAdapter extends PagerAdapter {
             mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName).getVoicePath());
             mediaPlayer.prepare();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "IOException", e);
             return;
         }
 
@@ -315,7 +320,7 @@ public class ViewPagerAdapter extends PagerAdapter {
                     mediaPlayer.setDataSource(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName).getVoicePath());
                     mediaPlayer.prepare();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "IOException", e);
                     return;
                 }
 
