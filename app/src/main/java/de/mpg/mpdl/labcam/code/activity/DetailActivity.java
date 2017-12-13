@@ -134,8 +134,6 @@ public class DetailActivity extends BaseCompatActivity implements android.suppor
         viewPagerAdapter.notifyDataSetChanged();
     }
 
-
-
     /**upload methods**/
      /*
             upload the selected files

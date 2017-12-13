@@ -7,6 +7,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -326,9 +327,18 @@ public class ViewPagerAdapter extends PagerAdapter {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtils.showLongMessage(context, "Deleting sound");
-                voicePanelLayout.setVisibility(View.GONE);
-                deleteVoice(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName), position, image.getId());
+                new AlertDialog.Builder(context)
+                        .setTitle("Delete")
+                        .setMessage("Do you want to delete this voice note?")
+                        .setPositiveButton("Yes", (dialogInterface, i) -> {
+                            ToastUtils.showLongMessage(context, "Voice note deleted");
+                            voicePanelLayout.setVisibility(View.GONE);
+                            deleteVoice(DBConnector.getVoiceById(image.getVoiceId(), userId, serverName), position, image.getId());
+                        })
+                        .setNegativeButton("Cancel", (dialogInterface, i) -> {
+                            // do nothing
+                        })
+                        .show();
             }
         });
     }

@@ -3,6 +3,8 @@ package de.mpg.mpdl.labcam.code.common.adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 
 public class RecentVoiceAdapter extends BaseAdapter {
 
+    private static final String TAG = BaseAdapter.class.getSimpleName();
     private LayoutInflater inflater;
 
     private Activity activity;
@@ -81,7 +84,7 @@ public class RecentVoiceAdapter extends BaseAdapter {
             mediaPlayer.setDataSource(voice.getVoicePath());
             mediaPlayer.prepare();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "IOException", e);
             return;
         }
         TextView createTimeTextView = (TextView) itemView.findViewById(R.id.voice_list_cell_text);
@@ -122,7 +125,7 @@ public class RecentVoiceAdapter extends BaseAdapter {
                     mediaPlayer.setDataSource(voice.getVoicePath());
                     mediaPlayer.prepare();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "IOException", e);
                     return;
                 }
 
@@ -134,8 +137,17 @@ public class RecentVoiceAdapter extends BaseAdapter {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ToastUtils.showLongMessage(activity, "Deleting sound");
-                deleteVoice(voice);
+                new AlertDialog.Builder(activity)
+                        .setTitle("Delete")
+                        .setMessage("Do you want to delete this voice note?")
+                        .setPositiveButton("Yes", (dialogInterface, i) -> {
+                            ToastUtils.showLongMessage(activity, "Voice note deleted");
+                            deleteVoice(voice);
+                        })
+                        .setNegativeButton("Cancel", (dialogInterface, i) -> {
+                            // do nothing
+                        })
+                        .show();
             }
         });
     }

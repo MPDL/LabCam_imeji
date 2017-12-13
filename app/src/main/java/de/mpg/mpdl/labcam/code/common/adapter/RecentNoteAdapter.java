@@ -2,6 +2,7 @@ package de.mpg.mpdl.labcam.code.common.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import de.mpg.mpdl.labcam.Model.LocalModel.Image;
 import de.mpg.mpdl.labcam.Model.LocalModel.Note;
 import de.mpg.mpdl.labcam.R;
 import de.mpg.mpdl.labcam.code.common.widget.DBConnector;
+import de.mpg.mpdl.labcam.code.utils.ToastUtils;
 
 /**
  * Created by Yunqing on 19.12.16.
@@ -79,7 +81,17 @@ public class RecentNoteAdapter extends BaseAdapter {
         deleteNoteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteNote(noteList.get(i));
+                new AlertDialog.Builder(activity)
+                        .setTitle("Delete")
+                        .setMessage("Do you want to delete this text note?")
+                        .setPositiveButton("Yes", (dialogInterface, listener) -> {
+                            ToastUtils.showLongMessage(activity, "Text note deleted");
+                            deleteNote(noteList.get(i));
+                        })
+                        .setNegativeButton("Cancel", (dialogInterface, listener) -> {
+                            // do nothing
+                        })
+                        .show();
             }
         });
 
